@@ -21,4 +21,4 @@ III. Main Object Descriptions
   d. Requirement
   e. Schedule
 IV. GUI Description
-V. Optimization.
+V. Optimization
