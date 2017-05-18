@@ -13,6 +13,7 @@ import java.util.Scanner;
  */
 
 public class CourseList {
+	private static final String String = null;
 	private static ArrayList<Course> CourseList = new ArrayList<Course>();
 	
 	public CourseList (String fname) throws FileNotFoundException{
@@ -45,13 +46,22 @@ public static Course removeAtIndex(int i){
 public  ArrayList<Course> getSemester(int s){//Would this be an integer with two parts, a semester object, a time object?
     ArrayList<Course> SemesterList = new ArrayList<Course>();
 	for(Course course : CourseList){
-		if (course.getSemester()==s){//If this was a time object change == to .equals s 
+		if ( course.getSemester()==s){//If this was a time object change == to .equals s 
 			SemesterList.add(course);
 		}
 	
 }
 	return SemesterList;
 }
-
+public  ArrayList<Course> getGER(Requirement r){//Would this be an integer with two parts, a semester object, a time object?
+    ArrayList<Course> GERList = new ArrayList<Course>();
+	for(Course course : CourseList){
+		if (r.getRequirement(course)){//If this was a time object change == to .equals s 
+			GERList.add(course);
+		}
+	
+}
+	return GERList;
+}
 
 }
