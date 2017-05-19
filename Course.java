@@ -7,8 +7,7 @@ package scheduler;
 
 public class Course {
 	
-	
-	private class Prefix{
+	public class Prefix{
 	 private int ClassNumber;
 	 private String MajorPrefix;
 	 
@@ -19,7 +18,7 @@ public class Course {
  * @param m Major Prefix MTH
  */
 
-	public Prefix( int c, int s, String m){
+	public Prefix( int c, String m){
 		ClassNumber=c;
 		MajorPrefix=m;
 	}
@@ -38,7 +37,7 @@ public class Course {
 
 	}
 	
-	private int CreditHours;
+	private int CreditHours; 
 	private Prefix CoursePrefix;
 	
 /**	
