@@ -13,7 +13,7 @@ import java.util.Scanner;
  */
 
 public class CourseList {
-	private static final String String = null;
+	
 	private static ArrayList<Course> CourseList = new ArrayList<Course>();
 	
 	public CourseList (String fname) throws FileNotFoundException{
@@ -43,20 +43,20 @@ public static Course removeAtIndex(int i){
 	return c;
 	
 }
-public  ArrayList<Course> getSemester(int s){//Would this be an integer with two parts, a semester object, a time object?
+public  ArrayList<Course> getCoursesIn(Semester s){//I think we should go with a semester object, it seems simpler to me than using ints.
     ArrayList<Course> SemesterList = new ArrayList<Course>();
 	for(Course course : CourseList){
-		if ( course.getSemester()==s){//If this was a time object change == to .equals s 
+		if ( course.getSemester().equals(s)){
 			SemesterList.add(course);
 		}
 	
 }
 	return SemesterList;
 }
-public  ArrayList<Course> getGER(Requirement r){//Would this be an integer with two parts, a semester object, a time object?
+public  ArrayList<Course> getCoursesSatisfying(Requirement r){
     ArrayList<Course> GERList = new ArrayList<Course>();
 	for(Course course : CourseList){
-		if (r.getRequirement(course)){//If this was a time object change == to .equals s 
+		if (r.isSatisfiedBy(course)){//If this was a time object change == to .equals s 
 			GERList.add(course);
 		}
 	
