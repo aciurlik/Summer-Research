@@ -9,7 +9,8 @@ I. Introduction
     Easy to mofidy a schedule
     Manual override for special circumstances
       Handle classes taken through abnormal means 
-        both past and future
+        both past (I don't need to satisfy that requirement) 
+          and future (I will be able to take that even though you think I won't)
         what if a class taken abnormally was a prerequsite for another class?
       Variable strength of a warning, harder to override some things
     Present as many options as possible
@@ -22,45 +23,38 @@ I. Introduction
     Allow the user to focus on future semesters
     Display remaining course requirements easily
     Easily find classes satisfying a requirement
-    Should be able to specify a spot as "any GER", "any TA," "HST 141," or "HST 141-02".
-II. Backround
+    Should be able to specify a spot in a schedule as "any GER", "any TA," "HST 141," or "HST 141-02"
+      different levels of generality.
+II. Background
 III. Main Object Descriptions
-  a. Course
-    A course that can be taken.
+  a. Course (extends Prefix)
+    An offered course that can be taken.
+    Any of the fields other than prefix, sectionNumber, and semester may be unspecified (null).
     Main Constructors:
-      Course(String) - read the course information from one line of a file
-      Course(prefix, courseTime, professor, 
+      Course(String line) - read the course information from one line of a file
+      Course(Prefix prefix, Semester semester, String professor, int[] meetingDays, Time labTime, Time examTime, Prefix[] prerequsites)
     Fields:
+      Prefix prefix - the subject and number. Also contains information about prerequsites
+      int sectionNumber
+      Semester semester
       
-      The following fields may be replaced by Prefix:
-      subject - i.e., MTH
-      number - i.e., the 220 in MTH 220.
-      prefix - the subject and number
-      
-      sectionNumber
-      
-      The following fields may be replaced by courseTime in the future:
-      semester
-      year
-      meetingDays
-      labs
-      examTime
-      courseTime - specifies all meeting times (including weekly meetings, labs, exams, ...) and used to check for overlap.
-      
-      professor - the professor(s) teaching the course
-      prerequsites - the courses that are prerequsites to this course
+      int[] meetingDays - specified using the constants in the Time class, SUNDAY = 0
+      Time labTime
+      Time examTime
+      String professor - the professor(s) teaching the course
       Other fields - (What else is there again?)
     Methods:
       overlaps(Course other) - returns true if this course and the other course are offered at the same time.
-      
-   i. Any subclasses i.e. prefix 
-     CourseTime
-       a class for keeping track of which times are reserved by a course. This class tests to see
-       if two courses overlap.
+      displayString() - return the string that would be displayed to represent this course in a dropdown bar in the SchedulePanel
+   i. Any superclasses or subclasses i.e. prefix 
      Prefix
-       a class for keeping track of subject and number of a course.
+       a class for keeping track of subject, number, and prerequsites of a course.
+       Fields:
+       String subject - for example, "MTH"
+       int number - for example, "220"
+       Prefix[] prerequsites
   b. CourseList
-    Main Constructor: Reads in a file and creates courses and adds them to an ArrayList
+    Main Constructor: Reads in a file of all courses known to be offered (describe what you're doing rather than how.)
     Methods:
       add(Course c) - adds course to the end of the CourseList
       addAt(Course c, int i)-adds course to a specified location in CourseList
@@ -70,8 +64,41 @@ III. Main Object Descriptions
       getGER(String[]) goes through courseList and copies courses that forfill that given GER
   
   c. Major
+    A fixed collection of requirements
+    Main Constructors:
+      Major(String lines) - read a saved major in from the lines of a file
+        this may be replaced by Major(String fileName)
+    Fields:
+      String Name - the name of the major, for example "Applied Mathematics"
+      ArrayList<Requirement> requirements
+    Methods:
+      getRequirements()
+      
   d. Requirement
+    A requirement for courses necessary to a major, minor, GER, or other.
+    Fields:
+      int numberNeeded - if this is a "pick 2" or "pick 3 of" requirement, numberNeeded specifies how many. Otherwise, numberNeeded is 1.
+      ArrayList<Prefix> satisfiers - the prefixes of the courses that can satisfy this requirement
+      boolean[] taken - keeps track of which of the satisfiers have actually been taken
+    Methods:
+      isSatisfiedBy(Prefix) - check if satisfiers contains this prefix
+      clearTaken() - set all the values in the taken array to false
+      took(Prefix) - set the correct value in the taken array. If Prefix is not in satisfiers, do nothing.
+
+      
   e. Schedule
+    A list of available semesters with courses, prefixes, or requirements in those semesters. 
+    Methods:
+      CheckSatisfied(ArrayList<Requirement> reqs) - figure out which of these requirements are satisfied by this schedule
+        be careful about the order in which you do this - if you took MTH360, and you have a requirement for
+        360 or 460, we don't want to claim that 360 is satisfying one of your electives requirements, we want it to satisfy
+        the 360/460 requirement.
+      CheckOverlap() - check if any of the courses in the schedule overlap
+      CheckDuplicates() - check if any of the courses are duplicates
+      add(Course course, Semester semester)
+      add(Prefix prefix, Semester semester) - this should also check if any courses fitting that prefix are offered that semester
+      add(Requirement r, Semester semester) - this should also check if any courses fitting that requirement are offered tha semester
+      
   
 IV. GUI Description
 V. Optimization
