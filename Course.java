@@ -1,6 +1,7 @@
 public class Course {
 
 	
+ 
 	protected int creditHours;
 	protected Prefix coursePrefix;
 	protected int sectionNumber;
@@ -29,6 +30,9 @@ public class Course {
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
+
+
+
 	}
 
 	
@@ -41,9 +45,12 @@ public class Course {
 		return creditHours;
 	}
 	
+
 	public Semester getSemester() {
 		return this.semester;
 	}
+
+
 	
 	
 	public String meetingDaysCode(){
