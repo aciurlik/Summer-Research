@@ -8,13 +8,13 @@
  * @author dannyrivers
  *
  */
-public class Interval<T> implements Comparable<Interval<T>>{
-	Time startTime;
-	Time endTime;
+public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>>{
+	T start;
+	T end;
 	
-	public Interval(Time startTime, Time endTime){
-		this.startTime = startTime;
-		this.endTime = endTime;
+	public Interval(T start, T end){
+		this.start = start;
+		this.end = end;
 	}
 	
 	public boolean overlaps(Interval<T> other){
@@ -26,11 +26,11 @@ public class Interval<T> implements Comparable<Interval<T>>{
 		
 		//thisStartTime is after otherStartTime, 
 		// so we are to the right of the fixed other
-		if(this.startTime.compareTo(other.startTime) >= 0){
+		if(this.start.compareTo(other.start) >= 0){
 			//if otherEndTime is to the right of thisStartTime
 			// then there is overlap.
 			//Otherwise, overlap is impossible.
-			if(other.endTime.compareTo(this.startTime) >= 0){
+			if(other.end.compareTo(this.start) >= 0){
 				return true;
 			}
 			else{
@@ -43,7 +43,7 @@ public class Interval<T> implements Comparable<Interval<T>>{
 			//if thisEndTime is to the right of otherStartTime, 
 			// then there is overlap.
 			//Otherwise, overlap is impossible.
-			if(this.endTime.compareTo(other.startTime) >= 0){
+			if(this.end.compareTo(other.start) >= 0){
 				return true;
 			}
 			else{
@@ -62,10 +62,10 @@ public class Interval<T> implements Comparable<Interval<T>>{
 	 *   end times first.
 	 */
 	@Override
-	public int compareTo(Interval o) {
-		int first = this.startTime.compareTo(o.startTime);
+	public int compareTo(Interval<T> o) {
+		int first = this.start.compareTo(o.start);
 		if(first == 0){
-			return this.endTime.compareTo(o.endTime);
+			return this.end.compareTo(o.end);
 		}
 		else{
 			return first;
@@ -81,6 +81,10 @@ public class Interval<T> implements Comparable<Interval<T>>{
 		Interval<Time> t = new Interval<Time>(t2, t4);
 		Interval<Time> v = new Interval<Time>(t1, t1);
 		System.out.println(v.overlaps(t));
+	}
+	
+	public String toString(){
+		return String.format("[%s,%s]", start.toString(), end.toString());
 	}
 	
 
