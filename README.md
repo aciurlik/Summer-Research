@@ -32,10 +32,13 @@ III. Main Object Descriptions
     Any of the fields other than prefix, sectionNumber, and semester may be unspecified (null).
     Main Constructors:
       Course(String line) - read the course information from one line of a file
-      Course(Prefix prefix, Semester semester, String professor, int[] meetingDays, Time labTime, Time examTime, Prefix[] prerequsites)
+      Course(Prefix prefix, Semester semester, String professor, int[] meetingDays, 
+          Time labTime, Time examTime, int creditHours)
     Fields:
-      Prefix prefix - the subject and number. Also contains information about prerequsites
+      Prefix prefix - the subject and number
+        //To find prerequsites, use CourseList.getPrereqs(prefix)
       int sectionNumber
+      int creditHours
       Semester semester
       
       int[] meetingDays - specified using the constants in the Time class, SUNDAY = 0
@@ -54,7 +57,13 @@ III. Main Object Descriptions
        int number - for example, "220"
        Prefix[] prerequsites
   b. CourseList
+    Keeps track of all offered courses.
+    Also keeps track of course prefixes and their prerequsites - ensures that you don't have two prefixes with the same number
+      and subject but different prerequsites.
     Main Constructor: Reads in a file of all courses known to be offered (describe what you're doing rather than how.)
+    Fields:
+      courseList
+      prefixPrerequsites - stores any prerequsites for a prefix
     Methods:
       add(Course c) - adds course to the end of the CourseList
       addAt(Course c, int i)-adds course to a specified location in CourseList
@@ -62,6 +71,8 @@ III. Main Object Descriptions
       removeAtIndex(removes the course and specified index, returns that course)
       getSemester(int s)-goes through courseList and copies courses that are in given semster
       getGER(String[]) goes through courseList and copies courses that forfill that given GER
+      setPrerequsites(Prefix p, Prefix[] prereqs) - update prefixPrerequeistes so future calls to getPrerqs will be accurate.
+      getPrereqs(Prefix p) - find the prerequsites for this prefix
   
   c. Major
     A fixed collection of requirements
@@ -101,4 +112,8 @@ III. Main Object Descriptions
       
   
 IV. GUI Description
+  The main window of the GUI is used to create a schedule based on requirements
+  There is an area for viewing the current schedule, an area for viewing requirements left to satisfy, and an area for 
+    additional functions (adding a major/minor, declaring a semester for study away, so on)
+  
 V. Optimization
