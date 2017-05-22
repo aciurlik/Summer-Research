@@ -14,6 +14,8 @@ public class Time implements Comparable<Time>{
 	public static final int FRIDAY = 5;
 	public static final int SATURDAY = 6;
 	
+	public static final String[] daysConversion = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+	
 	int day; //(1) thru (numDays)
 	int month; // 1 thru 12
 	int year; // regular year, as in 2017 right now.
@@ -64,17 +66,54 @@ public class Time implements Comparable<Time>{
 	}
 	
 	/**
+	 * Assumes military time for hours
+	 * @param hours
+	 * @param minutes
+	 * @param seconds
+	 */
+	public Time(int hours, int minutes, int seconds){
+		this(2000, 1, 1, hours, minutes, seconds);
+	}
+	/**
+	 * Uses normal hours, so 2:30 PM is 
+	 *   hours = 2, AM = false, minutes = 30, seconds  = 0.
+	 * @param hours
+	 * @param AM
+	 * @param minutes
+	 * @param seconds
+	 */
+	public Time(int hours, boolean AM,  int minutes, int seconds ){
+		this(2000, 1, 1, Time.toMilitary(hours, AM), minutes, seconds);
+	}
+	
+	
+	
+	
+	public static int toMilitary(int hours, boolean AM){
+		if(hours == 12 ){
+			if(AM) return 0;
+			return 12;
+		}
+		if(AM){
+			return hours;
+		}
+		return hours + 12;
+	}
+	
+	
+	/**
 	 * Return a new time that is the specified number
 	 * of minutes after this time.
 	 * @param minutes
 	 * @return
 	 */
 	public Time addMinutes(int minutes){
+		Time next = new Time(this);
 		int totalMinutes = this.minutes + minutes;
-		this.minutes = totalMinutes % 60;
+		next.minutes = totalMinutes % 60;
 		int totalHours = this.hours + totalMinutes / 60;
-		this.hours = totalHours % 24;
-		return this.addDays(totalHours / 24);
+		next.hours = totalHours % 24;
+		return next.addDays(totalHours / 24);
 	}
 	public Time addDays(int days){
 		Time t = new Time(this);
@@ -107,6 +146,14 @@ public class Time implements Comparable<Time>{
 		return new Time(this.year + years, this.month, 
 				this.day, this.hours, this.minutes, this.seconds);
 	}
+	public void setYear(int year){
+		this.year = year;
+	}
+	public void setMonth(int month){
+		if(month > 12 || month < 1){
+			throw new RuntimeException(month + "is an invalid month");
+		}
+	}
 	
 	public int dayOfWeek(){
 		//jan 1 2000 was a saturday = 6
@@ -116,6 +163,25 @@ public class Time implements Comparable<Time>{
 		}
 		return result;
 	}
+	/**
+	 * Given an integer day of week, return the normal name of that day.
+	 * For example, given 0 return "Sunday."
+	 * @param dayOfWeek
+	 * @return
+	 */
+	public String toText(int dayOfWeek){
+		return daysConversion[dayOfWeek];
+	}
+	public void advanceToNext(int dayOfWeek){
+		if(dayOfWeek / 7 != 0){
+			throw new RuntimeException("day " + dayOfWeek + " isn't a day of the week");
+		}
+		while(this.dayOfWeek() != dayOfWeek){
+			this.nextDay();
+		}
+	}
+	
+	
 	
 	/**
 	 * Find the number of days that have passed 
@@ -188,6 +254,9 @@ public class Time implements Comparable<Time>{
 		return totalSec;
 				
 	}
+	public String clockTime(){
+		return this.hours + ":" + this.minutes;
+	}
 	@Override
 	public int compareTo(Time that) {
 		
@@ -201,7 +270,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public String toString(){
-	return this.day + "//" + this.month + "//" + this.year + " " 
+	return this.day + "/" + this.month + "/" + this.year + " " 
 	+ this.hours + ":" + this.minutes + ":" + this.seconds;
 	}
 	

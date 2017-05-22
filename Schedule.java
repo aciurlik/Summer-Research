@@ -8,19 +8,23 @@ public class Schedule {
 	ArrayList<Requirement> reqsList;
 	ArrayList<Semester> semesters;
 	
+	CourseList masterList;
+	
 	boolean reqListValid;
 	
 	public static Schedule testSchedule(){
-		Schedule result = new Schedule();
+		Schedule result = new Schedule(null);
 		result.majorsList.add(Major.testMajor());
 		return result;
 	}
 	
-	public Schedule(){
+	public Schedule(CourseList masterList){
 		this.majorsList= new ArrayList<Major>();
 		this.semesters = new ArrayList<Semester>();
 		this.reqsList = new ArrayList<Requirement>();
 		reqListValid = false;
+		this.masterList = masterList;
+		
 	}
 	
 	
@@ -44,7 +48,7 @@ public class Schedule {
 			return;
 		}
 		else{
-			HashSet<Prefix> needed = CourseList.getPrerequsites(p);
+			HashSet<Prefix> needed = masterList.getPrerequsites(p);
 			for(Semester s : semesters){
 				if(s.sD.compareTo(sD) < 1){
 					for (ScheduleElement earlier : s.getElements()){
@@ -130,7 +134,7 @@ public class Schedule {
 	}
 	
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
-		return e.getRequirementsSatisfied();
+		return e.getRequirementsFulfilled();
 	}
 	
 	

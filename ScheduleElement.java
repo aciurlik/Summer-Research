@@ -1,4 +1,3 @@
-package scheduler;
 
 import java.util.ArrayList;
 
@@ -32,14 +31,14 @@ public interface ScheduleElement {
 	 * @return String of the ScheduleElement 
 	 * that should be displayed in GUI
 	 */
-	public String getDisplay();
+	public String getDisplayString();
 	
 	/**
 	 * 
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
 	 * if element has no requirements it fulfills (if course), an empty ArrayList is returned
 	 */
-	public ArrayList<ScheduleElement> getRequirements();
+	public ArrayList<Requirement> getRequirementsFulfilled();
 
 
 }

@@ -1,4 +1,3 @@
-package scheduler;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -17,7 +16,7 @@ public class SemesterPanel extends JPanel {
 	
 	public SemesterPanel(String classTitle, String semesterTitle){
 		super();
-		Schedule studentSchedule = new Schedule();
+		Schedule studentSchedule = Schedule.testSchedule();
 		this.setVisible(true);
 		this.setLayout(new GridLayout(7, 1, 5, 5));
 		this.setBackground(Color.blue);
