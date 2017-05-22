@@ -39,7 +39,7 @@ public interface ScheduleElement {
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
 	 * if element has no requirements it fulfills (if course), an empty ArrayList is returned
 	 */
-	public ArrayList<ScheduleElement> giveRequirements();
+	public ArrayList<ScheduleElement> getRequirements();
 
 
 }
