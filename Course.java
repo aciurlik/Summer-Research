@@ -1,17 +1,22 @@
-public class Course {
+import java.util.ArrayList;
+import java.util.HashSet;
+
+public class Course implements ScheduleElement{
 
 	
- 
 	protected int creditHours;
 	protected Prefix coursePrefix;
 	protected int sectionNumber;
-	protected Semester semester;
+	protected SemesterDate semester;
 	protected int[] meetingDays; //specified by the constants in the Time class, 
 	  //  as in Time.SUNDAY.
 	protected Interval<Time> meetingTime;
 	Interval<Time> labTime; //assumed to repeat weakly until examTime
 	Interval<Time> examTime; 
 	String professor;
+	
+	HashSet<Requirement> reqsSatisfied;
+	HashSet<Requirement> userSpecifiedReqs;
 	
 	public static final String[] dayCodes = {"U", "M", "T", "W", "H", "F", "S"};
 	
@@ -22,7 +27,7 @@ public class Course {
 	 * @param p
 	 */
 
-	public Course(Prefix prefix, Semester semester, String professor, int[] meetingDays, 
+	public Course(Prefix prefix, SemesterDate semester, String professor, int[] meetingDays, 
 			 int creditHours, int sectionNumber){
 		this.creditHours=creditHours;
 		this.coursePrefix=prefix;
@@ -30,9 +35,6 @@ public class Course {
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
-
-
-
 	}
 
 	
@@ -45,12 +47,9 @@ public class Course {
 		return creditHours;
 	}
 	
-
-	public Semester getSemester() {
+	public SemesterDate getSemester() {
 		return this.semester;
 	}
-
-
 	
 	
 	public String meetingDaysCode(){
@@ -109,8 +108,50 @@ public class Course {
 		
 		
 	}
-	public boolean overlaps(Course other){
-		return this.allTakenTimes().overlaps(other.allTakenTimes());
+	public boolean overlaps(ScheduleElement other){
+		if(other instanceof Course){
+			return this.allTakenTimes().overlaps(((Course)other).allTakenTimes());
+		}
+		else{
+			return false;
+		}
+	}
+	/**
+	 * Clear the list of requirements that this course satisfies.
+	 * Will not touch user specified requirements.
+	 */
+	public void clearReqsSatisfied(){
+		this.reqsSatisfied = new HashSet<Requirement>();
+	}
+	/**
+	 * Adds this requirement to the list of requirements satisfied by this course.
+	 * Automatically ignores duplicates.
+	 * @param req
+	 */
+	public void satisfies(Requirement req){
+		this.reqsSatisfied.add(req);
+	}
+	
+	/**
+	 * If the user declares that this course will satisfy this requirement, 
+	 * then this will save it forever (even if the requirement is no longer on
+	 * the requirements list visible to the user).
+	 * @param req
+	 */
+	public void userSpecifiedSatisfies(Requirement req){
+		userSpecifiedReqs.add(req);
+	}
+	
+	/**
+	 * Return an unsorted list of the requirements satisfied by this course.
+	 * @return
+	 */
+	public ArrayList<Requirement> getRequirementsSatisfied(){
+		ArrayList<Requirement> result = new ArrayList<Requirement>(reqsSatisfied);
+		for(Requirement specified : userSpecifiedReqs){
+			result.add(specified);
+		}
+		return result;
 	}
 	
 	public String toString(){
@@ -129,10 +170,28 @@ public class Course {
 	
 	public static void main(String[] args){
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
-		Course c = new Course(new Prefix("MTH", 220), new Semester(2017, Semester.FALL), "Fray", meetingDays, 4, 02);
+		Course c = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
 		c.setMeetingTime(11, true, 30, 50);
 		System.out.println(c.meetingTime);
 		System.out.println(c);
+	}
+
+
+
+	@Override
+	public boolean isDuplicate(ScheduleElement other) {
+		if(! ( other instanceof Course )){
+			return false;
+		}
+		return this.coursePrefix.compareTo(((Course)other).coursePrefix) == 0;
+	}
+
+
+
+	@Override
+	public String getDisplayString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

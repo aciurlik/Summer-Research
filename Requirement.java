@@ -1,3 +1,6 @@
+import java.util.Arrays;
+import java.util.Collections;
+
 
 public class Requirement implements Comparable<Requirement>{
 	Prefix[] choices;
@@ -14,9 +17,19 @@ public class Requirement implements Comparable<Requirement>{
 	public static Requirement testRequirement(){
 		return new Requirement(new Prefix[]{new Prefix("MTH", 220)}, 1);
 	}
+	
+	public boolean isSatisfiedBy(Course c){
+		for (Prefix p : choices){
+			if(c.coursePrefix.compareTo(p) == 0){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Requirement(Prefix[] choices, int numToChoose){
 		this.choices = choices;
+		Arrays.sort(this.choices);
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = -1;
 	}
@@ -57,7 +70,30 @@ public class Requirement implements Comparable<Requirement>{
 		}
 		//then compare based on doubleDipNumber, as this will separate 
 		// GER from major and each major from the others.
-		return this.doubleDipNumber - other.doubleDipNumber;
-
+		int dipDifference = this.doubleDipNumber - other.doubleDipNumber;
+		if(dipDifference != 0){
+			return dipDifference;
+		}
+		
+		//Compare based on numToChoose
+		int numChooseDifference = this.numToChoose - other.numToChoose;
+		if(numChooseDifference != 0){
+			return numChooseDifference;
+		}
+		//Finally, compare based on prefixes.
+		for (int i = 0; i < this.choices.length ; i ++){
+			if(other.choices.length >= i){
+				//this one has more, so other should come first. 
+				// that means other < this
+				return 1;
+			}
+			int diff = this.choices[i].compareTo(other.choices[i]);
+			if(diff != 0){
+				return diff;
+			}
+		}
+		return 0;
+		
+		
 	}
 }
