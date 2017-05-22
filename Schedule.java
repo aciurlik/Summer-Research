@@ -1,34 +1,22 @@
-import java.util.ArrayList;
-
+package scheduler;
 
 public class Schedule {
-	ArrayList<Requirement> reqList;
-	
-	
-	public static Schedule testSchedule(){
-		Schedule result = new Schedule();
-		result.reqList.add(Requirement.testRequirement());
-		result.reqList.add(Requirement.testRequirement());
-		return result;
+	int counter=0;
+
+	public String getRequirement(int requirementNumber) {
+		// TODO Auto-generated method stub
+		return "Hey Look I work! :D #MasterProgrammer";
 	}
-	
-	public Schedule(){
-		this.reqList = new ArrayList<Requirement>();
+
+	public boolean hasNextRequirement(int requirementNumber) {
+		if(counter<3){  //put at four to test extra class addition 
+		counter++;
+		return true;
+		
+		}
+		else{
+			return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public ArrayList<Requirement> getRequirementsList(){
-		return reqList;
-	}
-	
-	public int getCreditHoursComplete(){
-		return 5;
-	}
+
+}
 }
