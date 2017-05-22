@@ -146,7 +146,8 @@ public class Course implements ScheduleElement{
 	 * Return an unsorted list of the requirements satisfied by this course.
 	 * @return
 	 */
-	public ArrayList<Requirement> getRequirementsSatisfied(){
+	@Override
+	public ArrayList<Requirement> getRequirementsFulfilled(){
 		ArrayList<Requirement> result = new ArrayList<Requirement>(reqsSatisfied);
 		for(Requirement specified : userSpecifiedReqs){
 			result.add(specified);
@@ -193,6 +194,7 @@ public class Course implements ScheduleElement{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	
 	
 	

@@ -5,7 +5,7 @@
  * @author dannyrivers
  *
  */
-public class Prefix {
+public class Prefix implements Comparable<Prefix>{
 	private String subject;
 	private int courseNumber;
 	
@@ -24,6 +24,15 @@ public class Prefix {
 	
 	public String toString(){
 		return this.subject + "-" + this.courseNumber;
+	}
+
+	@Override
+	public int compareTo(Prefix other) {
+		int strDiff = this.subject .compareTo(other.subject);
+		if(strDiff!=0){
+			return strDiff;
+		}
+		return this.courseNumber - other.courseNumber;
 	}
 	
 }
