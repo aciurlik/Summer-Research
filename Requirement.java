@@ -10,7 +10,8 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 	// should be set to 2.
 	int numFinished;
 	int doubleDipNumber;
-
+	
+	
 
 	/**
 	 *
@@ -105,6 +106,36 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		else{
 			return String.format("%d of %s", numToChoose, choices.toString());
 		}
+	}
+	
+	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
+
+	public String saveString(){
+		Object[] data = {
+				numToChoose,
+				Arrays.toString(choices),
+				numFinished,
+				doubleDipNumber};
+		return SaverLoader.saveString(SAVE_DELIMETERS, data);
+	}
+	public static Requirement readFrom(String saveString){
+		String[] parsed = SaverLoader.parseString(SAVE_DELIMETERS, saveString);
+		int newNumToChoose = Integer.parseInt(parsed[0]);
+		ArrayList<Prefix> newChoices = new ArrayList<Prefix>();
+		String prefixArrayString = parsed[1];
+		for(String prefixString : prefixArrayString.substring(1,prefixArrayString.length() - 1).split(",") ){
+			newChoices.add(Prefix.readFrom(prefixString));
+		}
+		Requirement result = new Requirement(newChoices.toArray(new Prefix[newChoices.size()]), newNumToChoose);
+		try{
+			result.numFinished = Integer.parseInt(parsed[2]);
+			result.setDoubleDipNumber(Integer.parseInt(parsed[3]));
+		}
+		catch (Exception e){
+			
+		}
+		return result;
+		
 	}
 
 	@Override

@@ -25,6 +25,11 @@ public class Prefix implements Comparable<Prefix>{
 	public String toString(){
 		return this.subject + "-" + this.courseNumber;
 	}
+	
+	public static Prefix readFrom(String prefixString){
+		String[] pair = prefixString.split("-");
+		return new Prefix (pair[0], Integer.parseInt(pair[1]));
+	}
 
 	@Override
 	public int compareTo(Prefix other) {
