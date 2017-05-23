@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
 
+
 	
 	/**
 	 * 
@@ -22,58 +23,45 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int classCounter = 0;
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
+	private int normalNumberofClasses = 4;
+	private String deleteButton = "-";
 	JPanel defaultPanel = new JPanel();
 	
-	
-	
-	
-	
-	public SemesterPanel(String classTitle, String semesterTitle, Color c){
-		//change Parameter to semesterDate and do schedule.getclass title semesterDate.getSeason()
-	
-		super();
 
+
+
+
+	public SemesterPanel(String classTitle, String semesterTitle, Color c){
+
+		//Sets up the panel that will hold one semester
+		super();
 		this.setVisible(true);
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
-		this.setBackground(c);
+		this.setBackground(c); //This allows the schedule Panel to control the color
 		defaultPanel.setBackground(this.getBackground());
-		
+
+		//Header
 		JLabel ClassTitle = new JLabel(classTitle);
 		defaultPanel.add(ClassTitle);
-		
+
 		JLabel FallSpring = new JLabel(semesterTitle, JLabel.CENTER);
 		defaultPanel.add(FallSpring);
-		
-		
+
+
+	
 	
 		
-		
-	
-		Semester studentSemester = new Semester(new SemesterDate(2018, SemesterDate.FALL));
-		
-		
-		ArrayList<ScheduleElement> listOfClasses = studentSemester.getElements();
-		for (int i=0; i< listOfClasses.size(); i++){
-			ScheduleElement currentElement =(ScheduleElement) listOfClasses.get(i);
-			
-			inSemesterRequirementPanel requirementPanel = new inSemesterRequirementPanel(currentElement);
-			defaultPanel.add(requirementPanel);
-			classCounter++;
-			if(classCounter == 4){
-				JLabel extraCourseSpace = new JLabel("DROP NEW COURSE HERE");
-				defaultPanel.add(extraCourseSpace);
-			}
+		for (int i=0; i<=normalNumberofClasses; i++){
 			
 		
-		// if counter is at 4 then add a new spot 
-	else{
-		JLabel CourseSpace = new JLabel("DROP NEW COURSE HERE");
-		defaultPanel.add(CourseSpace);
-	}
+				JLabel CourseSpace = new JLabel("DROP NEW COURSE HERE");
+				defaultPanel.add(CourseSpace);
+			
 		}
-		
-		
-		
+
+
+
+
 	
 		JButton deleteSemester= new JButton("-");
 		defaultPanel.add(deleteSemester);
@@ -82,16 +70,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.setVisible(true);
 		this.add(defaultPanel);
 		
+
 	}
 
-	
-	
+
+
 	public int getClassCounter() {
 		return classCounter;
 	}
 
 
-	
+
 
 	public int getRequirementNumber() {
 		return requirementNumber;
@@ -118,60 +107,42 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			public void actionPerformed(ActionEvent e){
 				remove(hide);
 				add(defaultPanel);
-				}
 			}
-);
-		
-	
-	
+		}
+				);
+
+
+		//TO DO: Figure out repaint glitch
 		hide.add(showSemester);
 		showSemester.repaint(1);
 		hide.repaint(1);
 
 		this.add(hide);
 		this.repaint(1);
+
+	}
+	
+	public void addElement(ScheduleElement e){
 		
+	}
+
+	
+	private class SemesterPanelDropHandler extends PanelDropHandler{
+
+		@Override
+		public void recievedDrop(Container receiver, Component draggedItem) {
+			SemesterPanel r = (SemesterPanel) receiver;
+			RequirementPanel d =  (RequirementPanel) draggedItem;
+			r.addElement(d.getRequirement());
+			if (r.semester.addScheduleElement(d.getRequirement())){
+				inSemesterRequirementPanel requirementPanel = new inSemesterRequirementPanel(d.getRequirement());
+				receiver.add(requirementPanel);
+
+			}
+
+
+		}
+
+	}
 }
-	
-	/**
-	 *  private class SemesterPanelDropHandler extends PanelDropHandler{
 
-				@Override
-				public void recievedDrop(Container receiver, Component draggedItem) {
-					receiver = (SemesterPanel) receiver;
-					draggedItem = (RequirementPanel) draggedItem;
-					reciever.addReq(draggedItem.getRequirement());
-					reciever.semester.addScheduleElement(draggedItem.getRequirement());
-					
-					Update GUI 
-					
-					
-					
-					
-				
-						  		}
-					
-					
-				}
-	 
-				}
-	 * 
-	 *
-	 */
-
-	 
-}
-	
-
-
-
-	
-	
-
-
-	
-
-
-
-	
- 
