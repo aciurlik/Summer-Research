@@ -30,15 +30,51 @@ public class Schedule {
 	
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
-		Semester next = new Semester(last.next());
+		Semester next = new Semester(last.next(), this);
 		this.semesters.add(next);
 		return next;
 	}
 	
+	
+	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
+		checkPrerequsites(e, s.semesterDate);
+		s.checkOverlap(e);
+		checkDuplicates(e);
+	}
+	public void added(ScheduleElement e, Semester s){
+		if (e instanceof Course){
+			updateRequirementsSatisfied((Course)e);
+		}
+		for (Requirement r : e.getRequirementsFulfilled()){
+			r.numFinished ++;
+		}
+		
+	}
+	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
+		
+	}
+	public void removed(ScheduleElement e, Semester s){
+		for (Requirement r : e.getRequirementsFulfilled()){
+			r.numFinished -= 1;
+		}
+	}
+	
+	public ArrayList<ScheduleElement> allElements(){
+		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
+		for(Semester s : semesters){
+			result.addAll(s.getElements());
+		}
+		return result;
+	}
+	
+	
+	/**
+	 * Check every element to see if it has all the prereqs it needs.
+	 */
 	public void checkAllPrerequsites(){
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
-				checkPrerequsites(e, s.sD);
+				checkPrerequsites(e, s.semesterDate);
 			}
 		}
 	}
@@ -50,7 +86,7 @@ public class Schedule {
 		else{
 			HashSet<Prefix> needed = masterList.getPrerequsites(p);
 			for(Semester s : semesters){
-				if(s.sD.compareTo(sD) < 1){
+				if(s.semesterDate.compareTo(sD) < 1){
 					for (ScheduleElement earlier : s.getElements()){
 						Prefix earlierPrefix = earlier.getPrefix();
 						if(earlierPrefix != null){
@@ -68,6 +104,8 @@ public class Schedule {
 		}
 	}
 	
+	
+	
 	/**
 	 * Check all semesters for duplicates.
 	 * If one is found, throw an exception.
@@ -75,24 +113,9 @@ public class Schedule {
 	public void checkDuplicates(){
 		ArrayList<ScheduleElement> elements = allElements();
 		for (int i = 0; i < elements.size() ; i ++){
-			for(int j = 0; j < elements.size() ; j ++){
-				ScheduleElement e1 = elements.get(i);
-				ScheduleElement e2 = elements.get(j);
-				if(e1.isDuplicate(e2) || e2.isDuplicate(e1)){
-
-				}
-			}
+			checkDuplicates(elements.get(i));
 		}
 	}
-	
-	public ArrayList<ScheduleElement> allElements(){
-		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
-		for(Semester s : semesters){
-			result.addAll(s.getElements());
-		}
-		return result;
-	}
-	
 	public void checkDuplicates(ScheduleElement e){
 		for(ScheduleElement e1 : allElements()){
 			if(e1 == e){
@@ -104,27 +127,35 @@ public class Schedule {
 		}
 	}
 	
+	
+	
+
+	
 	/**
-	 * Check all semesters for overlap in the semester
+	 * Check all semesters to see if any elements in them
+	 * have overlapping times (are taken at the same time)
 	 */
 	public void checkOverlap(){
 		for(Semester s : semesters){
-			s.checkOverlap();
+			s.checkOverlap(null);
 		}
 	}
 	
+	
+	
 	/**
-	 * Forces a full update of all of the requirements.
+	 * Forces a full update of all of the requirements
+	 *  based on the majors currently included 
+	 *  and the courses currently taken 
+	 *  
+	 *  Assumes that all courses have up-to-date requirementsSatisfied lists.
 	 */
 	public void updateReqList(){
-		HashSet<Integer> doubleDipNumbers = new HashSet<Integer>();
 		for(Requirement r : reqsList){
-			doubleDipNumbers.add(r.doubleDipNumber);
 			r.numFinished = 0;
 		}
 		for(Semester s : semesters){
 			for(ScheduleElement e : s.getElements()){
-				Prefix p = e.getPrefix();
 				//update all requirements satisfied by this schedule element.
 				for (Requirement r : getRequirementsSatisfied(e)){
 					r.numFinished ++;
@@ -137,21 +168,12 @@ public class Schedule {
 		return e.getRequirementsFulfilled();
 	}
 	
-	
-	public void addMajor(Major newMajor){
-		//Use sets to prevent duplicate requirements.
-		HashSet<Requirement> set = new HashSet<Requirement>();
-		majorsList.add(newMajor);
-		for (Major m : majorsList){
-			for (Requirement r : m.reqList){
-				set.add(r);
-			}
-		}
-		reqsList = new ArrayList<Requirement>(set);
-		Collections.sort(reqsList);
-		updateAllCourseRequirementsSatisfied();
-	}
-	
+	/**
+	 * Tells this course the list of requirements that it satisfied.
+	 * 		this list is a subset of the requirements implied by the set
+	 * 		of majors.
+	 * @param c
+	 */
 	public void updateRequirementsSatisfied(Course c){
 		c.clearReqsSatisfied();
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
@@ -175,6 +197,12 @@ public class Schedule {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Go through the list of courses and tell each one
+	 * which current requirements it can satisfy.
+	 */
 	public void updateAllCourseRequirementsSatisfied(){
 		for(Semester s : semesters){
 			for(ScheduleElement e : s.getElements()){
@@ -186,6 +214,7 @@ public class Schedule {
 		}
 	}
 	
+	
 	public ArrayList<Requirement> getRequirementsList(){
 		if(! reqListValid){
 			updateReqList();
@@ -193,7 +222,30 @@ public class Schedule {
 		return reqsList;
 	}
 	
+	public void addMajor(Major newMajor){
+		//Use sets to prevent duplicate requirements.
+		HashSet<Requirement> set = new HashSet<Requirement>();
+		majorsList.add(newMajor);
+		for (Major m : majorsList){
+			for (Requirement r : m.reqList){
+				set.add(r);
+			}
+		}
+		reqsList = new ArrayList<Requirement>(set);
+		Collections.sort(reqsList);
+		//Tell the courses which requirements they satisfy
+		updateAllCourseRequirementsSatisfied();
+		//Tell the new requirements if some taken course satisfies them.
+		updateReqList();
+	}
+	
 	public int getCreditHoursComplete(){
-		return 5;
+		int result = 0;
+		for (ScheduleElement e : allElements()){
+			if(e instanceof Course){
+				result += ((Course)e).creditHours;
+			}
+		}
+		return result;
 	}
 }
