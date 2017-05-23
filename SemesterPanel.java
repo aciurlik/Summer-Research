@@ -1,5 +1,3 @@
-
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -7,12 +5,15 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
+	private Semester sem;
 
 
 	
@@ -25,51 +26,33 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
 	private String deleteButton = "-";
+	private String addAClass = "DROP A CLASS A HERE";
+	private String classTitle;
 	JPanel defaultPanel = new JPanel();
+	
+	
 	
 
 
 
 
-	public SemesterPanel(String classTitle, String semesterTitle, Color c){
+	public SemesterPanel(String classTitle, Semester sem, Color c){
 
 		//Sets up the panel that will hold one semester
 		super();
+		this.classTitle=classTitle;
+		this.sem=sem;
 		this.setVisible(true);
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		this.setBackground(c); //This allows the schedule Panel to control the color
 		defaultPanel.setBackground(this.getBackground());
+		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
 
-		//Header
-		JLabel ClassTitle = new JLabel(classTitle);
-		defaultPanel.add(ClassTitle);
-
-		JLabel FallSpring = new JLabel(semesterTitle, JLabel.CENTER);
-		defaultPanel.add(FallSpring);
-
-
-	
-	
-		
-		for (int i=0; i<=normalNumberofClasses; i++){
-			
-		
-				JLabel CourseSpace = new JLabel("DROP NEW COURSE HERE");
-				defaultPanel.add(CourseSpace);
-			
-		}
-
-
-
-
-	
-		JButton deleteSemester= new JButton("-");
-		defaultPanel.add(deleteSemester);
-		deleteSemester.addActionListener(this);
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setVisible(true);
 		this.add(defaultPanel);
-		
+		System.out.println("ORGINAL SIZE" + this.sem.elements.size());
+		this.updatePanel();
 
 	}
 
@@ -95,10 +78,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		buttonCounter++;
-		System.out.println(buttonCounter);
-
+		
 		String show = "Show Semester";
 		this.remove(defaultPanel);
+	
+		
 		JPanel hide = new JPanel();
 		hide.setBackground(Color.pink);
 		JButton showSemester = new JButton(show);
@@ -107,18 +91,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			public void actionPerformed(ActionEvent e){
 				remove(hide);
 				add(defaultPanel);
+				revalidate();
+				repaint();
 			}
 		}
 				);
 
-
-		//TO DO: Figure out repaint glitch
 		hide.add(showSemester);
-		showSemester.repaint(1);
-		hide.repaint(1);
-
 		this.add(hide);
-		this.repaint(1);
+		
+		this.revalidate();
+		this.repaint();
 
 	}
 	
@@ -126,23 +109,99 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		
 	}
 
+	public void updatePanel(){
+		defaultPanel.removeAll();
+		
+		JLabel ClassTitle = new JLabel(classTitle);
+		defaultPanel.add(ClassTitle);
+		
+		String season = sem.getDate().getSeason(sem.getDate().sNumber);
+		if(season.equals("MayX") || season.equals("Summer")){
+			season="MayX/Summer";
+		}
+		if(season.equals("Other") || season.equals(null)){
+			season="Error";
+		}
+		
+		
+
+		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
+		defaultPanel.add(FallSpring);
+		
+		
+		
+
+		
+		for (int i=0; i<this.sem.elements.size(); i++){
+			ScheduleElementPanel element = new ScheduleElementPanel(this.sem.elements.get(i));
+			defaultPanel.add(element);	
+		}
+		
+		if(sem.elements.size()==4){
+			JLabel dropLabel = new JLabel(addAClass);
+			dropLabel.setTransferHandler(new SemesterPanelDropHandler());
+			defaultPanel.add(dropLabel);
+		}
+		//Adds Drop Spaces 
+		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
+		for (int i= 0; i<DropsNeeded; i++){
+			JLabel dropLabel = new JLabel(addAClass);
+			defaultPanel.add(dropLabel);
+			
+		
+		
+		//Repaint 
+		defaultPanel.revalidate();
+		defaultPanel.repaint();
+		this.revalidate();
+		this.repaint();
+		}
+		JButton deleteSemester= new JButton("-");
+		defaultPanel.add(deleteSemester);
+		deleteSemester.addActionListener(this);
+		
+		
+		System.out.println("UPDATED SIZE" + this.sem.elements.size());
+	}
 	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-			SemesterPanel r = (SemesterPanel) receiver;
+			
+			
 			RequirementPanel d =  (RequirementPanel) draggedItem;
-			r.addElement(d.getRequirement());
-			if (r.semester.addScheduleElement(d.getRequirement())){
-				inSemesterRequirementPanel requirementPanel = new inSemesterRequirementPanel(d.getRequirement());
-				receiver.add(requirementPanel);
+			addElement(d.getRequirement());
+			sem.add(d.getRequirement());
+			ScheduleElementPanel requirementPanel = new ScheduleElementPanel(d.getRequirement());
+			receiver.add(requirementPanel);
+			updatePanel();
+		
+		
 
 			}
 
 
 		}
+	public class RequirementPanelDragHandler extends ComponentDragHandler{
+
+		@Override
+		public void initiateDrag(JComponent toBeDragged) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterDrop(Container source, JComponent dragged,
+				boolean moveAction) {
+			// Whether moveAction is true or false, we will leave the old panel
+			
+			
+		}
+		
+		
 
 	}
-}
+
+	}
 

@@ -40,6 +40,7 @@ public class Course implements ScheduleElement{
 	
 	
 	public Prefix getPrefix(){
+		
 		return coursePrefix;
 	}
 
@@ -53,6 +54,9 @@ public class Course implements ScheduleElement{
 	
 	
 	public String meetingDaysCode(){
+		if (meetingDays==null){
+			return"";
+		}
 		String result = "";
 		for (int day : meetingDays){
 			result += dayCodes[day];
@@ -164,7 +168,6 @@ public class Course implements ScheduleElement{
 			result.append( this.meetingTime.start.clockTime() + " ");
 		}
 		result.append(this.professor);
-		
 		return result.toString();
 	}
 	
@@ -192,7 +195,7 @@ public class Course implements ScheduleElement{
 	@Override
 	public String getDisplayString() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.toString();
 	}
 
 	
