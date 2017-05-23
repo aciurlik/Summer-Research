@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 public class SemesterPanel extends JPanel implements ActionListener{
 
 
+	
 	/**
 	 * 
 	 */
@@ -61,12 +62,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
-		JButton deleteSemester= new JButton(deleteButton);
+	
+		JButton deleteSemester= new JButton("-");
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
-		this.setLayout(new GridLayout(1, 1, 0, 0)); //Fits Default/Hide Panel to cover SemesterPanel. 
+		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setVisible(true);
 		this.add(defaultPanel);
+		
 
 	}
 
@@ -142,16 +145,4 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
