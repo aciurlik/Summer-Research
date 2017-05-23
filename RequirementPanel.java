@@ -32,7 +32,11 @@ public class RequirementPanel extends JPanel {
 		this.addMouseListener(listener);
 		
 		
-		this.add(new JLabel(req.displayName()));
+		this.add(new JLabel(req.getDisplayString()));
+	}
+	
+	public Requirement getRequirement(){
+		return req;
 	}
 	
 	

@@ -1,25 +1,17 @@
 
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class inSemesterRequirementPanel extends JPanel {
+	private Requirement r;
 	
-
-
-	public inSemesterRequirementPanel(ScheduleElement element) {
-			super();
-			String labelDisplay = element.getDisplay();
-			JLabel requirement = new JLabel(labelDisplay);
-			this.add(requirement);
-			
-			
-		}
-	
-	
-	
+	public inSemesterRequirementPanel(Requirement r){
+		super();
+		JLabel requirementLabel = new JLabel(r.getDisplayString());
+		this.add(requirementLabel);
+		
 	}
 
 	
 
-
+}

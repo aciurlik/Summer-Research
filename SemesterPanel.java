@@ -118,23 +118,22 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.repaint(1);
 
 	}
+	
+	public void addElement(ScheduleElement e){
+		
+	}
 
 	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-			receiver = (SemesterPanel) receiver;
-			draggedItem = (RequirementPanel) draggedItem;
-			receiver.addReq(draggedItem.getRequirement());
-			if (receiver.semester.addScheduleElement(draggedItem.getRequirement())){
-				inSemesterRequirementPanel requirementPanel = new inSemesterRequirementPanel(draggedItem.getRequirement);
-				receiver.add(draggedItem.getRequirement.)
-
-
-
-
-
+			SemesterPanel r = (SemesterPanel) receiver;
+			RequirementPanel d =  (RequirementPanel) draggedItem;
+			r.addElement(d.getRequirement());
+			if (r.semester.addScheduleElement(d.getRequirement())){
+				inSemesterRequirementPanel requirementPanel = new inSemesterRequirementPanel(d.getRequirement());
+				receiver.add(requirementPanel);
 
 			}
 
@@ -143,7 +142,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	}
 }
-
 
 
 

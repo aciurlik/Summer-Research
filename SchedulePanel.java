@@ -26,7 +26,6 @@ import javax.swing.JScrollPane;
 
 
 public class SchedulePanel extends JPanel implements ActionListener{
-
 	/**
 	 * 
 	 */
@@ -37,7 +36,6 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	JPanel scrollPanel = new JPanel();
 	JPanel addButtonPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
-	ArrayList<SemesterPanel> singleSemesterList = new ArrayList<SemesterPanel>();
 	JButton addSemester = new JButton("+");
 
 	public SchedulePanel() {
@@ -58,7 +56,6 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 
 		for (int i=0; i<numberOfRegularSemesters; i++){
-			//Inelegant, is there a better way?  Why is it messing up the order? 
 			String fall = "Fall Semester";
 			String spring = "Spring Semester";
 			String MayXSummer = "May X and Summer";
@@ -66,104 +63,73 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			String soph = "Sophmore";
 			String jun= "Junior";
 			String sen = "Senior";
-			//SingleSemester semester = null;
-			if (i==0){
-				SemesterPanel semester = new SemesterPanel(fresh, fall);
-				semester.setBackground(Color.green);
-				semester.setPreferredSize(new Dimension(500, 0)); //This sets it as .45 of scroll display to show two semesters and a bit more
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
+			Color firstAndThirdYear = Color.blue;
+			Color secondAndFourthYear = Color.green;
+			SemesterPanel semester = null;
+			switch(i){
+			
+			//Perhaps add a SemesterDate element to retrieve which one?
+			//Does this not happen because it does not give this as a parameter?
+			//Add the display function for the course
+			case 0: 
+				semester = new SemesterPanel(fresh, fall, firstAndThirdYear);
+				break;
 
+			
+			case 1:
+				semester = new SemesterPanel(fresh, spring, firstAndThirdYear);
+				break;
+			
+			
+			case 2:
+				semester = new SemesterPanel(fresh, MayXSummer, firstAndThirdYear);
+				break;
+				
+				
+			case 3: 
+				semester = new SemesterPanel(soph, fall,secondAndFourthYear);
+				break;
+			
+				
+			case 4:
+				semester = new SemesterPanel(soph, spring, secondAndFourthYear);
+				break;
+				
+			case 5:
+				semester = new SemesterPanel(soph, MayXSummer, secondAndFourthYear);
+				break;
+				
+			
+			case 6:
+				semester = new SemesterPanel(jun, fall, firstAndThirdYear);
+				break;
+	
+				
+			case 7: 
+				semester = new SemesterPanel(jun, spring, firstAndThirdYear);
+				break;
+			
+			case 8:
+				semester = new SemesterPanel(jun, MayXSummer, firstAndThirdYear);
+				break;
+			
+			case 9: 
+				semester = new SemesterPanel(sen, fall, secondAndFourthYear);
+				break;
+			
+			case 10:
+				semester = new SemesterPanel(sen, spring, secondAndFourthYear);
+				break;
+			
+			case 11:
+				semester = new SemesterPanel(sen, MayXSummer,secondAndFourthYear);
+				break;
+				
 			}
-			if (i==1){
-				SemesterPanel semester = new SemesterPanel(fresh, spring);
-				semester.setBackground(Color.green);
-				semester.setPreferredSize(new Dimension(500, 0));
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==2){
-				SemesterPanel semester = new SemesterPanel(fresh, MayXSummer);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.green);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==3){
-				SemesterPanel semester = new SemesterPanel(soph, fall);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==4){
-				SemesterPanel semester = new SemesterPanel(soph, spring);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==5){
-				SemesterPanel semester = new SemesterPanel(soph, MayXSummer);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==6){
-				SemesterPanel semester = new SemesterPanel(jun, fall);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.green);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==7){
-				SemesterPanel semester = new SemesterPanel(jun, spring);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.green);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==8){
-				SemesterPanel semester = new SemesterPanel(jun, MayXSummer);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.green);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==9){
-				SemesterPanel semester = new SemesterPanel(sen, fall);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==10){
-				SemesterPanel semester = new SemesterPanel(sen, spring);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-			}
-			if (i==11){
-				SemesterPanel semester = new SemesterPanel(sen, MayXSummer);
-				semester.setPreferredSize(new Dimension(500, 0));
-				semester.setBackground(Color.blue);
-				scrollPanel.add(semester);
-				singleSemesterList.add(semester);
-
-
-			}	
+		
+			semester.setPreferredSize(new Dimension(500, 0));
+			scrollPanel.add(semester);
+			
 
 
 
@@ -193,7 +159,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
+		Color extraSemesterColor = Color.pink;
 		
 		scrollPanel.setLayout(new GridLayout(1, numberOfRegularSemesters+buttonPress+1, spaceConstant, spaceConstant));
 		scrollPanel.remove(addButtonPanel);
@@ -203,30 +169,29 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 		if (buttonPress%3==0){
 			String extraSemester = "Fall";
-			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester);
+			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester, extraSemesterColor);
 			semester.setPreferredSize(new Dimension(500, 0));
 			semester.setBackground(Color.pink);
 			scrollPanel.add(semester);
-			singleSemesterList.add(semester);
+		
 
 		}
 		if (buttonPress%3==1){
 			String extraSemester = "Spring";
-			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester);
+			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester, extraSemesterColor);
 			semester.setPreferredSize(new Dimension(500, 0));
 			semester.setBackground(Color.pink);
 			scrollPanel.add(semester);
-			singleSemesterList.add(semester);
+			
 
 		}
 
 		if (buttonPress%3==2){
 			String extraSemester = "MayX and Summer";
-			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester);
+			SemesterPanel semester = new SemesterPanel("Super Senior", extraSemester, extraSemesterColor);
 			semester.setPreferredSize(new Dimension(500, 0));
-			semester.setBackground(Color.pink);
 			scrollPanel.add(semester);
-			singleSemesterList.add(semester);
+			
 
 
 		}
@@ -250,12 +215,11 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		this.repaint();
 		
 		
-		//Shows Semester being added to list, this means the problem is with updating GUI
-		System.out.println(singleSemesterList.size());
+		
+		
 	}
 
 }
-
 
 
 

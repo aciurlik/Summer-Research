@@ -1,8 +1,9 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 
-public class Requirement implements Comparable<Requirement>{
+public class Requirement implements Comparable<Requirement>, ScheduleElement{
 	Prefix[] choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
@@ -39,17 +40,6 @@ public class Requirement implements Comparable<Requirement>{
 	}
 	public int getDoubleDipNumber(){
 		return this.doubleDipNumber;
-	}
-
-
-
-	public String displayName(){
-		if(numToChoose == 1){
-			return choices[0].toString();
-		}
-		else{
-			return String.format("%d of %s", numToChoose, choices.toString());
-		}
 	}
 
 	public boolean isComplete(){
@@ -95,5 +85,32 @@ public class Requirement implements Comparable<Requirement>{
 		return 0;
 		
 		
+	}
+
+	@Override
+	public Prefix getPrefix() {
+		return null;
+	}
+
+	@Override
+	public boolean isDuplicate(ScheduleElement other) {
+		return false;
+	}
+
+	@Override
+	public String getDisplayString() {
+		if(numToChoose == 1){
+			return choices[0].toString();
+		}
+		else{
+			return String.format("%d of %s", numToChoose, choices.toString());
+		}
+	}
+
+	@Override
+	public ArrayList<Requirement> getRequirementsFulfilled() {
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		result.add(this);
+		return result;
 	}
 }
