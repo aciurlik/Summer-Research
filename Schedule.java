@@ -191,6 +191,16 @@ public class Schedule {
 				doubleDipIssues.add(r.doubleDipNumber);
 			}
 		}
+		//allow any doubleDip numbers that use the default DDN
+		// because you're allowed to double dip from requirements with the 
+		// default number.
+		for(Integer i : doubleDipIssues){
+			if(i%Major.MajorDDNRange == Requirement.defaultDDN){
+				doubleDipIssues.remove(i);
+			}
+		}
+		//Any time there's a question of which requirement a course should satisfy,
+		// ignore it and leave it up to the user (and the GUI) to specify.
 		for (Requirement r : allSatisfied){
 			if(! doubleDipIssues.contains(r.doubleDipNumber)){
 				c.satisfies(r);

@@ -12,6 +12,8 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 	int doubleDipNumber;
 	String name;
 	
+	public static final int defaultDDN = 0;
+	
 	
 
 	/**
@@ -34,7 +36,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		this.choices = choices;
 		Arrays.sort(this.choices);
 		this.numToChoose = numToChoose;
-		this.doubleDipNumber = 0;
+		this.doubleDipNumber = Requirement.defaultDDN;
 	}
 	public void setName(String name){
 		this.name = name;
