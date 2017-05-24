@@ -104,10 +104,9 @@ public abstract class PanelDropHandler extends TransferHandler{
 		//container.getParent().repaint();
 
 		//      JLabel label = (JLabel)component;
-		
-		//      System.out.println(label.getText() + " + " + location.getDropPoint());
-		
+
 		//DropLocation location = support.getDropLocation();
+		//      System.out.println(label.getText() + " + " + location.getDropPoint());
 		//dataComponent.setLocation( location.getDropPoint() );
 		
 		recievedDrop(container, dataComponent);
