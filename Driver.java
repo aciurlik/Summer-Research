@@ -7,14 +7,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
-	public CourseList masterList;
-
 	public Driver(){
 		CourseList masterList = new CourseList();
 		this.masterList = masterList;
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
 		Course a = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
+		Course b = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Harris", meetingDays, 4, 02);
 		masterList.add(a);
+		masterList.add(b);
 	}
 
 
