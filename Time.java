@@ -254,8 +254,22 @@ public class Time implements Comparable<Time>{
 		return totalSec;
 				
 	}
+	
 	public String clockTime(){
 		return this.hours + ":" + this.minutes;
+	}
+	
+	public boolean isAM(){
+		return (this.hours >=12);
+	}
+	
+	/**
+	 * Rounds down if seconds don't match up.
+	 * @param other
+	 * @return
+	 */
+	public int minutesUntil(Time other){
+		return (int)((other.toSec() - this.toSec()) / 60); 
 	}
 	@Override
 	public int compareTo(Time that) {
@@ -274,12 +288,30 @@ public class Time implements Comparable<Time>{
 	+ this.hours + ":" + this.minutes + ":" + this.seconds;
 	}
 	
+	public static Time readFrom(String s){
+		String[] split = s.split(" ");
+		String[] larges = split[0].split("/");
+		String[] smalls = split[1].split(":");
+		int day = Integer.parseInt(larges[0]);
+		int month = Integer.parseInt(larges[1]);
+		int year = Integer.parseInt(larges[2]);
+		int hours = Integer.parseInt(smalls[0]);
+		int minutes = Integer.parseInt(smalls[1]);
+		int seconds = Integer.parseInt(smalls[2]);
+		return new Time(year, month, day, hours, minutes, seconds);
+	}
+	
+	
 	public static void main(String[] args){
 		
 		
-		Time t = new Time(1996,1,31,0,0);
-		Time s = new Time(2003,12,31,0,0);
+		Time t = new Time(2003,1,31,10,30);
+		Time s = new Time(2003,1,31,11,0);
 		Time v = new Time(2004,3,1,0,0);
+		
+		System.out.println(t.minutesUntil(s));
+		
+		
 //		double year = 31536000;
 //		double day = 60 * 60 * 24;
 //		long v1 = t.toSec();
@@ -304,9 +336,6 @@ public class Time implements Comparable<Time>{
 //				System.out.println(t);
 //			}
 //		}
-		
-		
-		System.out.println(t.dayOfWeek());
 		
 		
 		
