@@ -16,12 +16,7 @@ public class CourseList {
 
 	private static ArrayList<Course> CourseList = new ArrayList<Course>();
 
-	public CourseList (String fname) throws FileNotFoundException{
-		Scanner sc = new Scanner(new File(fname));	
-		//This would read the file and scrape the 
-		// for(Every line representing a course){
-		//  CourseList.add(new Course(The data points read from the file would be funneled into the parameters));
-		sc.close();
+	public CourseList (){
 	}
 
 	public static boolean add(Course c){
