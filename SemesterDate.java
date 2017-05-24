@@ -19,6 +19,14 @@ public class SemesterDate {
 		return year;
 	}
 	
+	public String saveString(){
+		return this.year + "-" + this.sNumber;
+	}
+	public static SemesterDate readFrom(String saveString){
+		String[] parsed = saveString.split("-");
+		return new SemesterDate(Integer.parseInt(parsed[0]), Integer.parseInt(parsed[1]));
+	}
+	
 	public int getStartMonth(){
 		switch(sNumber){
 		case FALL:
