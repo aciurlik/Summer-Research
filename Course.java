@@ -314,24 +314,6 @@ public class Course implements ScheduleElement{
 	
   
   
-	@Override
-	public boolean isDuplicate(ScheduleElement other) {
-		if(! ( other instanceof Course )){
-			return false;
-		}
-		return this.coursePrefix.compareTo(((Course)other).coursePrefix) == 0;
-	}
-
-
-
-	@Override
-	public String getDisplayString() {
-		// TODO Auto-generated method stub
-		return this.toString();
-	}
-
-  
-  
 	
 	public static void main(String[] args){
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
@@ -344,7 +326,7 @@ public class Course implements ScheduleElement{
 		//TODO check out when you read in again it's military time?
 
 	
-	
+	}
 	
 	
 }

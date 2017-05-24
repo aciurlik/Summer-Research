@@ -42,13 +42,11 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		super();
 		
 		this.sch=sch;
-		this.setVisible(true);
 		this.setBackground(Color.yellow);
 		//This will be deleted once we set it relative to the whole. 
 		this.setPreferredSize(new Dimension(1000, 500));
 		
 		
-		scrollPanel.setVisible(true);
 		scrollPanel.setBackground(Color.yellow);//Same as Schedule Panel
 
 		scrollPanel.setLayout(new GridLayout(1, numberOfRegularSemesters+1, spaceConstant, spaceConstant));//+1 For button
@@ -57,7 +55,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		
 		
 		
-		this.sch.semesters.sort(null);
+		Collections.sort(sch.semesters);
 	
 		
 		for (int i=0; i<this.sch.semesters.size(); i++){
@@ -97,7 +95,6 @@ public class SchedulePanel extends JPanel implements ActionListener{
 				
 			}
 		
-			semester.setPreferredSize(new Dimension(500, 0));
 			scrollPanel.add(semester);
 			
 
