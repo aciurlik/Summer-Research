@@ -52,14 +52,11 @@ public class RequirementPanel extends JPanel {
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
 			// TODO Auto-generated method stub
-			System.out.println("Starting drag");
 		}
 
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
-			System.out.println("Finished drag");
-			System.out.println("After parent:" + getParent());
 			source.revalidate();
 			source.repaint();
 		}

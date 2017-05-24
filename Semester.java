@@ -64,6 +64,11 @@ public class Semester implements Comparable<Semester>{
 		
 	}
 	
+	public ArrayList<Course> getCoursesSatisfying(Requirement r){
+		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
+		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
+	}
+	
 	public boolean remove(ScheduleElement e){
 		this.schedule.checkErrorsWhenRemoving(e, this);
 		this.elements.remove(e);

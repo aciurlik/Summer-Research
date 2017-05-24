@@ -80,6 +80,13 @@ public abstract class ComponentDragHandler extends TransferHandler {
 	}
 	
 	
+	/**
+	 * The first call to getImage will set the drag image
+	 * to be the paint of this component.
+	 * After that, future calls return the first image.
+	 * @param c
+	 * @return
+	 */
 	public Image getImage(JComponent c){
 		if(mouseImage != null){
 			return mouseImage;
