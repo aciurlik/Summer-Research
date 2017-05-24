@@ -55,7 +55,6 @@ public class Course implements ScheduleElement{
 	
 	
 	public Prefix getPrefix(){
-		
 		return coursePrefix;
 	}
 
@@ -69,9 +68,6 @@ public class Course implements ScheduleElement{
 	
 	
 	public String meetingDaysCode(){
-		if (meetingDays==null){
-			return"";
-		}
 		String result = "";
 		for (int day : meetingDays){
 			result += dayCodes[day];
@@ -192,6 +188,7 @@ public class Course implements ScheduleElement{
 			result.append( this.meetingTime.start.clockTime() + " ");
 		}
 		result.append(this.professor);
+		
 		return result.toString();
 	}
 	
@@ -312,36 +309,17 @@ public class Course implements ScheduleElement{
 		
 	}
 	
-  
-  
-	@Override
-	public boolean isDuplicate(ScheduleElement other) {
-		if(! ( other instanceof Course )){
-			return false;
-		}
-		return this.coursePrefix.compareTo(((Course)other).coursePrefix) == 0;
-	}
-
-
-
-	@Override
-	public String getDisplayString() {
-		// TODO Auto-generated method stub
-		return this.toString();
-	}
-
-  
-  
 	
 	public static void main(String[] args){
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
 		Course c = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
 		c.setMeetingTime(11, true, 30, 50);
-    		c.setExamTime(new Time(2017, 6, 20, 13, 30, 0), 150);
+		c.setExamTime(new Time(2017, 6, 20, 13, 30, 0), 150);
 		System.out.println(c.saveString());
 		Course d = Course.readFrom(c.saveString());
 		System.out.println(d.saveString());
 		//TODO check out when you read in again it's military time?
+	}
 
 	
 	

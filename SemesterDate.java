@@ -1,6 +1,5 @@
 
-
-public class SemesterDate {
+public class SemesterDate implements Comparable<SemesterDate>{
 	public static final int SPRING = 1;
 	public static final int FALL = 2;
 	public static final int SUMMER = 3;
@@ -51,23 +50,11 @@ public class SemesterDate {
 		}
 	}
 
-	public String getSeason(int p){
-		String[] season = {null, "Spring", "Fall", "Summer", "MayX", "Other"};
-				
-				
-		return season[p];
-		
-	}
-	
-	//@Override
+	@Override
 	public int compareTo(SemesterDate o) {
 		if(this.year < o.year){
 			return - 1;
 		}
-		if(this.year > o.year){
-			return  1;
-		}
-		
 		if(this.sNumber < o.sNumber){
 			return -1;
 		}
@@ -77,6 +64,5 @@ public class SemesterDate {
 		else{
 			return 1;
 		}
-		
 	}
 }

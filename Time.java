@@ -1,5 +1,11 @@
-
-public class Time implements Comparable<Time> {
+/**
+ * A handy time class
+ * @author dannyrivers
+ *
+ */
+public class Time implements Comparable<Time>{
+	
+	
 	public static final int SUNDAY = 0;
 	public static final int MONDAY = 1;
 	public static final int TUESDAY = 2;
@@ -334,6 +340,9 @@ public class Time implements Comparable<Time> {
 		
 		
 	}
+	
+	
+	
 	
 
 }
