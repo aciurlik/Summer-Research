@@ -7,61 +7,43 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
-	public CourseList masterList;
-	
 	public Driver(){
 		CourseList masterList = new CourseList();
 		this.masterList = masterList;
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
 		Course a = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
+		Course b = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Harris", meetingDays, 4, 02);
 		masterList.add(a);
+		masterList.add(b);
 	}
 
-	
-	public static void main(String[] args){
-	
-		
-		
-	   JFrame frame = new JFrame();
-	  
-	   //frame.setSize(2000, 2000);
-	   
-	   
-	   
-	   JPanel p = new JPanel();
-	//   p.setVisible(true);
-	   
-	   Schedule test = Schedule.testSchedule();
-	   
-	   
-	   SchedulePanel s = new SchedulePanel(test);
-	   
-	  
-	  // s.setVisible(true);
-	   
-	  
-	   p.add(s);
-	  
-	  Requirement req = Requirement.testRequirement();
-	  RequirementPanel tester= new RequirementPanel(req);
-	 // tester.setVisible(true);
-	  p.add(tester);
-	  
-	  RequirementListPanel reqs = new RequirementListPanel(test);
-	   reqs.add(tester);
-	   reqs.add(tester);
-	  // reqs.setVisible(true);
-	   p.add(reqs);
-	  
-	   frame.add(p);
-	   frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	   frame.pack();
-	   frame.setVisible(true);
-	    
-	   
-	  
-	  
-	   
 
-}
+	public static void main(String[] args){
+
+		//Make data
+		Schedule test = Schedule.testSchedule();
+		
+
+		
+		//Start the GUI
+		
+		JPanel p = new JPanel();
+
+		SchedulePanel s = new SchedulePanel(test);
+		p.add(s);
+
+		RequirementListPanel reqs = new RequirementListPanel(test);
+		p.add(reqs);
+		
+		
+
+		JFrame frame = new JFrame();
+		frame.add(p);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+
+
+
+	}
 }
