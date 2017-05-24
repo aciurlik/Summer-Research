@@ -1,5 +1,4 @@
 
-
 public class OverlapException extends SchedulingException {
 	ScheduleElement i;
 	ScheduleElement j;
@@ -14,5 +13,4 @@ public class OverlapException extends SchedulingException {
 		this.i = i;
 		this.j = j;
 	}
-
 }

@@ -14,13 +14,7 @@ public class Schedule {
 	
 	public static Schedule testSchedule(){
 		Schedule result = new Schedule(null);
-		SemesterDate one= new SemesterDate(2018,SemesterDate.FALL);
-		SemesterDate two = new SemesterDate(2019, SemesterDate.SPRING);
-		Semester a = new Semester(one, result);
-		Semester b = new Semester(two, result);
-		result.semesters.add(a);
-		//result.semesters.add(b);
-		
+		result.majorsList.add(Major.testMajor());
 		return result;
 	}
 	
