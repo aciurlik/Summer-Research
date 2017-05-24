@@ -6,6 +6,8 @@ public class Major {
 	int groupNumber;
 	ArrayList<Requirement> reqList;
 	
+	public static final int MajorDDNRange = 100;
+	
 	public Major(String name){
 		this.name = name;
 		this.reqList = new ArrayList<Requirement>();
@@ -13,7 +15,7 @@ public class Major {
 	
 	public void addRequirement(Requirement r){
 		int dipNumber = r.doubleDipNumber;
-		addRequirement(r, dipNumber%100);
+		addRequirement(r, dipNumber%MajorDDNRange);
 		this.reqList.add(r);
 	}
 	/**
@@ -28,7 +30,7 @@ public class Major {
 	 * @param doubleDipNumber
 	 */
 	public void addRequirement(Requirement r, int doubleDipNumber){
-		r.setDoubleDipNumber(groupNumber * 100 + doubleDipNumber);
+		r.setDoubleDipNumber(groupNumber * MajorDDNRange + doubleDipNumber);
 	}
 	
 	public static Major testMajor(){

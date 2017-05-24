@@ -21,6 +21,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private String addAClass = "DROP A CLASS A HERE";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
+	JPanel hidePanel;
 	
 	
 	
@@ -34,14 +35,34 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		super();
 		this.classTitle=classTitle;
 		this.sem=sem;
-		this.setVisible(true);
+		
+		//Setup the defaultPanel, the panel which is visible whenever this
+		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		this.setBackground(c); //This allows the schedule Panel to control the color
 		defaultPanel.setBackground(this.getBackground());
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
 
+		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
+		// This panel includes a button to show the semester again.
+		this.hidePanel = new JPanel();
+		this.hidePanel.setBackground(Color.pink);
+		String showText = "Show Semester";
+		JButton showSemester = new JButton(showText);
+		showSemester.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				remove(hidePanel);
+				add(defaultPanel);
+				revalidate();
+				repaint();
+			}
+		}
+		);
+
+		hidePanel.add(showSemester);
+		
 		this.setLayout(new GridLayout(1, 1, 0, 0));
-		this.setVisible(true);
 		this.add(defaultPanel);
 		this.updatePanel();
 
@@ -54,8 +75,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	}
 
 
-
-
 	public int getRequirementNumber() {
 		return requirementNumber;
 	}
@@ -65,28 +84,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		
-		String show = "Show Semester";
+		//This method is called when you click the button to hide a semester.
 		this.remove(defaultPanel);
-	
-		
-		JPanel hide = new JPanel();
-		hide.setBackground(Color.pink);
-		JButton showSemester = new JButton(show);
-		showSemester.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				remove(hide);
-				add(defaultPanel);
-				revalidate();
-				repaint();
-			}
-		}
-				);
-
-		hide.add(showSemester);
-		this.add(hide);
-		
+		this.add(hidePanel);
 		this.revalidate();
 		this.repaint();
 
