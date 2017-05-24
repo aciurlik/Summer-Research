@@ -35,10 +35,10 @@ public class RequirementPanel extends JPanel {
 		this.add(new JLabel(req.getDisplayString()));
 	}
 	
+	
 	public Requirement getRequirement(){
 		return req;
 	}
-	
 	
 	/**
 	 * This class specifies the actions that should happen when 

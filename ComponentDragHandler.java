@@ -1,3 +1,6 @@
+
+
+import javax.swing.TransferHandler;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -13,39 +16,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.swing.JComponent;
-import javax.swing.TransferHandler;
 
-
-/**
- * PanelDropHandler and ComponentDragHandler work together.
- * PanelDropHandler can accept drops, while ComponentDragHandler 
- *   makes drops.
- * PanelDropHandler must specify what happens to the receiving container
- *   when a drop occurs, and ComponentDragHandler must specify what happens to
- *   the moving component and the donating container.
- *   
- * To use ComponentDragHandler, you should create a subclass handler.
- *   Your subclass should override the methods:
- *     public void initiateDrag(JComponent toBeDragged)
- *     public void afterDrop(Container source, JComponent dragged, boolean moveAction)
- * 
- * The former specifies actions that should happen as soon as a drag event starts.
- * The latter specifies actions that should happen after the drag event has completed. 
- *   if there is an error with the underlying DnD system, then 
- *    the argument 'dragged' may be null rather than the actual component.
- *   if moveAction is true, then this drag was specified by the user to be a move action.
- *     Most implementations decide that on a move action, the dragged component should be
- *     removed from the source container, but this is up to you.
- *   
- *   
- * 
- * 
- * @author dannyrivers
- *
- */
-
-public abstract class ComponentDragHandler extends TransferHandler {
+public abstract class ComponentDragHandler extends TransferHandler{
 	private Image mouseImage;
+	
 	
 	
 	public static final DataFlavor COMPONENT_FLAVOR;
@@ -181,6 +155,5 @@ public abstract class ComponentDragHandler extends TransferHandler {
 		}
 		afterDrop(source, dragged, action == TransferHandler.MOVE);
 	}
-
 
 }
