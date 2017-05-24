@@ -1,4 +1,3 @@
-
 public class DuplicateException extends SchedulingException{
 	ScheduleElement e1;
 	ScheduleElement e2;
