@@ -15,6 +15,7 @@ public class ScheduleElementPanel extends JPanel {
 	private int updateCount = 0;
 	private Requirement r;
 	private ScheduleElement s;
+
 //	Driver coursesSatisfy = new Driver();
 	JComboBox  requirmentDropDown = new JComboBox();
 	
@@ -22,16 +23,21 @@ public class ScheduleElementPanel extends JPanel {
 		super();
 		this.s=s;
 		if(s instanceof Requirement){
-		r=(Requirement)s;
+			r=(Requirement)s;
 		}
-		
+
 		else{
-		r=null;
-	
-				}
+			r=null;
+
+		}
 		this.updatePanel();
-	
+
 	}
+	
+	public ScheduleElement getElement(){
+		return s;
+	}
+
 
 	
 	
@@ -54,19 +60,17 @@ public class ScheduleElementPanel extends JPanel {
 				requirmentDropDown.addItem(listOfCourses.get(i));
 			}
 			this.add(requirmentDropDown);
-			System.out.println("The drop is added");
 			
 		}
 		
-		
-		
-}
-		
- 		
 	
+}
 
 
-		
+
+
+
+
 
 
 

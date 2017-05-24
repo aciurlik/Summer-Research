@@ -19,6 +19,8 @@ public class Schedule {
 		Semester a = new Semester(one, result);
 		Semester b = new Semester(two, result);
 		result.semesters.add(a);
+		
+		result.addMajor(Major.testMajor());
 		//result.semesters.add(b);
 		
 		return result;

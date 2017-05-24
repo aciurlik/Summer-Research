@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
+	
 	private Semester sem;
 
 	private int classCounter = 0;
@@ -99,7 +100,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	
 	
 	
-
+	//Redraw this panel based on the semester sem.
 	public void updatePanel(){
 		defaultPanel.removeAll();
 		
@@ -153,29 +154,27 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	
 	
 	public void addElement(ScheduleElement e){
-		
+		sem.add(e);
+		ScheduleElementPanel requirementPanel = new ScheduleElementPanel(e);
+		updatePanel();
 	}
 	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-			
-			
-			RequirementPanel d =  (RequirementPanel) draggedItem;
-			addElement(d.getRequirement());
-			sem.add(d.getRequirement());
-			ScheduleElementPanel requirementPanel = new ScheduleElementPanel(d.getRequirement());
-			receiver.add(requirementPanel);
-			updatePanel();
-		
-		
-
+			try{
+				RequirementPanel d =  (RequirementPanel) draggedItem;
+				addElement(d.getRequirement());
+			}catch(Exception e){
+				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
+				addElement(p.getElement());
 			}
-
-
 		}
-	
+
 
 	}
+
+
+}
 
