@@ -7,15 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
-	public Driver(){
-		CourseList masterList = new CourseList();
-		this.masterList = masterList;
-		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
-		Course a = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
-		Course b = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Harris", meetingDays, 4, 02);
-		masterList.add(a);
-		masterList.add(b);
-	}
+
 
 
 	public static void main(String[] args){
@@ -23,7 +15,6 @@ public class Driver {
 		//Make data
 		Schedule test = Schedule.testSchedule();
 		
-
 		
 		//Start the GUI
 		

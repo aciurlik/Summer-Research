@@ -109,11 +109,16 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		if(this.name != null){
 			return this.name;
 		}
-		if(numToChoose == 1){
+		if(choices.length == 1){
 			return choices[0].toString();
 		}
-		else{
-			return String.format("%d of %s", numToChoose, choices.toString());
+		else{ //choices has length at least 2.
+			String choicesString = "";
+			for(Prefix p : choices){
+				choicesString += p.toString() + ",";
+			}
+			choicesString = choicesString.substring(0,choicesString.length() - 1);
+			return String.format("%d of %s", numToChoose, choicesString);
 		}
 	}
 	

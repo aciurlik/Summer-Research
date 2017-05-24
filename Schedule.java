@@ -13,7 +13,8 @@ public class Schedule {
 	boolean reqListValid;
 	
 	public static Schedule testSchedule(){
-		Schedule result = new Schedule(null);
+		CourseList l = CourseList.testList();
+		Schedule result = new Schedule(l);
 		SemesterDate one= new SemesterDate(2018,SemesterDate.FALL);
 		SemesterDate two = new SemesterDate(2019, SemesterDate.SPRING);
 		Semester a = new Semester(one, result);
