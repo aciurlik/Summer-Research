@@ -1,6 +1,10 @@
 
 
 
+import java.util.ArrayList;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -13,6 +17,7 @@ public class ScheduleElementPanel extends JPanel {
 		this.s=s;
 		if(s instanceof Requirement){
 		r=(Requirement)s;
+		
 		}
 		else{
 		r=null;
@@ -26,8 +31,19 @@ public class ScheduleElementPanel extends JPanel {
 		public void updatePanel(){
 			JLabel requirementLabel = new JLabel(s.getDisplayString());
 			this.add(requirementLabel);
+			
 		
 	}
+		
+		public void dropDownGetRequirmentsFulfilled(){
+			ArrayList requirmentsFulfilled = r.getRequirementsFulfilled();
+			for(int i=0; i<requirmentsFulfilled.size(); i++){
+			 requirment	singleReq = requirmentsFulfilled.get(i);
+				
+			}
+			JComboBox petList = new JComboBox();
+			this.add(petList);
+		}
 }
 
 

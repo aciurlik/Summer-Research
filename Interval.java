@@ -1,14 +1,6 @@
 
-
-/**
- * A class that represents a time interval between startTime and endTime.
- * startTime must be less than endTime, so
- * starTime.compareTo(endTime) <= 0 should always be true.
- * 
- * @author dannyrivers
- *
- */
 public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>>{
+
 	T start;
 	T end;
 	
@@ -87,5 +79,6 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 		return String.format("[%s,%s]", start.toString(), end.toString());
 	}
 	
+
 
 }

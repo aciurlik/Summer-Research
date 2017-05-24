@@ -29,10 +29,13 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	private int numberOfRegularSemesters=12;
 	private int spaceConstant=5;
 	private int buttonPress=0;
+//	private int buttonCounter=0;
+//	private int doubleCounter=1;
+//	private int removalCount=0;
 	JPanel scrollPanel = new JPanel();
-	JPanel addButtonPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
-	JButton addSemester = new JButton("+");
+	JButton addSemesterButton = new JButton("+");
+	
 
 	public SchedulePanel(Schedule sch) {
 
@@ -103,13 +106,12 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		}
 		
 		//Took add Button Panel from here and put it at the top
-		addButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
-		addButtonPanel.setBackground(scrollPanel.getBackground());
+		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
+		addExtraSemesterButtonPanel.setBackground(scrollPanel.getBackground());
 		JButton addSemester = new JButton("+");
 		addSemester.setPreferredSize(new Dimension(50, 50)); //Arbitrary size
-
-		addButtonPanel.add(addSemester);
-		scrollPanel.add(addButtonPanel);
+		addExtraSemesterButtonPanel.add(addSemester);
+		scrollPanel.add(addExtraSemesterButtonPanel);
 		addSemester.addActionListener(this);
 
 
@@ -126,32 +128,29 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		this.revalidate();
-		this.repaint();
+
 		
-		Semester newSchedule = sch.addNewSemester();
+		Semester newSemester = sch.addNewSemester();
 		String extraSemesterClassTitle = "Super Senior";
 		Color extraSemesterColor = Color.pink;
 		
 		scrollPanel.setLayout(new GridLayout(1, numberOfRegularSemesters+buttonPress+1, spaceConstant, spaceConstant));
-		scrollPanel.remove(addButtonPanel);
-	
 		scrollPanel.remove(addExtraSemesterButtonPanel);
-		SemesterPanel semester = new SemesterPanel(extraSemesterClassTitle, newSchedule , extraSemesterColor);
+		
+		
+		SemesterPanel semester = new SemesterPanel(extraSemesterClassTitle, newSemester , extraSemesterColor);
 		semester.setPreferredSize(new Dimension(500, 0));
 		semester.setBackground(Color.pink);
 		scrollPanel.add(semester);
 		
 
-		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100));
-		addExtraSemesterButtonPanel.setBackground(Color.green);
-		
-		addSemester.setPreferredSize(new Dimension(50, 50)); //Arbitrary size
+		addSemesterButton.setPreferredSize(new Dimension(50, 50)); //Arbitrary size
 
-		addExtraSemesterButtonPanel.add(addSemester);
+		//addExtraSemesterButtonPanel.add(addSemesterButton);
 		scrollPanel.add(addExtraSemesterButtonPanel);
-		addSemester.addActionListener(this);
+		
 	
+			
 		this.revalidate();
 		this.repaint();
 		

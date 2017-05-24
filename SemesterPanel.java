@@ -8,24 +8,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
 	private Semester sem;
 
-
-	
-	/**
-	 * 
-	 */
-	private int buttonCounter = 0;
 	private int classCounter = 0;
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
-	private String deleteButton = "-";
 	private String addAClass = "DROP A CLASS A HERE";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
@@ -51,7 +43,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setVisible(true);
 		this.add(defaultPanel);
-		System.out.println("ORGINAL SIZE" + this.sem.elements.size());
 		this.updatePanel();
 
 	}
@@ -71,13 +62,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
-
-
-
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		buttonCounter++;
+
 		
 		String show = "Show Semester";
 		this.remove(defaultPanel);
@@ -105,9 +92,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	}
 	
-	public void addElement(ScheduleElement e){
-		
-	}
+
+	
+	
+	
+	
+	
+	
 
 	public void updatePanel(){
 		defaultPanel.removeAll();
@@ -123,15 +114,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			season="Error";
 		}
 		
-		
-
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		defaultPanel.add(FallSpring);
-		
-		
-		
-
-		
+				
 		for (int i=0; i<this.sem.elements.size(); i++){
 			ScheduleElementPanel element = new ScheduleElementPanel(this.sem.elements.get(i));
 			defaultPanel.add(element);	
@@ -156,12 +141,19 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.revalidate();
 		this.repaint();
 		}
+		
+		//Add button to hide Semester
 		JButton deleteSemester= new JButton("-");
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
+	}
+	
+	
+	
+	
+	
+	public void addElement(ScheduleElement e){
 		
-		
-		System.out.println("UPDATED SIZE" + this.sem.elements.size());
 	}
 	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
@@ -183,25 +175,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 		}
-	public class RequirementPanelDragHandler extends ComponentDragHandler{
-
-		@Override
-		public void initiateDrag(JComponent toBeDragged) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void afterDrop(Container source, JComponent dragged,
-				boolean moveAction) {
-			// Whether moveAction is true or false, we will leave the old panel
-			
-			
-		}
-		
-		
-
-	}
+	
 
 	}
 

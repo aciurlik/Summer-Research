@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-
 public class Intervals<T extends Comparable<T>> {
 	
 	ArrayList<Interval<T>> intervals;
@@ -72,6 +71,5 @@ public class Intervals<T extends Comparable<T>> {
 		
 		
 	}
-	
 
 }
