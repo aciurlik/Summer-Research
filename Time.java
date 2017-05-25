@@ -4,8 +4,8 @@
  *
  */
 public class Time implements Comparable<Time>{
-	
-	
+
+
 	public static final int SUNDAY = 0;
 	public static final int MONDAY = 1;
 	public static final int TUESDAY = 2;
@@ -13,17 +13,17 @@ public class Time implements Comparable<Time>{
 	public static final int THURSDAY = 4;
 	public static final int FRIDAY = 5;
 	public static final int SATURDAY = 6;
-	
+
 	public static final String[] daysConversion = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-	
+
 	int day; //(1) thru (numDays)
 	int month; // 1 thru 12
 	int year; // regular year, as in 2017 right now.
 	int hours; // military time, so 0 thru 23
 	int minutes; //0 thru 59
 	int seconds; //0 thru 59
-	
-	
+
+
 	public final static int[] daysInMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
 	/**
 	 * Copy constructor
@@ -64,7 +64,7 @@ public class Time implements Comparable<Time>{
 	public Time(int year, int month, int day, int hours, int minutes){
 		this(year, month, day, hours, minutes, 0);
 	}
-	
+
 	/**
 	 * Assumes military time for hours
 	 * @param hours
@@ -85,10 +85,10 @@ public class Time implements Comparable<Time>{
 	public Time(int hours, boolean AM,  int minutes, int seconds ){
 		this(2000, 1, 1, Time.toMilitary(hours, AM), minutes, seconds);
 	}
-	
-	
-	
-	
+
+
+
+
 	public static int toMilitary(int hours, boolean AM){
 		if(hours == 12 ){
 			if(AM) return 0;
@@ -99,8 +99,8 @@ public class Time implements Comparable<Time>{
 		}
 		return hours + 12;
 	}
-	
-	
+
+
 	/**
 	 * Return a new time that is the specified number
 	 * of minutes after this time.
@@ -154,7 +154,7 @@ public class Time implements Comparable<Time>{
 			throw new RuntimeException(month + "is an invalid month");
 		}
 	}
-	
+
 	public int dayOfWeek(){
 		//jan 1 2000 was a saturday = 6
 		int result =  (int)(((this.toSec() / (60 * 60 * 24)) + 6 )%7);
@@ -180,9 +180,9 @@ public class Time implements Comparable<Time>{
 			this.nextDay();
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Find the number of days that have passed 
 	 * since the start of this year,
@@ -205,12 +205,12 @@ public class Time implements Comparable<Time>{
 		}
 		result += this.day - 1;
 		return result;
-		
+
 	}
 	public boolean isLeapYear(){
 		return (this.year % 4 == 0) && (this.year % 100 != 0); 
 	}
-	
+
 	/**
 	 * This method returns an estimated number of seconds since midnight 2000
 	 * This estimate does not take into account leap seconds, 
@@ -225,8 +225,8 @@ public class Time implements Comparable<Time>{
 		// 60 * 60 * 24 sec in a day
 		// 60 * 60 * 24 * 365 sec in a year (or 366 for leap year)
 		long totalSec = 0;
-		
-		
+
+
 		//TODO there is an issue calculating negative leap years.
 		// It's taking away one day to many if the time is before 
 		// 2000 (negative yearsSince)
@@ -235,34 +235,34 @@ public class Time implements Comparable<Time>{
 		int yearsSince = this.year - 2000;
 		int leapYears = yearsSince / 4;
 		leapYears += - yearsSince / 100; // if divisible by 100, 
-					//a year isn't a leap year.
-		
+		//a year isn't a leap year.
+
 		totalSec += yearsSince * 60 * 60 * 24 * 365; //every year has 365 days
 		totalSec += leapYears * 60 * 60 * 24 * 1;    //but leap years add an extra day
-		
+
 		//If it is currently a leap year then we shouldn't have added the 
 		// extra day from this year (it will be handled in future calculations)
 		if(this.isLeapYear()){
 			totalSec -= 60 * 60 * 24;
 		}
-		
+
 		totalSec += this.daysThisYear() * 60 * 60 * 24;
 		totalSec += (this.hours) * 60 * 60;
 		totalSec += this.minutes * 60;
 		totalSec += this.seconds;
-		
+
 		return totalSec;
-				
+
 	}
-	
+
 	public String clockTime(){
 		return this.hours + ":" + this.minutes;
 	}
-	
+
 	public boolean isAM(){
 		return (this.hours >=12);
 	}
-	
+
 	/**
 	 * Rounds down if seconds don't match up.
 	 * @param other
@@ -273,7 +273,7 @@ public class Time implements Comparable<Time>{
 	}
 	@Override
 	public int compareTo(Time that) {
-		
+
 		if(this.toSec() > that.toSec()){
 			return 1;
 		}
@@ -282,12 +282,12 @@ public class Time implements Comparable<Time>{
 		}
 		return 0;
 	}
-	
+
 	public String toString(){
-	return this.day + "/" + this.month + "/" + this.year + " " 
-	+ this.hours + ":" + this.minutes + ":" + this.seconds;
+		return this.day + "/" + this.month + "/" + this.year + " " 
+				+ this.hours + ":" + this.minutes + ":" + this.seconds;
 	}
-	
+
 	public static Time readFrom(String s){
 		String[] split = s.split(" ");
 		String[] larges = split[0].split("/");
@@ -300,49 +300,49 @@ public class Time implements Comparable<Time>{
 		int seconds = Integer.parseInt(smalls[2]);
 		return new Time(year, month, day, hours, minutes, seconds);
 	}
-	
-	
+
+
 	public static void main(String[] args){
-		
-		
+
+
 		Time t = new Time(2003,1,31,10,30);
 		Time s = new Time(2003,1,31,11,0);
 		Time v = new Time(2004,3,1,0,0);
-		
+
 		System.out.println(t.minutesUntil(s));
-		
-		
-//		double year = 31536000;
-//		double day = 60 * 60 * 24;
-//		long v1 = t.toSec();
-//		long v2 = s.toSec();
-//		long v3 = v.toSec();
-//		//double day = 60 * 60 * 24;
-//		System.out.println(v1+ "\n" + v2  + "\n" + v3 + "\n");
-//		System.out.println(t.toSec() / day + "\n" + 
-//				   s . toSec() / day  + "\n" + v.toSec() / day + "\n");
-//		System.out.println((v3 - v2) / day);
-//		
-//		
-//		
-		
-		
-//		t = new Time(1999, 1, 1, 0,0,0);
-//		for (int i = 0; i < 366 * 2 ; i ++){
-//			long t1 = t.toSec();
-//			t.nextDay();
-//			long t2 = t.toSec();
-//			if(t2 - t1 != 60 * 60 * 24){
-//				System.out.println(t);
-//			}
-//		}
-		
-		
-		
+
+
+		//		double year = 31536000;
+		//		double day = 60 * 60 * 24;
+		//		long v1 = t.toSec();
+		//		long v2 = s.toSec();
+		//		long v3 = v.toSec();
+		//		//double day = 60 * 60 * 24;
+		//		System.out.println(v1+ "\n" + v2  + "\n" + v3 + "\n");
+		//		System.out.println(t.toSec() / day + "\n" + 
+		//				   s . toSec() / day  + "\n" + v.toSec() / day + "\n");
+		//		System.out.println((v3 - v2) / day);
+		//		
+		//		
+		//		
+
+
+		//		t = new Time(1999, 1, 1, 0,0,0);
+		//		for (int i = 0; i < 366 * 2 ; i ++){
+		//			long t1 = t.toSec();
+		//			t.nextDay();
+		//			long t2 = t.toSec();
+		//			if(t2 - t1 != 60 * 60 * 24){
+		//				System.out.println(t);
+		//			}
+		//		}
+
+
+
 	}
-	
-	
-	
-	
+
+
+
+
 
 }

@@ -11,10 +11,10 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 	int numFinished;
 	int doubleDipNumber;
 	String name;
-	
+
 	public static final int defaultDDN = 0;
-	
-	
+
+
 
 	/**
 	 *
@@ -22,14 +22,14 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 	public static Requirement testRequirement(){
 		return new Requirement(new Prefix[]{new Prefix("MTH", 220)}, 1);
 	}
-	
+
 	public Requirement(Prefix[] choices, int numToChoose){
 		this.choices = choices;
 		Arrays.sort(this.choices);
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = Requirement.defaultDDN;
 	}
-	
+
 	public boolean isSatisfiedBy(Course c){
 		for (Prefix p : choices){
 			if(c.coursePrefix.compareTo(p) == 0){
@@ -71,7 +71,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		if(dipDifference != 0){
 			return dipDifference;
 		}
-		
+
 		//Compare based on numToChoose
 		int numChooseDifference = this.numToChoose - other.numToChoose;
 		if(numChooseDifference != 0){
@@ -90,8 +90,8 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 			}
 		}
 		return 0;
-		
-		
+
+
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 			return String.format("%d of %s", numToChoose, choicesString);
 		}
 	}
-	
+
 	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
 
 	public String saveString(){
@@ -146,10 +146,10 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 			result.setDoubleDipNumber(Integer.parseInt(parsed[3]));
 		}
 		catch (Exception e){
-			
+
 		}
 		return result;
-		
+
 	}
 
 	@Override

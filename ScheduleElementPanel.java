@@ -25,9 +25,9 @@ public class ScheduleElementPanel extends JPanel {
 		super();
 		this.s=s;
 		if(s instanceof Requirement){
-		r=(Requirement)s;
+			r=(Requirement)s;
 		}
-		
+
 		else{
 
 			r=null;
@@ -68,12 +68,12 @@ public class ScheduleElementPanel extends JPanel {
 
 
 }
-		
- 		
-	
 
 
-		
+
+
+
+
 
 
 
