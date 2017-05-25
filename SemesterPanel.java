@@ -200,5 +200,4 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 	
 
-	}
 
