@@ -9,20 +9,19 @@ import javax.swing.ListSelectionModel;
 
 public class ExtrasAddList {
 	
-	public ExtrasAddList(){
-		
-		JFrame frame = new JFrame();
+	public ExtrasAddList(String type){
+		//Creates the PopUp Window
+		JFrame frame = new JFrame(type);
 		JPanel addMajor = new JPanel();
 		addMajor.setPreferredSize(new Dimension( 1000, 1001));
-		addMajor.setBackground(Color.BLACK);
+		addMajor.setBackground(Color.MAGENTA);
 		
-		JList listOfMajor = new JList();
-		listOfMajor.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		listOfMajor.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-		addMajor.add(listOfMajor);
 		
-		JScrollPane listScroller = new JScrollPane(addMajor);
-		listScroller.setPreferredSize(new Dimension (200, 100));
+		
+		//Creates list
+	//	DefaultListModel<>
+		
+	
 		
 		
 		
