@@ -311,7 +311,9 @@ public class Course implements ScheduleElement{
 		
 		
 	}
-	
+	public Course readFromFurman(String firstLine, String secondLine){
+		return null;
+	}
   
   
 	

@@ -42,6 +42,11 @@ public class SemesterDate {
 		}
 	}
 	
+	/**
+	 * Return the next school semester, either in fall or spring.
+	 *  
+	 * @return
+	 */
 	public SemesterDate next(){
 		if(this.sNumber == SemesterDate.FALL){
 			return new SemesterDate(this.year + 1, SemesterDate.SPRING);

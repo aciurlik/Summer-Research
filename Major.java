@@ -16,7 +16,6 @@ public class Major {
 	public void addRequirement(Requirement r){
 		int dipNumber = r.doubleDipNumber;
 		addRequirement(r, dipNumber%MajorDDNRange);
-		this.reqList.add(r);
 	}
 	/**
 	 * Add this requirement with the specified doubleDipNumber
@@ -31,6 +30,7 @@ public class Major {
 	 */
 	public void addRequirement(Requirement r, int doubleDipNumber){
 		r.setDoubleDipNumber(groupNumber * MajorDDNRange + doubleDipNumber);
+		this.reqList.add(r);
 	}
 	
 	public static Major testMajor(){
@@ -62,8 +62,8 @@ public class Major {
 				new Prefix("MTH",504)
 				}, 		
 				1);
-		electives.setName("Electives");
-		result.addRequirement(electives, 2);
+		electives.setName("4 Electives");
+		result.addRequirement(electives, 4);
 		return result;
 	}
 	

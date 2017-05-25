@@ -7,11 +7,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
+	
+	SchedulePanel sch;
+	RequirementListPanel reqs;
+	
 
-
-
-	public static void main(String[] args){
-
+	
+	public Driver(){
 		//Make data
 		Schedule test = Schedule.testSchedule();
 		
@@ -20,10 +22,10 @@ public class Driver {
 		
 		JPanel p = new JPanel();
 
-		SchedulePanel s = new SchedulePanel(test);
-		p.add(s);
+		sch = new SchedulePanel(test, this);
+		p.add(sch);
 
-		RequirementListPanel reqs = new RequirementListPanel(test);
+		reqs = new RequirementListPanel(test);
 		p.add(reqs);
 		
 		
@@ -34,7 +36,11 @@ public class Driver {
 		frame.pack();
 		frame.setVisible(true);
 
+	}
 
+
+	public static void main(String[] args){
+		new Driver();
 
 	}
 }

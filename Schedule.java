@@ -14,12 +14,7 @@ public class Schedule {
 	
 	public static Schedule testSchedule(){
 		CourseList l = CourseList.testList();
-		Schedule result = new Schedule(l);
-		SemesterDate one= new SemesterDate(2018,SemesterDate.FALL);
-		SemesterDate two = new SemesterDate(2019, SemesterDate.SPRING);
-		Semester a = new Semester(one, result);
-		Semester b = new Semester(two, result);
-		result.semesters.add(a);
+		Schedule result = new Schedule(l, new SemesterDate(2017, SemesterDate.FALL), null);
 		
 		result.addMajor(Major.testMajor());
 		//result.semesters.add(b);
@@ -27,12 +22,31 @@ public class Schedule {
 		return result;
 	}
 	
-	public Schedule(CourseList masterList){
+	/**
+	 * Make a new schedule of semesters where firstSemester is the first shown semester 
+	 * and currentSemester is the first semester that might be scheduled
+	 * (assume that earlier semesters have passed and already have their courses fixed.)
+	 * @param masterList
+	 * @param firstYear
+	 * @param currentSemester
+	 */
+	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
+		
+		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
-		this.semesters = new ArrayList<Semester>();
+		//add the GERs major
 		this.reqsList = new ArrayList<Requirement>();
 		reqListValid = false;
+		
+		//Course list
 		this.masterList = masterList;
+		
+		//Semesters
+		this.semesters = new ArrayList<Semester>();
+		for(int i = 0;i < 8 ; i ++){
+			this.semesters.add(new Semester(firstSemester, this));
+			firstSemester = firstSemester.next();
+		}
 		
 	}
 	
@@ -51,12 +65,15 @@ public class Schedule {
 		checkDuplicates(e);
 	}
 	public void added(ScheduleElement e, Semester s){
+		//Make sure this course is accurate on which reqs it satisfies
 		if (e instanceof Course){
 			updateRequirementsSatisfied((Course)e);
 		}
+		// tell each such requirement that it got one more satisfaction.
 		for (Requirement r : e.getRequirementsFulfilled()){
 			r.numFinished ++;
 		}
+		reqListValid = false;
 		
 	}
 	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
@@ -171,6 +188,8 @@ public class Schedule {
 				}
 			}
 		}
+		Collections.sort(reqsList);;
+		reqListValid = true;
 	}
 	
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
@@ -255,7 +274,7 @@ public class Schedule {
 		//Tell the courses which requirements they satisfy
 		updateAllCourseRequirementsSatisfied();
 		//Tell the new requirements if some taken course satisfies them.
-		updateReqList();
+		reqListValid = false;
 	}
 	
 	public int getCreditHoursComplete(){
