@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 
@@ -65,6 +66,17 @@ public abstract class ComponentDragHandler extends TransferHandler {
 				JComponent c = (JComponent) e.getSource();
 				TransferHandler handler = c.getTransferHandler();
 				handler.exportAsDrag(c, e, TransferHandler.MOVE);
+			}
+		};
+	}
+	
+	public static MouseAdapter passingAdapter(){
+		return new MouseAdapter(){
+			@Override
+			public void mousePressed(MouseEvent e){
+				Component source = (Component) e.getSource();
+				MouseEvent parentEvent = SwingUtilities.convertMouseEvent(source, e, source.getParent());
+		        source.getParent().dispatchEvent(parentEvent);
 			}
 		};
 	}
