@@ -120,7 +120,7 @@ public abstract class ComponentDragHandler extends TransferHandler {
 	public Transferable createTransferable(final JComponent c)
 	{
 		initiateDrag(c);
-		this.createImage(c);
+		this.getImage(c);
 		return new componentTransferable(c);
 	}
 	
