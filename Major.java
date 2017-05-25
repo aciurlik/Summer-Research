@@ -61,8 +61,8 @@ public class Major {
 				new Prefix("MTH",461),
 				new Prefix("MTH",504)
 		}, 		
-		4);
-		electives.setName("4 Electives");
+		7);
+		electives.setName("7 MTH Electives");
 		result.addRequirement(electives, 2);
 		return result;
 	}
