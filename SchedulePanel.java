@@ -46,7 +46,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		this.sch=sch;
 		this.setBackground(Color.yellow);
 		//This will be deleted once we set it relative to the whole. 
-		//this.setPreferredSize(new Dimension(1000, 500));
+		this.setPreferredSize(new Dimension(1000, 500));
 
 
 		scrollPanel.setBackground(Color.yellow);//Same as Schedule Panel
