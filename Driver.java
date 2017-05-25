@@ -1,27 +1,17 @@
-
-
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.io.FileNotFoundException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
-	public static  CourseList masterList;
-	
-	public Driver(){
-		
-		//Data
-		
-		
-		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
-		Course a = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
-		Course b = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Harris", meetingDays, 4, 02);
 
-	
+	public static void main(String[] args){
 		JFrame frame = new JFrame();
-
-		//Put the SchedulePanel and RequirementsPanel inside p.
+		
+		
+		
+		 	//Put the SchedulePanel and RequirementsPanel inside p.
 		JPanel p = new JPanel();
 
 		Schedule test = Schedule.testSchedule();
@@ -29,12 +19,6 @@ public class Driver {
 		p.add(s);
 		frame.pack();
 
-		test.masterList.add(a);
-		test.masterList.add(b);
-		
-		
-		
-		
 		Requirement req = Requirement.testRequirement();
 		RequirementPanel tester= new RequirementPanel(req);
 		p.add(tester);
@@ -44,109 +28,27 @@ public class Driver {
 		reqs.add(tester);
 		reqs.add(tester);
 		p.add(reqs);
+		
+		////
+		MenuLookDemo menu = new MenuLookDemo();
+		frame.setJMenuBar(menu.createMenuBar());
+	    frame.setContentPane(menu.createContentPane());
+		
+	
+		
 		frame.pack();
 
 		frame.add(p);
+		
+		
+	
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
 
 
 	}
-
-	}
-
-	
-	/**public static void main(String[] args){
-	 *    JFrame frame = new JFrame();
-	  
-	   //frame.setSize(2000, 2000);
-	   
-	   
-	   
-	   JPanel p = new JPanel();
-	//   p.setVisible(true);
-	   
-	   Schedule test = Schedule.testSchedule();
-	   
-	   
-	   SchedulePanel s = new SchedulePanel(test);
-	   
-	  
-	  // s.setVisible(true);
-	   
-	  
-	   p.add(s);
-	  
-	  Requirement req = Requirement.testRequirement();
-	  RequirementPanel tester= new RequirementPanel(req);
-	 // tester.setVisible(true);
-	  p.add(tester);
-	  
-	  RequirementListPanel reqs = new RequirementListPanel(test);
-	   reqs.add(tester);
-	   reqs.add(tester);
-	  // reqs.setVisible(true);
-	   p.add(reqs);
-	  
-	   frame.add(p);
-	   frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	   frame.pack();
-	   frame.setVisible(true);
-	   
-	   	
-	   JFrame frame = new JFrame();
-	  
-	   //frame.setSize(2000, 2000);
-	   
-	   
-	   
-	   JPanel p = new JPanel();
-	//   p.setVisible(true);
-	   
-	   Schedule test = Schedule.testSchedule();
-	   
-	   
-	   SchedulePanel s = new SchedulePanel(test);
-	   
-	  
-	  // s.setVisible(true);
-	   
-	  
-	   p.add(s);
-	  
-	  Requirement req = Requirement.testRequirement();
-	  RequirementPanel tester= new RequirementPanel(req);
-	 // tester.setVisible(true);
-	  p.add(tester);
-	  
-	  RequirementListPanel reqs = new RequirementListPanel(test);
-	   reqs.add(tester);
-	   reqs.add(tester);
-	  // reqs.setVisible(true);
-	   p.add(reqs);
-	  
-	   frame.add(p);
-	   frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	   frame.pack();
-	   frame.setVisible(true);
-	    
-	   
-	  
-	  
-	   
-
 }
-}
-	    
-	   
-	  
-	  
-	   
-
-}
-}
-	 */
 	
 		
 	

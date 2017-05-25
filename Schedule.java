@@ -13,14 +13,14 @@ public class Schedule {
 	boolean reqListValid;
 	
 	public static Schedule testSchedule(){
-		Schedule result = new Schedule(null);
+		Schedule result = new Schedule(new CourseList());
+		
 		SemesterDate one= new SemesterDate(2018,SemesterDate.FALL);
 		SemesterDate two = new SemesterDate(2019, SemesterDate.SPRING);
 		Semester a = new Semester(one, result);
 		Semester b = new Semester(two, result);
 		result.semesters.add(a);
 		
-		result.addMajor(Major.testMajor());
 		//result.semesters.add(b);
 		
 		return result;

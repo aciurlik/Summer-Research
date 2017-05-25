@@ -14,33 +14,34 @@ import java.util.Scanner;
 
 public class CourseList {
 
-	private static ArrayList<Course> CourseList = new ArrayList<Course>();
+	private static ArrayList<Course> listOfCourses = new ArrayList<Course>();
 
 	public CourseList (){
 	}
 
 	public static boolean add(Course c){
 
-		return CourseList.add(c);
+		return listOfCourses.add(c);
+		
 	}
 
 	public static void addAt(Course c, int i){
-		CourseList.add(i, c);
+		listOfCourses.add(i, c);
 	}
 
 	public static Course removeCourse(Course c){
-		CourseList.remove(c);
+		listOfCourses.remove(c);
 		return c;
 	}
 
 	public static Course removeAtIndex(int i){
-		Course c = CourseList.remove(i);
+		Course c = listOfCourses.remove(i);
 		return c;
 
 	}
 	public  ArrayList<Course> getCoursesIn(Semester s){//I think we should go with a semester object, it seems simpler to me than using ints.
 		ArrayList<Course> SemesterList = new ArrayList<Course>();
-		for(Course course : CourseList){
+		for(Course course : listOfCourses){
 			if ( course.getSemester().equals(s)){
 				SemesterList.add(course);
 			}
@@ -50,7 +51,7 @@ public class CourseList {
 	}
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> GERList = new ArrayList<Course>();
-		for(Course course : CourseList){
+		for(Course course : listOfCourses){
 			if (r.isSatisfiedBy(course)){//If this was a time object change == to .equals s 
 				GERList.add(course);
 			}

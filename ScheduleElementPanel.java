@@ -17,7 +17,7 @@ public class ScheduleElementPanel extends JPanel {
 	private ScheduleElement s;
 //	Driver coursesSatisfy = new Driver();
 	JComboBox  requirmentDropDown = new JComboBox();
-	Driver test = new Driver();
+
 	
 	public ScheduleElementPanel(ScheduleElement s) { 
 		super();
@@ -50,7 +50,7 @@ public class ScheduleElementPanel extends JPanel {
 		
 		public void dropDownRequirment(){
 			
-			ArrayList<Course> listOfCourses = test.masterList.getCoursesSatisfying(this.r);
+			ArrayList<Course> listOfCourses = 
 			for( int i = 0; i< listOfCourses.size(); i++){
 				requirmentDropDown.addItem(listOfCourses.get(i));
 			}
