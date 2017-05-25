@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -47,7 +48,9 @@ public class RequirementListPanel extends JPanel{
 		// "Requirements" and "Credit Hours"
 		this.infoPanel = new JPanel();
 		creditHoursLabel = new JLabel(this.getCHText());
-		this.infoPanel.add(new JLabel("Requirements      "));
+		JLabel infoLabel = new JLabel("Requirements     ");
+		infoLabel.setFont(new Font(infoLabel.getFont().getName(), Font.PLAIN,18));
+		this.infoPanel.add(infoLabel);
 		this.infoPanel.add(creditHoursLabel);
 		this.infoPanel.setBackground(inner.getBackground());
 
