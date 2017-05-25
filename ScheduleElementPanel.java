@@ -1,11 +1,13 @@
 
 
 
+import java.awt.Container;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -13,25 +15,20 @@ import javax.swing.JPanel;
 
 public class ScheduleElementPanel extends JPanel {
 	private int updateCount = 0;
-	private Requirement r;
 	private ScheduleElement s;
+	private SemesterPanel container;
 
 
 	//	Driver coursesSatisfy = new Driver();
-	JComboBox  requirmentDropDown = new JComboBox();
+	JComboBox<ScheduleElement>  requirmentDropDown = new JComboBox<ScheduleElement>();
 
-	public ScheduleElementPanel(ScheduleElement s) {
-
+	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
 		super();
 		this.s=s;
-		if(s instanceof Requirement){
-			r=(Requirement)s;
-		}
-
-		else{
-
-			r=null;
-		}
+		this.container = container;
+		
+		this.setTransferHandler(new SEPDragHandler());
+		this.addMouseListener(ComponentDragHandler.getDragListener());
 
 	}
 
@@ -43,8 +40,8 @@ public class ScheduleElementPanel extends JPanel {
 
 
 	public void updatePanel(){ //This can be taken out later
-		JLabel requirementLabel = new JLabel(s.getDisplayString());
-		this.add(requirementLabel);
+		JLabel elementLabel = new JLabel(s.getDisplayString());
+		this.add(elementLabel);
 		if(s instanceof Requirement) {
 			updateDropDown();
 		}
@@ -54,15 +51,38 @@ public class ScheduleElementPanel extends JPanel {
 
 
 
+	/**
+	 * This should only be called if the schedule element is a requirement.
+	 */
 	public void updateDropDown(){
+		Requirement r = (Requirement)this.s;
 		this.requirmentDropDown.removeAllItems();
-		SemesterPanel container = (SemesterPanel)this.getParent().getParent();
-		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(this.r);
-		for( int i = 0; i< listOfCourses.size(); i++){
-			requirmentDropDown.addItem(listOfCourses.get(i));
+		//Find the list of courses that might satisfy this requirement
+		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(r);
+		for( Course c : listOfCourses){
+			requirmentDropDown.addItem(c);
 		}
 		this.add(requirmentDropDown);
+	}
+	
+	
+	public class SEPDragHandler extends ComponentDragHandler{
 
+		@Override
+		public void initiateDrag(JComponent toBeDragged) {
+			
+		}
+
+		@Override
+		public void afterDrop(Container source, JComponent dragged,
+				boolean moveAction) {
+			container.removeElement(s);
+			container.d.reqs.update();
+			container.d.reqs.revalidate();
+			container.d.reqs.repaint();
+			
+		}
+		
 	}
 
 
