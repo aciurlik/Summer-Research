@@ -29,10 +29,11 @@ public class Driver {
 
 		p.add(reqs);
 		
+		JFrame frame = new JFrame();
 		//Adds the menu bar
 		MenuLookDemo menu = new MenuLookDemo();
 		frame.setJMenuBar(menu.createMenuBar());
-	    frame.setContentPane(menu.createContentPane());
+	        frame.setContentPane(menu.createContentPane());
 		
 	
 		
