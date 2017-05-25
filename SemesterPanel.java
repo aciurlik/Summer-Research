@@ -20,7 +20,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
-	private String addAClass = "DROP A CLASS A HERE";
+	private String addAClass = "Drop a requirement here";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
 	JPanel hidePanel;
