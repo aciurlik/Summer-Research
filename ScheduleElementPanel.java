@@ -15,11 +15,13 @@ public class ScheduleElementPanel extends JPanel {
 	private int updateCount = 0;
 	private Requirement r;
 	private ScheduleElement s;
-//	Driver coursesSatisfy = new Driver();
+
+
+	//	Driver coursesSatisfy = new Driver();
 	JComboBox  requirmentDropDown = new JComboBox();
 
-	
-	public ScheduleElementPanel(ScheduleElement s) { 
+	public ScheduleElementPanel(ScheduleElement s) {
+
 		super();
 		this.s=s;
 		if(s instanceof Requirement){
@@ -27,40 +29,44 @@ public class ScheduleElementPanel extends JPanel {
 		}
 		
 		else{
-		r=null;
-	
-				}
-		this.updatePanel();
-	
+
+			r=null;
+		}
+
 	}
 
-	
-	
-		public void updatePanel(){ //This can be taken out later
-			JLabel requirementLabel = new JLabel(s.getDisplayString());
-			this.add(requirementLabel);
-			if(s instanceof Requirement) {
-				dropDownRequirment();
-			}
-			}
-			//If course is dropped then no dropDown Panel is needed
-			
-		
-		
-		
-		public void dropDownRequirment(){
-			
-			ArrayList<Course> listOfCourses = 
-			for( int i = 0; i< listOfCourses.size(); i++){
-				requirmentDropDown.addItem(listOfCourses.get(i));
-			}
-			this.add(requirmentDropDown);
-			System.out.println("The drop is added");
-			
+	public ScheduleElement getElement(){
+		return s;
+	}
+
+
+
+
+	public void updatePanel(){ //This can be taken out later
+		JLabel requirementLabel = new JLabel(s.getDisplayString());
+		this.add(requirementLabel);
+		if(s instanceof Requirement) {
+			updateDropDown();
 		}
-		
-		
-		
+	}
+	//If course is dropped then no dropDown Panel is needed
+
+
+
+
+	public void updateDropDown(){
+		this.requirmentDropDown.removeAllItems();
+		SemesterPanel container = (SemesterPanel)this.getParent().getParent();
+		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(this.r);
+		for( int i = 0; i< listOfCourses.size(); i++){
+			requirmentDropDown.addItem(listOfCourses.get(i));
+		}
+		this.add(requirmentDropDown);
+
+	}
+
+
+
 }
 		
  		

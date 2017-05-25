@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 
 public class Driver {
 
+
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
 		
@@ -29,7 +30,7 @@ public class Driver {
 		reqs.add(tester);
 		p.add(reqs);
 		
-		////
+		//Adds the menu bar
 		MenuLookDemo menu = new MenuLookDemo();
 		frame.setJMenuBar(menu.createMenuBar());
 	    frame.setContentPane(menu.createContentPane());

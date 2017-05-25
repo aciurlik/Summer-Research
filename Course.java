@@ -320,6 +320,8 @@ public class Course implements ScheduleElement{
 		Course c = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
 		c.setMeetingTime(11, true, 30, 50);
     		c.setExamTime(new Time(2017, 6, 20, 13, 30, 0), 150);
+    		
+    		
 		System.out.println(c.saveString());
 		Course d = Course.readFrom(c.saveString());
 		System.out.println(d.saveString());

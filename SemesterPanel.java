@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
+
 	private Semester sem;
 
 	private int classCounter = 0;
@@ -22,9 +23,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
 	JPanel hidePanel;
-	
-	
-	
+
+
+
 
 
 
@@ -35,7 +36,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		super();
 		this.classTitle=classTitle;
 		this.sem=sem;
-		
+
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
@@ -58,13 +59,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				repaint();
 			}
 		}
-		);
+				);
 
 		hidePanel.add(showSemester);
-		
+
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.add(defaultPanel);
-		this.updatePanel();
+		this.updatePanel(true);
 
 	}
 
@@ -72,6 +73,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	public int getClassCounter() {
 		return classCounter;
+	}
+
+	public Semester getSemester(){
+		return sem;
 	}
 
 
@@ -91,37 +96,45 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.repaint();
 
 	}
-	
 
-	
-	
-	
-	
-	
-	
 
-	public void updatePanel(){
+
+
+
+
+
+
+
+	//Redraw this panel based on the semester sem.
+	public void updatePanel(boolean repaint){
+
 		defaultPanel.removeAll();
+
 		
+		//Add the classTitle (Freshman, Sophomore)
 		JLabel ClassTitle = new JLabel(classTitle);
 		defaultPanel.add(ClassTitle);
-		
-		String season = sem.getDate().getSeason(sem.getDate().sNumber);
+
+		//Figure out the season and add it
+		SemesterDate d = sem.getDate();
+		String season = d.getSeason(d.sNumber);
 		if(season.equals("MayX") || season.equals("Summer")){
 			season="MayX/Summer";
 		}
 		if(season.equals("Other") || season.equals(null)){
 			season="Error";
 		}
-		
+		season += "-" + d.year;
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		defaultPanel.add(FallSpring);
-				
-		for (int i=0; i<this.sem.elements.size(); i++){
-			ScheduleElementPanel element = new ScheduleElementPanel(this.sem.elements.get(i));
-			defaultPanel.add(element);	
-		}
+
 		
+		for (ScheduleElement e : this.sem.elements){
+			ScheduleElementPanel element = new ScheduleElementPanel(e);
+			defaultPanel.add(element);
+			element.updatePanel();
+		}
+
 		if(sem.elements.size()==4){
 			JLabel dropLabel = new JLabel(addAClass);
 			dropLabel.setTransferHandler(new SemesterPanelDropHandler());
@@ -132,46 +145,50 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		for (int i= 0; i<DropsNeeded; i++){
 			JLabel dropLabel = new JLabel(addAClass);
 			defaultPanel.add(dropLabel);
-			
-		
-		
-		//Repaint 
-		defaultPanel.revalidate();
-		defaultPanel.repaint();
-		this.revalidate();
-		this.repaint();
+
 		}
-		
+
+		if(repaint){
+			//Repaint 
+			defaultPanel.revalidate();
+			defaultPanel.repaint();
+			this.revalidate();
+			this.repaint();
+		}
+
 		//Add button to hide Semester
 		JButton deleteSemester= new JButton("-");
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	public void addElement(ScheduleElement e){
-		
+
+		sem.add(e);
+		this.updatePanel(true);
+
 	}
-	
+
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-			
-			
-			RequirementPanel d =  (RequirementPanel) draggedItem;
-			addElement(d.getRequirement());
-			sem.add(d.getRequirement());
-			ScheduleElementPanel requirementPanel = new ScheduleElementPanel(d.getRequirement());
-			receiver.add(requirementPanel);
-			updatePanel();
-		
-		
 
+			try{
+				RequirementPanel d =  (RequirementPanel) draggedItem;
+				addElement(d.getRequirement());
+			}catch(Exception e){
+				e.printStackTrace();
+				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
+				addElement(p.getElement());
 			}
+		}
+
+	}
 
 
 		}
