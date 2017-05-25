@@ -1,7 +1,5 @@
-
-
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.io.FileNotFoundException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,32 +7,49 @@ import javax.swing.JPanel;
 public class Driver {
 
 
-
 	public static void main(String[] args){
-
-		//Make data
-		Schedule test = Schedule.testSchedule();
+		JFrame frame = new JFrame();
 		
 		
-		//Start the GUI
 		
+		 	//Put the SchedulePanel and RequirementsPanel inside p.
 		JPanel p = new JPanel();
 
+		Schedule test = Schedule.testSchedule();
 		SchedulePanel s = new SchedulePanel(test);
 		p.add(s);
+		frame.pack();
 
+		Requirement req = Requirement.testRequirement();
+		RequirementPanel tester= new RequirementPanel(req);
+		p.add(tester);
+		frame.pack();
+		
 		RequirementListPanel reqs = new RequirementListPanel(test);
+		reqs.add(tester);
+		reqs.add(tester);
 		p.add(reqs);
 		
+		//Adds the menu bar
+		MenuLookDemo menu = new MenuLookDemo();
+		frame.setJMenuBar(menu.createMenuBar());
+	    frame.setContentPane(menu.createContentPane());
 		
+	
+		
+		frame.pack();
 
-		JFrame frame = new JFrame();
 		frame.add(p);
+		
+		
+	
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
 
 
-
 	}
 }
+	
+		
+	

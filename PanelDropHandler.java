@@ -96,18 +96,17 @@ public abstract class PanelDropHandler extends TransferHandler{
 		}
 
 		Container container = (Container)support.getComponent();
-		//container.add(dataComponent);
+		container.add(dataComponent);
 		//      container.revalidate();
 		//      container.repaint();
-		//container.invalidate();
+		container.invalidate();
 		//container.getParent().revalidate();
 		//container.getParent().repaint();
 
 		//      JLabel label = (JLabel)component;
-
-		//DropLocation location = support.getDropLocation();
+		DropLocation location = support.getDropLocation();
 		//      System.out.println(label.getText() + " + " + location.getDropPoint());
-		//dataComponent.setLocation( location.getDropPoint() );
+		dataComponent.setLocation( location.getDropPoint() );
 		
 		recievedDrop(container, dataComponent);
 
