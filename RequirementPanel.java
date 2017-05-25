@@ -1,4 +1,6 @@
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -31,13 +33,24 @@ public class RequirementPanel extends JPanel {
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
 		
+		JLabel shown = new JLabel(req.getDisplayString());
 		
-		this.add(new JLabel(req.getDisplayString()));
+		if(this.req.isComplete()){
+			this.setBackground(Color.gray);
+		}
+		else{
+			this.setBackground(Color.yellow);
+		}
+		
+		this.add(shown);
+		
 	}
+	
 	
 	public Requirement getRequirement(){
 		return req;
 	}
+	
 	
 	
 	/**

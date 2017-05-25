@@ -35,12 +35,14 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
+	Driver d;
 	
 
-	public SchedulePanel(Schedule sch) {
+	public SchedulePanel(Schedule sch, Driver d) {
 
 		super();
 		
+		this.d = d;
 		this.sch=sch;
 		this.setBackground(Color.yellow);
 		//This will be deleted once we set it relative to the whole. 
@@ -63,10 +65,10 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			String soph = "Sophmore";
 			String jun= "Junior";
 			String sen = "Senior";
-			Color firstAndThirdYear = Color.blue;
+			Color firstAndThirdYear = Color.cyan;
 			Color secondAndFourthYear = Color.green;
 			SemesterPanel semester = null;
-			switch(i/3){
+			switch(i/2){
 			
 			//Perhaps add a SemesterDate element to retrieve which one?
 			//Does this not happen because it does not give this as a parameter?
@@ -74,22 +76,22 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			
 			
 			case 0: 
-				semester = new SemesterPanel(fresh, this.sch.semesters.get(i) , firstAndThirdYear);
+				semester = new SemesterPanel(fresh, this.sch.semesters.get(i) , firstAndThirdYear, this.d);
 				break;
 
 			
 			case 1:
-				semester = new SemesterPanel(soph, this.sch.semesters.get(i), secondAndFourthYear);
+				semester = new SemesterPanel(soph, this.sch.semesters.get(i), secondAndFourthYear, this.d);
 				break;
 			
 			
 			case 2:
-				semester = new SemesterPanel(jun, this.sch.semesters.get(i), firstAndThirdYear);
+				semester = new SemesterPanel(jun, this.sch.semesters.get(i), firstAndThirdYear, this.d);
 				break;
 				
 				
 			case 3: 
-				semester = new SemesterPanel(sen, this.sch.semesters.get(i),secondAndFourthYear);
+				semester = new SemesterPanel(sen, this.sch.semesters.get(i),secondAndFourthYear, this.d);
 				break;
 			
 				
@@ -135,7 +137,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		scrollPanel.remove(addExtraSemesterButtonPanel);
 		
 		
-		SemesterPanel semester = new SemesterPanel(extraSemesterClassTitle, newSemester , extraSemesterColor);
+		SemesterPanel semester = new SemesterPanel(extraSemesterClassTitle, newSemester , extraSemesterColor, d);
 		semester.setPreferredSize(new Dimension(500, 0));
 		semester.setBackground(Color.pink);
 		scrollPanel.add(semester);

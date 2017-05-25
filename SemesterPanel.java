@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +24,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
 	JPanel hidePanel;
+	Driver d;
 
 
 
@@ -30,12 +32,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
-	public SemesterPanel(String classTitle, Semester sem, Color c){
+	public SemesterPanel(String classTitle, Semester sem, Color c, Driver d){
 
 		//Sets up the panel that will hold one semester
 		super();
 		this.classTitle=classTitle;
 		this.sem=sem;
+		this.d = d;
+		
 
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
@@ -59,14 +63,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				repaint();
 			}
 		}
-				);
+		);
 
 		hidePanel.add(showSemester);
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
+		this.setPreferredSize(new Dimension(500,500));
 		this.add(defaultPanel);
 		this.updatePanel(true);
-
 	}
 
 
@@ -170,6 +174,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		sem.add(e);
 		this.updatePanel(true);
+		this.d.reqs.update();
+		this.d.reqs.revalidate();
+		this.d.reqs.repaint();
 
 	}
 
@@ -182,7 +189,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d.getRequirement());
 			}catch(Exception e){
-				e.printStackTrace();
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
 				addElement(p.getElement());
 			}

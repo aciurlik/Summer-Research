@@ -5,29 +5,28 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Driver {
+	
+	SchedulePanel sch;
+	RequirementListPanel reqs;
+	
 
 
-	public static void main(String[] args){
-		JFrame frame = new JFrame();
+	
+	public Driver(){
+		//Make data
+		Schedule test = Schedule.testSchedule();
+
 		
 		
 		
 		 	//Put the SchedulePanel and RequirementsPanel inside p.
 		JPanel p = new JPanel();
 
-		Schedule test = Schedule.testSchedule();
-		SchedulePanel s = new SchedulePanel(test);
-		p.add(s);
-		frame.pack();
+		sch = new SchedulePanel(test, this);
+		p.add(sch);
 
-		Requirement req = Requirement.testRequirement();
-		RequirementPanel tester= new RequirementPanel(req);
-		p.add(tester);
-		frame.pack();
-		
-		RequirementListPanel reqs = new RequirementListPanel(test);
-		reqs.add(tester);
-		reqs.add(tester);
+		reqs = new RequirementListPanel(test);
+
 		p.add(reqs);
 		
 		//Adds the menu bar
@@ -46,6 +45,11 @@ public class Driver {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
+
+	}
+
+	public static void main(String[] args){
+		new Driver();
 
 
 	}

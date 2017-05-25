@@ -49,6 +49,7 @@ public class RequirementListPanel extends JPanel{
 		creditHoursLabel = new JLabel(this.getCHText());
 		this.infoPanel.add(new JLabel("Requirements      "));
 		this.infoPanel.add(creditHoursLabel);
+		this.infoPanel.setBackground(inner.getBackground());
 		
 		//put all the items, including infoPanel and the requirement panels,
 		// into inner.
