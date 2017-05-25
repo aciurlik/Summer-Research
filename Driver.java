@@ -31,7 +31,7 @@ public class Driver {
 		
 		JFrame frame = new JFrame();
 		//Adds the menu bar
-		MenuLookDemo menu = new MenuLookDemo();
+		MainMenuBar menu = new MainMenuBar();
 		frame.setJMenuBar(menu.createMenuBar());
 	        frame.setContentPane(menu.createContentPane());
 		
