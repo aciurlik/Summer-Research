@@ -6,19 +6,19 @@ public class SemesterDate {
 	public static final int SUMMER = 3;
 	public static final int MAYX = 4;
 	public static final int OTHER = 5;
-	
+
 	int year;
 	int sNumber; //one of FALL, SPRING, MAYX, SUMMER, OTHER
-	
+
 	public SemesterDate(int year, int semesterNumber){
 		this.year = year;
 		this.sNumber = semesterNumber;
 	}
-	
+
 	public int getYear(){
 		return year;
 	}
-	
+
 	public String saveString(){
 		return this.year + "-" + this.sNumber;
 	}
@@ -26,7 +26,7 @@ public class SemesterDate {
 		String[] parsed = saveString.split("-");
 		return new SemesterDate(Integer.parseInt(parsed[0]), Integer.parseInt(parsed[1]));
 	}
-	
+
 	public int getStartMonth(){
 		switch(sNumber){
 		case FALL:
@@ -41,7 +41,7 @@ public class SemesterDate {
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * Return the next school semester, either in fall or spring.
 	 *  
@@ -58,12 +58,12 @@ public class SemesterDate {
 
 	public String getSeason(int p){
 		String[] season = {null, "Spring", "Fall", "Summer", "MayX", "Other"};
-				
-				
+
+
 		return season[p];
-		
+
 	}
-	
+
 	//@Override
 	public int compareTo(SemesterDate o) {
 		if(this.year < o.year){
@@ -72,7 +72,7 @@ public class SemesterDate {
 		if(this.year > o.year){
 			return  1;
 		}
-		
+
 		if(this.sNumber < o.sNumber){
 			return -1;
 		}
@@ -82,6 +82,6 @@ public class SemesterDate {
 		else{
 			return 1;
 		}
-		
+
 	}
 }

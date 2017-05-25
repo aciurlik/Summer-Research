@@ -58,8 +58,8 @@ public abstract class PanelDropHandler extends TransferHandler{
 		boolean canImport = support.isDataFlavorSupported(ComponentDragHandler.COMPONENT_FLAVOR);
 		return canImport;
 	}
-	
-	
+
+
 	/**
 	 * The actions that should happen when a draggable component
 	 * is dragged to this location.
@@ -107,7 +107,7 @@ public abstract class PanelDropHandler extends TransferHandler{
 		//DropLocation location = support.getDropLocation();
 		//      System.out.println(label.getText() + " + " + location.getDropPoint());
 		//dataComponent.setLocation( location.getDropPoint() );
-		
+
 		recievedDrop(container, dataComponent);
 
 		return true;

@@ -39,7 +39,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.classTitle=classTitle;
 		this.sem=sem;
 		this.d = d;
-		
+
 
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
@@ -63,7 +63,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				repaint();
 			}
 		}
-		);
+				);
 
 		hidePanel.add(showSemester);
 
@@ -114,7 +114,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		defaultPanel.removeAll();
 
-		
+
 		//Add the classTitle (Freshman, Sophomore)
 		JLabel ClassTitle = new JLabel(classTitle);
 		defaultPanel.add(ClassTitle);
@@ -132,7 +132,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		defaultPanel.add(FallSpring);
 
-		
+
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e);
 			defaultPanel.add(element);
@@ -197,7 +197,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	}
 
 
-		}
-	
+}
+
 
 

@@ -29,37 +29,37 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	private int numberOfRegularSemesters=12;
 	private int spaceConstant=5;
 	private int buttonPress=0;
-//	private int buttonCounter=0;
-//	private int doubleCounter=1;
-//	private int removalCount=0;
+	//	private int buttonCounter=0;
+	//	private int doubleCounter=1;
+	//	private int removalCount=0;
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
 	Driver d;
-	
+
 
 	public SchedulePanel(Schedule sch, Driver d) {
 
 		super();
-		
+
 		this.d = d;
 		this.sch=sch;
 		this.setBackground(Color.yellow);
 		//This will be deleted once we set it relative to the whole. 
 		this.setPreferredSize(new Dimension(1000, 500));
-		
-		
+
+
 		scrollPanel.setBackground(Color.yellow);//Same as Schedule Panel
 
 		scrollPanel.setLayout(new GridLayout(1, numberOfRegularSemesters+1, spaceConstant, spaceConstant));//+1 For button
-	
+
 		//This looks at the schedule given and goes through and adds course to each semester
-		
-		
-		
+
+
+
 		Collections.sort(sch.semesters);
-	
-		
+
+
 		for (int i=0; i<this.sch.semesters.size(); i++){
 			String fresh = "Freshman";
 			String soph = "Sophmore";
@@ -69,41 +69,41 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			Color secondAndFourthYear = Color.green;
 			SemesterPanel semester = null;
 			switch(i/2){
-			
+
 			//Perhaps add a SemesterDate element to retrieve which one?
 			//Does this not happen because it does not give this as a parameter?
 			//Add the display function for the course
-			
-			
+
+
 			case 0: 
 				semester = new SemesterPanel(fresh, this.sch.semesters.get(i) , firstAndThirdYear, this.d);
 				break;
 
-			
+
 			case 1:
 				semester = new SemesterPanel(soph, this.sch.semesters.get(i), secondAndFourthYear, this.d);
 				break;
-			
-			
+
+
 			case 2:
 				semester = new SemesterPanel(jun, this.sch.semesters.get(i), firstAndThirdYear, this.d);
 				break;
-				
-				
+
+
 			case 3: 
 				semester = new SemesterPanel(sen, this.sch.semesters.get(i),secondAndFourthYear, this.d);
 				break;
-			
-				
+
+
 			}
-		
+
 			scrollPanel.add(semester);
-			
+
 
 
 
 		}
-		
+
 		//Took add Button Panel from here and put it at the top
 		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
 		addExtraSemesterButtonPanel.setBackground(scrollPanel.getBackground());
@@ -128,34 +128,34 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		
+
 		Semester newSemester = sch.addNewSemester();
 		String extraSemesterClassTitle = "Super Senior";
 		Color extraSemesterColor = Color.pink;
-		
+
 		scrollPanel.setLayout(new GridLayout(1, numberOfRegularSemesters+buttonPress+1, spaceConstant, spaceConstant));
 		scrollPanel.remove(addExtraSemesterButtonPanel);
-		
-		
+
+
 		SemesterPanel semester = new SemesterPanel(extraSemesterClassTitle, newSemester , extraSemesterColor, d);
 		semester.setPreferredSize(new Dimension(500, 0));
 		semester.setBackground(Color.pink);
 		scrollPanel.add(semester);
-		
+
 
 		addSemesterButton.setPreferredSize(new Dimension(50, 50)); //Arbitrary size
 
 		//addExtraSemesterButtonPanel.add(addSemesterButton);
 		scrollPanel.add(addExtraSemesterButtonPanel);
-		
-	
-			
+
+
+
 		this.revalidate();
 		this.repaint();
-		
-		
-		
-		
+
+
+
+
 	}
 
 }

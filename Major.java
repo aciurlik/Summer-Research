@@ -5,14 +5,14 @@ public class Major {
 	String name;
 	int groupNumber;
 	ArrayList<Requirement> reqList;
-	
+
 	public static final int MajorDDNRange = 100;
-	
+
 	public Major(String name){
 		this.name = name;
 		this.reqList = new ArrayList<Requirement>();
 	}
-	
+
 	public void addRequirement(Requirement r){
 		int dipNumber = r.doubleDipNumber;
 		addRequirement(r, dipNumber%MajorDDNRange);
@@ -32,7 +32,7 @@ public class Major {
 		r.setDoubleDipNumber(groupNumber * MajorDDNRange + doubleDipNumber);
 		this.reqList.add(r);
 	}
-	
+
 	public static Major testMajor(){
 		Major result = new Major("Math-BS");
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 250)}, 1));
@@ -60,14 +60,14 @@ public class Major {
 				new Prefix("MTH",460),
 				new Prefix("MTH",461),
 				new Prefix("MTH",504)
-				}, 		
-				1);
+		}, 		
+		4);
 		electives.setName("4 Electives");
-		result.addRequirement(electives, 4);
+		result.addRequirement(electives, 2);
 		return result;
 	}
-	
-	
+
+
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
@@ -76,7 +76,7 @@ public class Major {
 		}
 		return result.toString();
 	}
-	
+
 	public static Major readFrom(String saveString){
 		String[] lines = saveString.split("[\n]+");
 		Major result = new Major(lines[0]);
@@ -87,8 +87,8 @@ public class Major {
 		}
 		return result;
 	}
-	
-	
+
+
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
