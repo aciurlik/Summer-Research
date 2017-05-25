@@ -16,9 +16,9 @@ public class CourseList {
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
-	
-	
-	
+
+
+
 	public static CourseList testList(){
 		CourseList result = new CourseList();
 		Course[] list = new Course[]{
@@ -31,7 +31,7 @@ public class CourseList {
 				Course.readFrom("MTH-504-02;Fray;[1, 3, 5];1:30:P,50;20/6/2018 13:30:0;4;2018-2"),
 				Course.readFrom("MTH-151-02;Fray;[1, 3, 5];1:30:P,50;20/6/2018 13:30:0;4;2018-2")
 		};
-		
+
 		for(Course c : list){
 			result.add(c);
 		}
@@ -64,11 +64,11 @@ public class CourseList {
 		Course c = listOfCourses.remove(i);
 		return c;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * Return only those members of input which are in the given semester.
 	 * @param input
@@ -76,7 +76,6 @@ public class CourseList {
 	 * @return
 	 */
 	public ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
-		System.out.println(input);
 		ArrayList<Course> SemesterList = new ArrayList<Course>();
 
 		for(Course course : input){
@@ -92,7 +91,7 @@ public class CourseList {
 	public  ArrayList<Course> getCoursesIn(Semester s){
 		return onlyThoseIn(listOfCourses,s);
 	}
-	
+
 	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c : input){
@@ -105,7 +104,7 @@ public class CourseList {
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
-	
+
 	public HashSet<Prefix> getPrerequsites(Prefix p){
 		//TODO
 		return new HashSet<Prefix>();

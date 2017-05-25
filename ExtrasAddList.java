@@ -8,6 +8,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 public class ExtrasAddList {
+
 	
 	public ExtrasAddList(String type){
 		//Creates the PopUp Window
@@ -27,10 +28,11 @@ public class ExtrasAddList {
 		
 		
 		
+
 		frame.add(addMajor);
 		frame.pack();
 		frame.setVisible(true);
-		
+
 	}
 
 }

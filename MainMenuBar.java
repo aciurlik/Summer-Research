@@ -10,14 +10,14 @@ import javax.swing.JMenuBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ImageIcon;
- 
+
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JFrame;
 import javax.swing.JList;
- 
+
 /* 
  * 
  * http://docs.oracle.com/javase/tutorial/uiswing/examples/components/MenuLookDemoProject/src/components/MenuLookDemo.java
@@ -26,6 +26,7 @@ import javax.swing.JList;
 
 
 public class MainMenuBar implements ActionListener {
+
     JTextArea output;
     JScrollPane scrollPane;
  
@@ -158,6 +159,4 @@ public class MainMenuBar implements ActionListener {
 	}
 
 
-	}
-
-
+}

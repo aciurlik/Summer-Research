@@ -7,24 +7,24 @@ public class Schedule {
 	ArrayList<Major> majorsList;
 	ArrayList<Requirement> reqsList;
 	ArrayList<Semester> semesters;
-	
+
 	CourseList masterList;
-	
+
 	boolean reqListValid;
-	
+
 	public static Schedule testSchedule(){
 
 		CourseList l = CourseList.testList();
 		Schedule result = new Schedule(l, new SemesterDate(2017, SemesterDate.FALL), null);
-		
+
 		result.addMajor(Major.testMajor());
 
-		
+
 		//result.semesters.add(b);
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Make a new schedule of semesters where firstSemester is the first shown semester 
 	 * and currentSemester is the first semester that might be scheduled
@@ -34,34 +34,34 @@ public class Schedule {
 	 * @param currentSemester
 	 */
 	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
-		
+
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
 		//add the GERs major
 		this.reqsList = new ArrayList<Requirement>();
 		reqListValid = false;
-		
+
 		//Course list
 		this.masterList = masterList;
-		
+
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
 		for(int i = 0;i < 8 ; i ++){
 			this.semesters.add(new Semester(firstSemester, this));
 			firstSemester = firstSemester.next();
 		}
-		
+
 	}
-	
-	
+
+
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
 		this.semesters.add(next);
 		return next;
 	}
-	
-	
+
+
 	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
 		checkPrerequsites(e, s.semesterDate);
 		s.checkOverlap(e);
@@ -77,17 +77,17 @@ public class Schedule {
 			r.numFinished ++;
 		}
 		reqListValid = false;
-		
+
 	}
 	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
-		
+
 	}
 	public void removed(ScheduleElement e, Semester s){
 		for (Requirement r : e.getRequirementsFulfilled()){
 			r.numFinished -= 1;
 		}
 	}
-	
+
 	public ArrayList<ScheduleElement> allElements(){
 		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
 		for(Semester s : semesters){
@@ -95,8 +95,8 @@ public class Schedule {
 		}
 		return result;
 	}
-	
-	
+
+
 	/**
 	 * Check every element to see if it has all the prereqs it needs.
 	 */
@@ -129,12 +129,12 @@ public class Schedule {
 			if(! needed.isEmpty()){
 				throw new PrerequsiteException(needed, e);
 			}
-			
+
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Check all semesters for duplicates.
 	 * If one is found, throw an exception.
@@ -155,11 +155,11 @@ public class Schedule {
 			}
 		}
 	}
-	
-	
-	
 
-	
+
+
+
+
 	/**
 	 * Check all semesters to see if any elements in them
 	 * have overlapping times (are taken at the same time)
@@ -169,9 +169,9 @@ public class Schedule {
 			s.checkOverlap(null);
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Forces a full update of all of the requirements
 	 *  based on the majors currently included 
@@ -194,11 +194,11 @@ public class Schedule {
 		Collections.sort(reqsList);;
 		reqListValid = true;
 	}
-	
+
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
 		return e.getRequirementsFulfilled();
 	}
-	
+
 	/**
 	 * Tells this course the list of requirements that it satisfied.
 	 * 		this list is a subset of the requirements implied by the set
@@ -238,8 +238,8 @@ public class Schedule {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Go through the list of courses and tell each one
 	 * which current requirements it can satisfy.
@@ -254,15 +254,15 @@ public class Schedule {
 			}
 		}
 	}
-	
-	
+
+
 	public ArrayList<Requirement> getRequirementsList(){
 		if(! reqListValid){
 			updateReqList();
 		}
 		return reqsList;
 	}
-	
+
 	public void addMajor(Major newMajor){
 		//Use sets to prevent duplicate requirements.
 		HashSet<Requirement> set = new HashSet<Requirement>();
@@ -279,7 +279,7 @@ public class Schedule {
 		//Tell the new requirements if some taken course satisfies them.
 		reqListValid = false;
 	}
-	
+
 	public int getCreditHoursComplete(){
 		int result = 0;
 		for (ScheduleElement e : allElements()){

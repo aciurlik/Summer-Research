@@ -46,8 +46,8 @@ import javax.swing.TransferHandler;
 
 public abstract class ComponentDragHandler extends TransferHandler {
 	private Image mouseImage;
-	
-	
+
+
 	public static final DataFlavor COMPONENT_FLAVOR;
 	static{
 		try{
@@ -56,7 +56,7 @@ public abstract class ComponentDragHandler extends TransferHandler {
 			throw new RuntimeException("failed to create COMPONENT_FLAVOR");
 		}
 	}
-	
+
 	public static MouseAdapter getDragListener(){
 		return new MouseAdapter(){
 			@Override
@@ -68,8 +68,8 @@ public abstract class ComponentDragHandler extends TransferHandler {
 			}
 		};
 	}
-	
-	
+
+
 	//When a TransferHandler is created, it will ask for the possible source
 	// actions. We don't want to mess with the constructors, so we will set the
 	// mouse image in this method rather than in a constructor.
@@ -78,8 +78,8 @@ public abstract class ComponentDragHandler extends TransferHandler {
 	{
 		return TransferHandler.COPY_OR_MOVE;
 	}
-	
-	
+
+
 	/**
 	 * The first call to getImage will set the drag image
 	 * to be the paint of this component.
@@ -104,13 +104,13 @@ public abstract class ComponentDragHandler extends TransferHandler {
 	 */
 	public void createImage(JComponent c){
 		Dimension size = c.getSize();
-	    BufferedImage myImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D g2 = myImage.createGraphics();
-	    c.paint(g2);
-	    this.mouseImage = myImage;
-	    setDragImage( this.mouseImage );
+		BufferedImage myImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = myImage.createGraphics();
+		c.paint(g2);
+		this.mouseImage = myImage;
+		setDragImage( this.mouseImage );
 	}
-	
+
 
 	/**
 	 * Make a Transferable that holds just this component.
@@ -123,7 +123,7 @@ public abstract class ComponentDragHandler extends TransferHandler {
 		this.getImage(c);
 		return new componentTransferable(c);
 	}
-	
+
 	public class componentTransferable implements Transferable{
 		private JComponent data;
 		public componentTransferable(JComponent source){
@@ -148,15 +148,15 @@ public abstract class ComponentDragHandler extends TransferHandler {
 		{
 			return flavor.equals(COMPONENT_FLAVOR);
 		}
-		
-	}
-	
-	
-	
-	
-	
 
-	
+	}
+
+
+
+
+
+
+
 	/**
 	 * Subclasses should override this method.
 	 * Anything that needs to happen to start a drag should 

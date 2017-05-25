@@ -31,7 +31,7 @@ public interface ScheduleElement {
 	 * that should be displayed in GUI
 	 */
 	public String getDisplayString();
-	
+
 	/**
 	 * 
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,

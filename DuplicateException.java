@@ -6,5 +6,5 @@ public class DuplicateException extends SchedulingException{
 		this.e1 = e1;
 		this.e2 = e2;
 	}
-	
+
 }
