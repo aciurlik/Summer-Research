@@ -97,7 +97,7 @@ public class CourseList {
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c : input){
 			if(r.isSatisfiedBy(c)){
-
+				result.add(c);
 			}
 		}
 		return result;
