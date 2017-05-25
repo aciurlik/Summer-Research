@@ -134,7 +134,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 		for (ScheduleElement e : this.sem.elements){
-			ScheduleElementPanel element = new ScheduleElementPanel(e);
+			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
 			defaultPanel.add(element);
 			element.updatePanel();
 		}
@@ -178,6 +178,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.d.reqs.revalidate();
 		this.d.reqs.repaint();
 
+	}
+	
+	public void removeElement(ScheduleElement e){
+		sem.remove(e);
+		this.updatePanel(true);
 	}
 
 	private class SemesterPanelDropHandler extends PanelDropHandler{
