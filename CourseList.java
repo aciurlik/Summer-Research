@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 public class CourseList {
 
+
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
 	
 	
@@ -37,9 +38,11 @@ public class CourseList {
 		return result;
 	}
 
+
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 	}
+
 
 	public boolean add(Course c){
 		return listOfCourses.add(c);
@@ -50,11 +53,14 @@ public class CourseList {
 	}
 
 	public Course removeCourse(Course c){
+
 		listOfCourses.remove(c);
 		return c;
 	}
 
+
 	public Course removeAtIndex(int i){
+
 		Course c = listOfCourses.remove(i);
 		return c;
 	}
@@ -72,13 +78,17 @@ public class CourseList {
 	public ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
 		System.out.println(input);
 		ArrayList<Course> SemesterList = new ArrayList<Course>();
+
 		for(Course course : input){
 			if ( course.getSemester().compareTo(s.getDate()) == 0){
+
 				SemesterList.add(course);
 			}
 		}
 		return SemesterList;
 	}
+
+
 	public  ArrayList<Course> getCoursesIn(Semester s){
 		return onlyThoseIn(listOfCourses,s);
 	}
@@ -87,7 +97,7 @@ public class CourseList {
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c : input){
 			if(r.isSatisfiedBy(c)){
-				result.add(c);
+
 			}
 		}
 		return result;

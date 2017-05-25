@@ -16,17 +16,20 @@ public class ScheduleElementPanel extends JPanel {
 	private Requirement r;
 	private ScheduleElement s;
 
+
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox  requirmentDropDown = new JComboBox();
 
 	public ScheduleElementPanel(ScheduleElement s) {
+
 		super();
 		this.s=s;
 		if(s instanceof Requirement){
-			r=(Requirement)s;
+		r=(Requirement)s;
 		}
-
+		
 		else{
+
 			r=null;
 		}
 
@@ -63,13 +66,14 @@ public class ScheduleElementPanel extends JPanel {
 	}
 
 
+
 }
+		
+ 		
+	
 
 
-
-
-
-
+		
 
 
 

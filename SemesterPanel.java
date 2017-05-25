@@ -108,8 +108,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
+
 	//Redraw this panel based on the semester sem.
 	public void updatePanel(boolean repaint){
+
 		defaultPanel.removeAll();
 
 		
@@ -169,17 +171,20 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 	public void addElement(ScheduleElement e){
+
 		sem.add(e);
 		this.updatePanel(true);
 		this.d.reqs.update();
 		this.d.reqs.revalidate();
 		this.d.reqs.repaint();
+
 	}
 
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
+
 			try{
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d.getRequirement());
@@ -192,5 +197,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	}
 
 
-}
+		}
+	
+
+	}
 
