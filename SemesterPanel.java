@@ -190,6 +190,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.updatePanel(true);
 
 	}
+	
+	public void removeElement(ScheduleElement e){
+		sem.remove(e);
+		this.updatePanel(true);
+	}
 
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
