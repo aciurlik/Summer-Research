@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
+import javax.swing.border.BevelBorder;
 
 
 /**
@@ -37,8 +38,25 @@ public class RequirementPanel extends JPanel {
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
 		
-		JLabel shown = new JLabel(req.getDisplayString());
+		
+
+		String fullText = req.getDisplayString();
+		
+		if(req.numToChoose > 1){
+			fullText = String.format("(%d more) ", req.numToChoose - req.numFinished) + fullText;
+		}
+		
+		int numChars = 20;
+		String labelText = fullText;
+		if(labelText.length() > numChars){
+			labelText = labelText.substring(0,numChars-3) + "...";
+		}
+		JLabel shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
+		shown.setToolTipText(fullText);
+		shown.addMouseListener(ComponentDragHandler.passingAdapter());
+
+		this.setBorder(new BevelBorder(BevelBorder.RAISED));
 	
 		
 		
