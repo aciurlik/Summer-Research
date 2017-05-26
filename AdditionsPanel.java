@@ -73,7 +73,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("Cat");
+		ExtrasAddList list = new ExtrasAddList(e.getActionCommand());
 		
 	}
 
