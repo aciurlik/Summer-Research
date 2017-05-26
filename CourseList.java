@@ -12,7 +12,7 @@ import java.util.Scanner;
  *
  */
 
-public class CourseList {
+public class CourseList  {
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
