@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -9,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
+import javax.swing.border.BevelBorder;
 
 
 /**
@@ -33,7 +35,20 @@ public class RequirementPanel extends JPanel {
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
 
-		JLabel shown = new JLabel(req.getDisplayString());
+		String fullText = req.getDisplayString();
+		
+		if(req.numToChoose > 1){
+			fullText = String.format("(%d more) ", req.numToChoose - req.numFinished) + fullText;
+		}
+		
+		int numChars = 20;
+		String labelText = fullText;
+		if(labelText.length() > numChars){
+			labelText = labelText.substring(0,numChars-3) + "...";
+		}
+		JLabel shown = new JLabel(labelText);
+		shown.setToolTipText(fullText);
+		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 		if(this.req.isComplete()){
 			this.setBackground(Color.gray);
@@ -43,6 +58,9 @@ public class RequirementPanel extends JPanel {
 		}
 
 		this.add(shown);
+		
+		//this.setPreferredSize(new Dimension(200,40));
+		this.setBorder(new BevelBorder(BevelBorder.RAISED));
 
 	}
 
