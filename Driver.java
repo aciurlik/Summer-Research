@@ -16,28 +16,12 @@ public class Driver {
 		//Make data
 		Schedule test = Schedule.testSchedule();
 
-		
-		
-		
-		 	//Put the SchedulePanel and RequirementsPanel inside p.
-		JPanel p = new JPanel();
-
-		sch = new SchedulePanel(test, this);
-		p.add(sch);
 
 		
-		JPanel q = new JPanel();
-		reqs = new RequirementListPanel(test);
-		q.add(reqs);
-		
-		
-
 		
 		
 		JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
-		
-		
 				
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar();
@@ -53,8 +37,10 @@ public class Driver {
 		
 		frame.pack();
 
-		frame.add(p, BorderLayout.LINE_END);
-		frame.add(q, BorderLayout.PAGE_END);
+		sch = new SchedulePanel(test, this);
+		frame.add(sch, BorderLayout.LINE_END);
+		reqs = new RequirementListPanel(test);
+		frame.add(reqs, BorderLayout.PAGE_END);
 		
 		
 	

@@ -162,7 +162,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 		//Add button to hide Semester
-		JButton deleteSemester= new JButton("-");
+		JButton deleteSemester= new JButton("Hide Semester");
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
 
