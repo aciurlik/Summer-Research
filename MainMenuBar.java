@@ -41,7 +41,7 @@ public class MainMenuBar implements ActionListener {
 
 		menu = new JMenu("The Furman Advantage");
 		submenu = new JMenu("MayX");
-		menuItem = new JMenuItem("Explore MayX Oppurtunities");
+		menuItem = new JMenuItem("Explore MayX Opportunities");
 		submenu.add(menuItem);
 		menuItem = new JMenuItem("Add a MayX");
 		submenu.add(menuItem);
@@ -49,7 +49,7 @@ public class MainMenuBar implements ActionListener {
 
 
 		submenu = new JMenu("Study Abroad");
-		menuItem = new JMenuItem("Explore Study Abroad Oppurunities");
+		menuItem = new JMenuItem("Explore Study Abroad Opportunities");
 		submenu.add(menuItem);
 		menuItem = new JMenuItem("Add Study Abroad");
 		submenu.add(menuItem);
@@ -57,7 +57,7 @@ public class MainMenuBar implements ActionListener {
 
 		menuItem = new JMenuItem("Add a Summer Course");
 		menu.add(menuItem);
-		menuItem = new JMenuItem("Explore Intership Oppertunities");
+		menuItem = new JMenuItem("Explore Intership Opportunities");
 		menu.add(menuItem);
 		menuBar.add(menu);
 
