@@ -1,6 +1,6 @@
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,7 +10,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
-import javax.swing.border.BevelBorder;
 
 
 /**
@@ -21,56 +20,46 @@ import javax.swing.border.BevelBorder;
  */
 public class RequirementPanel extends JPanel {
 	public Requirement req;
-
+	public Color FurmanDarkPurple = new Color(43, 12, 86);
+	public Color FurmanLightPurple = new Color(79, 33, 112);
+	public Color FurmanGray = new Color(96, 96, 91);
+	
 	public RequirementPanel(Requirement req){
 		super();
 		this.req = req;
-
+		
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
-
-
+		
+		
 		//Make sure any click on the requirementPanel 
 		// will begin a dragEvent.
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
-
-		String fullText = req.getDisplayString();
 		
-		if(req.numToChoose > 1){
-			fullText = String.format("(%d more) ", req.numToChoose - req.numFinished) + fullText;
-		}
+		JLabel shown = new JLabel(req.getDisplayString());
+		shown.setForeground(Color.white);
+	
 		
-		int numChars = 20;
-		String labelText = fullText;
-		if(labelText.length() > numChars){
-			labelText = labelText.substring(0,numChars-3) + "...";
-		}
-		JLabel shown = new JLabel(labelText);
-		shown.setToolTipText(fullText);
-		shown.addMouseListener(ComponentDragHandler.passingAdapter());
-
+		
 		if(this.req.isComplete()){
-			this.setBackground(Color.gray);
+			this.setBackground(FurmanGray);
 		}
 		else{
-			this.setBackground(Color.yellow);
+			this.setBackground(FurmanDarkPurple);
 		}
-
+		
 		this.add(shown);
 		
-		//this.setPreferredSize(new Dimension(200,40));
-		this.setBorder(new BevelBorder(BevelBorder.RAISED));
-
 	}
-
-
+	
+	
 	public Requirement getRequirement(){
 		return req;
 	}
-
-
-
+	
+	
+	
 	/**
 	 * This class specifies the actions that should happen when 
 	 * the user begins to drag a requirement panel.
@@ -90,12 +79,14 @@ public class RequirementPanel extends JPanel {
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
 
-			source.revalidate();
-			source.repaint();
+		//	source.revalidate();
+		//	source.repaint();
+			
+			
 
 		}
-
-
+		
+		
 
 	}
 }
