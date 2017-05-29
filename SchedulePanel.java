@@ -35,12 +35,6 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
-	//public Color FurmanDarkPurple = new Color(43, 12, 86);
-	//public Color FurmanLightPurple = new Color(79, 33, 112);
-	//public Color FurmanGray = new Color(96, 96, 91);
-	public Color FurmanDarkPurpleAlpha = new Color(43,12,86,50);
-	public Color FurmanGrayAlpha = new Color(96, 96, 91, 50);
-	public Color FurmanLightPurpleAlpha = new Color(79, 33, 112, 50);
 	Driver d;
 	
 
@@ -76,22 +70,26 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			
 			
 			case 0: 
-				semester = new SemesterPanel( this.sch.semesters.get(i) ,  FurmanLightPurpleAlpha, this.d);
+				semester = new SemesterPanel( this.sch.semesters.get(i),this.d);
+				semester.setBackground(FurmanOfficial.lightPurple(50));
 				break;
 
 			
 			case 1:
-				semester = new SemesterPanel( this.sch.semesters.get(i), FurmanGrayAlpha, this.d);
+				semester = new SemesterPanel( this.sch.semesters.get(i), this.d);
+				semester.setBackground(FurmanOfficial.grey(50));
 				break;
 			
 			
 			case 2:
-				semester = new SemesterPanel( this.sch.semesters.get(i), FurmanLightPurpleAlpha, this.d);
+				semester = new SemesterPanel( this.sch.semesters.get(i), this.d);
+				semester.setBackground(FurmanOfficial.lightPurple(50));
 				break;
 				
 				
 			case 3: 
-				semester = new SemesterPanel( this.sch.semesters.get(i), FurmanGrayAlpha, this.d);
+				semester = new SemesterPanel( this.sch.semesters.get(i), this.d);
+				semester.setBackground(FurmanOfficial.grey(50));
 				break;
 			
 				
@@ -106,7 +104,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		
 		//Took add Button Panel from here and put it at the top
 		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
-		addExtraSemesterButtonPanel.setBackground(FurmanLightPurpleAlpha);
+		addExtraSemesterButtonPanel.setBackground(FurmanOfficial.lightPurple(50));
 		JButton addSemester = new JButton("+");
 		addSemester.setPreferredSize(new Dimension(50, 50)); //Arbitrary size
 		addExtraSemesterButtonPanel.add(addSemester);
@@ -135,7 +133,8 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		scrollPanel.remove(addExtraSemesterButtonPanel);
 		
 		
-		SemesterPanel semester = new SemesterPanel(newSemester , FurmanLightPurpleAlpha, d);
+		SemesterPanel semester = new SemesterPanel(newSemester ,  d);
+		semester.setBackground(FurmanOfficial.lightPurple(50));
 		semester.setPreferredSize(new Dimension(500, 0));
 		scrollPanel.add(semester);
 		
