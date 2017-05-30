@@ -194,6 +194,16 @@ public class Schedule {
 		Collections.sort(reqsList);;
 		reqListValid = true;
 	}
+	
+	public void updateRequirement(Requirement r){
+		r.numFinished = 0;
+		ArrayList<ScheduleElement> all = allElements();
+		for(ScheduleElement e : all){
+			if(r.isSatisfiedBy(e)){
+				r.numFinished ++;
+			}
+		}
+	}
 
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
 		return e.getRequirementsFulfilled();
@@ -256,6 +266,20 @@ public class Schedule {
 	}
 
 
+	public ArrayList<Major> getMajors(){
+		//Update major requirements.
+		// This may need to be done even if requirementsList is valid,
+		// because validating the requirements list only validates one
+		// copy of each requirement. If multiple majors have the same 
+		// requirement the old update method won't catch it.
+		for (Major m : this.majorsList){
+			for (Requirement r : m.reqList){
+				updateRequirement(r);
+			}
+		}
+		return this.majorsList;
+	}
+	
 	public ArrayList<Requirement> getRequirementsList(){
 		if(! reqListValid){
 			updateReqList();

@@ -30,13 +30,28 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		this.doubleDipNumber = Requirement.defaultDDN;
 	}
 
-	public boolean isSatisfiedBy(Course c){
-		for (Prefix p : choices){
-			if(c.coursePrefix.compareTo(p) == 0){
+	public boolean isSatisfiedBy(ScheduleElement e){
+		if(e instanceof Course){
+			Course c = (Course)e;
+
+			for (Prefix p : choices){
+				if(c.coursePrefix.compareTo(p) == 0){
+					return true;
+				}
+			}
+			return false;
+		}
+		else if (e instanceof Requirement){
+			if(this.choices.equals(((Requirement)e).choices)){
 				return true;
 			}
+			return false;
+		}
+		else if(e.getRequirementsFulfilled().contains(this)){
+			return true;
 		}
 		return false;
+		
 	}
 	public void setName(String name){
 		this.name = name;
