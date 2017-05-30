@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
 
-	private Semester sem;
+
 
 	private int classCounter = 0;
 	private int requirementNumber=0;
@@ -25,17 +25,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	JPanel defaultPanel = new JPanel();
 	JPanel hidePanel;
 	Driver d;
-	
+	Semester sem;
+
 
 
 	public SemesterPanel(Semester sem, Driver d){
 
 		//Sets up the panel that will hold one semester
 		super();
-		this.classTitle=classTitle;
 		this.sem=sem;
 		this.d = d;
-		
+
 
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
@@ -51,7 +51,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		showSemester.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-		
+
 				remove(hidePanel);
 				add(defaultPanel);
 				revalidate();
@@ -60,7 +60,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				getParent().getParent().repaint();
 			}
 		}
-		);
+				);
 
 		hidePanel.add(showSemester);
 
@@ -69,7 +69,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.add(defaultPanel);
 		this.updatePanel(false);
 	}
-	
+
 	@Override
 	public void setBackground(Color c){
 		super.setBackground(c);
@@ -97,25 +97,21 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
+
+
 		//This method is called when you click the button to hide a semester.
 		this.remove(defaultPanel);
 		this.add(hidePanel);
-		
+
 		this.revalidate();
 		this.repaint();
-		
+
 		this.getParent().getParent().revalidate();
 		this.getParent().getParent().repaint();
-		
-		
+
+
 
 	}
-
-
-
-
-
-
 
 
 
@@ -124,7 +120,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		defaultPanel.removeAll();
 
-		
+
 		//Add the classTitle (Freshman, Sophomore)
 		JLabel ClassTitle = new JLabel(classTitle);
 		defaultPanel.add(ClassTitle);
@@ -184,16 +180,23 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
-	public void addElement(ScheduleElement e){
+	public void addElement(Component s){
+		try{
+			RequirementPanel r = (RequirementPanel) s;
+			d.GUIRequirementPanelDropped(r, this);
 
-		sem.add(e);
-		this.d.reqs.update();
-		this.d.reqs.revalidate();
-		this.d.reqs.repaint();
-		this.updatePanel(true);
+		}
+		catch(Exception e){
+			ScheduleElementPanel p = (ScheduleElementPanel) s;
+			d.GUIScheduleElementPanelDropped(p, this);
+		}
+
+
+
+
 
 	}
-	
+
 	public void removeElement(ScheduleElement e){
 		sem.remove(e);
 		this.updatePanel(true);
@@ -203,14 +206,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-
 			try{
 				RequirementPanel d =  (RequirementPanel) draggedItem;
-				addElement(d.getRequirement());
+				addElement(d);
 			}catch(Exception e){
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
-				addElement(p.getElement());
-				
+				addElement(p);
+
 			}
 		}
 
