@@ -89,11 +89,17 @@ public class Major {
 		return result;
 	}
 
-
+	@Override
+	public String toString(){
+		return this.name;
+	}
+	
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
 	}
+	
+	
 }
