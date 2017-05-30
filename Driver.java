@@ -76,6 +76,13 @@ public class Driver {
 		this.update();
 
 	}
+	
+	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
+		Semester s = container.sem;
+		ScheduleElement old = toChange.getElement();
+		sch.replaceElement(s, old, newValue);
+		update();
+	}
 
 	public void updateAll(){
 		schP.update(sch);

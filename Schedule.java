@@ -61,6 +61,20 @@ public class Schedule {
 		this.semesters.add(next);
 		return next;
 	}
+	
+	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
+		s.replace(oldElement, newElement);
+		if(newElement instanceof Course){
+			updateRequirementsSatisfied((Course) newElement);
+		}
+		for(Requirement r : oldElement.getRequirementsFulfilled()){
+			r.numFinished --;
+		}
+		for(Requirement r : newElement.getRequirementsFulfilled()){
+			r.numFinished ++;
+		}
+		
+	}
 
 
 	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
@@ -313,7 +327,6 @@ public class Schedule {
 	}
 
 	public int getCreditHoursComplete(){
-		System.out.println(allElements().toString());
 		int result = 0;
 		for (ScheduleElement e : allElements()){
 			if(e instanceof Course){
@@ -325,8 +338,6 @@ public class Schedule {
 
 	public void addRequirementElement(Requirement req, Semester sem) {
 		sem.add(req);
-
-
 
 	}
 

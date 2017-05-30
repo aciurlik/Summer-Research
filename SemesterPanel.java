@@ -181,20 +181,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 	public void addElement(Component s){
-		try{
+		if(s instanceof RequirementPanel){
 			RequirementPanel r = (RequirementPanel) s;
 			d.GUIRequirementPanelDropped(r, this);
-
 		}
-		catch(Exception e){
+		else{
 			ScheduleElementPanel p = (ScheduleElementPanel) s;
 			d.GUIScheduleElementPanelDropped(p, this);
 		}
-
-
-
-
-
 	}
 
 	public void removeElement(ScheduleElementPanel e){
@@ -206,14 +200,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
-			try{
+			if(draggedItem instanceof RequirementPanel){
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d);
-			}catch(Exception e){
+			}
+			else{
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
 				addElement(p);
-
 			}
+			
 		}
 
 	}

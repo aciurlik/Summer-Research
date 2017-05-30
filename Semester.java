@@ -57,21 +57,30 @@ public class Semester implements Comparable<Semester>{
 	 * @return
 	 */
 	public boolean add(ScheduleElement e){
-		this.schedule.checkErrorsWhenAdding(e,this);
+		//this.schedule.checkErrorsWhenAdding(e,this);
 		this.elements.add(e);
 		this.schedule.added(e, this);
 		return true;
 
 	}
+	public boolean remove(ScheduleElement e){
+		//this.schedule.checkErrorsWhenRemoving(e, this);
+		this.elements.remove(e);
+		return true;
+	}
+	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
+		//this.schedule.checkErrorsWhenAdding(newElement, this);
+		//this.schedule.checkErrorsWhenRemoving(oldElement, this);
+		int i = this.elements.indexOf(oldElement);
+		this.elements.set(i, newElement);
+		return true;
+	}
+	
 
 	public ArrayList<Course> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
 		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
 	}
 
-	public boolean remove(ScheduleElement e){
-		this.schedule.checkErrorsWhenRemoving(e, this);
-		this.elements.remove(e);
-		return true;
-	}
+
 }
