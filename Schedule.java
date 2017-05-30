@@ -305,6 +305,7 @@ public class Schedule {
 	}
 
 	public int getCreditHoursComplete(){
+		System.out.println(allElements().toString());
 		int result = 0;
 		for (ScheduleElement e : allElements()){
 			if(e instanceof Course){

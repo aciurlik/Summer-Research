@@ -30,6 +30,7 @@ public class RequirementListPanel extends JPanel{
 	public JPanel infoPanel;
 	public Schedule schedule;
 	public JLabel creditHoursLabel;
+	public JLabel reqsLeftLabel;
 	
 	public int layoutCounter;
 	public static final int gridHeight = 3;
@@ -52,8 +53,9 @@ public class RequirementListPanel extends JPanel{
 		// Make the first row of the inner panel, with labels
 		// "Requirements" and "Credit Hours"
 		this.infoPanel = new JPanel();
-		creditHoursLabel = new JLabel(this.getCHText());
-		this.infoPanel.add(new JLabel("Requirements      "));
+		creditHoursLabel = new JLabel();
+		reqsLeftLabel = new JLabel();
+		this.infoPanel.add(reqsLeftLabel);
 		this.infoPanel.add(creditHoursLabel);
 		this.infoPanel.setBackground(inner.getBackground());
 		
@@ -97,14 +99,20 @@ public class RequirementListPanel extends JPanel{
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(3,3,3,3);
 		
+		this.inner.add(infoPanel);
+		
+		int reqsLeft = 0;
 		ArrayList<Major> majors = schedule.getMajors();
-		int heightCounter = 0;
+		int heightCounter = 1;
 		for(Major m : majors){
 			JPanel p = new JPanel();
 			p.add(new JLabel(m.name));
 			p.add(new JSeparator(SwingConstants.HORIZONTAL));
 			Collections.sort(m.reqList);
 			for(Requirement r : m.reqList){
+				if(r.numFinished < r.numToChoose){
+					reqsLeft += r.numToChoose - r.numFinished;
+				}
 				p.add(new RequirementPanel(r));
 			}
 			gbc.gridx = 0;
@@ -113,12 +121,18 @@ public class RequirementListPanel extends JPanel{
 			this.inner.add(p, gbc);
 		}
 
+		this.creditHoursLabel.setText(this.getCHText() + (230 - this.schedule.getCreditHoursComplete()));
+		this.reqsLeftLabel.setText(this.getReqsText() + reqsLeft);
 	}
 	/**
 	 * Produce the text for the credit hours label
 	 */
 	public String getCHText(){
-		return "Credit Hours Completed: " + this.schedule.getCreditHoursComplete();
+		return "Credit Hours Left: ";
+	}
+	
+	public String getReqsText(){
+		return "Requirements Left: "; 
 	}
 	
 	
