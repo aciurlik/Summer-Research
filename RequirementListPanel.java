@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 /**
  * This panel is the list of requirements that can be added to the
@@ -83,27 +85,32 @@ public class RequirementListPanel extends JPanel{
 	
 	/**
 	 * Update the requirementPanels displayed based on 
-	 * the sort of the schedule's requirementsList.
+	 * the the majors in the schedule. 
 	 */
 	public void update(){
 		this.inner.removeAll();
+		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = gbc.CENTER;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(3,3,3,3);
-
-		//Then add each of the requirement panels.
-		layoutCounter = 0;
-		ArrayList<Requirement> reqList = schedule.getRequirementsList();
-		Collections.sort(reqList);
-		for (Requirement req : reqList){
-			RequirementPanel p = new RequirementPanel(req);
-			int[] nextLocation = nextLocation();
-			gbc.gridx = nextLocation[0];
-			gbc.gridy = nextLocation[1];
-			this.inner.add(p,gbc);
+		
+		ArrayList<Major> majors = schedule.getMajors();
+		int heightCounter = 0;
+		for(Major m : majors){
+			JPanel p = new JPanel();
+			p.add(new JLabel(m.name));
+			p.add(new JSeparator(SwingConstants.HORIZONTAL));
+			Collections.sort(m.reqList);
+			for(Requirement r : m.reqList){
+				p.add(new RequirementPanel(r));
+			}
+			gbc.gridx = 0;
+			gbc.gridy = heightCounter;
+			heightCounter++;
+			this.inner.add(p, gbc);
 		}
 
 	}

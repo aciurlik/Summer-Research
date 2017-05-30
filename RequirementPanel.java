@@ -21,9 +21,6 @@ import javax.swing.border.BevelBorder;
  */
 public class RequirementPanel extends JPanel {
 	public Requirement req;
-	public Color FurmanDarkPurple = new Color(43, 12, 86);
-	public Color FurmanLightPurple = new Color(79, 33, 112);
-	public Color FurmanGray = new Color(96, 96, 91);
 	
 	public RequirementPanel(Requirement req){
 		super();
@@ -61,10 +58,10 @@ public class RequirementPanel extends JPanel {
 		
 		
 		if(this.req.isComplete()){
-			this.setBackground(FurmanGray);
+			this.setBackground(FurmanOfficial.grey(200));
 		}
 		else{
-			this.setBackground(FurmanDarkPurple);
+			this.setBackground(FurmanOfficial.darkPurple(230));
 		}
 		
 		this.add(shown);
