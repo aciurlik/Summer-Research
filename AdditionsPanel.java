@@ -18,10 +18,12 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		public Color FurmanDarkPurple = new Color(43, 12, 86);
 		public Color FurmanLightPurple = new Color(79, 33, 112);
 		public Color FurmanGray = new Color(96, 96, 91);
+		Driver d;
 	
-	public AdditionsPanel(){
+	public AdditionsPanel( Driver d){
 		
 		super();
+		this.d=d;
 		this.setLayout((new GridLayout(optionsNumber+headerNumber+2, 1, 3, 3)));
 		JLabel empty = new JLabel("          ");
 		this.add(empty);
@@ -61,19 +63,11 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		
 	
 	}
-	public static void main(String[] args){
 	
-		JFrame frame = new JFrame();
-		AdditionsPanel add = new AdditionsPanel();
-		frame.setSize(210, 300);
-		frame.add(add);
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ExtrasAddList list = new ExtrasAddList(e.getActionCommand());
+		d.GUIPopUP(e.getActionCommand());
 		
 	}
 

@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,12 +26,12 @@ public class Driver {
 		frame.setLayout(new BorderLayout());
 
 		//Adds the menu bar
-		MainMenuBar menu = new MainMenuBar();
-		frame.setJMenuBar(menu.createMenuBar());
+		MainMenuBar menu = new MainMenuBar(this);
+		frame.setJMenuBar(menu);
 		frame.setContentPane(menu.createContentPane());
 
 		//Adds Additions Panel
-		AdditionsPanel add = new AdditionsPanel();
+		AdditionsPanel add = new AdditionsPanel(this);
 		frame.add(add, BorderLayout.LINE_START);
 
 
@@ -64,6 +65,7 @@ public class Driver {
 		sch.addScheduleElement(p.getElement(), semesterPanel.sem);
 		this.update();
 	}
+	
 
 	public void GUISemesterPanelAdded(){
 		sch.addNewSemester();
@@ -75,6 +77,24 @@ public class Driver {
 		sch.remove(e.getElement(), semesterPanel.sem);
 		this.update();
 
+	}
+	
+	public void GUIAddMajor(Major m) {
+		sch.addMajor(m);
+		System.out.println("works");
+		this.update();
+		
+	}
+	
+	public void GUIPopUP(String s){
+		ExtrasAddList list = new ExtrasAddList(s, this, sch);
+	}
+	
+	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
+		return sch.removeAlreadyChosenMajors(collectionOfMajors);
+		
+	
+		
 	}
 
 	public void updateAll(){
@@ -90,6 +110,8 @@ public class Driver {
 		reqs.repaint();
 
 	}
+	
+	
 
 	public void update() {
 		updateAll();
@@ -105,6 +127,12 @@ public class Driver {
 
 
 	}
+
+
+
+	
+
+	
 
 
 
