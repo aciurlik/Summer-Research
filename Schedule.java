@@ -8,6 +8,7 @@ public class Schedule {
 	ArrayList<Requirement> reqsList;
 	ArrayList<Semester> semesters;
 
+
 	CourseList masterList;
 
 	boolean reqListValid;
@@ -101,7 +102,7 @@ public class Schedule {
 	 * Check every element to see if it has all the prereqs it needs.
 	 */
 	public void checkAllPrerequsites(){
-		
+
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
@@ -113,8 +114,8 @@ public class Schedule {
 			}
 		}
 	}
-	
-	
+
+
 	public void checkPrerequsites(ScheduleElement e, SemesterDate sD){
 		Prefix p = e.getPrefix();
 		if(p == null){
@@ -200,7 +201,7 @@ public class Schedule {
 		Collections.sort(reqsList);;
 		reqListValid = true;
 	}
-	
+
 	public void updateRequirement(Requirement r){
 		r.numFinished = 0;
 		ArrayList<ScheduleElement> all = allElements();
@@ -285,7 +286,7 @@ public class Schedule {
 		}
 		return this.majorsList;
 	}
-	
+
 	public ArrayList<Requirement> getRequirementsList(){
 		if(! reqListValid){
 			updateReqList();
@@ -319,5 +320,12 @@ public class Schedule {
 			}
 		}
 		return result;
+	}
+
+	public void addElement(Requirement req, Semester sem) {
+		sem.add(req);
+
+
+
 	}
 }
