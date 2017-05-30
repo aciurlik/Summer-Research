@@ -36,6 +36,8 @@ public class Course implements ScheduleElement{
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
+		userSpecifiedReqs = new HashSet<Requirement>();
+		reqsSatisfied = new HashSet<Requirement>();
 	}
 
 	/**
@@ -50,6 +52,8 @@ public class Course implements ScheduleElement{
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
+		userSpecifiedReqs = new HashSet<Requirement>();
+		reqsSatisfied = new HashSet<Requirement>();
 	}
 
 

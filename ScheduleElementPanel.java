@@ -2,6 +2,8 @@
 
 
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -20,12 +22,15 @@ public class ScheduleElementPanel extends JPanel {
 
 
 	//	Driver coursesSatisfy = new Driver();
-	JComboBox<ScheduleElement>  requirmentDropDown = new JComboBox<ScheduleElement>();
+	JComboBox<ScheduleElement>  requirementDropDown;
 
 	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
+		
 		super();
 		this.s=s;
 		this.container = container;
+		
+		
 
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
@@ -36,6 +41,14 @@ public class ScheduleElementPanel extends JPanel {
 		return s;
 	}
 
+	/**
+	 * This method should only be called if the user selected a course 
+	 * from the dropdown.
+	 */
+	public void dropdownSelected(){
+		ScheduleElement e = (ScheduleElement) this.requirementDropDown.getSelectedItem();
+		container.d.GUIElementChanged(container, this, e);
+	}
 
 
 
@@ -55,14 +68,23 @@ public class ScheduleElementPanel extends JPanel {
 	 * This should only be called if the schedule element is a requirement.
 	 */
 	public void updateDropDown(){
+		this. requirementDropDown = new JComboBox<ScheduleElement>();
+		
+		
 		Requirement r = (Requirement)this.s;
-		this.requirmentDropDown.removeAllItems();
+		this.requirementDropDown.removeAllItems();
+		
 		//Find the list of courses that might satisfy this requirement
 		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(r);
 		for( Course c : listOfCourses){
-			requirmentDropDown.addItem(c);
+			requirementDropDown.addItem(c);
 		}
-		this.add(requirmentDropDown);
+		requirementDropDown.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				dropdownSelected();
+			}
+		});
+		this.add(requirementDropDown);
 	}
 
 

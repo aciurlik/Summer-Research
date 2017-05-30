@@ -79,6 +79,13 @@ public class Driver {
 
 	}
 	
+	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
+		Semester s = container.sem;
+		ScheduleElement old = toChange.getElement();
+		sch.replaceElement(s, old, newValue);
+		update();
+  }
+  
 	public void GUIAddMajor(Major m) {
 		sch.addMajor(m);
 		System.out.println("works");
@@ -94,7 +101,6 @@ public class Driver {
 		return sch.removeAlreadyChosenMajors(collectionOfMajors);
 		
 	
-		
 	}
 
 	public void updateAll(){
