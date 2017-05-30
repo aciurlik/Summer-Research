@@ -2,7 +2,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Scanner;
 /**
  * 
@@ -16,6 +18,8 @@ public class CourseList  {
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
+	
+	private Dictionary<Prefix, Prefix[]> prereqs ;
 
 
 
@@ -41,8 +45,115 @@ public class CourseList  {
 
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
+		this.prereqs = new Hashtable<Prefix, Prefix[]>();
+	}
+	
+	
+	public Prefix[] getPrereqsShallow(Prefix p){
+		if(p == null){
+			return new Prefix[0];
+		}
+		Prefix[] result = this.prereqs.get(p);
+		if(result == null){
+			result = new Prefix[0];
+		}
+		return result;
+	}
+	
+	/**
+	 * Find all the prerequsites of this prefix using a breadth first
+	 * search.
+	 * @param p
+	 * @return
+	 */
+	public HashSet<Prefix> getPrereqsDeep(Prefix p){
+		HashSet<Prefix> result = new HashSet<Prefix>();
+		HashSet<Prefix> newList = new HashSet<Prefix>();
+		for( Prefix x : getPrereqsShallow(p)){
+			newList.add(x);
+		}
+		if(p == null){
+			return result;
+		}
+		//Each iteration, add newList to result and
+		// find all the new prereqs implied.
+		while(!newList.isEmpty()){
+			//replacement new list
+			HashSet<Prefix> repNewList = new HashSet<Prefix>();
+			for(Prefix x : newList){
+				//if result already contains this piece of newList,
+				// we shouldn't add its prereqs (or we might get into an infinite
+				// loop if both MTH 220 requires MTH 110, 
+				// and MTH 110 requires MTH 220.
+				if(result.add(x)){
+					for(Prefix y : getPrereqsShallow(x)){
+						repNewList.add(y);
+					}
+				}
+			}
+			newList = new HashSet<Prefix>(repNewList);
+			repNewList = new HashSet<Prefix>();
+		}
+		return result;
 	}
 
+	/**
+	 * See if this hashSet of prefixes has all the immediate
+	 * prereqs for main. If not, return false.
+	 * @param p
+	 * @param taken
+	 * @return
+	 */
+	public boolean checkPrereqsShallow(Prefix main, HashSet<Prefix> taken){
+		return missingPrereqsShallow(main, taken).isEmpty();
+	}
+	
+	/**
+	 * See if this hashSet of prefixes has all the prereqs necessary for
+	 * the main prefix. If not, return false.
+	 * @param main
+	 * @param taken
+	 * @return
+	 */
+	public boolean checkPrereqsDeep(Prefix main, HashSet<Prefix> taken){
+		return missingPrereqsDeep(main, taken).isEmpty();
+	}
+	/**
+	 * Find the entire set of prereqs that would need to be taken to 
+	 * allow main to be taken.
+	 * @param main
+	 * @param taken
+	 * @return
+	 */
+	public HashSet<Prefix> missingPrereqsDeep(Prefix main, HashSet<Prefix> taken){
+		HashSet<Prefix> result = new HashSet<Prefix>();
+		HashSet<Prefix> allNeeded = getPrereqsDeep(main);
+		for (Prefix p : allNeeded){
+			if(!taken.contains(p)){
+				result.add(p);
+			}
+		}
+		return result;
+	}
+	
+	
+	public HashSet<Prefix> missingPrereqsShallow(Prefix main, HashSet<Prefix> taken){
+		HashSet<Prefix> result = new HashSet<Prefix>();
+		Prefix[] allNeeded = getPrereqsShallow(main);
+		for (Prefix p : allNeeded){
+			if(!taken.contains(p)){
+				result.add(p);
+			}
+		}
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	public boolean add(Course c){
 		return listOfCourses.add(c);
@@ -105,9 +216,5 @@ public class CourseList  {
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
 
-	public HashSet<Prefix> getPrerequsites(Prefix p){
-		//TODO
-		return new HashSet<Prefix>();
-	}
 
 }
