@@ -347,8 +347,6 @@ public class Schedule {
 	}
 
 	public ArrayList<Major> removeAlreadyChosenMajors(ArrayList<Major> collectionOfMajors) {
-		System.out.println("Before " + collectionOfMajors);
-		System.out.println(this.majorsList);
 		for(Major m: this.majorsList){
 			if(collectionOfMajors.contains(m)){
 				collectionOfMajors.remove(m);
