@@ -94,6 +94,21 @@ public class Major {
 		return this.name;
 	}
 	
+	@Override 
+	public boolean equals(Object o){
+		if(!(o instanceof Major)){
+			return false;
+		}
+		Major other = (Major) o;
+		if(this.name.equals(other.name)){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
+	
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
