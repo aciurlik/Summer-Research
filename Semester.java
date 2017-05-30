@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 
 
@@ -5,7 +6,8 @@ public class Semester implements Comparable<Semester>{
 	public SemesterDate semesterDate;
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
-
+	
+	
 	public Semester(SemesterDate sD, Schedule s){
 		elements = new ArrayList<ScheduleElement>();
 		this.semesterDate = sD;

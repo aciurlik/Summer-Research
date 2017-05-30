@@ -25,11 +25,14 @@ import javax.swing.JList;
 
 
 
-public class MainMenuBar implements ActionListener {
+public class MainMenuBar extends JMenuBar implements ActionListener {
 	JTextArea output;
 	JScrollPane scrollPane;
+	Driver d;
 
-	public JMenuBar createMenuBar() {
+	public MainMenuBar(Driver d) {
+		super();
+		this.d=d;
 		JMenuBar menuBar;
 		JMenu menu, submenu;
 		JMenuItem menuItem;
@@ -37,7 +40,7 @@ public class MainMenuBar implements ActionListener {
 		JCheckBoxMenuItem cbMenuItem;
 
 		//Create the menu bar.
-		menuBar = new JMenuBar();
+		
 
 		menu = new JMenu("The Furman Advantage");
 		submenu = new JMenu("MayX");
@@ -59,7 +62,7 @@ public class MainMenuBar implements ActionListener {
 		menu.add(menuItem);
 		menuItem = new JMenuItem("Explore Intership Opportunities");
 		menu.add(menuItem);
-		menuBar.add(menu);
+		this.add(menu);
 
 
 
@@ -68,7 +71,7 @@ public class MainMenuBar implements ActionListener {
 		menu.setMnemonic(KeyEvent.VK_A);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"The only menu in this program that has menu items");
-		menuBar.add(menu);
+		this.add(menu);
 		menuItem = new JMenuItem("New Schedule",
 				KeyEvent.VK_T);
 		menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
@@ -95,7 +98,7 @@ public class MainMenuBar implements ActionListener {
 		menu.setMnemonic(KeyEvent.VK_N);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"This allows edits to schedule");
-		menuBar.add(menu);
+		this.add(menu);
 
 
 		submenu = new JMenu("Major");
@@ -128,12 +131,12 @@ public class MainMenuBar implements ActionListener {
 		//Add Help
 		menu = new JMenu("Help");
 		menu.setMnemonic(KeyEvent.VK_N);
-		menuBar.add(menu);
+		this.add(menu);
 
 
 
 
-		return menuBar;
+		
 	}
 
 
@@ -152,8 +155,8 @@ public class MainMenuBar implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String addMajor = "Add Major";
-		ExtrasAddList list = new ExtrasAddList(e.getActionCommand());
+		d.GUIPopUP(e.getActionCommand());
+	
 
 	}
 

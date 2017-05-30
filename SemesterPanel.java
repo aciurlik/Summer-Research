@@ -41,6 +41,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
+		
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
@@ -67,14 +68,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(500,500));
 		this.add(defaultPanel);
-		this.updatePanel(false);
+		this.updatePanel();
 	}
 
 	@Override
 	public void setBackground(Color c){
 		super.setBackground(c);
 		if(defaultPanel != null){
-			defaultPanel.setBackground(this.getBackground());
+			
+			defaultPanel.setBackground(c);
 		}
 	}
 
@@ -113,18 +115,30 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	}
 
+	public Color semesterColor(Semester s){
+		int ColorNum = 0;
+		if(s.getDate().sNumber>SemesterDate.SPRING){
+			ColorNum = s.getDate().year;
+		}
+		else{
+			ColorNum = s.getDate().year-1;
+		}
+		if(ColorNum%2==0){
+			return FurmanOfficial.grey(50);
+
+		}
+		else{
+			return FurmanOfficial.lightPurple(50);
+		}
+	}
+
 
 
 	//Redraw this panel based on the semester sem.
-	public void updatePanel(boolean repaint){
+	public void updatePanel(){
 
 		defaultPanel.removeAll();
-
-
-		//Add the classTitle (Freshman, Sophomore)
-		JLabel ClassTitle = new JLabel(classTitle);
-		defaultPanel.add(ClassTitle);
-
+		defaultPanel.setBackground(this.semesterColor(this.sem));
 		//Figure out the season and add it
 		SemesterDate d = sem.getDate();
 		String season = d.getSeason(d.sNumber);
@@ -165,15 +179,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
 
-		//Repaint 
-		if(repaint){
-			defaultPanel.revalidate();
-			defaultPanel.repaint();
-			this.getParent().revalidate();
-			this.getParent().repaint();
-			this.revalidate();
-			this.repaint();
-		}
+	
+		
 	}
 
 
