@@ -101,32 +101,38 @@ public class Schedule {
 	 * Check every element to see if it has all the prereqs it needs.
 	 */
 	public void checkAllPrerequsites(){
+		
+		HashSet<Prefix> taken = new HashSet<Prefix>();
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
-				checkPrerequsites(e, s.semesterDate);
+				boolean success = masterList.checkPrereqsShallow(e.getPrefix(), taken);
+				if(!success){
+					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
+					throw new PrerequsiteException(needed,e);
+				}
 			}
 		}
 	}
+	
+	
 	public void checkPrerequsites(ScheduleElement e, SemesterDate sD){
 		Prefix p = e.getPrefix();
 		if(p == null){
 			return;
 		}
 		else{
-			HashSet<Prefix> needed = masterList.getPrerequsites(p);
+			HashSet<Prefix> taken = new HashSet<Prefix>();
 			for(Semester s : semesters){
+				// Allow courses taken before or in the same semester.
 				if(s.semesterDate.compareTo(sD) < 1){
 					for (ScheduleElement earlier : s.getElements()){
 						Prefix earlierPrefix = earlier.getPrefix();
-						if(earlierPrefix != null){
-							if(needed.contains(earlierPrefix)){
-								needed.remove(earlierPrefix);
-							}
-						}
+						taken.add(earlierPrefix);
 					}
 				}
 			}
-			if(! needed.isEmpty()){
+			HashSet<Prefix> needed = masterList.missingPrereqsDeep(p, taken);
+			if(!needed.isEmpty()){
 				throw new PrerequsiteException(needed, e);
 			}
 
