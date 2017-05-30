@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.List;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,7 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class ExtrasAddList {
-
+	JList <Major> addList;
 
 	public ExtrasAddList(String type){
 		//Creates the PopUp Window
@@ -37,37 +38,57 @@ public class ExtrasAddList {
 		System.out.println(type);
 
 		//Creates Add list
-		DefaultListModel<String> addList = new DefaultListModel<>();
-
+		
+		
 		if(type.equals(addMajor)){
 			ListOfMajors majors = ListOfMajors.testList();
-			for(int i=0; i<majors.size(); i++){
-				addList.addElement(majors.get(i).name);
+			Major[] collectionOfMajors =  majors.getGUIMajors();
+			addList = new JList <Major>(collectionOfMajors);
+	
 
-			}
+			
 		}
 		if(type.equals(addMinor)){
-			System.out.println("I am doing this");
-			String[] minor = {"cat", "dog", "pig"};
-			for(int i=0; i<minor.length; i++){
-				addList.addElement(minor[i]);
+			ListOfMajors majors = ListOfMajors.testList();
+			Major[] collectionOfMajors =  majors.getGUIMinor();
+			addList = new JList <Major>(collectionOfMajors);
+			
+			
 			}
-		}
+		
 		if(type.equals(addTrack)){
-			System.out.println("I am doing this Track");
+			ListOfMajors majors = ListOfMajors.testList();
+			Major[] collectionOfMajors =  majors.getGUITrack();
+			addList = new JList <Major>(collectionOfMajors);
 		}
 
 
-		JList<String> addCourses = new JList<>(addList);
-		addCourses.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	
+		addList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		addList.setFocusTraversalKeysEnabled(true);
 		
-		
-		JScrollPane listScroller = new JScrollPane(addCourses);
+		JScrollPane listScroller = new JScrollPane(addList);
 		listScroller.setPreferredSize(new Dimension(200, 200));
 		popUP.add(listScroller);
 
 
+		//List Listener
+		
+		ListSelectionListener listSelectionListener = new ListSelectionListener(){
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+			
+				Iterable<Major> pickMajors =  addList.getSelectedValuesList();
+				for(Major m: pickMajors){
+				
+				}
+
+			}
+
+
+		};
+		
+		addList.addListSelectionListener(listSelectionListener);
 		//Sets up location of popup
 		Dimension screenSize= Toolkit.getDefaultToolkit().getScreenSize();
 		int screenWidth = (int) screenSize.getWidth();

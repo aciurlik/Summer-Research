@@ -14,10 +14,7 @@ public class Driver {
 	
 	public Driver(){
 		//Make data
-		Schedule test = Schedule.testSchedule();
-
-
-		
+		Schedule test = Schedule.testSchedule();		
 		
 		
 		JFrame frame = new JFrame();
