@@ -2,7 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Driver {
@@ -15,7 +17,12 @@ public class Driver {
 
 
 	public Driver(){
-
+		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
+		JLabel label = new JLabel(icon);
+		
+		
+		
+		
 
 		//Make data
 
@@ -32,7 +39,9 @@ public class Driver {
 
 		//Adds Additions Panel
 		AdditionsPanel add = new AdditionsPanel(this);
-		frame.add(add, BorderLayout.LINE_START);
+		frame.add(add, BorderLayout.CENTER);
+		
+		frame.add(label, BorderLayout.LINE_START);
 
 
 
@@ -79,6 +88,13 @@ public class Driver {
 
 	}
 	
+	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
+		Semester s = container.sem;
+		ScheduleElement old = toChange.getElement();
+		sch.replaceElement(s, old, newValue);
+		update();
+  }
+  
 	public void GUIAddMajor(Major m) {
 		sch.addMajor(m);
 		System.out.println("works");
@@ -94,7 +110,6 @@ public class Driver {
 		return sch.removeAlreadyChosenMajors(collectionOfMajors);
 		
 	
-		
 	}
 
 	public void updateAll(){

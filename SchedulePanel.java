@@ -80,20 +80,14 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 	}
 
-	public void removeAllSemesters(){
-		scrollPanel.removeAll();
-	}
-
 
 
 	public void update(Schedule sch) {
-		removeAllSemesters();
+		scrollPanel.removeAll();
 		scrollPanel.setLayout(new GridLayout(1, sch.semesters.size()+1, 5, 5));
 		for(Semester s: sch.semesters){
 			SemesterPanel semester = new SemesterPanel(s, this.d);
 			scrollPanel.add(semester);
-
-
 		}
 		scrollPanel.add(addExtraSemesterButtonPanel);
 	}
