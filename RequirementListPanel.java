@@ -28,10 +28,10 @@ public class RequirementListPanel extends JPanel{
 	public JScrollPane scroll;
 	public JPanel inner;
 	public JPanel infoPanel;
-	public Schedule schedule;
+	//public Schedule schedule;
 	public JLabel creditHoursLabel;
 	public JLabel reqsLeftLabel;
-	
+
 	public int layoutCounter;
 	public static final int gridHeight = 3;
 	// the layout locations handle the first few requirementpanels.
@@ -39,17 +39,17 @@ public class RequirementListPanel extends JPanel{
 	public Color FurmanDarkPurple = new Color(43, 12, 86);
 	public Color FurmanLightPurple = new Color(79, 33, 112);
 	public Color FurmanGray = new Color(96, 96, 91);
-	
+
 	public RequirementListPanel(Schedule s){
-		this.schedule = s;
-		
-		
+		//this.schedule = s;
+
+
 		//Put the main RequirementList panel, called inner, inside a scroll pane.
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
 		this.inner.setBackground(Color.white);
 		this.scroll = new  JScrollPane(inner);
-		
+
 		// Make the first row of the inner panel, with labels
 		// "Requirements" and "Credit Hours"
 		this.infoPanel = new JPanel();
@@ -58,22 +58,22 @@ public class RequirementListPanel extends JPanel{
 		this.infoPanel.add(reqsLeftLabel);
 		this.infoPanel.add(creditHoursLabel);
 		this.infoPanel.setBackground(inner.getBackground());
-		
+
 		this.setLayout(new BorderLayout());
 		this.add(infoPanel, BorderLayout.NORTH);
-		
+
 		//put all the items, including infoPanel and the requirement panels,
 		// into inner.
-		update();
-		
-		
+		update(s);
+
+
 		scroll.setPreferredSize(new Dimension(800,200));
 		this.add(scroll);
-		
-		
-		
+
+
+
 	}
-	
+
 	/**
 	 * Find the next location to place a component in the gridbag.
 	 * @return
@@ -84,23 +84,23 @@ public class RequirementListPanel extends JPanel{
 		return result;
 
 	}
-	
+
 	/**
 	 * Update the requirementPanels displayed based on 
 	 * the the majors in the schedule. 
 	 */
-	public void update(){
+	public void update(Schedule schedule){
 		this.inner.removeAll();
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = gbc.CENTER;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(3,3,3,3);
-		
+
 		this.inner.add(infoPanel);
-		
+
 		int reqsLeft = 0;
 		ArrayList<Major> majors = schedule.getMajors();
 		int heightCounter = 1;
@@ -108,8 +108,9 @@ public class RequirementListPanel extends JPanel{
 			JPanel p = new JPanel();
 			p.add(new JLabel(m.name));
 			p.add(new JSeparator(SwingConstants.HORIZONTAL));
-			Collections.sort(m.reqList);
-			for(Requirement r : m.reqList){
+			ArrayList<Requirement> reqList = new ArrayList<Requirement>(m.reqList);
+			Collections.sort(reqList);
+			for(Requirement r : reqList){
 				if(r.numFinished < r.numToChoose){
 					reqsLeft += r.numToChoose - r.numFinished;
 				}
@@ -121,7 +122,7 @@ public class RequirementListPanel extends JPanel{
 			this.inner.add(p, gbc);
 		}
 
-		this.creditHoursLabel.setText(this.getCHText() + (230 - this.schedule.getCreditHoursComplete()));
+		this.creditHoursLabel.setText(this.getCHText() + (230 - schedule.getCreditHoursComplete()));
 		this.reqsLeftLabel.setText(this.getReqsText() + reqsLeft);
 	}
 	/**
@@ -130,24 +131,24 @@ public class RequirementListPanel extends JPanel{
 	public String getCHText(){
 		return "Credit Hours Left: ";
 	}
-	
+
 	public String getReqsText(){
 		return "Requirements Left: "; 
 	}
-	
-	
+
+
 	public static void main(String[] args){
 		// Testing the requirementList panel for the first time
 		RequirementListPanel p = new RequirementListPanel(Schedule.testSchedule());
-		
-		
-		
+
+
+
 		JFrame frame = new JFrame();
 		frame.getContentPane().add(p);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
-		
+
 	}
-	
+
 }

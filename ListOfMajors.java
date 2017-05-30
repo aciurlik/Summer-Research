@@ -3,12 +3,12 @@ import java.util.ArrayList;
 public class ListOfMajors {
 
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
-	
 
-	
-	
-	
-	
+
+
+
+
+
 	public static ListOfMajors testList(){
 		ListOfMajors result = new ListOfMajors();
 		Major[] list = new Major[]{
@@ -30,20 +30,20 @@ public class ListOfMajors {
 		};
 		//	Major.readFrom(),
 		//	Major.readFrom()
-		
+
 		for(Major m : list){
 			result.add(m);
 		}
 		return result;
 	}
 
-	
+
 	public ArrayList<Major> getCompleteMajorsList() {
 		return completeMajorsList;
 	}
 
 
-	
+
 
 
 	public ListOfMajors(){
@@ -54,31 +54,31 @@ public class ListOfMajors {
 
 	public boolean add(Major m){
 		return completeMajorsList.add(m);
-		
+
 
 	}
 
 	public void addAt(Major m, int i){
-	
+
 		completeMajorsList.add(i, m);
 	}
-	
 
-	
-	
+
+
+
 	public int getSize() {
 		return completeMajorsList.size();
 	}
 
 	public Major get(int i){
 		Major m = completeMajorsList.get(i);
-		
+
 		return m;
 	}
 
 
-/**
- *	public Major removeMajor(Major m){
+	/**
+	 *	public Major removeMajor(Major m){
 		completeMajorsList.remove(m);
 		return m;
 	}
@@ -87,8 +87,8 @@ public class ListOfMajors {
 		Major m = completeMajorsList.remove(i);
 		return m;
 	} 
- *
- */
+	 *
+	 */
 
 
 	public ArrayList<String> nameForPopup(Iterable<Major> m){
@@ -102,18 +102,18 @@ public class ListOfMajors {
 
 	}
 
-	
+
 	public Major[] getGUIMajors() {
 		ArrayList<Major> majorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
 			//if (m.major)){
-				majorGUI.add(m);
-		//	}
-			
+			majorGUI.add(m);
+			//	}
+
 		}
 		Major listOfMajors[] = new Major[majorGUI.size()];
 		return (Major[]) majorGUI.toArray(listOfMajors);
-		
+
 	}
 
 
@@ -123,7 +123,7 @@ public class ListOfMajors {
 			if (m.minor){
 				majorGUI.add(m);
 			}
-			
+
 		}
 		return (Major[]) majorGUI.toArray();
 	}
@@ -135,7 +135,7 @@ public class ListOfMajors {
 			if (m.track){
 				majorGUI.add(m);
 			}
-			
+
 		}
 		return (Major[]) majorGUI.toArray();
 	}

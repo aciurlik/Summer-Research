@@ -26,7 +26,7 @@ public class ScheduleElementPanel extends JPanel {
 		super();
 		this.s=s;
 		this.container = container;
-		
+
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
 
@@ -64,25 +64,25 @@ public class ScheduleElementPanel extends JPanel {
 		}
 		this.add(requirmentDropDown);
 	}
-	
-	
+
+
 	public class SEPDragHandler extends ComponentDragHandler{
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
-			
+
 		}
 
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
-			container.removeElement(s);
-			container.d.reqs.update();
-			container.d.reqs.revalidate();
-			container.d.reqs.repaint();
-			
+			container.removeElement((ScheduleElementPanel) dragged);
+			//container.d.reqs.update();
+			//container.d.reqs.revalidate();
+			//	container.d.reqs.repaint();
+
 		}
-		
+
 	}
 
 

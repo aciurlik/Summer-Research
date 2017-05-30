@@ -83,7 +83,8 @@ public class Schedule {
 	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
 
 	}
-	public void removed(ScheduleElement e, Semester s){
+	public void remove(ScheduleElement e, Semester s){
+		s.remove(e);
 		for (Requirement r : e.getRequirementsFulfilled()){
 			r.numFinished -= 1;
 		}
@@ -322,10 +323,15 @@ public class Schedule {
 		return result;
 	}
 
-	public void addElement(Requirement req, Semester sem) {
+	public void addRequirementElement(Requirement req, Semester sem) {
 		sem.add(req);
 
 
+
+	}
+
+	public void addScheduleElement(ScheduleElement element, Semester sem) {
+		sem.add(element);
 
 	}
 }
