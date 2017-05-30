@@ -51,7 +51,7 @@ public class ExtrasAddList implements ActionListener {
 			ArrayList<Major> collectionOfMajors =  majors.getGUIMajors();
 			
 			ArrayList<Major> displayThings = d.sch. removeAlreadyChosenMajors(collectionOfMajors);
-			System.out.println("Display" + displayThings);
+	
 			
 			addList = new JList <Major>(displayThings.toArray(new Major[displayThings.size()]));
 	
