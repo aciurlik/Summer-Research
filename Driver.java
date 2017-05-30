@@ -54,15 +54,15 @@ public class Driver {
 	}
 
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
-		sch.addElement(r.req, semesterP.sem);
+		sch.addRequirementElement(r.req, semesterP.sem);
 		this.update();
 
 	}
 
 
 	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel semesterPanel) {
-		// TODO Auto-generated method stub
-
+		sch.addScheduleElement(p.getElement(), semesterPanel.sem);
+		this.update();
 	}
 
 	public void GUISemesterPanelAdded(){
@@ -71,9 +71,15 @@ public class Driver {
 
 	}
 
+	public void GUIRemoveElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
+		sch.remove(e.getElement(), semesterPanel.sem);
+		this.update();
+
+	}
+
 	public void updateAll(){
 		schP.update(sch);
-		//	reqs.update(sch);
+		reqs.update(sch);
 	}
 
 	public void repaintAll(){
@@ -99,6 +105,8 @@ public class Driver {
 
 
 	}
+
+
 
 
 

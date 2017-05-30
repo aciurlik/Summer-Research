@@ -72,7 +72,6 @@ public class Semester implements Comparable<Semester>{
 	public boolean remove(ScheduleElement e){
 		this.schedule.checkErrorsWhenRemoving(e, this);
 		this.elements.remove(e);
-		this.schedule.removed(e,this);
 		return true;
 	}
 }
