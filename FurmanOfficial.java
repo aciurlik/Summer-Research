@@ -14,20 +14,53 @@ public class FurmanOfficial {
 	public static final Color grey = new Color(91,91,91);
 	public static final int[] greyRGB = {91, 91, 91};
 	
-	
+	/**
+	 * Rescale this RGB value according to the given alpha
+	 * as if it were placed on a white background.
+	 * @param originalValue
+	 * @param alpha
+	 * @return
+	 */
+	public static int rescale(int originalValue, int alpha){
+		double scalar = alpha / 255.0;
+		int result = (int)(originalValue * scalar + 255 * (1- scalar));
+		return result;
+	}
 	public static Color lightPurple(int alpha){
-		return new Color(lightPurpleRGB[0], lightPurpleRGB[1], lightPurpleRGB[2], alpha);
+		return new Color(
+				rescale(lightPurpleRGB[0], alpha), 
+				rescale(lightPurpleRGB[1], alpha),
+				rescale(lightPurpleRGB[2], alpha)
+				);
 	}
 	public static Color darkPurple(int alpha){
-		return new Color(darkPurpleRGB[0], darkPurpleRGB[1], darkPurpleRGB[2], alpha);
+		return new Color(
+				rescale(darkPurpleRGB[0], alpha),
+				rescale(darkPurpleRGB[1], alpha),
+				rescale(darkPurpleRGB[2], alpha)
+				);
 	}
 	public static Color grey(int alpha){
-		return new Color(greyRGB[0], greyRGB[1], greyRGB[2], alpha);
+		return new Color(
+				rescale(greyRGB[0], alpha),
+				rescale(greyRGB[1], alpha),
+				rescale(greyRGB[2], alpha)
+				);
 	}
 	
 	public static final Font closeFont = new Font("Helvatica", Font.PLAIN, 12);
 
+	
+	/**
+	 * Make a window showing all the different colors with different
+	 * alpha values.
+	 * 
+	 * numDivisions tells how many swaths of each color should be made, and
+	 * it will split the range 0-255 into numDivisions pieces to make the panels.
+	 * @param numDivisions
+	 */
 	public static void testColors(int numDivisions){
+		
 		JFrame f = new JFrame();
 		JPanel main = new JPanel();
 		int numTests = numDivisions;
@@ -49,6 +82,7 @@ public class FurmanOfficial {
 		f.setVisible(true);
 		
 	}
+	
 	
 	public static void main(String[] args){
 		testColors(10);

@@ -26,11 +26,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	JPanel hidePanel;
 	Driver d;
 	
-	public Color FurmanLightPurple = new Color(79, 33, 112);
-	public Color FurmanGray = new Color(96, 96, 91);
 
 
-	public SemesterPanel(Semester sem, Color c, Driver d){
+	public SemesterPanel(Semester sem, Driver d){
 
 		//Sets up the panel that will hold one semester
 		super();
@@ -42,14 +40,12 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
-		this.setBackground(c); //This allows the schedule Panel to control the color
-		defaultPanel.setBackground(this.getBackground());
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
 		this.hidePanel = new JPanel();
-		this.hidePanel.setBackground(FurmanLightPurple);
+		this.hidePanel.setBackground(FurmanOfficial.lightPurple(255));
 		String showText = "Show Semester";
 		JButton showSemester = new JButton(showText);
 		showSemester.addActionListener(new ActionListener(){
@@ -73,7 +69,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.add(defaultPanel);
 		this.updatePanel(false);
 	}
-
+	
+	@Override
+	public void setBackground(Color c){
+		super.setBackground(c);
+		if(defaultPanel != null){
+			defaultPanel.setBackground(this.getBackground());
+		}
+	}
 
 
 	public int getClassCounter() {
