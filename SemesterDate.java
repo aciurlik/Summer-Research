@@ -2,9 +2,9 @@
 
 public class SemesterDate {
 	public static final int SPRING = 1;
-	public static final int FALL = 2;
+	public static final int FALL = 4;
 	public static final int SUMMER = 3;
-	public static final int MAYX = 4;
+	public static final int MAYX = 2;
 	public static final int OTHER = 5;
 
 	int year;
@@ -51,13 +51,17 @@ public class SemesterDate {
 		if(this.sNumber == SemesterDate.FALL){
 			return new SemesterDate(this.year + 1, SemesterDate.SPRING);
 		}
+		if(this.sNumber == SemesterDate.SPRING){
+			return new SemesterDate(this.year, SemesterDate.FALL);
+		}
 		else{
 			return new SemesterDate(this.year,(this.sNumber + 1)%4 );
 		}
 	}
 
+	
 	public String getSeason(int p){
-		String[] season = {null, "Spring", "Fall", "Summer", "MayX", "Other"};
+		String[] season = {null, "Spring", "MayX", "Summer", "Fall", "Other"};
 
 
 		return season[p];
@@ -84,4 +88,21 @@ public class SemesterDate {
 		}
 
 	}
+	
+ @Override 
+ public boolean equals(Object other){
+	 if(!(other instanceof SemesterDate)){
+		 return false;
+	 }
+	 SemesterDate o = (SemesterDate) other;
+	 if(o.compareTo(this)==0){
+		 return true;
+	 }
+	 else{
+		 return false;
+	 }
+	 
+	 
+	 
+ }
 }

@@ -120,7 +120,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	public Color semesterColor(Semester s){
 		int ColorNum = 0;
-		if(s.getDate().sNumber>SemesterDate.SPRING){
+		if(s.getDate().sNumber<SemesterDate.FALL){
 			ColorNum = s.getDate().year;
 		}
 		else{
@@ -142,16 +142,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
+		
 		//Figure out the season and add it
+		
 		SemesterDate d = sem.getDate();
 		String season = d.getSeason(d.sNumber);
-		if(season.equals("MayX") || season.equals("Summer")){
-			season="MayX/Summer";
-		}
-		if(season.equals("Other") || season.equals(null)){
+		
+		
+		if(season == null){
 			season="Error";
 		}
-		season += "-" + d.year;
+		season +=  " " + sem.semesterDate.year;
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
 		defaultPanel.add(FallSpring);
@@ -218,10 +219,12 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			if(draggedItem instanceof RequirementPanel){
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d);
+				System.out.println("EXISTS");
 			}
 			else{
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
 				addElement(p);
+				System.out.println("DOES NOT EXIST");
 			}
 			
 		}

@@ -143,9 +143,9 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUIMajors() {
 		ArrayList<Major> majorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			//if (m.major)){
+			if (m.major){
 			majorGUI.add(m);
-			//	}
+			}
 
 		}
 		
@@ -154,27 +154,27 @@ public class ListOfMajors {
 	}
 
 
-	public Major[] getGUIMinor() {
-		ArrayList<Major> majorGUI = new ArrayList<Major>();
+	public ArrayList<Major> getGUIMinor() {
+		ArrayList<Major> minorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
 			if (m.minor){
-				majorGUI.add(m);
+				minorGUI.add(m);
 			}
 
 		}
-		return (Major[]) majorGUI.toArray();
+		return minorGUI;
 	}
 
 
-	public Major[] getGUITrack() {
-		ArrayList<Major> majorGUI = new ArrayList<Major>();
+	public ArrayList<Major> getGUITrack() {
+		ArrayList<Major> trackGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
 			if (m.track){
-				majorGUI.add(m);
+				trackGUI.add(m);
 			}
 
 		}
-		return (Major[]) majorGUI.toArray();
+		return trackGUI;
 	}
 
 
