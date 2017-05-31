@@ -6,9 +6,9 @@ public class Major {
 	String name;
 	int groupNumber;
 	ArrayList<Requirement> reqList;
-	boolean major;
-	boolean minor;
-	boolean track;
+	boolean major = true;
+	boolean minor = true;
+	boolean track = true;
 
 	public static final int MajorDDNRange = 100;
 

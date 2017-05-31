@@ -62,6 +62,16 @@ public class Schedule {
 		return next;
 	}
 	
+	public void addNewSemesterInsideSch(int i, int season) {
+		SemesterDate inside = new SemesterDate(i, season);
+		Semester toAdd = new Semester(inside, this);
+		this.semesters.add(toAdd);
+		Collections.sort(semesters);
+
+	}
+	
+	
+	
 	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
 		s.replace(oldElement, newElement);
 		if(newElement instanceof Course){
@@ -359,7 +369,7 @@ public class Schedule {
 
 	}
 
-	public ArrayList<Major> removeAlreadyChosenMajors(ArrayList<Major> collectionOfMajors) {
+	public ArrayList<Major> removeAlreadyChosenMajors(ArrayList<Major> collectionOfMajors ) {
 		for(Major m: this.majorsList){
 			if(collectionOfMajors.contains(m)){
 				collectionOfMajors.remove(m);
@@ -369,4 +379,17 @@ public class Schedule {
 		return collectionOfMajors;
 		
 	}
+
+	public boolean SemesterAlreadyExists(SemesterDate semesterDate) {
+		for(Semester s: this.semesters){
+			if(s.semesterDate.equals(semesterDate)){
+				return true;
+			
+			}
+
+		}
+		return false;
+	}
+
+
 }

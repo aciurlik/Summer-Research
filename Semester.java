@@ -83,6 +83,20 @@ public class Semester implements Comparable<Semester>{
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
 		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
 	}
+	
+	@Override
+	public boolean equals(Object other){
+		if(!(other instanceof Semester)){
+			return false;
+		}
+		Semester o = (Semester) other;
+		if(this.compareTo(o)==0){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 
 
 }
