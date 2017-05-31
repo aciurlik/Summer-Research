@@ -21,6 +21,7 @@ import javax.swing.border.BevelBorder;
  */
 public class RequirementPanel extends JPanel {
 	public Requirement req;
+	int fontSize = 14;
 	
 	public RequirementPanel(Requirement req){
 		super();
@@ -50,6 +51,7 @@ public class RequirementPanel extends JPanel {
 		}
 		JLabel shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
+		shown.setFont(FurmanOfficial.getFont(fontSize));
 		shown.setToolTipText(fullText);
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 

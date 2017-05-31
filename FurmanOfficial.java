@@ -51,6 +51,9 @@ public class FurmanOfficial {
 	public static final Font closeFont = new Font("Helvatica", Font.PLAIN, 12);
 
 	
+	public static Font getFont(int point){
+		return new Font("Helvatica", Font.PLAIN, point);
+	}
 	/**
 	 * Make a window showing all the different colors with different
 	 * alpha values.

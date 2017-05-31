@@ -20,6 +20,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
+	public int seasonFontSize = 16;
+	public int dropLabelFontSize = 11;
 	private String addAClass = "Drop a requirement here";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
@@ -49,6 +51,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.hidePanel.setBackground(FurmanOfficial.lightPurple(255));
 		String showText = "Show Semester";
 		JButton showSemester = new JButton(showText);
+		showSemester.setFont(FurmanOfficial.getFont(12));
 		showSemester.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
@@ -150,6 +153,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 		season += "-" + d.year;
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
+		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
 		defaultPanel.add(FallSpring);
 
 		//Add all Schedule elements
@@ -158,18 +162,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			defaultPanel.add(element);
 			element.updatePanel();
 		}
-
+		//Adds Drop Spaces 
 		if(sem.elements.size()==4){
-			JLabel dropLabel = new JLabel(addAClass);
-			dropLabel.setTransferHandler(new SemesterPanelDropHandler());
+			JLabel dropLabel = newDropLabel();
 			defaultPanel.add(dropLabel);
 		}
-		//Adds Drop Spaces 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 		for (int i= 0; i<DropsNeeded; i++){
-			JLabel dropLabel = new JLabel(addAClass);
+			JLabel dropLabel = newDropLabel();
 			defaultPanel.add(dropLabel);
-
 		}
 
 
@@ -181,6 +182,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	
 		
+	}
+	
+	public JLabel newDropLabel(){
+		JLabel dropLabel = new JLabel(addAClass);
+		dropLabel.setTransferHandler(new SemesterPanelDropHandler());
+		dropLabel.setFont(FurmanOfficial.getFont(dropLabelFontSize));
+		return dropLabel;
 	}
 
 

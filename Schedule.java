@@ -216,6 +216,19 @@ public class Schedule {
 		Collections.sort(reqsList);;
 		reqListValid = true;
 	}
+	
+	public int totalRequirementsLeft(){
+		if(!reqListValid){
+			updateReqList();
+		}
+		int result = 0;
+		for(Requirement r : reqsList){
+			if(r.numFinished < r.numToChoose){
+				result += r.numToChoose - r.numFinished;
+			}
+		}
+		return result;
+	}
 
 	public void updateRequirement(Requirement r){
 		r.numFinished = 0;

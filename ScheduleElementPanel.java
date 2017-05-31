@@ -30,7 +30,6 @@ public class ScheduleElementPanel extends JPanel {
 		this.s=s;
 		this.container = container;
 		
-		
 
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
@@ -54,6 +53,7 @@ public class ScheduleElementPanel extends JPanel {
 
 	public void updatePanel(){ //This can be taken out later
 		JLabel elementLabel = new JLabel(s.getDisplayString());
+		elementLabel.setFont(FurmanOfficial.getFont(12));
 		this.add(elementLabel);
 		if(s instanceof Requirement) {
 			updateDropDown();
@@ -69,7 +69,7 @@ public class ScheduleElementPanel extends JPanel {
 	 */
 	public void updateDropDown(){
 		this. requirementDropDown = new JComboBox<ScheduleElement>();
-		
+		this.requirementDropDown.setFont(FurmanOfficial.getFont(12));
 		
 		Requirement r = (Requirement)this.s;
 		this.requirementDropDown.removeAllItems();

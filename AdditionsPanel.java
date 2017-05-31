@@ -15,6 +15,8 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		public String classAddition = new String("MAJOR/MINOR");
 		public int optionsNumber = 8;
 		public int headerNumber = 2;
+		public int buttonsFontSize = 14;
+		public int headerFontSize = 14;
 		public Color FurmanDarkPurple = new Color(43, 12, 86);
 		public Color FurmanLightPurple = new Color(79, 33, 112);
 		public Color FurmanGray = new Color(96, 96, 91);
@@ -30,6 +32,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.setBackground(Color.white);
 		JLabel header = new JLabel(AdditionsHeader);
 		header.setHorizontalAlignment(JLabel.CENTER);
+		header.setFont(FurmanOfficial.getFont(headerFontSize));
 		this.add(header);
 		this.addButton("Add MayX");
 		this.addButton("Add Summer Class");
@@ -38,6 +41,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.addButton("Add Research");
 		JLabel classAdditions = new JLabel(classAddition);
 		classAdditions.setHorizontalAlignment(JLabel.CENTER);
+		classAdditions.setFont(FurmanOfficial.getFont(headerFontSize));
 		this.add(classAdditions);
 		this.addButton("Add Major");
 		this.addButton("Add Minor");
@@ -49,12 +53,14 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public void addButton(String s){
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBackground(Color.white);
+		
 		JButton button = new JButton(s);
+		button.setFont(FurmanOfficial.getFont(buttonsFontSize));
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
 		button.setBackground(FurmanDarkPurple);
 		button.setBorderPainted(false);
-		button.setPreferredSize(new Dimension(200, 20));
+		//button.setPreferredSize(new Dimension(153, 20));
 		button.setOpaque(true);
 		button.addActionListener(this);
 		
