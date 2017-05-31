@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class Course implements ScheduleElement{
@@ -14,12 +15,20 @@ public class Course implements ScheduleElement{
 	protected Interval<Time> meetingTime;
 	Interval<Time> labTime; //assumed to repeat weakly until examTime
 	Interval<Time> examTime; 
+	
 	String professor;
 
 	HashSet<Requirement> reqsSatisfied;
 	HashSet<Requirement> userSpecifiedReqs;
 
-	public static final String[] dayCodes = {"U", "M", "T", "W", "H", "F", "S"};
+	public static final char[] dayCodes = {'U', 'M', 'T', 'W', 'R', 'F', 'S'};
+	public static HashMap<Character, Integer> reverseDayCodes;
+	static {
+		reverseDayCodes = new HashMap<Character, Integer>();
+		for(int i = 0; i < dayCodes.length ; i ++){
+			reverseDayCodes.put(dayCodes[i], i);
+		}
+	}
 
 
 	/**
@@ -82,6 +91,21 @@ public class Course implements ScheduleElement{
 		}
 		return result;
 	}
+	
+	/**
+	 * Given a code of the form "MWF" make the correct
+	 * meeting days list.
+	 * @param dayCode
+	 * @return
+	 */
+	public static int[] meetingDaysFrom(String dayCode){
+		char[] days = dayCode.toCharArray();
+		int[] result = new int[days.length];
+		for(int i = 0; i < result.length ; i ++){
+			result[i] = reverseDayCodes.get(days[i]);
+		}
+		return result;
+	}
 
 	///////////////////
 	///////////////////
@@ -99,12 +123,18 @@ public class Course implements ScheduleElement{
 				examStartTime, 
 				examStartTime.addMinutes(durationInMinutes));
 	}
+	public void setExamTime(Interval<Time> t){
+		this.examTime = t;
+	}
 	public void setLabTime(int dayOfWeek, int hour, boolean AM, int minutes, int durationMinutes){
 		Time startTime = new Time( hour, AM, minutes, 0);
 		startTime.setYear(this.semester.getYear());
 		startTime.setMonth(this.semester.getStartMonth());
 		startTime.advanceToNext(dayOfWeek);
 		this.labTime = new Interval<Time>(startTime, startTime.addMinutes(durationMinutes));
+	}
+	public void setLabTime(Interval<Time> t){
+		this.labTime = t;
 	}
 
 	//////////////
@@ -315,8 +345,38 @@ public class Course implements ScheduleElement{
 
 
 	}
-	public Course readFromFurman(String firstLine, String secondLine){
-		return null;
+	public static Course readFromFurmanData(ArrayList<String> furmanData){
+		String semesterString = furmanData.get(0); // EX "Fall 2017 - Day"
+		String section = furmanData.get(1); // EX "ACC-111-01"
+		String title = furmanData.get(3);  // EX "Financial Accounting Prncpls"
+		int creditHours = Integer.parseInt(furmanData.get(4));
+		String instructionalMethod = furmanData.get(5); 
+		// Known examples 
+		// EXAM, LEC, LAB, IDI, STU, SKL, SEM, ADD, ACT, blank 
+		String location = furmanData.get(6);
+		String startDate = furmanData.get(7); // EX "08/22/2017"
+		String endDate = furmanData.get(8);
+		String meetingDays = furmanData.get(9);
+		String startTime = furmanData.get(10); // EX "08:30PM"
+		String endTime = furmanData.get(11);
+		String professor = furmanData.get(12);
+		String GERs = furmanData.get(14);
+		String prerequsites = furmanData.get(16);
+		
+		String[] sectionValues = section.split("-");
+		Prefix p = new Prefix(sectionValues[0], Integer.parseInt(sectionValues[1]));
+		int sectionNumber = Integer.parseInt(sectionValues[2]);
+		
+		String[] semesterSplit = semesterString.split(" ");
+		SemesterDate semester = new SemesterDate(semesterSplit[0], Integer.parseInt(semesterSplit[1]));
+		
+		return new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
+		
+		
+	}
+	
+	public static Interval<Time> readTimeFrom(ArrayList<String> furmanData){
+		
 	}
 
 

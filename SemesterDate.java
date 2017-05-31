@@ -14,6 +14,11 @@ public class SemesterDate {
 		this.year = year;
 		this.sNumber = semesterNumber;
 	}
+	
+	public SemesterDate(String season, int year){
+		this.year = year;
+		this.sNumber = toSNumber(season);
+	}
 
 	public int getYear(){
 		return year;
@@ -61,7 +66,21 @@ public class SemesterDate {
 
 
 		return season[p];
-
+	}
+	public int toSNumber(String season){
+		switch(season.toUpperCase().replaceAll(" ", "")){
+		case "FALL":
+			return FALL;
+		case "SPRING":
+			return SPRING;
+		case "MAYX:":
+		case "MAY-X":
+			return MAYX;
+		case "SUMMER":
+			return SUMMER;
+		default:
+			return OTHER;
+		}
 	}
 
 	//@Override

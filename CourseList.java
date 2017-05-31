@@ -1,6 +1,9 @@
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -214,6 +217,47 @@ public class CourseList  {
 	}
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(this.listOfCourses,r);
+	}
+	
+	
+	
+	
+	public void addCoursesIn(File furmanCoursesFile){
+		String lastSectionNumber = "";
+		Course lastCourse = null;
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(furmanCoursesFile));
+			//skip the first line of field names
+			String line = br.readLine();
+
+			//Read in each course
+			while(line != null){
+				ArrayList<String> data = SaverLoader.parseCSVLine(line);
+				String sectionNumber = data.get(1);
+				//Check if we've found a new course
+				if(sectionNumber != lastSectionNumber){
+					if(lastCourse != null){
+						this.add(lastCourse);
+					}
+					lastCourse = Course.readFromFurmanData(data);
+				}
+				//If this isn't a new course, then it's either a lab or an exam.
+				else{
+					String InstructionalMethod = data.get(5);
+					if(InstructionalMethod.equals("EXAM")){
+						lastCourse.setExamTime(Course.readTimeFrom(data));
+					}
+					else{
+						lastCourse.setLabTime(Course.readTimeFrom(data));
+					}
+				}
+			br.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 	}
 
 
