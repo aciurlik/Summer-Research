@@ -7,6 +7,7 @@ package scheduler;
 /*
  * GridBagLayoutDemo.java requires no other files.
  */
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -32,7 +34,14 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
+	JPanel infoPanel; //reqs left, credit hours, and CLPs
+	public int infoPanelFontSize = 20;
+	public JLabel creditHoursLabel;
+	public String cHText = "     Credit Hours Left: ";
+	public JLabel reqsLeftLabel;
+	public String reqsText = "Requirements Left: ";
 	Driver d;
+	
 
 
 	public SchedulePanel(Schedule sch, Driver d) {
@@ -42,15 +51,27 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		this.d = d;
 		this.sch=sch;
 
+		
+		
 		this.setBackground(Color.white);
 		//This will be deleted once we set it relative to the whole. 
-		this.setPreferredSize(new Dimension(1000, 500));
+		this.setPreferredSize(new Dimension(700, 400));
+		this.setLayout(new BorderLayout());
 
+		this.infoPanel = new JPanel();
+		creditHoursLabel = new JLabel();
+		creditHoursLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		reqsLeftLabel = new JLabel();
+		reqsLeftLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		this.infoPanel.add(reqsLeftLabel);
+		this.infoPanel.add(creditHoursLabel);
+		this.infoPanel.setBackground(this.getBackground());
+		
+		this.add(infoPanel, BorderLayout.NORTH);
 
-		scrollPanel.setBackground(Color.white);//Same as Schedule Panel
-
-
-		//Took add Button Panel from here and put it at the top
+		scrollPanel.setBackground(Color.white);
+		
+		
 		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
 		addExtraSemesterButtonPanel.setBackground(FurmanOfficial.lightPurple(50));
 		JButton addSemester = new JButton("+");
@@ -63,10 +84,10 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 
 		JScrollPane scrollPane = new JScrollPane(scrollPanel);
-		scrollPane.setPreferredSize(this.getPreferredSize());
+		scrollPane.setPreferredSize(new Dimension(700, 300));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		this.add(scrollPane); 
+		this.add(scrollPane, BorderLayout.CENTER); 
 
 	}
 
@@ -90,6 +111,9 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			scrollPanel.add(semester);
 		}
 		scrollPanel.add(addExtraSemesterButtonPanel);
+		
+		this.creditHoursLabel.setText(this.cHText + (230 - sch.getCreditHoursComplete()));
+		this.reqsLeftLabel.setText(this.reqsText + sch.totalRequirementsLeft());
 	}
 
 

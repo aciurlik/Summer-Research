@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Image;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -17,8 +18,13 @@ public class Driver {
 
 
 	public Driver(){
+		
+		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
-		JLabel label = new JLabel(icon);
+		Image image = icon.getImage();
+		Image newImage = image.getScaledInstance(100,400 , java.awt.Image.SCALE_SMOOTH);
+		icon = new ImageIcon(newImage);
+		JLabel belltowerLabel = new JLabel(icon);
 		
 		
 		
@@ -29,35 +35,39 @@ public class Driver {
 		Schedule test = Schedule.testSchedule();		
 		sch=test;
 
+		
+		
+		
 		JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
 
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
+		menu.setFont(FurmanOfficial.getFont(12));
 		frame.setJMenuBar(menu);
 		frame.setContentPane(menu.createContentPane());
 
-		//Adds Additions Panel
-		AdditionsPanel add = new AdditionsPanel(this);
-		frame.add(add, BorderLayout.CENTER);
-		
-		frame.add(label, BorderLayout.LINE_START);
+		//Adds Additions Panel and belltower
+		AdditionsPanel extras = new AdditionsPanel(this);
+		JPanel left = new JPanel();
+		left.add(belltowerLabel);
+		left.add(extras);
+		frame.add(left, BorderLayout.WEST);
 
 
 
-
-		frame.pack();
 
 		schP = new SchedulePanel(test, this);
-		frame.add(schP, BorderLayout.LINE_END);
+		frame.add(schP, BorderLayout.CENTER);
 		reqs = new RequirementListPanel(test);
-		frame.add(reqs, BorderLayout.PAGE_END);
+		frame.add(reqs, BorderLayout.SOUTH);
 
 		this.update();
 
 
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		frame.pack();
 		frame.setVisible(true);
 
