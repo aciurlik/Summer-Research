@@ -5,7 +5,7 @@
  * @author dannyrivers
  *
  */
-public class Prefix implements Comparable<Prefix>{
+public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 	private String subject;
 	private int courseNumber;
 
@@ -38,6 +38,16 @@ public class Prefix implements Comparable<Prefix>{
 			return strDiff;
 		}
 		return this.courseNumber - other.courseNumber;
+	}
+
+	
+	public static Prefix readFromJSON(String s) {
+		return readFrom(SaverLoader.peel(s));
+	}
+
+	@Override
+	public String saveAsJSON() {
+		return this.toString();
 	}
 
 }
