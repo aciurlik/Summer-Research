@@ -1,126 +1,79 @@
 
-import java.awt.Dimension;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-
-import javax.swing.JButton;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.JOptionPane;
 
 
-public class ExtrasAddList implements ActionListener {
+
+
+
+public class ExtrasAddList {
 	JList <Major> addList;
 	Driver d;
 	Schedule s;
-	String addMajor = new String("Add Major");
-	String addMinor = new String("Add Minor");
-	String addTrack = new String("Add Track");
-	String addMayX = new String("Add MayX");
-	String addSummerClass = new String("Add Summer Class");
-	String addStudyAway = new String("Add Study Away");
-	String addInternship = new String("Add Internship");
-	String addResearch = new String("Add Research");
 	JFrame frame = new JFrame();
+	ArrayList <Major> displayThings;
+	String polite = "Please ";
+	ImageIcon icon = new ImageIcon("src/dioglogIcon.gif");
 
 
 
 	public ExtrasAddList(String type, Driver d, Schedule s){
 		//Creates the PopUp Window
-		
 		frame = new JFrame(type);
-		JPanel popUP = new JPanel();
-		
-		
-
 		this.d=d;
-		popUP.setBackground(FurmanOfficial.darkPurple);
 
 
-		//Creates Add list
-		
-		
-		if(type.equals(addMajor)){
-			ListOfMajors majors = ListOfMajors.testList();
+		//Retrieves correct list to display on dialog box, and calls diaolog box method
+		if(type.equals(MenuOptions.addMajor)){
+			ListOfMajors majors = ListOfMajors.testList(); //Links to test Major
 			ArrayList<Major> collectionOfMajors =  majors.getGUIMajors();
-			
-			ArrayList<Major> displayThings = d.sch. removeAlreadyChosenMajors(collectionOfMajors);
-	
-			
-			addList = new JList <Major>(displayThings.toArray(new Major[displayThings.size()]));
-	
+			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfMajors);
+			createDiaologBox(type);
 
-			
 		}
-		if(type.equals(addMinor)){
+
+		if(type.equals(MenuOptions.addMinor)){
+			ListOfMajors majors = ListOfMajors.testList();//Links to test List
+			ArrayList<Major> collectionOfMinors =  majors.getGUIMinor();
+			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfMinors);
+			createDiaologBox(type);
+		}
+
+		if(type.equals(MenuOptions.addTrack)){
 			ListOfMajors majors = ListOfMajors.testList();
-			Major[] collectionOfMajors =  majors.getGUIMinor();
-			addList = new JList <Major>(collectionOfMajors);
-			
-			
-			}
-		
-		if(type.equals(addTrack)){
-			ListOfMajors majors = ListOfMajors.testList();
-			Major[] collectionOfMajors =  majors.getGUITrack();
-			addList = new JList <Major>(collectionOfMajors);
+			ArrayList<Major> collectionOfTrack =  majors.getGUITrack();
+			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfTrack);
+			createDiaologBox(type);
+
 		}
 
 
-		addList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		addList.setFocusTraversalKeysEnabled(true);
-		
-		JScrollPane listScroller = new JScrollPane(addList);
-		listScroller.setPreferredSize(new Dimension(200, 200));
-		popUP.add(listScroller);
-
-
-		//addList.addListSelectionListener(listSelectionListener);
-		//Sets up location of popup
-		
-		Dimension screenSize= Toolkit.getDefaultToolkit().getScreenSize();
-		int screenWidth = (int) screenSize.getWidth();
-		int screenHeight = (int) screenSize.getHeight();
-
-		//Sets up Frame
-		JPanel p = new JPanel();
-		frame.setLocation((int)(screenWidth*.4),(int)(screenHeight*.4));
-		frame.setPreferredSize(new Dimension(200, 300));
-		p.add(popUP);
-		
-		JButton done = new JButton("DONE");
-		done.addActionListener(this);
-		
-		p.add(done);
-		frame.add(p);
-
-
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		
-		frame.setVisible(true);
 
 	}
 
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		for(Major m :addList.getSelectedValuesList()){
+
+	//Creates dialog box
+	public void createDiaologBox(String s){
+		Major[] dialogList = new Major[displayThings.size()];
+
+		for(int i=0; i<displayThings.size(); i++){
+			dialogList[i]=displayThings.get(i);
+		}
+		Major m = (Major)JOptionPane.showInputDialog(frame, polite + s,  s, JOptionPane.PLAIN_MESSAGE, icon, dialogList, "cat" );
+		if((m != null) && (m instanceof Major)){
 			d.GUIAddMajor(m);
-		
 		}
-		frame.dispose();
-		
-		
-		
+
+
+
 	}
-
-
-
 }
+
+
+
+
