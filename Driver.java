@@ -68,9 +68,9 @@ public class Driver implements ActionListener{
 		frame.add(left, BorderLayout.WEST);
 
 		schP = new SchedulePanel(test, this);
-		frame.add(schP, BorderLayout.CENTER);
+		frame.add(schP, BorderLayout.NORTH);
 		reqs = new RequirementListPanel(test);
-		frame.add(reqs, BorderLayout.SOUTH);
+		frame.add(reqs, BorderLayout.CENTER);
 
 		this.update();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
