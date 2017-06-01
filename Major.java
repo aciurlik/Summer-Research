@@ -1,5 +1,8 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 
 public class Major {
@@ -76,20 +79,40 @@ public class Major {
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
 		for (Requirement r : this.reqList){
-			result.append("REQ:" + r.saveString() + "\n");
+			result.append("REQ:" + r.saveAsJSON() + "\n");
 		}
 		return result.toString();
 	}
 
+	
 	public static Major readFrom(String saveString){
 		String[] lines = saveString.split("[\n]+");
 		Major result = new Major(lines[0]);
 		for(int i = 1; i < lines.length ; i ++){
-			Requirement newRequirement = Requirement.readFrom(lines[i].substring(4));
+			if(lines[i].length() < 3){
+				continue;
+			}
+			Requirement newRequirement = Requirement.readFromJSON(lines[i].substring(4));
 			newRequirement.numFinished = 0;
 			result.addRequirement(newRequirement);
 		}
 		return result;
+	}
+	
+	public static Major readFrom(File f){
+		
+		Scanner scan;
+		try {
+			scan = new Scanner(f);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		scan.useDelimiter("\\Z");
+		String contents = scan.next();
+		scan.close();
+		return readFrom(contents);
 	}
 
 	@Override

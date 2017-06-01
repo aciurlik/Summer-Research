@@ -43,7 +43,7 @@ public class Semester implements Comparable<Semester>{
 		for (int i = 0; i < courses.size() ; i ++){
 			for(int j = i; j < courses.size() ; j ++){
 				if(courses.get(i).overlaps(courses.get(j))){
-					throw new OverlapException(elements.get(i), elements.get(j));
+					//throw new OverlapException(elements.get(i), elements.get(j));
 				}
 			}
 		}

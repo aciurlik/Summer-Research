@@ -17,6 +17,13 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 		this.end = end;
 	}
 
+	/**
+	 * Check if these two intervals overlap.
+	 * 
+	 * If they just touch, they don't overlap.
+	 * @param other
+	 * @return
+	 */
 	public boolean overlaps(Interval<T> other){
 		//Imagine other as a fixed time interval on a number line, 
 		// with earlier times to the left. We'll imagine two scenarios:
@@ -30,7 +37,9 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 			//if otherEndTime is to the right of thisStartTime
 			// then there is overlap.
 			//Otherwise, overlap is impossible.
-			if(other.end.compareTo(this.start) >= 0){
+			if(this.start.compareTo(other.end) < 0){
+				// Alternatively, this code makes it so overlaps occur
+				// when intervals just touch. other.end.compareTo(this.start) >= 0){
 				return true;
 			}
 			else{
@@ -43,7 +52,7 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 			//if thisEndTime is to the right of otherStartTime, 
 			// then there is overlap.
 			//Otherwise, overlap is impossible.
-			if(this.end.compareTo(other.start) >= 0){
+			if(this.end.compareTo(other.start) > 0){
 				return true;
 			}
 			else{
