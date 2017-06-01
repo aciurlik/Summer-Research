@@ -1,13 +1,16 @@
 
 
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.ComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -19,20 +22,26 @@ public class ScheduleElementPanel extends JPanel {
 	private int updateCount = 0;
 	private ScheduleElement s;
 	private SemesterPanel container;
+	private Dimension buttonSize = new Dimension(20, 20);
+	private String removeButtonText = "x";
 
 
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox<ScheduleElement>  requirementDropDown;
 
 	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
-		
+
 		super();
 		this.s=s;
 		this.container = container;
-		
+
 
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
+
+
+
+
 
 	}
 
@@ -70,12 +79,14 @@ public class ScheduleElementPanel extends JPanel {
 	public void updateDropDown(){
 		this. requirementDropDown = new JComboBox<ScheduleElement>();
 		this.requirementDropDown.setFont(FurmanOfficial.getFont(12));
-		
+
 		Requirement r = (Requirement)this.s;
 		this.requirementDropDown.removeAllItems();
-		
+
 		//Find the list of courses that might satisfy this requirement
 		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(r);
+
+
 		for( Course c : listOfCourses){
 			requirementDropDown.addItem(c);
 		}
@@ -84,9 +95,26 @@ public class ScheduleElementPanel extends JPanel {
 				dropdownSelected();
 			}
 		});
+
 		this.add(requirementDropDown);
+
+		//Adds remove Button 
+		JPanel remove = new JPanel();
+		JButton toRemove = new JButton(removeButtonText);
+		toRemove.setForeground(FurmanOfficial.darkPurple);
+		toRemove.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				removeSelf();
+			}
+		});
+		toRemove.setPreferredSize(buttonSize);
+		remove.add(toRemove);
+		this.add(remove);
 	}
 
+	public void removeSelf(){
+		container.removeElement(this);
+	}
 
 	public class SEPDragHandler extends ComponentDragHandler{
 

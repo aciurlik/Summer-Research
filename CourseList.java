@@ -32,7 +32,7 @@ public class CourseList  {
 		
 		/*Course[] list = new Course[]{
 				Course.readFrom("MTH-220-02;Fray;[1, 3, 5];10:30:A,50;20/6/2017 11:30:0;4;2017-2"),
-				Course.readFrom("MTH-330-02;Fray;[1, 3, 5];10:30:A,50;20/6/2018 11:30:0;4;2018-2"),
+				Course.readFrom("MTH-250-02;Fray;[1, 3, 5];10:30:A,50;20/6/2018 11:30:0;4;2018-4"),
 				Course.readFrom("MTH-360-02;Fray;[1, 3, 5];11:30:A,50;20/6/2018 13:30:0;4;2018-2"),
 				Course.readFrom("MTH-350-02;Fray;[1, 3, 5];11:30:A,50;20/6/2019 11:30:0;4;2019-2"),
 				Course.readFrom("MTH-460-02;Fray;[1, 3, 5];12:30:A,50;20/6/2018 13:30:0;4;2018-2"),
