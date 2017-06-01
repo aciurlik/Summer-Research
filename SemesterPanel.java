@@ -23,7 +23,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
 	public int seasonFontSize = 16;
-	public int dropLabelFontSize = 11;
+	public int dropLabelFontSize = 12;
 	private String addAClass = "Drop a requirement here";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
@@ -32,6 +32,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	Semester sem;
 	public String changeInstruct = "Change Course";
 	public String removeInstruct = "Delete Semester";
+
+	public int preferredHeight = 300;
 
 
 
@@ -60,12 +62,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			@Override
 			public void actionPerformed(ActionEvent e){
 
-				remove(hidePanel);
-				add(defaultPanel);
-				revalidate();
-				repaint();
-				getParent().getParent().revalidate();
-				getParent().getParent().repaint();
+				show();
+				
 			}
 		}
 				);
@@ -73,9 +71,26 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		hidePanel.add(showSemester);
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
-		this.setPreferredSize(new Dimension(500,500));
+		this.setPreferredSize(new Dimension(300,500));
 		this.add(defaultPanel);
 		this.updatePanel();
+	}
+	
+	public void show(){
+		remove(hidePanel);
+		add(defaultPanel);
+		localRepaint();
+	}
+	public void hide(){
+		add(hidePanel);
+		remove(defaultPanel);
+		localRepaint();
+	}
+	public void localRepaint(){
+		revalidate();
+		repaint();
+		this.d.schP.revalidate();
+		this.d.schP.repaint();
 	}
 
 	@Override
@@ -111,20 +126,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		else if(e.getActionCommand().equals(changeInstruct)){
 			d.addCourseDialogBox("MayX", this.sem);
 		}
-
-		else{
-			//This method is called when you click the button to hide a semester.
-			this.remove(defaultPanel);
-			this.add(hidePanel);
-
-			this.revalidate();
-			this.repaint();
-
-			this.getParent().getParent().revalidate();
-			this.getParent().getParent().repaint();
-		}
-
-
+    else{
+      hide();
+    }
 	}
 
 	public Color semesterColor(Semester s){
@@ -144,6 +148,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 	}
 
+	@Override 
+	public Dimension getPreferredSize(){
+		int minWidth = 0;
+		for(Component c : this.getComponents()){
+			int newWidth = c.getPreferredSize().width;
+			if(newWidth > minWidth){
+				minWidth = newWidth;
+			}
+		}
+		return new Dimension(minWidth, preferredHeight);
+	}
 
 
 	//Redraw this panel based on the semester sem.
