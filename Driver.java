@@ -72,7 +72,7 @@ public class Driver{
 		schP = new SchedulePanel(test, this);
 
 		frame.add(schP, BorderLayout.NORTH);
-		reqs = new RequirementListPanel(test);
+		reqs = new RequirementListPanel(test, this);
 		frame.add(reqs, BorderLayout.CENTER);
 
 		this.update();
