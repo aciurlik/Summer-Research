@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
-public class Driver implements ActionListener{ 
+public class Driver{ 
 
 	Schedule sch;
 	SchedulePanel schP;
@@ -29,8 +28,11 @@ public class Driver implements ActionListener{
 	String seasonName;
 	Integer[] yearsDialog;
 	ImageIcon icon = new ImageIcon("src/Furman-logo.png");
-	String instruct = "Please pick year(s) you would like to add a ";
-	String headInstruct = "Please pick a course";
+	String instructYear = "Please pick a year you would like to add a ";
+	String headInstructYear = "Pick a year";
+	String instructCourse = "Please pick the course you would like to add to your ";
+	String headInstructCourse = "Pick a course";
+	Course[] coursesDialog;
 
 
 
@@ -68,6 +70,7 @@ public class Driver implements ActionListener{
 		frame.add(left, BorderLayout.WEST);
 
 		schP = new SchedulePanel(test, this);
+
 		frame.add(schP, BorderLayout.NORTH);
 		reqs = new RequirementListPanel(test);
 		frame.add(reqs, BorderLayout.CENTER);
@@ -118,7 +121,7 @@ public class Driver implements ActionListener{
 	}
 
 	public void GUIPopUP(String s){
-		ExtrasAddList list = new ExtrasAddList(s, this, sch);
+		new ExtrasAddList(s, this, sch);
 	}
 
 	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
@@ -151,6 +154,17 @@ public class Driver implements ActionListener{
 
 	}
 
+	public void GUIRemoveSemester(SemesterPanel semesterPanel) {
+		sch.removeSemester(semesterPanel.sem);
+		this.update();
+
+	}
+
+	public void GUIRemoveMajor(MajorPanel p) {
+		sch.removeMajor(p.major);
+		this.update();
+
+	}
 
 	public void GUIYearsPopUP(String actionCommand){
 		if(actionCommand.equals(MenuOptions.addSummerClass)){
@@ -182,19 +196,45 @@ public class Driver implements ActionListener{
 		for(int i=0; i<availableYears.size(); i++){
 			yearsDialog[i]= availableYears.get(i);
 		}
-		createDialogBox(instruct + seasonName);
 
+		if(availableYears.size()!=0){
+
+			createYearDialogBox(seasonName);
+
+		}
 
 
 	}
 
-	public void createDialogBox(String s){
-		Integer y = (Integer)JOptionPane.showInputDialog(popUP, s,  headInstruct, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
+	public void createYearDialogBox(String s){
+		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
 		if((y != null) && (y !=0)){
-			sch.addNewSemesterInsideSch(y,season);
+			Semester addedSemester = sch.addNewSemesterInsideSch(y,season);
 			this.update();
+			addCourseDialogBox(s, addedSemester);
 		}
 	}
+
+	public void addCourseDialogBox(String season, Semester s){
+		ArrayList<Course> addCourses = new ArrayList<Course>();
+		addCourses = CourseList.testList().getCoursesIn(s);
+		Course[] toAdd = new Course[addCourses.size()];
+		for(int i = 0; i<addCourses.size(); i++){
+			toAdd[i]= addCourses.get(i);
+		}
+		if(addCourses.size()>0){
+			Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
+			if((c != null) && (c instanceof Course)){
+				s.elements.clear();
+				sch.addScheduleElement(c, s);
+				this.update();
+
+			}
+		}
+	}
+
+
+
 
 	public void updateAll(){
 		schP.update(sch);
@@ -219,24 +259,15 @@ public class Driver implements ActionListener{
 	}
 
 
-
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		for(int i: pickYears.getSelectedValuesList()){
-			sch.addNewSemesterInsideSch(i,season);
-		}
-		this.update();
-		popUP.dispose();
-	}
-
-
-
 	public static void main(String[] args){
 		new Driver();
 
 
 	}
+
+
+
+
 
 
 }

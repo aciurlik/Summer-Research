@@ -2,12 +2,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,6 +30,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	JPanel hidePanel;
 	Driver d;
 	Semester sem;
+	public String changeInstruct = "Change Course";
+	public String removeInstruct = "Delete Semester";
 
 	public int preferredHeight = 300;
 
@@ -116,7 +120,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		hide();
+		if(e.getActionCommand().equals(removeInstruct)){
+			d.GUIRemoveSemester(this);
+		}
+		else if(e.getActionCommand().equals(changeInstruct)){
+			d.addCourseDialogBox("MayX", this.sem);
+		}
+    else{
+      hide();
+    }
 	}
 
 	public Color semesterColor(Semester s){
@@ -181,18 +193,38 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			defaultPanel.add(dropLabel);
 		}
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
-		for (int i= 0; i<DropsNeeded; i++){
-			JLabel dropLabel = newDropLabel();
-			defaultPanel.add(dropLabel);
+		if(sem.semesterDate.sNumber != SemesterDate.MAYX){
+			for (int i= 0; i<DropsNeeded; i++){
+				JLabel dropLabel = newDropLabel();
+				defaultPanel.add(dropLabel);
+			}
+			//Add button to hide Semester
+			JButton deleteSemester= new JButton("Hide Semester");
+			defaultPanel.add(deleteSemester);
+			deleteSemester.addActionListener(this);
+
 		}
-
-
-
-		//Add button to hide Semester
-		JButton deleteSemester= new JButton("Hide Semester");
-		defaultPanel.add(deleteSemester);
-		deleteSemester.addActionListener(this);
-
+		
+		//Adds special buttons to MayX 
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX){
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new FlowLayout());
+			buttonPanel.setBackground(defaultPanel.getBackground());
+			
+			JButton changeCourse = new JButton(changeInstruct);
+			changeCourse.setActionCommand(changeInstruct);
+			changeCourse.addActionListener(this);
+			buttonPanel.add(changeCourse);
+			
+			JButton removeCourse = new JButton(removeInstruct);
+			removeCourse.setActionCommand(removeInstruct);
+			removeCourse.addActionListener(this);
+			buttonPanel.add(removeCourse);
+			
+			defaultPanel.add(buttonPanel);
+			
+		}
+	
 
 
 	}

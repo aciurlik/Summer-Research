@@ -62,13 +62,21 @@ public class Schedule {
 		return next;
 	}
 
-	public void addNewSemesterInsideSch(int i, int season) {
+	public Semester addNewSemesterInsideSch(int i, int season) {
 		SemesterDate inside = new SemesterDate(i, season);
 		Semester toAdd = new Semester(inside, this);
 		this.semesters.add(toAdd);
 		Collections.sort(semesters);
+		return toAdd;
 
 	}
+
+	public void removeSemester(Semester sem) {
+		this.semesters.remove(sem);
+		this.updateReqList();
+		Collections.sort(semesters);
+	}
+
 
 
 
@@ -107,6 +115,7 @@ public class Schedule {
 	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
 
 	}
+
 	public void remove(ScheduleElement e, Semester s){
 		s.remove(e);
 		for (Requirement r : e.getRequirementsFulfilled()){
@@ -349,6 +358,25 @@ public class Schedule {
 		reqListValid = false;
 	}
 
+
+	public void removeMajor(Major major) {
+		HashSet<Requirement> set = new HashSet<Requirement>();
+		majorsList.remove(major);
+		for (Major m : majorsList){
+			for (Requirement r : m.reqList){
+				set.add(r);
+			}
+		}
+		reqsList = new ArrayList<Requirement>(set);
+		Collections.sort(reqsList);
+
+		updateAllCourseRequirementsSatisfied();
+		reqListValid=false;
+
+	}
+
+
+
 	public int getCreditHoursComplete(){
 		int result = 0;
 		for (ScheduleElement e : allElements()){
@@ -366,8 +394,11 @@ public class Schedule {
 
 	public void addScheduleElement(ScheduleElement element, Semester sem) {
 		sem.add(element);
+		//System.out.println("I added this");
 
 	}
+
+
 
 	public ArrayList<Major> removeAlreadyChosenMajors(ArrayList<Major> collectionOfMajors ) {
 		for(Major m: this.majorsList){
@@ -388,6 +419,9 @@ public class Schedule {
 		}
 		return false;
 	}
+
+
+
 
 
 }
