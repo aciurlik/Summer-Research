@@ -5,11 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -31,32 +35,34 @@ import javax.swing.border.MatteBorder;
 public class RequirementListPanel extends JPanel{
 	public JScrollPane scroll;
 	public JPanel inner;
+	public Driver d;
 	//public Schedule schedule;
-	
+
 
 	public int layoutCounter;
 	public static final int gridHeight = 3;
 	// the layout locations handle the first few requirementpanels.
 	// it may be safely changed, so long as the last entry is at the end of a column.
 
-	public RequirementListPanel(Schedule s){
+	public RequirementListPanel(Schedule s, Driver d){
 		//this.schedule = s;
-
+		this.d = d;
 
 		//Put the main RequirementList panel, called inner, inside a scroll pane.
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
 		this.inner.setBackground(Color.white);
 		this.scroll = new  JScrollPane(inner);
-		
+
 		this.setLayout(new BorderLayout());
 
 		//put all the requirement panels into inner.
 
 
 		scroll.setPreferredSize(new Dimension(800,200));
-		this.add(scroll);
-		
+		this.add(scroll, BorderLayout.CENTER);
+
+
 		update(s);
 	}
 
@@ -78,6 +84,8 @@ public class RequirementListPanel extends JPanel{
 	public void update(Schedule schedule){
 		this.inner.removeAll();
 
+
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = gbc.CENTER;
 		gbc.gridx = 0;
@@ -87,50 +95,25 @@ public class RequirementListPanel extends JPanel{
 
 		ArrayList<Major> majors = schedule.getMajors();
 		int heightCounter = 1;
+
+
 		for(Major m : majors){
-			ArrayList<Requirement> reqList = new ArrayList<Requirement>(m.reqList);
-			Collections.sort(reqList);
-			
-			//Calculte the requirements left in this major
-			int reqsLeft = 0;
-			for(Requirement r : reqList){
-				if(r.numFinished < r.numToChoose){
-					reqsLeft += r.numToChoose - r.numFinished;
-				}
-			}
-			
-			
-			//Make this major's panel
-			JPanel majorPanel = new JPanel();
-			majorPanel.setLayout(new BorderLayout());
-			JPanel top = new JPanel();
-			
-			top.setLayout(new FlowLayout(FlowLayout.LEFT));
-            top.setBorder(new CompoundBorder(new EmptyBorder(4, 4, 4, 4), new MatteBorder(0, 0, 1, 0, Color.BLACK)));
-            JLabel topLabel =new JLabel(m.name + "         " + reqsLeft + " Unscheduled"); 
-            topLabel.setFont(FurmanOfficial.getFont(16));
-            top.add(topLabel);
-			majorPanel.add(top, BorderLayout.NORTH);
-			
-			
-			JPanel bottom = new JPanel();
-			for(Requirement r : reqList){
-				bottom.add(new RequirementPanel(r));
-			}
-			majorPanel.add(bottom, BorderLayout.CENTER);
+
+			MajorPanel majorPanel = new MajorPanel(m, d);
+
+
+
 			gbc.gridx = 0;
 			gbc.gridy = heightCounter;
 			heightCounter++;
-			
 			this.inner.add(majorPanel, gbc);
 		}
-		
 	}
 
 
 	public static void main(String[] args){
 		// Testing the requirementList panel for the first time
-		RequirementListPanel p = new RequirementListPanel(Schedule.testSchedule());
+		RequirementListPanel p = new RequirementListPanel(Schedule.testSchedule(), null);
 
 		JFrame frame = new JFrame();
 		frame.getContentPane().add(p);

@@ -70,6 +70,9 @@ public class Semester implements Comparable<Semester>{
 		this.elements.remove(e);
 		return true;
 	}
+	
+	
+	
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
 		//this.schedule.checkErrorsWhenAdding(newElement, this);
 		//this.schedule.checkErrorsWhenRemoving(oldElement, this);
