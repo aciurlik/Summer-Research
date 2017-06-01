@@ -7,18 +7,22 @@
  */
 public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 	private String subject;
-	private int courseNumber;
+	private String courseNumber; //Became a string when we found a few strange courses.
 
 
-	public Prefix(String subject, int courseNumber) {
+	public Prefix(String subject, String courseNumber) {
 		this.subject = subject;
 		this.courseNumber = courseNumber;
+	}
+	public Prefix(String subject, int courseNumber){
+		this.subject = subject;
+		this.courseNumber = "" + courseNumber;
 	}
 
 	public String getSubject() {
 		return subject;
 	}
-	public int getNumber() {
+	public String getNumber() {
 		return courseNumber;
 	}
 
@@ -28,7 +32,7 @@ public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 
 	public static Prefix readFrom(String prefixString){
 		String[] pair = prefixString.split("-");
-		return new Prefix (pair[0], Integer.parseInt(pair[1]));
+		return new Prefix (pair[0], pair[1]);
 	}
 
 	@Override
@@ -37,7 +41,7 @@ public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 		if(strDiff!=0){
 			return strDiff;
 		}
-		return this.courseNumber - other.courseNumber;
+		return this.courseNumber.compareTo(other.courseNumber);
 	}
 
 	

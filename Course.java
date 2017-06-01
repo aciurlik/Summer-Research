@@ -8,13 +8,14 @@ public class Course implements ScheduleElement{
 
 	protected int creditHours;
 	protected Prefix coursePrefix;
-	protected int sectionNumber;
+	protected String sectionNumber; //was originally an int, but for courses like
+	// ACC-221-BLK is was converted to a string.
 	protected SemesterDate semester;
 	protected int[] meetingDays; //specified by the constants in the Time class, 
 	//  as in Time.SUNDAY.
-	protected Interval<Time> meetingTime;
-	Interval<Time> labTime; //assumed to repeat weakly until examTime
-	Interval<Time> examTime; 
+	protected Time[] meetingTime; //two times where the day, month, and year are unused.
+	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
+	Time[] examTime; // month, day, year, and so on are all used.
 	
 	String professor;
 
@@ -38,7 +39,7 @@ public class Course implements ScheduleElement{
 	 */
 
 	public Course(Prefix prefix, SemesterDate semester, String professor, int[] meetingDays, 
-			int creditHours, int sectionNumber ){
+			int creditHours, String sectionNumber ){
 		this.creditHours=creditHours;
 		this.coursePrefix=prefix;
 		this.semester = semester;
@@ -54,7 +55,7 @@ public class Course implements ScheduleElement{
 	 * @param p
 	 * @param sectionNumber
 	 */
-	public Course(Prefix prefix, int sectionNumber, String professor, int[] meetingDays, int creditHours, SemesterDate semester ){
+	public Course(Prefix prefix, String sectionNumber, String professor, int[] meetingDays, int creditHours, SemesterDate semester ){
 		this.creditHours=creditHours;
 		this.coursePrefix=prefix;
 		this.semester = semester;
@@ -82,10 +83,10 @@ public class Course implements ScheduleElement{
 
 
 	public String meetingDaysCode(){
-		if (meetingDays==null){
-			return"";
-		}
 		String result = "";
+		if (meetingDays==null){
+			return result;
+		}
 		for (int day : meetingDays){
 			result += dayCodes[day];
 		}
@@ -116,14 +117,17 @@ public class Course implements ScheduleElement{
 		Time startTime = new Time(hours, AM, minutes, 0);
 		startTime.setYear(semester.getYear());
 		startTime.setMonth(this.semester.getStartMonth());
-		this.meetingTime = new Interval<Time> (startTime, startTime.addMinutes(durationMinutes));
+		this.meetingTime = new Time[] {startTime, startTime.addMinutes(durationMinutes)};
+	}
+	public void setMeetingTime(Time[] t){
+		this.meetingTime = t;
 	}
 	public void setExamTime(Time examStartTime, int durationInMinutes){
-		this.examTime = new Interval<Time>(
+		this.examTime = new Time[]{
 				examStartTime, 
-				examStartTime.addMinutes(durationInMinutes));
+				examStartTime.addMinutes(durationInMinutes)};
 	}
-	public void setExamTime(Interval<Time> t){
+	public void setExamTime(Time[] t){
 		this.examTime = t;
 	}
 	public void setLabTime(int dayOfWeek, int hour, boolean AM, int minutes, int durationMinutes){
@@ -131,9 +135,9 @@ public class Course implements ScheduleElement{
 		startTime.setYear(this.semester.getYear());
 		startTime.setMonth(this.semester.getStartMonth());
 		startTime.advanceToNext(dayOfWeek);
-		this.labTime = new Interval<Time>(startTime, startTime.addMinutes(durationMinutes));
+		this.labTime = new Time[]{startTime, startTime.addMinutes(durationMinutes)};
 	}
-	public void setLabTime(Interval<Time> t){
+	public void setLabTime(Time[] t){
 		this.labTime = t;
 	}
 
@@ -143,15 +147,18 @@ public class Course implements ScheduleElement{
 	public Intervals<Time> allTakenTimes(){
 		Intervals<Time> result = new Intervals<Time>();
 		if(labTime != null){
-			result.addInterval(labTime);
+			result.addInterval(new Interval<Time>(labTime[0], labTime[1]));
 		}
 		if(examTime != null){
-			result.addInterval(examTime);
+			result.addInterval(new Interval<Time>(examTime[0], examTime[1]));
 		}
+		
+		//note - some courses may have meeting times with all values unused.
+		// For example, music courses often don't specify times.
 		if(meetingDays != null && meetingTime != null){
 			for (int day : meetingDays){
-				Time s = new Time(meetingTime.start);
-				Time f = new Time(meetingTime.end);
+				Time s = new Time(meetingTime[0]);
+				Time f = new Time(meetingTime[1]);
 				s.advanceToNext(day);
 				f.advanceToNext(day);
 				result.addInterval(new Interval<Time>(s,f));
@@ -220,10 +227,10 @@ public class Course implements ScheduleElement{
 	public String toString(){
 		StringBuilder result = new StringBuilder();
 		result.append(coursePrefix.toString());
-		result.append(String.format("-%02d ", this.sectionNumber));
+		result.append(String.format("-" + this.sectionNumber + " "));
 		result.append(this.meetingDaysCode() + " ");
 		if(this.meetingTime != null){
-			result.append( this.meetingTime.start.clockTime() + " ");
+			result.append( this.meetingTime[0].clockTime() + " ");
 		}
 		result.append(this.professor);
 		return result.toString();
@@ -249,35 +256,29 @@ public class Course implements ScheduleElement{
 		Prefix-sectionNumber;Professor; meetingDays; meetingTime,meetingDuration; examTime;creditHours;Semester[;labDay,labTime,labDuration]
 
 		Examples:
-		MTH-220-01;Fray;[3,5,7];11:30:A,50;30/5/2017 14:30:00;4;2017-2;2,2:30:P,150
-		MTH-220-01;Fray;[3,5,7];11:30:P,50;30/5/2017 12:30:00;4;2017-2;
+		MTH-220-01;Fray;[3,5,7];11:30:A,50;5/30/2017 14:30:00;4;2017-2;2,2:30:P,150
+		MTH-220-01;Fray;[3,5,7];11:30:P,50;5/30/2017 12:30:00;4;2017-2;
 		 */
 
 		StringBuilder result = new StringBuilder();
-		result.append(this.coursePrefix.toString() + String.format("-%02d", sectionNumber) + ";");
+		result.append(this.coursePrefix.toString() + "-" + sectionNumber + ";");
 		result.append(this.professor + ";");
 		result.append(Arrays.toString(this.meetingDays) + ";");
-		result.append(this.meetingTime.start.clockTime() );
-		if(this.meetingTime.start.isAM()){
-			result.append(":A,");
+		if(this.meetingTime != null){
+			result.append(this.meetingTime[0].clockTime() + ",");
+			result.append(meetingTime[0].minutesUntil(meetingTime[1]) );
 		}
-		else{
-			result.append(":P,");
+		result.append(";");
+		if(this.examTime!=null){
+		result.append(this.examTime[0].toString());
 		}
-		result.append(meetingTime.start.minutesUntil(meetingTime.end) + ";");
-		result.append(this.examTime.start.toString() + ";");
+		result.append(";");
 		result.append(this.creditHours + ";");
 		result.append(this.semester.saveString());
 		if(this.labTime != null){
-			int labDay = labTime.start.day;
-			String timeString = labTime.start.clockTime();
-			if(labTime.start.isAM()){
-				timeString = timeString + ":A";
-			}
-			else{
-				timeString = timeString+ ":P";
-			}
-			int labDuration = labTime.start.minutesUntil(labTime.end);
+			int labDay = labTime[0].day;
+			String timeString = labTime[0].clockTime();
+			int labDuration = labTime[0].minutesUntil(labTime[1]);
 			result.append(";" + labDay);
 			result.append("," + timeString);
 			result.append("," + labDuration);
@@ -291,7 +292,7 @@ public class Course implements ScheduleElement{
 		String[] chunks = saveString.split(";");
 		String[] courseCode = chunks[chunkNumber].split("-");
 		Prefix prefix = new Prefix(courseCode[0], Integer.parseInt(courseCode[1]));
-		int sectionNumber = Integer.parseInt(courseCode[2]);
+		String sectionNumber = courseCode[2];
 
 		chunkNumber ++;
 		String professor = chunks[chunkNumber];
@@ -306,15 +307,21 @@ public class Course implements ScheduleElement{
 
 		//Make the meetingTimes 
 		chunkNumber ++;
-		String[] time = chunks[chunkNumber].split(":");
-		int meetingHours = Integer.parseInt(time[0]);
-		int meetingMinutes = Integer.parseInt(time[1]);
-		time = time[2].split(",");
-		boolean meetingAM = (time[0].contains("A"));
-		int meetingDuration = Integer.parseInt(time[1]);
+		boolean foundMeetingTime = false;
+		String[] time = null;
+		if(!chunks[chunkNumber].equals("")){
+			foundMeetingTime = true;
+			time = chunks[chunkNumber].split(":");
+		}
 
 		chunkNumber++;
-		Time examTime = Time.readFrom(chunks[chunkNumber]);
+		boolean foundExamTime = false;
+		String examTimeString = null;
+		if(!chunks[chunkNumber].equals("")){
+			foundExamTime = true;
+			examTimeString = chunks[chunkNumber];
+		}
+		
 
 		chunkNumber++;
 		int creditHours = Integer.parseInt(chunks[chunkNumber]);
@@ -323,8 +330,18 @@ public class Course implements ScheduleElement{
 		SemesterDate semester = SemesterDate.readFrom(chunks[chunkNumber]);
 
 		Course result = new Course(prefix, sectionNumber, professor, meetingDays, creditHours, semester);
-		result.setExamTime(examTime, 150);
-		result.setMeetingTime(meetingHours, meetingAM, meetingMinutes, meetingDuration);
+		if(foundExamTime){
+			Time examTime = Time.readFrom(examTimeString);
+			result.setExamTime(examTime, 150);
+		}
+		if(foundMeetingTime){
+			int meetingHours = Integer.parseInt(time[0]);
+			int meetingMinutes = Integer.parseInt(time[1]);
+			time = time[2].split(",");
+			boolean meetingAM = (time[0].contains("A"));
+			int meetingDuration = Integer.parseInt(time[1]);
+			result.setMeetingTime(meetingHours, meetingAM, meetingMinutes, meetingDuration);
+		}
 
 
 		chunkNumber++;
@@ -354,28 +371,55 @@ public class Course implements ScheduleElement{
 		// Known examples 
 		// EXAM, LEC, LAB, IDI, STU, SKL, SEM, ADD, ACT, blank 
 		String location = furmanData.get(6);
-		String startDate = furmanData.get(7); // EX "08/22/2017"
-		String endDate = furmanData.get(8);
+		Time[] times = readTimesFrom(furmanData);
 		String meetingDays = furmanData.get(9);
-		String startTime = furmanData.get(10); // EX "08:30PM"
-		String endTime = furmanData.get(11);
 		String professor = furmanData.get(12);
 		String GERs = furmanData.get(14);
 		String prerequsites = furmanData.get(16);
 		
 		String[] sectionValues = section.split("-");
-		Prefix p = new Prefix(sectionValues[0], Integer.parseInt(sectionValues[1]));
-		int sectionNumber = Integer.parseInt(sectionValues[2]);
+		Prefix p = new Prefix(sectionValues[0], sectionValues[1]);
+		String sectionNumber = sectionValues[2];
+	
+		SemesterDate semester = SemesterDate.fromFurman(semesterString);
 		
-		String[] semesterSplit = semesterString.split(" ");
-		SemesterDate semester = new SemesterDate(semesterSplit[0], Integer.parseInt(semesterSplit[1]));
+		Time totalStartTime = Time.combine(times[0], times[1]);
+		Time totalEndTime = Time.combine(times[0], times[3]);
+		Time[] meetingTime = new Time[]{totalStartTime, totalEndTime};
 		
-		return new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
+		
+		Course result =  new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
+		if(meetingTime[0].hours != Time.UNUSED){
+			result.setMeetingTime(meetingTime);
+		}
+		return result;
+		
+		
 		
 		
 	}
 	
-	public static Interval<Time> readTimeFrom(ArrayList<String> furmanData){
+	/**
+	 * Return an array of times:
+	 * StartDate
+	 * StartTime
+	 * EndDate
+	 * EndTime
+	 * @param furmanData
+	 * @return
+	 */
+	public static Time[] readTimesFrom(ArrayList<String> furmanData){
+		String startDateString = furmanData.get(7);
+		String endDateString = furmanData.get(8);
+		String meetingDaysString = furmanData.get(9);
+		String startTimeString = furmanData.get(10);
+		String endTimeString = furmanData.get(11);
+		Time startTime = Time.tryRead(startTimeString);
+		Time startDate = Time.tryRead(startDateString);
+		Time endTime = Time.tryRead(endTimeString);
+		Time endDate = Time.tryRead(endDateString);
+		
+		return new Time[]{startDate, startTime, endDate, endTime};
 		
 	}
 
@@ -383,7 +427,7 @@ public class Course implements ScheduleElement{
 
 	public static void main(String[] args){
 		int[] meetingDays = {Time.MONDAY, Time.WEDNESDAY, Time.FRIDAY};
-		Course c = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, 02);
+		Course c = new Course(new Prefix("MTH", 220), new SemesterDate(2017, SemesterDate.FALL), "Fray", meetingDays, 4, "02");
 		c.setMeetingTime(11, true, 30, 50);
 		c.setExamTime(new Time(2017, 6, 20, 13, 30, 0), 150);
 

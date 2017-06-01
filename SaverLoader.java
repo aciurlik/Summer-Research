@@ -145,7 +145,7 @@ object[0].toString() delimiter[0] object[1].toString() .... delimiter[n-1] objec
 	 */
 	public static ArrayList<String> parseCSVLine(String csvLine){
 		ArrayList<String> result = new ArrayList<>();
-		if (csvLine == null && csvLine.isEmpty()) {
+		if (csvLine == null || csvLine.isEmpty()) {
 			return result;
 		}
 		StringBuilder chunk = new StringBuilder();
