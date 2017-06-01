@@ -1,6 +1,10 @@
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -24,8 +28,9 @@ public class CourseList  {
 
 
 	public static CourseList testList(){
-		CourseList result = new CourseList();
-		Course[] list = new Course[]{
+		
+		
+		/*Course[] list = new Course[]{
 				Course.readFrom("MTH-220-02;Fray;[1, 3, 5];10:30:A,50;20/6/2017 11:30:0;4;2017-2"),
 				Course.readFrom("MTH-250-02;Fray;[1, 3, 5];10:30:A,50;20/6/2018 11:30:0;4;2018-4"),
 				Course.readFrom("MTH-360-02;Fray;[1, 3, 5];11:30:A,50;20/6/2018 13:30:0;4;2018-2"),
@@ -39,9 +44,30 @@ public class CourseList  {
 		for(Course c : list){
 			result.add(c);
 		}
-		return result;
+		*/
+		
+		//result.addCoursesIn(new File("Mayx2017.csv"));
+		//result.addCoursesIn(new File("Fall2017.csv"));
+		return readAll();
 	}
 
+	public static CourseList readAll(){
+		CourseList result = new CourseList();
+		File f = new File("CourseCatologs");
+		for ( File semesterFile : f.listFiles(new FilenameFilter(){
+			@Override
+			public boolean accept(File dir, String name) {
+				if(name.contains(".csv")){
+					return true;
+				}
+				return false;
+			}
+			
+		})){
+			result.addCoursesIn(semesterFile);
+		}
+		return result;
+	}
 
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
@@ -214,6 +240,66 @@ public class CourseList  {
 	}
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(this.listOfCourses,r);
+	}
+	
+	
+	
+	
+	public void addCoursesIn(File furmanCoursesFile){
+		String lastSectionNumber = "";
+		Course lastCourse = null;
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(furmanCoursesFile));
+			//skip the first line of field names
+			
+			br.readLine();
+			
+			String line = br.readLine();
+
+			//Read in each course
+			while(line != null){
+				ArrayList<String> data = SaverLoader.parseCSVLine(line);
+				String sectionNumber = data.get(1);
+				//Check if we've found a new course
+				if(! sectionNumber.equals( lastSectionNumber)){
+					lastSectionNumber = sectionNumber;
+					if(lastCourse != null){
+						this.add(lastCourse);
+					}
+					lastCourse = Course.readFromFurmanData(data);
+				}
+				//If this isn't a new course, then it's either a lab or an exam.
+				else{
+					String InstructionalMethod = data.get(5);
+					Time[] times = Course.readTimesFrom(data);
+					Time totalStart = Time.combine(times[0], times[1]);
+					if(InstructionalMethod.equals("EXAM")){
+						//set examTime = startTime thru endTime, no dates.
+						Time totalEnd = Time.combine(times[2], times[3]);
+						lastCourse.setExamTime(new Time[]{totalStart, totalEnd});
+					}
+					else{
+						//Set labTime = startTime thru endTime, no dates.
+						lastCourse.setLabTime(new Time[]{times[1], times[3]});
+					}
+				}
+				line = br.readLine();
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+	
+	public static void main(String[] args){
+		CourseList c = CourseList.readAll(); //CourseList.testList();
+		
+		for(Course cour : c.listOfCourses){
+			System.out.println(cour.saveString());
+		}
+		
 	}
 
 

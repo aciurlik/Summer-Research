@@ -1,4 +1,10 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ListOfMajors {
 
@@ -10,69 +16,32 @@ public class ListOfMajors {
 
 
 	public static ListOfMajors testList(){
+		ListOfMajors result = readFrom(new File("Majors"));
+		return result;
+	}
+
+	public static ListOfMajors readFrom(File folder){
 		ListOfMajors result = new ListOfMajors();
-		Major[] list = new Major[]{
-				Major.readFrom("Math-BS\n" +
-						"REQ:1 of [MTH-250]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-260]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-450, MTH-350]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-460, MTH-360]; 	 0 Completed; DDN:1\n"+
-						"REQ:7 of [MTH-160, MTH-250, MTH-320, MTH-335, MTH-337, MTH-340, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, MTH-450, MTH-450, MTH-451, MTH-460, MTH-461, MTH-504, MTH-151]; 	 0 Completed; DDN:2\n" +
-						"REQ:2 of [BIO-111, CHM-110, CHM-115, CHM-120, EES-115, EES-112, EES-113, PHY-111, PHY-112, PSY-320, SUS-120]; 	 0 Completed; DDN:3"),
-				Major.readFrom("Math-BA\n" +
-						"REQ:1 of [MTH-250]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-260]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-450, MTH-350]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-460, MTH-360]; 	 0 Completed; DDN:1\n"+
-						"REQ:7 of [MTH-160, MTH-250, MTH-320, MTH-335, MTH-337, MTH-340, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, MTH-450, MTH-450, MTH-451, MTH-460, MTH-461, MTH-504, MTH-151]; 	 0 Completed; DDN:2\n" +
-						"REQ:2 of [BIO-111, CHM-110, CHM-115, CHM-120, EES-115, EES-112, EES-113, PHY-111, PHY-112, PSY-320, SUS-120]; 	 0 Completed; DDN:3"),
-				Major.readFrom("Applied Math-BS\n" +
-						"REQ:1 of [CSC-121]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [CSC-122]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-160]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-250]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-260]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-350, MTH-360, MTH-450, MTH-460]; 	 0 Completed; DDN:2\n" +
-						"REQ:4 of [MTH-255, MTH-335, MTH-337, MTH-340, MTH-341, MTH-435, BIO-340, BIO-440, BIO-445, CSC-343, CSC-461, CHM-310, CHM-330, CHM-340, ECN-331, ECN-345, ECN-346, ECN-475, MTH-320, MTH-330, PHY-311, PHY-312, PHY-321, PHY-312, PHY-322, PHY-421, PHY-421, PHY-441, PHY-442, PHY-451]; 	 0 Completed; DDN:2\n" +
-						//Only two of these can be non math, or later listed math
-						"REQ:2 of [BIO-111, CHM-110, CHM-115, CHM-120, EES-115, EES-112, EES-113, PHY-111, PHY-112, PSY-320, SUS-120]; 	 0 Completed; DDN:3"),
-				Major.readFrom("Math-Economics-BA\n" +
-						"REQ:1 of [ECN-111]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-331]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-345]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-346]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-475]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-151]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-160]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-250]; 	 0 Completed; DDN:1\n" +
-						//Two more ECN courses numbered 201 or greater not ECN 225, or ECN-503
-						"REQ:2 of [MTH-260, MTH-340, MTH-341, MTH-450]; 	 0 Completed; DDN:2\n" +
-						"REQ:1 of [MTH-337, MTH-255, MTH-260, MTH-335, MTH-340, MTH-341, MTH-360, MTH-450]; 	 0 Completed; DDN:3"),
-				Major.readFrom("Math-Economics-BS\n" +
-						"REQ:1 of [ECN-111]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-331]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-345]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-346]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [ECN-475]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-151]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-160]; 	 0 Completed; DDN:1\n" +
-						"REQ:1 of [MTH-250]; 	 0 Completed; DDN:1\n" +
-						//Two more ECN courses numbered 201 or greater not ECN 225, or ECN-503
-						"REQ:2 of [MTH-260, MTH-340, MTH-341, MTH-450]; 	 0 Completed; DDN:2\n" +
-						"REQ:1 of [MTH-337, MTH-255, MTH-260, MTH-335, MTH-340, MTH-341, MTH-360, MTH-450]; 	 0 Completed; DDN:3" +
-						"REQ:2 of [BIO-111, CHM-110, CHM-115, CHM-120, EES-115, EES-112, EES-113, PHY-111, PHY-112, PSY-320, SUS-120]; 	 0 Completed; DDN:3"),
-				
+		for (File f: folder.listFiles(
+				new FileFilter(){
+					@Override
+					public boolean accept(File pathname) {
+						String fullName = pathname.getAbsolutePath();
+						int i = fullName.lastIndexOf('.');
+						if(i <= 0){
+							return false;
+						}
+						String extension = fullName.substring(i+1);
+						return pathname.isFile() && extension.equals("mjr");
+					}
 
-		};
-		//Requirement.readFrom("2 of [BIO-111, CHM-110, CHM-115, CHM-120, EES-115, EES-112, EES-113, PHY-111, PHY-112, PSY-320, SUS-120]");
-		//	Major.readFrom(),
-		//	Major.readFrom()
-
-		for(Major m : list){
-			result.add(m);
+				}
+				)){
+			result.add(Major.readFrom(f));
 		}
 		return result;
 	}
+
 
 
 	public ArrayList<Major> getCompleteMajorsList() {
@@ -143,7 +112,7 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUIMajors() {
 		ArrayList<Major> majorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.major){
+			if (m.isType(Major.NORMAL_MAJOR)){
 			majorGUI.add(m);
 			}
 
@@ -157,7 +126,7 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUIMinor() {
 		ArrayList<Major> minorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.minor){
+			if (m.isType(Major.MINOR)){
 				minorGUI.add(m);
 			}
 
@@ -169,14 +138,71 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUITrack() {
 		ArrayList<Major> trackGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.track){
+			if (m.isType(Major.TRACK)){
 				trackGUI.add(m);
 			}
 
 		}
 		return trackGUI;
 	}
+	
+	
 
+	
+	
+	/*
+	 * 
+Math-BS
+REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-260}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-350}{MTH-450}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-360}{MTH-460}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {7} Choices: {{ MTH-151}{ MTH-250}{ MTH-320}{ MTH-335}{ MTH-337}{ MTH-340}{ MTH-341}{ MTH-350}{ MTH-360}{ MTH-420}{ MTH-435}{ MTH-450}{ MTH-450}{ MTH-451}{ MTH-460}{ MTH-461}{ MTH-504}{MTH-160}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ CHM-110}{ CHM-115}{ CHM-120}{ EES-112}{ EES-113}{ EES-115}{ PHY-111}{ PHY-112}{ PSY-320}{ SUS-120}{BIO-111}} DDN: {0} Requirement Name:{null}}
+
+Math-BA
+REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-260}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-350}{MTH-450}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-360}{MTH-460}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {7} Choices: {{ MTH-151}{ MTH-250}{ MTH-320}{ MTH-335}{ MTH-337}{ MTH-340}{ MTH-341}{ MTH-350}{ MTH-360}{ MTH-420}{ MTH-435}{ MTH-450}{ MTH-450}{ MTH-451}{ MTH-460}{ MTH-461}{ MTH-504}{MTH-160}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ CHM-110}{ CHM-115}{ CHM-120}{ EES-112}{ EES-113}{ EES-115}{ PHY-111}{ PHY-112}{ PSY-320}{ SUS-120}{BIO-111}} DDN: {0} Requirement Name:{null}}
+
+Applied Math-BS
+REQ:{Number to Choose: {1} Choices: {{CSC-121}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{CSC-122}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-160}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-260}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-360}{ MTH-450}{ MTH-460}{MTH-350}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {4} Choices: {{ BIO-340}{ BIO-440}{ BIO-445}{ CHM-310}{ CHM-330}{ CHM-340}{ CSC-343}{ CSC-461}{ ECN-331}{ ECN-345}{ ECN-346}{ ECN-475}{ MTH-320}{ MTH-330}{ MTH-335}{ MTH-337}{ MTH-340}{ MTH-341}{ MTH-435}{ PHY-311}{ PHY-312}{ PHY-312}{ PHY-321}{ PHY-322}{ PHY-421}{ PHY-421}{ PHY-441}{ PHY-442}{ PHY-451}{MTH-255}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ CHM-110}{ CHM-115}{ CHM-120}{ EES-112}{ EES-113}{ EES-115}{ PHY-111}{ PHY-112}{ PSY-320}{ SUS-120}{BIO-111}} DDN: {0} Requirement Name:{null}}
+
+Math-Economics-BA
+REQ:{Number to Choose: {1} Choices: {{ECN-111}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-331}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-345}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-346}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-475}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-151}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-160}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ MTH-340}{ MTH-341}{ MTH-450}{MTH-260}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-255}{ MTH-260}{ MTH-335}{ MTH-340}{ MTH-341}{ MTH-360}{ MTH-450}{MTH-337}} DDN: {0} Requirement Name:{null}}
+
+Math-Economics-BS
+REQ:{Number to Choose: {1} Choices: {{ECN-111}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-331}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-345}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-346}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ECN-475}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-151}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-160}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ MTH-340}{ MTH-341}{ MTH-450}{MTH-260}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ MTH-255}{ MTH-260}{ MTH-335}{ MTH-340}{ MTH-341}{ MTH-360}{ MTH-450}{MTH-337}} DDN: {0} Requirement Name:{null}}
+
+	 */
 
 
 

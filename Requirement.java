@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 
 
-public class Requirement implements Comparable<Requirement>, ScheduleElement{
+
+public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable{
 	Prefix[] choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
@@ -147,6 +149,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 				doubleDipNumber};
 		return SaverLoader.saveString(SAVE_DELIMETERS, data);
 	}
+
 	public static Requirement readFrom(String saveString){
 		String[] parsed = SaverLoader.parseString(SAVE_DELIMETERS, saveString);
 		int newNumToChoose = Integer.parseInt(parsed[0]);
@@ -172,5 +175,46 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement{
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		result.add(this);
 		return result;
+	}
+
+	public static Requirement readFromJSON(String s) {
+		//Get the list of objects in this string, after chopping off the first and last characters 
+		// (hopefully "{" and "}" ) and ignoring anything outside brackets ("{" or "}").
+		Iterator<String> i = SaverLoader.fromJSON(SaverLoader.peel(s)).iterator();
+		
+		//Peal off each piece of data from this iterator of strings.
+		int numToChoose = Integer.parseInt(SaverLoader.peel(i.next()));
+		Iterable<String> prefixes = SaverLoader.fromJSON(SaverLoader.peel(i.next()));
+		ArrayList<Prefix> choices = new ArrayList<Prefix>();
+		for(String p : prefixes){
+			choices.add(Prefix.readFromJSON(p));
+		}
+		int doubleDipNumber = Integer.parseInt(SaverLoader.peel(i.next()));
+		String name = SaverLoader.peel(i.next());
+		if(name.equals("null")){
+			name = null;
+		}
+		Requirement result = new Requirement(choices.toArray(new Prefix[choices.size()]), numToChoose);
+		result.setDoubleDipNumber(doubleDipNumber);
+		result.setName(name);
+		return result;
+	}
+
+	@Override
+	public String saveAsJSON() {
+		return String.format(
+				"{Number to Choose: {%s} Choices: {%s} DDN: {%s} Requirement Name:{%s}}",
+				numToChoose,
+				SaverLoader.toJSON((Iterable)Arrays.asList(choices)),
+				doubleDipNumber,
+				name);
+	}
+	
+	public static void main(String[] args){
+		Requirement r = Requirement.testRequirement();
+		System.out.println(r.saveAsJSON());
+		Requirement z = Requirement.readFromJSON(r.saveAsJSON());
+		System.out.println(z.saveAsJSON());
+		System.out.println(z.saveAsJSON().equals(r.saveAsJSON()));
 	}
 }
