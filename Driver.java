@@ -1,8 +1,5 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
+
 
 public class Driver implements ActionListener{ 
 
@@ -29,6 +26,11 @@ public class Driver implements ActionListener{
 	int season;
 	JFrame popUP = new JFrame();
 	JList<Integer> pickYears;
+	String seasonName;
+	Integer[] yearsDialog;
+	ImageIcon icon = new ImageIcon("src/Furman-logo.png");
+	String instruct = "Please pick year(s) you would like to add a ";
+	String headInstruct = "Please pick a course";
 
 
 
@@ -44,15 +46,9 @@ public class Driver implements ActionListener{
 		JLabel belltowerLabel = new JLabel(icon);
 
 
-
-
-
 		//Make data
-
 		Schedule test = Schedule.testSchedule();		
 		sch=test;
-
-
 
 
 		JFrame frame = new JFrame();
@@ -71,20 +67,13 @@ public class Driver implements ActionListener{
 		left.add(extras);
 		frame.add(left, BorderLayout.WEST);
 
-
-
-
 		schP = new SchedulePanel(test, this);
 		frame.add(schP, BorderLayout.CENTER);
 		reqs = new RequirementListPanel(test);
 		frame.add(reqs, BorderLayout.SOUTH);
 
 		this.update();
-
-
-
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		frame.pack();
 		frame.setVisible(true);
 
@@ -166,66 +155,47 @@ public class Driver implements ActionListener{
 	public void GUIYearsPopUP(String actionCommand){
 		if(actionCommand.equals(MenuOptions.addSummerClass)){
 			season= SemesterDate.SUMMER;
-		}
-		
-		if(actionCommand.equals(MenuOptions.addMayX)){
-			season= SemesterDate.MAYX;
+			seasonName = "Summer Class";
 		}
 
-		String instructions = "Pick the year(s) you would like to ";
+		if(actionCommand.equals(MenuOptions.addMayX)){
+			season= SemesterDate.MAYX;
+			seasonName = "May X";
+		}
+
 
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
 		Collections.sort(sch.semesters);
-		 
+
 		int last = (sch.semesters.size()-1);
 		int end = sch.semesters.get(last).semesterDate.year;
-		
+
 		for(int i=  sch.semesters.get(1).semesterDate.year; i<= end; i++){
 			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
-				
+
 				availableYears.add(i);
 			}
 
 		}
-		
-		
-		
-		
-		
-
-		popUP = new JFrame(actionCommand);
-		JPanel popUpAddition = new JPanel();
-		popUpAddition.setLayout(new GridLayout(3,1,3,3));
-		JLabel instruct = new JLabel(instructions + actionCommand);
-		instruct.setForeground(Color.white);
-		instruct.setFont(FurmanOfficial.getFont(12));
-		popUpAddition.add(instruct);
-		
-		
-		pickYears = new JList<Integer>(availableYears.toArray(new Integer[availableYears.size()]));
-		pickYears.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		pickYears.setFocusTraversalKeysEnabled(true);
+		yearsDialog = new Integer[availableYears.size()];
+		for(int i=0; i<availableYears.size(); i++){
+			yearsDialog[i]= availableYears.get(i);
+		}
+		createDialogBox(instruct + seasonName);
 
 
-		popUpAddition.add(pickYears);
 
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setSize(30, 10);
-		buttonPanel.setBackground(FurmanOfficial.darkPurple);
-		JButton done = new JButton("Done");
-		done.addActionListener(this);
-		buttonPanel.add(done);
-		popUpAddition.add(buttonPanel);
-
-		popUP.add(popUpAddition);
-		popUpAddition.setBackground(FurmanOfficial.darkPurple);
-		popUP.setLocation(1000, 500);
-		popUP.pack();
-		popUP.setVisible(true);
 	}
-	
-	
+
+	public void createDialogBox(String s){
+		Integer y = (Integer)JOptionPane.showInputDialog(popUP, s,  headInstruct, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
+		if((y != null) && (y !=0)){
+			sch.addNewSemesterInsideSch(y,season);
+			this.update();
+		}
+	}
+
 	public void updateAll(){
 		schP.update(sch);
 		reqs.update(sch);
@@ -246,8 +216,6 @@ public class Driver implements ActionListener{
 		updateAll();
 		repaintAll(); 
 
-
-
 	}
 
 
@@ -261,9 +229,9 @@ public class Driver implements ActionListener{
 		this.update();
 		popUP.dispose();
 	}
-	
-	
-	
+
+
+
 	public static void main(String[] args){
 		new Driver();
 

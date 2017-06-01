@@ -43,7 +43,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
-		
+
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
@@ -78,7 +78,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public void setBackground(Color c){
 		super.setBackground(c);
 		if(defaultPanel != null){
-			
+
 			defaultPanel.setBackground(c);
 		}
 	}
@@ -142,13 +142,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
-		
+
 		//Figure out the season and add it
-		
+
 		SemesterDate d = sem.getDate();
 		String season = d.getSeason(d.sNumber);
-		
-		
+
+
 		if(season == null){
 			season="Error";
 		}
@@ -181,10 +181,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		defaultPanel.add(deleteSemester);
 		deleteSemester.addActionListener(this);
 
-	
-		
+
+
 	}
-	
+
 	public JLabel newDropLabel(){
 		JLabel dropLabel = new JLabel(addAClass);
 		dropLabel.setTransferHandler(new SemesterPanelDropHandler());
@@ -219,14 +219,12 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			if(draggedItem instanceof RequirementPanel){
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d);
-				System.out.println("EXISTS");
 			}
 			else{
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
 				addElement(p);
-				System.out.println("DOES NOT EXIST");
 			}
-			
+
 		}
 
 	}

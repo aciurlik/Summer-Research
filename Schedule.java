@@ -61,7 +61,7 @@ public class Schedule {
 		this.semesters.add(next);
 		return next;
 	}
-	
+
 	public void addNewSemesterInsideSch(int i, int season) {
 		SemesterDate inside = new SemesterDate(i, season);
 		Semester toAdd = new Semester(inside, this);
@@ -69,9 +69,9 @@ public class Schedule {
 		Collections.sort(semesters);
 
 	}
-	
-	
-	
+
+
+
 	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
 		s.replace(oldElement, newElement);
 		if(newElement instanceof Course){
@@ -83,7 +83,7 @@ public class Schedule {
 		for(Requirement r : newElement.getRequirementsFulfilled()){
 			r.numFinished ++;
 		}
-		
+
 	}
 
 
@@ -226,7 +226,7 @@ public class Schedule {
 		Collections.sort(reqsList);;
 		reqListValid = true;
 	}
-	
+
 	public int totalRequirementsLeft(){
 		if(!reqListValid){
 			updateReqList();
@@ -375,16 +375,14 @@ public class Schedule {
 				collectionOfMajors.remove(m);
 			}
 		}
-		System.out.println("After" + collectionOfMajors);
 		return collectionOfMajors;
-		
+
 	}
 
 	public boolean SemesterAlreadyExists(SemesterDate semesterDate) {
 		for(Semester s: this.semesters){
 			if(s.semesterDate.equals(semesterDate)){
 				return true;
-			
 			}
 
 		}
