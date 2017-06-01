@@ -9,15 +9,31 @@ public class Major {
 	String name;
 	int groupNumber;
 	ArrayList<Requirement> reqList;
-	boolean major = true;
-	boolean minor = true;
-	boolean track = true;
+	
+	public static final String NORMAL_MAJOR = "Major";
+	public static final String MINOR = "Minor";
+	public static final String TRACK = "Track";
+	String majorType;
 
 	public static final int MajorDDNRange = 100;
 
 	public Major(String name){
 		this.name = name;
+		this.majorType = NORMAL_MAJOR;
 		this.reqList = new ArrayList<Requirement>();
+	}
+	
+	/**
+	 * Sets the type of this major.
+	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
+	 * @param majorType
+	 */
+	public void setType(String majorType){
+		this.majorType = majorType;
+	}
+	
+	public boolean isType(String majorType){
+		return this.majorType.equals(majorType);
 	}
 
 	public void addRequirement(Requirement r){
@@ -75,9 +91,11 @@ public class Major {
 	}
 
 
+	static final String typeString = "Type: ";
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
+		result.append(typeString + this.majorType + "\n");
 		for (Requirement r : this.reqList){
 			result.append("REQ:" + r.saveAsJSON() + "\n");
 		}
@@ -88,7 +106,12 @@ public class Major {
 	public static Major readFrom(String saveString){
 		String[] lines = saveString.split("[\n]+");
 		Major result = new Major(lines[0]);
-		for(int i = 1; i < lines.length ; i ++){
+		int startIndex = 1;
+		if(lines[1].contains(typeString)){
+			result.setType(lines[1].substring(typeString.length()));
+			startIndex ++;
+		}
+		for(int i = startIndex; i < lines.length ; i ++){
 			if(lines[i].length() < 3){
 				continue;
 			}
@@ -140,6 +163,9 @@ public class Major {
 		System.out.println(t.saveString());
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
+		
+		ListOfMajors m = ListOfMajors.testList();
+		System.out.println(m.getCompleteMajorsList().get(1).saveString());
 	}
 	
 	

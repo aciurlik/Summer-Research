@@ -112,7 +112,7 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUIMajors() {
 		ArrayList<Major> majorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.major){
+			if (m.isType(Major.NORMAL_MAJOR)){
 			majorGUI.add(m);
 			}
 
@@ -126,7 +126,7 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUIMinor() {
 		ArrayList<Major> minorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.minor){
+			if (m.isType(Major.MINOR)){
 				minorGUI.add(m);
 			}
 
@@ -138,7 +138,7 @@ public class ListOfMajors {
 	public ArrayList<Major> getGUITrack() {
 		ArrayList<Major> trackGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
-			if (m.track){
+			if (m.isType(Major.TRACK)){
 				trackGUI.add(m);
 			}
 
