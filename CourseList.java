@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -27,7 +28,6 @@ public class CourseList  {
 
 
 	public static CourseList testList(){
-		CourseList result = new CourseList();
 		
 		
 		/*Course[] list = new Course[]{
@@ -46,11 +46,28 @@ public class CourseList  {
 		}
 		*/
 		
-		result.addCoursesIn(new File("Mayx2017.csv"));
-		result.addCoursesIn(new File("Fall2017.csv"));
-		return result;
+		//result.addCoursesIn(new File("Mayx2017.csv"));
+		//result.addCoursesIn(new File("Fall2017.csv"));
+		return readAll();
 	}
 
+	public static CourseList readAll(){
+		CourseList result = new CourseList();
+		File f = new File("CourseCatologs");
+		for ( File semesterFile : f.listFiles(new FilenameFilter(){
+			@Override
+			public boolean accept(File dir, String name) {
+				if(name.contains(".csv")){
+					return true;
+				}
+				return false;
+			}
+			
+		})){
+			result.addCoursesIn(semesterFile);
+		}
+		return result;
+	}
 
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
@@ -277,7 +294,7 @@ public class CourseList  {
 	}
 	
 	public static void main(String[] args){
-		CourseList c = CourseList.testList();
+		CourseList c = CourseList.readAll(); //CourseList.testList();
 		
 		for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
