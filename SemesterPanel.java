@@ -30,8 +30,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	JPanel hidePanel;
 	Driver d;
 	Semester sem;
-	public String changeInstruct = "Change Course";
-	public String removeInstruct = "Delete Semester";
+	private JButton changeCourse;
 
 
 
@@ -105,13 +104,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(removeInstruct)){
+		if(e.getActionCommand().equals(MenuOptions.removeInstruct)){
 			d.GUIRemoveSemester(this);
 		}
-		else if(e.getActionCommand().equals(changeInstruct)){
-			d.addCourseDialogBox("MayX", this.sem);
+		else if(e.getActionCommand().equals(MenuOptions.changeInstruct) || e.getActionCommand().equals(MenuOptions.addInstruct)){
+			d.addCourseDialogBox(e.getActionCommand(), this.sem);
 		}
-
+		else if(e.getActionCommand().equals(MenuOptions.supriseMe)){
+			d.GUISupriseWindow(this.sem);
+		}
 		else{
 			//This method is called when you click the button to hide a semester.
 			this.remove(defaultPanel);
@@ -178,38 +179,49 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			defaultPanel.add(dropLabel);
 		}
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
-		if(sem.semesterDate.sNumber != SemesterDate.MAYX){
+		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
 			for (int i= 0; i<DropsNeeded; i++){
 				JLabel dropLabel = newDropLabel();
 				defaultPanel.add(dropLabel);
 			}
-			//Add button to hide Semester
-			JButton deleteSemester= new JButton("Hide Semester");
-			defaultPanel.add(deleteSemester);
-			deleteSemester.addActionListener(this);
+			if(sem.semesterDate.sNumber != SemesterDate.SUMMER){
+				//Add button to hide Semester
+				JButton deleteSemester= new JButton("Hide Semester");
+				defaultPanel.add(deleteSemester);
+				deleteSemester.addActionListener(this);
+			}
 
 		}
-		
+
 		//Adds special buttons to MayX 
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX){
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMER){
+			JButton removeCourse = new JButton(MenuOptions.removeInstruct);
+			removeCourse.setActionCommand(MenuOptions.removeInstruct);
+			removeCourse.addActionListener(this);
+			
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new FlowLayout());
 			buttonPanel.setBackground(defaultPanel.getBackground());
+
+			if(sem.semesterDate.sNumber == SemesterDate.MAYX){
+				changeCourse = makeAddChangeButton(MenuOptions.changeInstruct);
+			}
+			if(sem.semesterDate.sNumber == SemesterDate.SUMMER){
+				changeCourse = makeAddChangeButton(MenuOptions.addInstruct);
+			}
 			
-			JButton changeCourse = new JButton(changeInstruct);
-			changeCourse.setActionCommand(changeInstruct);
-			changeCourse.addActionListener(this);
+			JButton supriseMe = new JButton(MenuOptions.supriseMe);
+			supriseMe.setActionCommand(MenuOptions.supriseMe);
+			supriseMe.addActionListener(this);
+			
+			buttonPanel.add(supriseMe);
 			buttonPanel.add(changeCourse);
-			
-			JButton removeCourse = new JButton(removeInstruct);
-			removeCourse.setActionCommand(removeInstruct);
-			removeCourse.addActionListener(this);
 			buttonPanel.add(removeCourse);
-			
+
 			defaultPanel.add(buttonPanel);
-			
+
 		}
-	
+
 
 
 	}
@@ -223,7 +235,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
+	public JButton makeAddChangeButton(String s){
+		JButton alter = new JButton(s);
+		alter.setActionCommand(s);
+		alter.addActionListener(this);
 
+		return alter;
+	}
 
 	public void addElement(Component s){
 		if(s instanceof RequirementPanel){

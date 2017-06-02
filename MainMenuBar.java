@@ -30,38 +30,66 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 	JScrollPane scrollPane;
 	Driver d;
 
+
 	public MainMenuBar(Driver d) {
 		super();
 		this.d=d;
-		JMenuBar menuBar;
 		JMenu menu, submenu;
 		JMenuItem menuItem;
-		JRadioButtonMenuItem rbMenuItem;
-		JCheckBoxMenuItem cbMenuItem;
+
+
+
 
 		//Create the menu bar.
-		
+
 
 		menu = new JMenu("The Furman Advantage");
 		submenu = new JMenu("MayX");
-		menuItem = new JMenuItem("Explore MayX Opportunities");
+
+
+		menuItem = new JMenuItem(MenuOptions.exploreMayX);
+		JPopupMenu exploreMayXPopup = new JPopupMenu();
+		menuItem.addActionListener(this);
+		exploreMayXPopup.add(menuItem);
 		submenu.add(menuItem);
-		menuItem = new JMenuItem("Add a MayX");
+
+
+		menuItem = new JMenuItem(MenuOptions.addMayX);
+		JPopupMenu addMayX = new JPopupMenu();
+		menuItem.addActionListener(this);
+		addMayX.add(menuItem);
 		submenu.add(menuItem);
+
 		menu.add(submenu);
 
 
 		submenu = new JMenu("Study Abroad");
-		menuItem = new JMenuItem("Explore Study Abroad Opportunities");
+
+		menuItem = new JMenuItem(MenuOptions.addStudyAway);
+		JPopupMenu exploreStudyAway = new JPopupMenu();
+		menuItem.addActionListener(this);
+		exploreStudyAway.add(menuItem);
 		submenu.add(menuItem);
-		menuItem = new JMenuItem("Add Study Abroad");
-		submenu.add(menuItem);
+
 		menu.add(submenu);
 
-		menuItem = new JMenuItem("Add a Summer Course");
+
+		menuItem = new JMenuItem(MenuOptions.addSummerClass);
+		JPopupMenu addSummer = new JPopupMenu();
+		menuItem.addActionListener(this);
+		addSummer.add(menuItem);
 		menu.add(menuItem);
-		menuItem = new JMenuItem("Explore Intership Opportunities");
+
+
+
+		menuItem = new JMenuItem(MenuOptions.addInternship);
+		JPopupMenu exploreInternship = new JPopupMenu();
+		menuItem.addActionListener(this);
+		exploreInternship.add(menuItem);
 		menu.add(menuItem);
+
+
+
 		this.add(menu);
 
 
@@ -72,6 +100,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		menu.getAccessibleContext().setAccessibleDescription(
 				"The only menu in this program that has menu items");
 		this.add(menu);
+		
 		menuItem = new JMenuItem("New Schedule",
 				KeyEvent.VK_T);
 		menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
@@ -79,14 +108,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 				KeyEvent.VK_1, ActionEvent.ALT_MASK));
 		menuItem.getAccessibleContext().setAccessibleDescription(
 				"Add a new Schedule");
+		JPopupMenu newSched = new JPopupMenu(MenuOptions.newSchedule);
+		menuItem.addActionListener(this);
+		newSched.add(menuItem);
 		menu.add(menuItem);
+		
+		
+		
+		
 		menuItem = new JMenuItem("Save Schedule");
 		menuItem.setMnemonic(KeyEvent.VK_B);
 		menu.add(menuItem);
 		menuItem.setMnemonic(KeyEvent.VK_D);
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("Do another new fangly thing");
+		menuItem = new JMenuItem("Print Schedule");
 		menu.add(menuItem);
 
 
@@ -103,29 +139,54 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		submenu = new JMenu("Major");
 		submenu.setMnemonic(KeyEvent.VK_S);
-		menuItem = new JMenuItem("Add Major");
+		menuItem = new JMenuItem(MenuOptions.addMajor);
 		JPopupMenu majorPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
 		majorPopup.add(menuItem);
 		submenu.add(menuItem);
-		menuItem = new JMenuItem("Remove Major");
+
+
+		menuItem = new JMenuItem(MenuOptions.removeMajor);
+		JPopupMenu removeMajorPopup = new JPopupMenu(MenuOptions.removeMajor);
+		menuItem.addActionListener(this);
+		removeMajorPopup.add(menuItem);
 		submenu.add(menuItem);
+
 		menu.add(submenu);
 
 
 
 
 		submenu = new JMenu("Minor");
-		menuItem = new JMenuItem("Add Minor");
+		menuItem = new JMenuItem(MenuOptions.addMinor);
 		JPopupMenu minorPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
 		minorPopup.add(menuItem);
 		submenu.add(menuItem);
-		menuItem = new JMenuItem("Remove Minor");
+
+
+		menuItem = new JMenuItem(MenuOptions.removeMinor);
+		JPopupMenu minorRemovePopup = new JPopupMenu();
+		menuItem.addActionListener(this);
+		minorRemovePopup.add(menuItem);
 		submenu.add(menuItem);
+
 		menu.add(submenu);
 
+		submenu = new JMenu("Track");
+		menuItem = new JMenuItem(MenuOptions.addTrack);
+		JPopupMenu trackPopup = new JPopupMenu();
+		menuItem.addActionListener(this);
+		trackPopup.add(menuItem);
+		submenu.add(menuItem);
 
+		menuItem = new JMenuItem(MenuOptions.removeTrack);
+		JPopupMenu trackRemovePopup = new JPopupMenu();
+		menuItem.addActionListener(this);
+		trackRemovePopup.add(menuItem);
+		submenu.add(menuItem);
+
+		menu.add(submenu);
 
 
 		//Add Help
@@ -136,7 +197,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 
 
-		
+
 	}
 
 
@@ -155,8 +216,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		d.GUIPopUP(e.getActionCommand());
-	
+		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.addStudyAway) || e.getActionCommand().equals(MenuOptions.addInternship)){
+			d.GUIOutsideLink(e.getActionCommand());
+		}
+		if(e.getActionCommand().equals(MenuOptions.addMayX) || e.getActionCommand().equals(MenuOptions.addSummerClass)){
+			d.GUIYearsPopUP(e.getActionCommand());
+		}
+		if(e.getActionCommand().equals(MenuOptions.removeMajor) || e.getActionCommand().equals(MenuOptions.removeMinor) || (e.getActionCommand().equals(MenuOptions.removeTrack))){
+			d.GUIRemoveMajorDialogBox(e.getActionCommand());
+		}
+		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
+			d.GUIPopUP(e.getActionCommand());
+		}
+		if(e.getActionCommand().equals(MenuOptions.newSchedule)){
+			d.GUINewSchedule();
+		}
 
 	}
 

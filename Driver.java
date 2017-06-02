@@ -33,6 +33,7 @@ public class Driver{
 	String instructCourse = "Please pick the course you would like to add to your ";
 	String headInstructCourse = "Pick a course";
 	Course[] coursesDialog;
+	
 
 
 
@@ -81,6 +82,17 @@ public class Driver{
 
 	}
 
+	public void GUINewSchedule() {
+		CourseList l = CourseList.testList();
+		Collections.sort(sch.semesters);
+		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
+		Schedule current = new Schedule(sch.masterList, sch.semesters.get(0).semesterDate, null);
+		sch = current;
+		this.update();
+		
+	}
+
+	
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addRequirementElement(r.req, semesterP.sem);
 		this.update();
@@ -139,6 +151,9 @@ public class Driver{
 			}
 			if(actionCommand.equals(MenuOptions.addResearch)){
 				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/ur/Pages/default.aspx").toURI());
+			}
+			if(actionCommand.equals(MenuOptions.exploreMayX)){
+				Desktop.getDesktop().browse(new URL("http://www.furman.edu/academics/may-experience/Pages/default.aspx").toURI());
 			}
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
@@ -224,7 +239,10 @@ public class Driver{
 		if(addCourses.size()>0){
 			Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
 			if((c != null) && (c instanceof Course)){
-				s.elements.clear();
+				//Removes all courses that have already been added in case of MayX 
+				if(season.equals(MenuOptions.changeInstruct)){
+					s.elements.clear();
+				}
 				sch.addScheduleElement(c, s);
 				this.update();
 
@@ -232,7 +250,61 @@ public class Driver{
 		}
 	}
 
+	public void GUIRemoveMajorDialogBox(String actionCommand) {
+		ArrayList<Major> removeMajor = new ArrayList<Major>();
+		removeMajor = sch.majorsList;
+		
+		//Make Note to test This
+		if(actionCommand.equals(MenuOptions.removeMinor)){
+			for(Major m : removeMajor){
+				if(!m.isType(Major.MINOR)){
+					removeMajor.remove(m);
 
+				}
+			}
+		}
+		if(actionCommand.equals(MenuOptions.removeTrack)){
+			for(Major m : removeMajor){
+				if(!m.isType(Major.TRACK)){
+					removeMajor.remove(m);
+
+				}
+			}
+		}
+			Major[] toRemove = new Major[removeMajor.size()];
+			if(removeMajor.size() != 0){
+				for(int i = 0; i<removeMajor.size(); i++){
+					toRemove[i] = removeMajor.get(i);
+				}
+				
+			Major m = (Major) JOptionPane.showInputDialog(popUP, actionCommand, actionCommand, JOptionPane.PLAIN_MESSAGE,icon, toRemove, "Cat" );
+			if((m != null) && (m instanceof Major)){
+				sch.removeMajor(m);
+				this.update();
+			}
+			}
+		}
+		
+	public void GUISupriseWindow(Semester s) {
+		
+		new SupriseMe(sch, s, this);
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	public void GUIChallengeExcepted(Semester s, Course c){
+		if(s.semesterDate.sNumber==SemesterDate.MAYX){
+			s.elements.clear();
+		}
+		sch.addScheduleElement(c, s);
+		this.update();
+	}
 
 
 	public void updateAll(){
@@ -263,6 +335,11 @@ public class Driver{
 
 
 	}
+
+	
+
+	
+	
 
 
 

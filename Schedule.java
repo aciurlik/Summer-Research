@@ -16,7 +16,7 @@ public class Schedule {
 	public static Schedule testSchedule(){
 
 		CourseList l = CourseList.testList();
-		Schedule result = new Schedule(l, new SemesterDate(2017, SemesterDate.FALL), null);
+		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
 
 		result.addMajor(Major.testMajor());
 

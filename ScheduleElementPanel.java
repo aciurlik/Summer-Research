@@ -67,6 +67,20 @@ public class ScheduleElementPanel extends JPanel {
 		if(s instanceof Requirement) {
 			updateDropDown();
 		}
+		
+		
+		//Adds remove Button
+		JPanel remove = new JPanel();
+		JButton toRemove = new JButton(removeButtonText);
+		toRemove.setForeground(FurmanOfficial.darkPurple);
+		toRemove.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				removeSelf();
+			}
+		});
+		toRemove.setPreferredSize(buttonSize);
+		remove.add(toRemove);
+		this.add(remove);
 	}
 	//If course is dropped then no dropDown Panel is needed
 
@@ -98,18 +112,7 @@ public class ScheduleElementPanel extends JPanel {
 
 		this.add(requirementDropDown);
 
-		//Adds remove Button 
-		JPanel remove = new JPanel();
-		JButton toRemove = new JButton(removeButtonText);
-		toRemove.setForeground(FurmanOfficial.darkPurple);
-		toRemove.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				removeSelf();
-			}
-		});
-		toRemove.setPreferredSize(buttonSize);
-		remove.add(toRemove);
-		this.add(remove);
+	
 	}
 
 	public void removeSelf(){
