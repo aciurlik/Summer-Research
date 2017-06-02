@@ -626,7 +626,15 @@ public class Schedule {
 		}
 	}
 	private void updateRequirementsSatisfied(Requirement r){
-		//TODO fill this out.
+		r.fulfills = new ArrayList<Requirement>();
+		r.fulfills.add(r); //r will have the same doubleDipNumber as itself.
+		for(Requirement otherReq : this.getAllRequirements()){
+			if(r.subset(otherReq) && 
+					r.doubleDipNumber != 0 &&
+					r.doubleDipNumber != otherReq.doubleDipNumber){
+				r.fulfills.add(otherReq);
+			}
+		}
 	}
 	
 	private void updateRequirementsSatisfied(Course c){
