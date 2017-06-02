@@ -95,7 +95,7 @@ public class Driver{
 
 	
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
-		sch.addRequirementElement(r.req, semesterP.sem);
+		sch.addScheduleElement(r.req, semesterP.sem);
 		this.update();
 
 	}
@@ -114,7 +114,7 @@ public class Driver{
 	}
 
 	public void GUIRemoveElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
-		sch.remove(e.getElement(), semesterPanel.sem);
+		sch.removeElement(e.getElement(), semesterPanel.sem);
 		this.update();
 
 	}
@@ -137,7 +137,7 @@ public class Driver{
 	}
 
 	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
-		return sch.removeAlreadyChosenMajors(collectionOfMajors);
+		return sch.filterAlreadyChosenMajors(collectionOfMajors);
 
 
 	}
