@@ -4,6 +4,7 @@
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -28,12 +29,19 @@ public class ScheduleElementPanel extends JPanel {
 
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox<ScheduleElement>  requirementDropDown;
+	JButton addCourse = new JButton (MenuOptions.addCourseWithRequirement);
+
+
+
 
 	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
 
 		super();
 		this.s=s;
 		this.container = container;
+
+
+
 
 
 		this.setTransferHandler(new SEPDragHandler());
@@ -67,8 +75,8 @@ public class ScheduleElementPanel extends JPanel {
 		if(s instanceof Requirement) {
 			updateDropDown();
 		}
-		
-		
+
+
 		//Adds remove Button
 		JPanel remove = new JPanel();
 		JButton toRemove = new JButton(removeButtonText);
@@ -82,7 +90,7 @@ public class ScheduleElementPanel extends JPanel {
 		remove.add(toRemove);
 		this.add(remove);
 	}
-	//If course is dropped then no dropDown Panel is needed
+
 
 
 
@@ -91,28 +99,16 @@ public class ScheduleElementPanel extends JPanel {
 	 * This should only be called if the schedule element is a requirement.
 	 */
 	public void updateDropDown(){
-		this. requirementDropDown = new JComboBox<ScheduleElement>();
-		this.requirementDropDown.setFont(FurmanOfficial.getFont(12));
 
-		Requirement r = (Requirement)this.s;
-		this.requirementDropDown.removeAllItems();
-
-		//Find the list of courses that might satisfy this requirement
-		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying(r);
-
-
-		for( Course c : listOfCourses){
-			requirementDropDown.addItem(c);
-		}
-		requirementDropDown.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				dropdownSelected();
-			}
-		});
-
-		this.add(requirementDropDown);
-
-	
+		if(container.getSemester().getCoursesSatisfying((Requirement)s).size()>0){
+			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
+			addCourse.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					container.d.GUIAddCourseWithRequirement(s, container, e.getActionCommand());
+				}
+			});
+			this.add(addCourse);
+		}	
 	}
 
 	public void removeSelf(){

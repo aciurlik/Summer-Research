@@ -5,10 +5,11 @@ import java.util.regex.Pattern;
 
 public class SemesterDate {
 	public static final int SPRING = 1;
-	public static final int FALL = 4;
-	public static final int SUMMER = 3;
+	public static final int FALL = 5;
+	public static final int SUMMERONE = 3;
+	public static final int SUMMERTWO = 4;
 	public static final int MAYX = 2;
-	public static final int OTHER = 5;
+	public static final int OTHER = 6;
 
 	int year;
 	int sNumber; //one of FALL, SPRING, MAYX, SUMMER, OTHER
@@ -54,8 +55,10 @@ public class SemesterDate {
 			return 8;
 		case SPRING:
 			return 1;
-		case SUMMER:
+		case SUMMERONE:
 			return 6;
+		case SUMMERTWO:
+			return 7;
 		case MAYX:
 			return 5;
 		default:
@@ -82,7 +85,7 @@ public class SemesterDate {
 
 	
 	public String getSeason(int p){
-		String[] season = {null, "Spring", "MayX", "Summer", "Fall", "Other"};
+		String[] season = {null, "Spring", "MayX", "Summer Session One", "Summer Session Two", "Fall", "Other"};
 
 
 		return season[p];
@@ -98,7 +101,7 @@ public class SemesterDate {
 		case "MAYEXPERIENCE":
 			return MAYX;
 		case "SUMMER":
-			return SUMMER;
+			return SUMMERONE;
 		default:
 			return OTHER;
 		}

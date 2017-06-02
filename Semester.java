@@ -6,6 +6,7 @@ public class Semester implements Comparable<Semester>{
 	public SemesterDate semesterDate;
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
+	private int OverloadLimit;
 	
 	
 	public Semester(SemesterDate sD, Schedule s){
@@ -48,6 +49,33 @@ public class Semester implements Comparable<Semester>{
 			}
 		}
 	}
+	
+	public void checkOverload(ScheduleElement addition){
+		if(this.semesterDate.sNumber == SemesterDate.FALL || this.semesterDate.sNumber == SemesterDate.SPRING){
+			OverloadLimit = 20;
+		}
+		if(this.semesterDate.sNumber == SemesterDate.SUMMERONE|| this.semesterDate.sNumber == SemesterDate.SUMMERTWO){
+			OverloadLimit = 8;
+		}
+		if(this.semesterDate.sNumber == SemesterDate.MAYX ){
+			OverloadLimit = 4;
+		}
+		int totalHours = 0;
+		
+		if(addition instanceof Course){
+			Course toAdd = (Course) addition;
+			totalHours= totalHours + toAdd.getCreditHours();
+		}
+		
+		for(ScheduleElement e : this.elements){
+			if(e instanceof Course){
+				totalHours = totalHours + ((Course) e).getCreditHours();
+			}
+		}
+		if (totalHours > OverloadLimit){
+			throw new OverloadException();
+		}
+	}
 
 	public int compareTo(Semester other){
 		return this.semesterDate.compareTo(other.semesterDate);
@@ -59,6 +87,7 @@ public class Semester implements Comparable<Semester>{
 	 * @return
 	 */
 	public boolean add(ScheduleElement e){
+		this.checkOverload(e);
 		//this.schedule.checkErrorsWhenAdding(e,this);
 		this.elements.add(e);
 		this.schedule.added(e, this);
@@ -73,7 +102,9 @@ public class Semester implements Comparable<Semester>{
 	
 	
 	
+	
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
+		this.checkOverload(newElement);
 		//this.schedule.checkErrorsWhenAdding(newElement, this);
 		//this.schedule.checkErrorsWhenRemoving(oldElement, this);
 		int i = this.elements.indexOf(oldElement);

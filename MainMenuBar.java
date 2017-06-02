@@ -96,34 +96,40 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		//Build the file menu-> Add/Save Schedule
 		menu = new JMenu("File");
-		menu.setMnemonic(KeyEvent.VK_A);
-		menu.getAccessibleContext().setAccessibleDescription(
-				"The only menu in this program that has menu items");
 		this.add(menu);
+	
 		
 		menuItem = new JMenuItem("New Schedule",
 				KeyEvent.VK_T);
-		menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_1, ActionEvent.ALT_MASK));
-		menuItem.getAccessibleContext().setAccessibleDescription(
-				"Add a new Schedule");
 		JPopupMenu newSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
 		newSched.add(menuItem);
 		menu.add(menuItem);
 		
 		
+		menuItem = new JMenuItem(MenuOptions.openSchedule);
+		JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
+		menuItem.addActionListener(this);
+		openSched.add(menuItem);
+		menu.add(menuItem);
+		
 		
 		
 		menuItem = new JMenuItem("Save Schedule");
-		menuItem.setMnemonic(KeyEvent.VK_B);
+		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
+		menuItem.addActionListener(this);
+		saveSched.add(menuItem);
 		menu.add(menuItem);
-		menuItem.setMnemonic(KeyEvent.VK_D);
-		menu.add(menuItem);
+		
+	
+		
 
 		menuItem = new JMenuItem("Print Schedule");
+		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
+		menuItem.addActionListener(this);
+		saveSched.add(menuItem);
 		menu.add(menuItem);
+		
 
 
 
@@ -231,7 +237,15 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		if(e.getActionCommand().equals(MenuOptions.newSchedule)){
 			d.GUINewSchedule();
 		}
-
+		if(e.getActionCommand().equals(MenuOptions.openSchedule)){
+			System.out.println("Watch me open this bad boy");
+		}
+		if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
+			System.out.println("Watch me save this bad boy");
+		}
+		if(e.getActionCommand().equals(MenuOptions.printSchedule)){
+			System.out.println("Watch me print this bad boy");
+		}
 	}
 
 

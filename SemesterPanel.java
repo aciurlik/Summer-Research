@@ -182,6 +182,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		if(season == null){
 			season="Error";
 		}
+		
 		season +=  " " + sem.semesterDate.year;
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
@@ -198,13 +199,19 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			JLabel dropLabel = newDropLabel();
 			defaultPanel.add(dropLabel);
 		}
+		
+		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
+			normalNumberofClasses = 2;
+		}
+		
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
+			
 			for (int i= 0; i<DropsNeeded; i++){
 				JLabel dropLabel = newDropLabel();
 				defaultPanel.add(dropLabel);
 			}
-			if(sem.semesterDate.sNumber != SemesterDate.SUMMER){
+			if(sem.semesterDate.sNumber != SemesterDate.SUMMERONE && sem.semesterDate.sNumber != SemesterDate.SUMMERTWO){
 				//Add button to hide Semester
 				JButton deleteSemester= new JButton("Hide Semester");
 				defaultPanel.add(deleteSemester);
@@ -214,7 +221,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 
 		//Adds special buttons to MayX 
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMER){
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			JButton removeCourse = new JButton(MenuOptions.removeInstruct);
 			removeCourse.setActionCommand(MenuOptions.removeInstruct);
 			removeCourse.addActionListener(this);
@@ -226,7 +233,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			if(sem.semesterDate.sNumber == SemesterDate.MAYX){
 				changeCourse = makeAddChangeButton(MenuOptions.changeInstruct);
 			}
-			if(sem.semesterDate.sNumber == SemesterDate.SUMMER){
+			if(sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber == SemesterDate.SUMMERTWO){
 				changeCourse = makeAddChangeButton(MenuOptions.addInstruct);
 			}
 			

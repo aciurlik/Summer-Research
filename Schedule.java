@@ -81,6 +81,7 @@ public class Schedule {
 
 
 	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
+		this.checkErrorsWhenAdding(newElement, s);
 		s.replace(oldElement, newElement);
 		if(newElement instanceof Course){
 			updateRequirementsSatisfied((Course) newElement);
@@ -143,7 +144,8 @@ public class Schedule {
 				boolean success = masterList.checkPrereqsShallow(e.getPrefix(), taken);
 				if(!success){
 					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
-					//throw new PrerequsiteException(needed,e);
+					
+					throw new PrerequsiteException(needed,e);
 				}
 			}
 		}
@@ -168,7 +170,7 @@ public class Schedule {
 			}
 			HashSet<Prefix> needed = masterList.missingPrereqsDeep(p, taken);
 			if(!needed.isEmpty()){
-				//throw new PrerequsiteException(needed, e);
+				throw new PrerequsiteException(needed, e);
 			}
 
 		}
@@ -192,7 +194,7 @@ public class Schedule {
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
-				//throw new DuplicateException(e1, e);
+				throw new DuplicateException(e1, e);
 			}
 		}
 	}

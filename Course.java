@@ -65,6 +65,7 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
+	
 
 
 

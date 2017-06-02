@@ -36,6 +36,8 @@ public class Time implements Comparable<Time>{
 	//When necessary (for example, calculating total seconds) unused values are taken from the time
 	// Jan 1 2000 12:00:00 AM 
 	
+	//However, if the month is unused, treat the day as a day of week.
+	
 	
 	int day; //(1) thru (numDays)
 	int month; // 1 thru 12
@@ -169,7 +171,7 @@ public class Time implements Comparable<Time>{
 	}
 	private void nextDay(){
 		if(this.month == UNUSED){
-			this.day = (this.day + 1)%31;
+			this.day = (this.day + 1)%7;
 			return;
 		}
 		if(this.day < daysInMonth[this.month - 1]){
@@ -207,7 +209,13 @@ public class Time implements Comparable<Time>{
 
 	public int dayOfWeek(){
 		if(this.month == UNUSED || this.year == UNUSED || this.day == UNUSED){
-			throw new RuntimeException( "Tried to find the day of week for an unspecified date: " + this.toString());
+			this.day=0;
+			
+			//throw new RuntimeException( "Tried to find the day of week for an unspecified date: " + this.toString());
+			
+		}
+		if(this.month==UNUSED && this.year==UNUSED){
+			return this.day;
 		}
 		//jan 1 2000 was a saturday = 6
 		int result =  (int)(((this.toSec() / (60 * 60 * 24)) + 6 )%7);
