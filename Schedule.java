@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
@@ -54,8 +55,27 @@ public class Schedule {
 		}
 
 	}
+	
+	
+
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	//////////	Methods called by the GUI  //////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/*		|		|		|		|
+	 *		|		|		|		|
+	 *		V		V		V		V
+	 */
 
 
+	///////////////////////////////
+	///////////////////////////////
+	//	Adding and removing semesters
+	///////////////////////////////
+	///////////////////////////////
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
@@ -79,8 +99,20 @@ public class Schedule {
 
 
 
+	///////////////////////////////
+	///////////////////////////////
+	//	Adding and removing Elements
+	///////////////////////////////
+	///////////////////////////////
 
+	/**
+	 * In semester s, replace oldElement with newElement.
+	 * @param s
+	 * @param oldElement
+	 * @param newElement
+	 */
 	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
+		checkErrorsWhenReplacing(s, s, oldElement, newElement);
 		s.replace(oldElement, newElement);
 		if(this.reqsFulfilledValid){
 			//keep the reqsFufilled set valid
@@ -95,29 +127,14 @@ public class Schedule {
 				r.numFinished ++;
 			}
 		}
-
 	}
-
-
-	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
-		checkPrerequsites(e, s.semesterDate);
-		s.checkOverlap(e);
-		checkDuplicates(e);
-	}
-	public void added(ScheduleElement e, Semester s){
-		updateRequirementsSatisfied(e);
-		if(reqsValid){
-			//keep them valid
-			for (Requirement r : e.getRequirementsFulfilled()){
-				r.numFinished ++;
-			}
-		}
-	}
-	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
-		//TODO
-	}
-
-	public void remove(ScheduleElement e, Semester s){
+	/**
+	 * In semester S, remove ScheduleElement e.
+	 * @param e
+	 * @param s
+	 */
+	public void removeElement (ScheduleElement e, Semester s){
+		this.checkErrorsWhenRemoving(e, s);
 		s.remove(e);
 		if(reqsFulfilledValid){
 			if(reqsValid){
@@ -131,8 +148,114 @@ public class Schedule {
 			reqsValid = false;
 		}
 	}
+	
+	public void addScheduleElement(ScheduleElement element, Semester sem) {
+		this.checkErrorsWhenAdding(element, sem);
+		sem.add(element);
+		updateRequirementsSatisfied(element);
+		if(reqsValid){
+			//keep them valid
+			for (Requirement r : element.getRequirementsFulfilled()){
+				r.numFinished ++;
+			}
+		}
+	}
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Adding and removing Majors
+	///////////////////////////////
+	///////////////////////////////
+	
+	
+	public void addMajor(Major newMajor){
+		majorsList.add(newMajor);
+		//Tell the courses which requirements they satisfy
+		reqsFulfilledValid = false;
+		//Tell the new requirements if some taken course satisfies them.
+		reqsValid = false;
+	}
 
-	public ArrayList<ScheduleElement> allElements(){
+
+	public void removeMajor(Major major) {
+		majorsList.remove(major);
+		reqsValid = false;
+		reqsFulfilledValid = false;
+	}
+	
+	
+	/*				^		^		^
+	 * 				|		|		|
+	 * 				|		|		|
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	//////////	Methods called by the GUI  //////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	*/
+	
+	
+		
+	///////////////////////////////
+	///////////////////////////////
+	//	General error checks for GUI events
+	///////////////////////////////
+	///////////////////////////////
+	
+	public void checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
+		this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement);
+		newS.checkOverlap(newElement);
+		checkDuplicates(newElement);
+	}
+
+	
+	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
+		checkPrerequsitesFor(e, s.semesterDate);
+		s.checkOverlap(e);
+		checkDuplicates(e);
+	}
+
+	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
+		this.checkPrerequsitesRemoving(e, s);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Nice getters
+	///////////////////////////////
+	///////////////////////////////
+	
+	
+	
+	
+	
+	/**
+	 * Find the list of all ScheduleElements in any semester of this Schedule.
+	 * @return
+	 */
+	public ArrayList<ScheduleElement> getAllElements(){
 		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
 		for(Semester s : semesters){
 			result.addAll(s.getElements());
@@ -140,20 +263,57 @@ public class Schedule {
 		return result;
 	}
 	
-	public ArrayList<Requirement> allRequirements(){
+	/**
+	 * Find the list of all requirements in any major of this schedule.
+	 * May include duplicate requirements if two majors share a requirement.
+	 * @return
+	 */
+	public ArrayList<Requirement> getAllRequirements(){
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
 		return result;
 	}
+	
+	
+	
+	
 
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Prerequisite error checking
+	///////////////////////////////
+	///////////////////////////////
+	
 	/**
 	 * Check every element to see if it has all the prereqs it needs.
 	 */
 	public void checkAllPrerequsites(){
-
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
@@ -165,31 +325,145 @@ public class Schedule {
 			}
 		}
 	}
-
-
-	public void checkPrerequsites(ScheduleElement e, SemesterDate sD){
-		Prefix p = e.getPrefix();
+	public void checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
+		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
+		if(!needed.isEmpty()){
+			//throw new PrerequsiteException(needed, e);
+		}
+	}
+	public HashSet<Prefix> prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
-			return;
+			return new HashSet<Prefix>();
 		}
 		else{
-			HashSet<Prefix> taken = new HashSet<Prefix>();
-			for(Semester s : semesters){
-				// Allow courses taken before or in the same semester.
-				if(s.semesterDate.compareTo(sD) < 1){
-					for (ScheduleElement earlier : s.getElements()){
-						Prefix earlierPrefix = earlier.getPrefix();
-						taken.add(earlierPrefix);
+			HashSet<Prefix> taken = prefixesTakenBefore(sD);
+			taken.addAll(prefixesTakenIn(sD));
+			HashSet<Prefix> needed = masterList.missingPrereqsDeep(p, taken);
+			return needed;
+		}
+	}
+	
+	public void checkPrerequsitesRemoving(ScheduleElement e, Semester s){
+		Prefix currentP = e.getPrefix();
+		for(Semester other : this.semesters){
+			if(other.getDate().compareTo(s.getDate()) >= 0 ){
+				for(ScheduleElement oElement : s.getElements()){
+					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
+					if(needed.contains(currentP)){
+						//throw new PrerequsiteException(needed, oElement);
 					}
 				}
 			}
-			HashSet<Prefix> needed = masterList.missingPrereqsDeep(p, taken);
-			if(!needed.isEmpty()){
-				//throw new PrerequsiteException(needed, e);
-			}
-
 		}
 	}
+	public void checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
+			ScheduleElement oldE, ScheduleElement newE){
+		//If newP is null or if the prefixes are different, we're really just doing an
+		// add and a remove.
+		Prefix newP = newE.getPrefix();
+		if(newP == null){
+			checkPrerequsitesRemoving(oldE, oldSem);
+			checkPrerequsitesFor(newE, newSem.semesterDate);
+		}
+		//If they're equal, we're really moving the time we take this class.
+		// Check to see if anything happening before the new placement but
+		// after the old placement now has a prerequsite not filled.
+		if(newP.equals(oldE.getPrefix())){
+			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
+				return;
+			}
+			for(Semester s : this.semesters){
+				//prefixes between oldSem and newSem inclusive.
+				HashSet<Prefix> beforeNew = this.prefixesTakenBefore(newSem.semesterDate);
+				HashSet<Prefix> afterOld = this.prefixesTakenAfter(oldSem.semesterDate);
+				HashSet<Prefix> old = this.prefixesTakenIn(oldSem);
+				afterOld.addAll(old);
+				afterOld.retainAll(beforeNew);
+				for(Prefix p : afterOld){
+					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
+						//throw new PrerequsiteException(new Prefix[]{newP}, p);
+					}
+				}
+			}
+		}
+		else{
+			checkPrerequsitesRemoving(oldE, oldSem);
+			checkPrerequsitesFor(newE, newSem.semesterDate);
+		}
+	}
+	
+	
+	/**
+	 * All prefixes taken before or including this semester.
+	 * @param sd
+	 * @return
+	 */
+	public HashSet<Prefix> prefixesTakenBefore(SemesterDate sd){
+		HashSet<Prefix> taken = new HashSet<Prefix>();
+		for(Semester s : semesters){
+			// Allow courses taken before or in the same semester.
+			if(s.semesterDate.compareTo(sd) < 0){
+				taken.addAll(prefixesTakenIn(s));
+			}
+		}
+		return taken;
+	}
+	/**
+	 * All prefixes scheduled strictly after this semester.
+	 * @param sd
+	 * @return
+	 */
+	public HashSet<Prefix> prefixesTakenAfter(SemesterDate sd){
+		HashSet<Prefix> taken = new HashSet<Prefix>();
+		for(Semester s : semesters){
+			// Allow courses taken before or in the same semester.
+			if(s.semesterDate.compareTo(sd) > 0){
+				taken.addAll(prefixesTakenIn(s));
+			}
+		}
+		return taken;
+	}
+	public HashSet<Prefix> prefixesTakenIn(SemesterDate sD){
+		HashSet<Prefix> taken = new HashSet<Prefix>();
+		for(Semester s : semesters){
+			// Allow courses taken before or in the same semester.
+			if(s.semesterDate.compareTo(sD) == 0){
+				taken.addAll(prefixesTakenIn(s));
+			}
+		}
+		return taken;
+	}
+	public HashSet<Prefix> prefixesTakenIn(Semester s){
+		HashSet<Prefix> result = new HashSet<Prefix>();
+		for(ScheduleElement e : s.getElements()){
+			result.add(e.getPrefix());
+		}
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Duplicate error checking
+	///////////////////////////////
+	///////////////////////////////
 
 
 
@@ -198,13 +472,18 @@ public class Schedule {
 	 * If one is found, throw an exception.
 	 */
 	public void checkDuplicates(){
-		for( ScheduleElement element : allElements()){
+		for( ScheduleElement element : getAllElements()){
 			checkDuplicates(element);
 		}
 	}
 	public void checkDuplicates(ScheduleElement e){
-		for(ScheduleElement e1 : allElements()){
+		int exactDuplicateCount = 0;
+		for(ScheduleElement e1 : getAllElements()){
 			if(e1 == e){
+				exactDuplicateCount++;
+				if(exactDuplicateCount > 1){
+					//throw new DuplicateException(e1, e);
+				}
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
@@ -216,6 +495,11 @@ public class Schedule {
 
 
 
+	///////////////////////////////
+	///////////////////////////////
+	//	Course overlap error checking
+	///////////////////////////////
+	///////////////////////////////
 
 	/**
 	 * Check all semesters to see if any elements in them
@@ -227,24 +511,40 @@ public class Schedule {
 		}
 	}
 
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Keeping requirements up to date
+	///////////////////////////////
+	///////////////////////////////
+	// Two main booleans are used here:
+	// reqsValid and reqsFulfilledValid.
+	// 
+	// reqsValid tells if all the 
+	// requirements in all majors are up-to-date
+	// and know how many scheduled elements are currently
+	// satisfying them
+	//
+	// reqsFulfilledValid tells if each scheduleElement knows
+	// which requirements it satisfies.
 
 
 	/**
-	 * Forces a full update of all of the requirements
-	 *  based on the majors currently included 
-	 *  and the courses currently taken 
+	 * Forces a full update of all of the requirements,
+	 * ensuring that all majors know which courses have been
+	 * taken that satisfy any of their requirements.
 	 *  
 	 */
 	public void updateReqs(){
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
-		
-		for(Requirement r : this.allRequirements()){
+		for(Requirement r : this.getAllRequirements()){
 			r.numFinished = 0;
 		}
 		//update all requirements satisfied by this schedule element.
-		for(ScheduleElement e : allElements()){
+		for(ScheduleElement e : getAllElements()){
 			for (Requirement r : getRequirementsSatisfied(e)){
 				r.numFinished ++;
 			}
@@ -252,19 +552,29 @@ public class Schedule {
 		reqsValid = true;
 	}
 	
-	public void updateRequirement(Requirement r){
+	/**
+	 * Count the number of currently placed schedule elements
+	 * satisfying this requirement.
+	 * @param r
+	 */
+	public int updateRequirement(Requirement r){
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
 		r.numFinished = 0;
-		for(ScheduleElement e : allElements()){
+		for(ScheduleElement e : getAllElements()){
 			if(r.isSatisfiedBy(e)){
 				r.numFinished ++;
 			}
 		}
+		return r.numFinished;
 	}
 	
 
+	/**
+	 * Get the number of requirements still left to put in the schedule.
+	 * @return
+	 */
 	public int totalRequirementsLeft(){
 		if(!reqsValid){
 			updateReqs();
@@ -280,12 +590,18 @@ public class Schedule {
 
 	
 
+	/**
+	 * Find all the requirements that this ScheduleElement satisfies.
+	 * @param e
+	 * @return
+	 */
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
 		if(!reqsFulfilledValid){
 			this.updateRequirementsSatisfied(e);
 		}
 		return e.getRequirementsFulfilled();
 	}
+	
 	
 	/**
 	 * /**
@@ -303,11 +619,11 @@ public class Schedule {
 			updateRequirementsSatisfied((Course) e);
 		}
 		if(e instanceof Requirement){
-			
+			updateRequirementsSatisfied((Requirement)e);
 		}
 	}
 	private void updateRequirementsSatisfied(Requirement r){
-		//TODO
+		//TODO fill this out.
 	}
 	
 	private void updateRequirementsSatisfied(Course c){
@@ -352,13 +668,28 @@ public class Schedule {
 	 * which current requirements it can satisfy.
 	 */
 	public void updateAllReqsFulfilled(){
-		for (ScheduleElement e : allElements()){
+		for (ScheduleElement e : getAllElements()){
 			updateRequirementsSatisfied(e);
 		}
 		reqsFulfilledValid = true;
 	}
 
 
+
+	/**
+	 * Return an up-to-date list of all requirements from any major,
+	 * but remove duplicate requirements (according to Requirement.equals)
+	 * @return
+	 */
+	public ArrayList<Requirement> getUniqueRequirementsList(){
+		if(! reqsValid){
+			updateReqs();
+		}
+		HashSet<Requirement> result = new HashSet<Requirement>(this.getAllRequirements());
+		return new ArrayList<Requirement>(result);
+	}
+	
+	
 	public ArrayList<Major> getMajors(){
 		//Update major requirements.
 		// This may need to be done even if requirementsList is valid,
@@ -373,39 +704,14 @@ public class Schedule {
 		return this.majorsList;
 	}
 
-	/**
-	 * Return an up-to-date list of all requirements from any major,
-	 * but remove duplicate requirements (according to Requirement.equals)
-	 * @return
-	 */
-	public ArrayList<Requirement> getUniqueRequirementsList(){
-		if(! reqsValid){
-			updateReqs();
-		}
-		HashSet<Requirement> result = new HashSet<Requirement>(this.allRequirements());
-		return new ArrayList<Requirement>(result);
-	}
 
-	public void addMajor(Major newMajor){
-		majorsList.add(newMajor);
-		//Tell the courses which requirements they satisfy
-		reqsFulfilledValid = false;
-		//Tell the new requirements if some taken course satisfies them.
-		reqsValid = false;
-	}
-
-
-	public void removeMajor(Major major) {
-		majorsList.remove(major);
-		reqsValid = false;
-		reqsFulfilledValid = false;
-	}
 
 
 
 	public int getCreditHoursComplete(){
+		//TODO replace with each semester's getCreditHours method
 		int result = 0;
-		for (ScheduleElement e : allElements()){
+		for (ScheduleElement e : getAllElements()){
 			if(e instanceof Course){
 				result += ((Course)e).creditHours;
 			}
@@ -413,14 +719,7 @@ public class Schedule {
 		return result;
 	}
 
-	
-	public void addRequirementElement(Requirement req, Semester sem) {
-		sem.add(req);
-	}
 
-	public void addScheduleElement(ScheduleElement element, Semester sem) {
-		sem.add(element);
-	}
 
 
 
