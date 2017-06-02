@@ -9,8 +9,12 @@ package scheduler;
  */
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -42,6 +46,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	public String reqsText = "Requirements Left: ";
 	Driver d;
 	
+	
 
 
 	public SchedulePanel(Schedule sch, Driver d) {
@@ -55,7 +60,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		
 		this.setBackground(Color.white);
 		//This will be deleted once we set it relative to the whole. 
-		this.setPreferredSize(new Dimension(700, 400));
+		//this.setPreferredSize(new Dimension(700, 400));
 		this.setLayout(new BorderLayout());
 
 		this.infoPanel = new JPanel();
@@ -97,20 +102,27 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 		d.GUISemesterPanelAdded();
 
-
-
 	}
+	
 
 
 
 	public void update(Schedule sch) {
 		scrollPanel.removeAll();
-		scrollPanel.setLayout(new GridLayout(1, sch.semesters.size()+1, 5, 5));
+		scrollPanel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = gbc.VERTICAL;
+		gbc.insets = new Insets(5,5,5,5);
+		
 		for(Semester s: sch.semesters){
 			SemesterPanel semester = new SemesterPanel(s, this.d);
-			scrollPanel.add(semester);
+			scrollPanel.add(semester, gbc);
+			gbc.gridx ++;
 		}
-		scrollPanel.add(addExtraSemesterButtonPanel);
+		gbc.fill = gbc.NONE;
+		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
 		
 		this.creditHoursLabel.setText(this.cHText + (230 - sch.getCreditHoursComplete()));
 		this.reqsLeftLabel.setText(this.reqsText + sch.totalRequirementsLeft());
