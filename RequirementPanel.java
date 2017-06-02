@@ -56,6 +56,8 @@ public class RequirementPanel extends JPanel {
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 		this.setBorder(new BevelBorder(BevelBorder.RAISED));
+		
+		
 	
 		
 		
