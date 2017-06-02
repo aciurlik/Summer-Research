@@ -31,7 +31,7 @@ public class ExtrasAddList {
 		if(type.equals(MenuOptions.addMajor)){
 			ListOfMajors majors = ListOfMajors.testList(); //Links to test Major
 			ArrayList<Major> collectionOfMajors =  majors.getGUIMajors();
-			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfMajors);
+			displayThings = d.sch.filterAlreadyChosenMajors(collectionOfMajors);
 			createDiaologBox(type);
 
 		}
@@ -39,14 +39,14 @@ public class ExtrasAddList {
 		if(type.equals(MenuOptions.addMinor)){
 			ListOfMajors majors = ListOfMajors.testList();//Links to test List
 			ArrayList<Major> collectionOfMinors =  majors.getGUIMinor();
-			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfMinors);
+			displayThings = d.sch.filterAlreadyChosenMajors(collectionOfMinors);
 			createDiaologBox(type);
 		}
 
 		if(type.equals(MenuOptions.addTrack)){
 			ListOfMajors majors = ListOfMajors.testList();
 			ArrayList<Major> collectionOfTrack =  majors.getGUITrack();
-			displayThings = d.sch.removeAlreadyChosenMajors(collectionOfTrack);
+			displayThings = d.sch.filterAlreadyChosenMajors(collectionOfTrack);
 			createDiaologBox(type);
 
 		}

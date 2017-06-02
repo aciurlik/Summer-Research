@@ -80,9 +80,11 @@ public class Semester implements Comparable<Semester>{
 	public int compareTo(Semester other){
 		return this.semesterDate.compareTo(other.semesterDate);
 	}
+	
+	
 	/**
 	 * Add a schedule element to this semester.
-	 * This semester will handle error checks and changes in the Schedule.
+	 * This method should only be called by Schedule.
 	 * @param e
 	 * @return
 	 */
@@ -90,7 +92,7 @@ public class Semester implements Comparable<Semester>{
 		this.checkOverload(e);
 		//this.schedule.checkErrorsWhenAdding(e,this);
 		this.elements.add(e);
-		this.schedule.added(e, this);
+		//this.schedule.added(e, this);
 		return true;
 
 	}
