@@ -208,7 +208,7 @@ public class Schedule {
 	
 	public void checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
 		this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement);
-		newS.checkOverlap(newElement);
+		newS.checkOverlap(newElement); //TODO if the newElement overlaps the old element, this will still throw the error.
 		checkDuplicates(newElement);
 	}
 
