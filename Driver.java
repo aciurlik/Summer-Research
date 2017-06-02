@@ -137,7 +137,7 @@ public class Driver{
 	}
 
 	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
-		return sch.removeAlreadyChosenMajors(collectionOfMajors);
+		return sch.filterAlreadyChosenMajors(collectionOfMajors);
 
 
 	}
