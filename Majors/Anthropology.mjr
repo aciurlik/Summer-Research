@@ -1,0 +1,7 @@
+Anthropology
+REQ:{Number to Choose: {1} Choices: {{ANT-101}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ANT-105}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ANT-401}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ANT-202}{ANT-203}{ANT-204}{ANT-205}{ANT-210}{ANT-211}{ANT-250}{ANT-223}{ANT-225}{ANT-227}{ANT-325}{ANT-209}} DDN: {1} Requirement Name:{1 Regional Course}}
+REQ:{Number to Choose: {1} Choices: {{ANT-202}{ANT-203}{ANT-204}{ANT-205}{ANT-210}{ANT-211}{ANT-250}{ANT-223}{ANT-225}{ANT-227}{ANT-325}{ANT-209}{ANT-110}{ANT-302}{ANT-303}{ANT-344}{ANT-501}{CLS-211}{FYW-1117}{LNG-210}{LNG-220}{LNG-230}{LNG-240}{ANT-312}} DDN: {1} Requirement Name:{1 Topical Course}}
+REQ:{Number to Choose: {3} Choices: {{ANT-110}{ANT-302}{ANT-303}{ANT-344}{ANT-501}{CLS-211}{FYW-1117}{LNG-210}{LNG-220}{LNG-230}{LNG-240}{ANT-312}} DDN: {1} Requirement Name:{3 Topical or Regional Courses}}
