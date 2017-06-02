@@ -208,7 +208,7 @@ public class Schedule {
 	
 	public void checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
 		this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement);
-		newS.checkOverlap(newElement);
+		newS.checkOverlap(newElement); //TODO if the newElement overlaps the old element, this will still throw the error.
 		checkDuplicates(newElement);
 	}
 
@@ -323,7 +323,7 @@ public class Schedule {
 				if(!success){
 					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
 					
-					throw new PrerequsiteException(needed,e);
+					//throw new PrerequsiteException(needed,e);
 				}
 			}
 		}
@@ -353,7 +353,7 @@ public class Schedule {
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-						throw new PrerequsiteException(needed, oElement);
+						//throw new PrerequsiteException(needed, oElement);
 					}
 				}
 			}
@@ -490,7 +490,7 @@ public class Schedule {
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
-				throw new DuplicateException(e1, e);
+				//throw new DuplicateException(e1, e);
 			}
 		}
 	}
@@ -626,7 +626,15 @@ public class Schedule {
 		}
 	}
 	private void updateRequirementsSatisfied(Requirement r){
-		//TODO fill this out.
+		r.fulfills = new ArrayList<Requirement>();
+		r.fulfills.add(r); //r will have the same doubleDipNumber as itself.
+		for(Requirement otherReq : this.getAllRequirements()){
+			if(r.subset(otherReq) && 
+					r.doubleDipNumber != 0 &&
+					r.doubleDipNumber != otherReq.doubleDipNumber){
+				r.fulfills.add(otherReq);
+			}
+		}
 	}
 	
 	private void updateRequirementsSatisfied(Course c){
