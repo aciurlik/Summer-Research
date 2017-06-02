@@ -32,7 +32,7 @@ public class SupriseMe extends JPanel implements ActionListener {
 		this.s=s;
 
 		frame = new JFrame();
-
+		
 
 		ArrayList<Course> getReady = sch.masterList.getCoursesIn(s);
 		Random rand = new Random();

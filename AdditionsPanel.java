@@ -120,9 +120,12 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 			d.GUIOutsideLink(e.getActionCommand());
 
 		}
-		if(e.getActionCommand().equals(MenuOptions.addSummerClass)|| (e.getActionCommand().equals(MenuOptions.addMayX))){
-			d.GUIYearsPopUP(e.getActionCommand());
+		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
+			d.GUIChooseSummerSession();
 
+		}
+		if(e.getActionCommand().equals(MenuOptions.addMayX)){
+			d.GUIYearsPopUP(e.getActionCommand());
 		}
 
 

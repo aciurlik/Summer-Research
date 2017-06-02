@@ -112,7 +112,9 @@ public class Schedule {
 	 * @param newElement
 	 */
 	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
+
 		checkErrorsWhenReplacing(s, s, oldElement, newElement);
+
 		s.replace(oldElement, newElement);
 		if(this.reqsFulfilledValid){
 			//keep the reqsFufilled set valid
@@ -320,7 +322,8 @@ public class Schedule {
 				boolean success = masterList.checkPrereqsShallow(e.getPrefix(), taken);
 				if(!success){
 					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
-					//throw new PrerequsiteException(needed,e);
+					
+					throw new PrerequsiteException(needed,e);
 				}
 			}
 		}
@@ -350,7 +353,7 @@ public class Schedule {
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-						//throw new PrerequsiteException(needed, oElement);
+						throw new PrerequsiteException(needed, oElement);
 					}
 				}
 			}
@@ -487,7 +490,7 @@ public class Schedule {
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
-				//throw new DuplicateException(e1, e);
+				throw new DuplicateException(e1, e);
 			}
 		}
 	}

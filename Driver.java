@@ -33,7 +33,8 @@ public class Driver{
 	String instructCourse = "Please pick the course you would like to add to your ";
 	String headInstructCourse = "Pick a course";
 	Course[] coursesDialog;
-	
+	String summerOverload = "You need to delete a course before you can add another";
+
 
 
 
@@ -90,10 +91,10 @@ public class Driver{
 		Schedule current = new Schedule(sch.masterList, sch.semesters.get(0).semesterDate, null);
 		sch = current;
 		this.update();
-		
+
 	}
 
-	
+
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
 		this.update();
@@ -181,15 +182,27 @@ public class Driver{
 
 	}
 
+
+
+	public void GUIChooseSummerSession() {
+		String[] summerChoice = {MenuOptions.summerSessionOne, MenuOptions.summerSessionTwo};
+		String c = (String)JOptionPane.showInputDialog(popUP, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
+		GUIYearsPopUP(c);
+	}
+
 	public void GUIYearsPopUP(String actionCommand){
-		if(actionCommand.equals(MenuOptions.addSummerClass)){
-			season= SemesterDate.SUMMER;
-			seasonName = "Summer Class";
+		if(actionCommand.equals(MenuOptions.summerSessionOne)){
+			season= SemesterDate.SUMMERONE;
+			seasonName = MenuOptions.summerSessionOne;
+		}
+		if(actionCommand.equals(MenuOptions.summerSessionTwo)){
+			season = SemesterDate.SUMMERTWO;
+			seasonName = MenuOptions.summerSessionTwo;
 		}
 
 		if(actionCommand.equals(MenuOptions.addMayX)){
 			season= SemesterDate.MAYX;
-			seasonName = "May X";
+			seasonName = MenuOptions.mayX;
 		}
 
 
@@ -230,7 +243,7 @@ public class Driver{
 		}
 	}
 
-	public void addCourseDialogBox(String season, Semester s){
+	public void addCourseDialogBox(String season, Semester s){	
 		ArrayList<Course> addCourses = new ArrayList<Course>();
 		addCourses = CourseList.testList().getCoursesIn(s);
 		Course[] toAdd = new Course[addCourses.size()];
@@ -244,17 +257,37 @@ public class Driver{
 				if(season.equals(MenuOptions.changeInstruct)){
 					s.elements.clear();
 				}
+
 				sch.addScheduleElement(c, s);
 				this.update();
 
+			}	
+		}
+	}
+
+	public void GUIAddCourseWithRequirement(ScheduleElement s, SemesterPanel container, String action) {
+		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
+		Course[] toAdd = new Course[listOfCourses.size()];
+		for(int i =0; i<listOfCourses.size(); i++){
+			toAdd[i]=listOfCourses.get(i);
+		}
+		if(listOfCourses.size()>0){
+			Course c = (Course)JOptionPane.showInputDialog(popUP, action , action , JOptionPane.PLAIN_MESSAGE, icon, toAdd, "Dr. Fray");
+			if(c!=null && c instanceof Course){
+				sch.replaceElement(container.sem, s, c);
+				this.update();
 			}
 		}
 	}
 
+
+
+
+
 	public void GUIRemoveMajorDialogBox(String actionCommand) {
 		ArrayList<Major> removeMajor = new ArrayList<Major>();
 		removeMajor = sch.majorsList;
-		
+
 		//Make Note to test This
 		if(actionCommand.equals(MenuOptions.removeMinor)){
 			for(Major m : removeMajor){
@@ -272,42 +305,44 @@ public class Driver{
 				}
 			}
 		}
-			Major[] toRemove = new Major[removeMajor.size()];
-			if(removeMajor.size() != 0){
-				for(int i = 0; i<removeMajor.size(); i++){
-					toRemove[i] = removeMajor.get(i);
-				}
-				
+		Major[] toRemove = new Major[removeMajor.size()];
+		if(removeMajor.size() != 0){
+			for(int i = 0; i<removeMajor.size(); i++){
+				toRemove[i] = removeMajor.get(i);
+			}
+
 			Major m = (Major) JOptionPane.showInputDialog(popUP, actionCommand, actionCommand, JOptionPane.PLAIN_MESSAGE,icon, toRemove, "Cat" );
 			if((m != null) && (m instanceof Major)){
 				sch.removeMajor(m);
 				this.update();
 			}
-			}
 		}
-		
-	public void GUISupriseWindow(Semester s) {
-		
-		new SupriseMe(sch, s, this);
-		
-		
-		
 	}
-	
-	
-	
-	
-	
-	
+
+	public void GUISupriseWindow(Semester s) {
+
+		new SupriseMe(sch, s, this);
+
+
+
+	}
+
 	public void GUIChallengeExcepted(Semester s, Course c){
 		if(s.semesterDate.sNumber==SemesterDate.MAYX){
 			s.elements.clear();
+
 		}
-		sch.addScheduleElement(c, s);
-		this.update();
+		if(s.semesterDate.sNumber == SemesterDate.SUMMERONE || s.semesterDate.sNumber == SemesterDate.SUMMERTWO){
+
+			sch.addScheduleElement(c, s);
+			this.update();
+		}
+
 	}
 
-
+	public void SummerOverloadDialog(){
+		JOptionPane.showMessageDialog(popUP, summerOverload, "Summer Overload", JOptionPane.INFORMATION_MESSAGE, icon);
+	}
 	public void updateAll(){
 		schP.update(sch);
 		reqs.update(sch);
@@ -332,15 +367,23 @@ public class Driver{
 
 
 	public static void main(String[] args){
-		new Driver();
+		try{
+			new Driver();
+		}
+		catch(SchedulingException e){
+			e.printStackTrace();
+		}
 
 
 	}
 
-	
 
-	
-	
+
+
+
+
+
+
 
 
 
