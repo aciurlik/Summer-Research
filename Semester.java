@@ -75,7 +75,7 @@ public class Semester implements Comparable<Semester>{
 			}
 		}
 		if (totalHours > OverloadLimit){
-			throw new OverloadException();
+			//throw new OverloadException();
 		}
 	}
 

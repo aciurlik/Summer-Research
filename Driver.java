@@ -366,12 +366,7 @@ public class Driver{
 
 
 	public static void main(String[] args){
-		try{
-			new Driver();
-		}
-		catch(SchedulingException e){
-			e.printStackTrace();
-		}
+		new Driver();
 
 
 	}
