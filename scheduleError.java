@@ -14,6 +14,7 @@ public class scheduleError {
 	public scheduleError(String s, ScheduleElement[] offendingCourses){
 		this.error=s;
 		this.duplicateCourses = offendingCourses;
+		
 		if(this.error.equals(MenuOptions.duplicateError)){
 			this.instructions=duplicateCourses[0].getDisplayString() + " duplicates " +  duplicateCourses[1];		
 		}

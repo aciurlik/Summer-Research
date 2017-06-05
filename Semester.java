@@ -42,44 +42,42 @@ public class Semester implements Comparable<Semester>{
 	 */
 	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
-		Course toAdd = null;
-		Course offending = null;
+
 		ArrayList<Course> courses = new ArrayList<Course>();
 		for (ScheduleElement e : this.elements){
 			if(e instanceof Course){
 				courses.add((Course)e);
-				toAdd=(Course) e;
 			}
 		}
-		if(addition != null && (addition instanceof Course)){
-			courses.add((Course) addition);
-		}
+		//	if(addition != null && (addition instanceof Course)){
+		//		courses.add((Course) addition);
+		//}
 		int overlapCounter = 0;
 		if(addition == null){
 			for (int i = 0; i < courses.size() ; i ++){
 				for(int j = i+1; j < courses.size() ; j ++){
 					if(courses.get(i).overlaps(courses.get(j))){
-						if(courses.get(i).equals(toAdd)){
-							offending = courses.get(j);
-
-						}
-						else{
-							offending = courses.get(i);
-						}
 						overlapCounter++;
+						if(overlapCounter > 0){
+							Course[] overlap ={courses.get(i), courses.get(j) };
+							return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+						}
+
 					}
 				}
 			}
 		}
-		if(addition != null){
+		if(addition != null && addition instanceof Course){
 			for(int i= 0; i<courses.size(); i++){
-				if(courses.get(i).overlaps(addition));
-				overlapCounter++;
+				if(courses.get(i).overlaps(addition)){
+					overlapCounter++;
+					if(overlapCounter > 0){
+						Course[] overlap ={courses.get(i), (Course) addition };
+						return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+					}
+				}
 			}
-		}
-		if(overlapCounter > 0){
-			Course[] overlap = {toAdd, offending };
-			return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+
 		}
 		return false;
 	}
