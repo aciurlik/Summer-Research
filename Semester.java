@@ -34,8 +34,6 @@ public class Semester implements Comparable<Semester>{
 	}
 
 	/**
-	 * TODO remake this method so it only checks if the given class has
-	 * overlap, not if the whole semester has overlap.
 	 * Check for any overlap among the Courses in this semester.
 	 * If addition is not equal to null, check if there would be
 	 *   overlap were addition to be added.
@@ -62,7 +60,7 @@ public class Semester implements Comparable<Semester>{
 						overlapCounter++;
 						if(overlapCounter > 0){
 							Course[] overlap ={courses.get(i), courses.get(j) };
-							return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+							return(!this.schedule.userOverride(new ScheduleError(MenuOptions.overlapError, overlap)));
 						}
 
 					}
@@ -75,7 +73,7 @@ public class Semester implements Comparable<Semester>{
 					overlapCounter++;
 					if(overlapCounter > 0){
 						Course[] overlap ={courses.get(i), (Course) addition };
-						return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+						return(!this.schedule.userOverride(new ScheduleError(MenuOptions.overlapError, overlap)));
 					}
 				}
 			}
@@ -107,13 +105,11 @@ public class Semester implements Comparable<Semester>{
 				totalHours = totalHours + ((Requirement) e).getCreditHours();
 			}
 		}
-
 		if(totalHours > OverloadLimit){
-			return (!this.schedule.userOverride(new scheduleError(MenuOptions.overloadError, addition, this.OverloadLimit)));
+			return (!this.schedule.userOverride(new ScheduleError(MenuOptions.overloadError, addition, this.OverloadLimit)));
 		}
 		else{
 			return false;
-
 		}
 	}
 

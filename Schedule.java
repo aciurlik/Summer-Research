@@ -210,24 +210,21 @@ public class Schedule {
 	//	General error checks for GUI events
 	///////////////////////////////
 	///////////////////////////////
-
-	public boolean userOverride(scheduleError s){
+	public boolean userOverride(ScheduleError s){
 		if(this.d != null){
 			return(d.userRequestError(s.error, s.instructions));
 		}
 		else{
 			return true;
 		}
-
-	
-	public void checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
-		this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement);
-		newS.checkOverlap(newElement); //TODO if the newElement overlaps the old element, this will still throw the error.
-		checkDuplicates(newElement);
-
 	}
 
 
+
+	public boolean checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
+		if(this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement)){
+			return true;
+		}
 
 
 		if (checkDuplicates(newElement, false)){
@@ -358,9 +355,7 @@ public class Schedule {
 				boolean success = masterList.missingPrereqsShallow(e.getPrefix(), taken).isEmpty();
 				if(!success){
 					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
-
 					Object[] result = new Object[]{e, needed};
-
 
 				}
 			}
@@ -371,7 +366,7 @@ public class Schedule {
 	public boolean checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
-			return(!this.userOverride(new scheduleError(MenuOptions.preReqError, e, needed)));
+			return(!this.userOverride(new ScheduleError(MenuOptions.preReqError, e, needed)));
 			//throw new PrerequsiteException(needed, e);
 		}
 		return false;
@@ -395,9 +390,7 @@ public class Schedule {
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-
-						return(!this.userOverride(new scheduleError(MenuOptions.preReqError, e, needed)));
-
+						return(!this.userOverride(new ScheduleError(MenuOptions.preReqError, e, needed)));
 					}
 				}
 			}
@@ -423,7 +416,7 @@ public class Schedule {
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
 				HashSet<Prefix> missing =masterList.missingPrereqsShallow(oldE.getPrefix(), taken);
 				if(!missing.isEmpty()){
-					return((this.userOverride(new scheduleError(MenuOptions.preReqError, newE, missing))));
+					return((this.userOverride(new ScheduleError(MenuOptions.preReqError, newE, missing))));
 				}
 			}
 			for(Semester s : this.semesters){
@@ -436,7 +429,7 @@ public class Schedule {
 				for(Prefix p : afterOld){
 					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
 						//throw new PrerequsiteException(new Prefix[]{newP}, p);
-						return(!this.userOverride( new scheduleError(MenuOptions.preReqError ,p, newP)));
+						return(!this.userOverride( new ScheduleError(MenuOptions.preReqError ,p, newP)));
 					}
 				}
 			}
@@ -550,16 +543,14 @@ public class Schedule {
 					ScheduleElement[] result = {e, e1};
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
-						return(!this.userOverride(new scheduleError(MenuOptions.duplicateError, results)));
+						return(!this.userOverride(new ScheduleError(MenuOptions.duplicateError, results)));
 					}
 				}
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
-
 				ScheduleElement[] result = {e, e1};
-				return (!this.userOverride(new scheduleError(MenuOptions.duplicateError, result)));
-
+				return (!this.userOverride(new ScheduleError(MenuOptions.duplicateError, result)));
 			}
 		}
 		return false;
@@ -700,15 +691,7 @@ public class Schedule {
 		}
 	}
 	private void updateRequirementsSatisfied(Requirement r){
-		r.fulfills = new ArrayList<Requirement>();
-		r.fulfills.add(r); //r will have the same doubleDipNumber as itself.
-		for(Requirement otherReq : this.getAllRequirements()){
-			if(r.subset(otherReq) && 
-					r.doubleDipNumber != 0 &&
-					r.doubleDipNumber != otherReq.doubleDipNumber){
-				r.fulfills.add(otherReq);
-			}
-		}
+		//TODO fill this out.
 	}
 
 	private void updateRequirementsSatisfied(Course c){

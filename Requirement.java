@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 
 
@@ -14,8 +13,6 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	int numFinished;
 	int doubleDipNumber;
 	String name;
-	
-	ArrayList<Requirement> fulfills;
 
 	public static final int defaultDDN = 0;
 
@@ -33,8 +30,6 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		Arrays.sort(this.choices);
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = Requirement.defaultDDN;
-		fulfills = new ArrayList<Requirement>();
-		fulfills.add(this);
 	}
 
 	public boolean isSatisfiedBy(ScheduleElement e){
@@ -45,6 +40,12 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 				if(c.coursePrefix.compareTo(p) == 0){
 					return true;
 				}
+			}
+			return false;
+		}
+		else if (e instanceof Requirement){
+			if(this.choices.equals(((Requirement)e).choices)){
+				return true;
 			}
 			return false;
 		}
@@ -171,19 +172,9 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled() {
-		return fulfills;
-	}
-	
-	/**
-	 * If this requirement is a subset of the other, meaning
-	 * all prefixes in this requirement are also in other.
-	 * @param other
-	 * @return
-	 */
-	public boolean subset(Requirement other){
-		HashSet<Prefix> left = new HashSet<Prefix> (Arrays.asList(choices));
-		HashSet<Prefix> right = new HashSet<Prefix> (Arrays.asList(other.choices));
-		return right.containsAll(left);
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		result.add(this);
+		return result;
 	}
 
 	public static Requirement readFromJSON(String s) {
@@ -225,14 +216,11 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 
 	public static void main(String[] args){
-		
-		/*
 		Requirement r = Requirement.testRequirement();
 		System.out.println(r.saveAsJSON());
 		Requirement z = Requirement.readFromJSON(r.saveAsJSON());
 		System.out.println(z.saveAsJSON());
 		System.out.println(z.saveAsJSON().equals(r.saveAsJSON()));
-		*/
 	}
 
 

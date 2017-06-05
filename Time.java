@@ -46,6 +46,8 @@ public class Time implements Comparable<Time>{
 	int minutes; //0 thru 59
 	int seconds; //0 thru 59
 
+
+	public final static int[] daysInMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
 	/**
 	 * Copy constructor
 	 * @param t
@@ -137,11 +139,6 @@ public class Time implements Comparable<Time>{
 			return new int[]{UNUSED,AM};
 		}
 	}
-	
-	public final static int[] daysInMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
-	public static int daysIn(int month){
-		return daysInMonth[month - 1];
-	}
 
 
 	/**
@@ -177,7 +174,7 @@ public class Time implements Comparable<Time>{
 			this.day = (this.day + 1)%7;
 			return;
 		}
-		if(this.day < daysIn(this.month)){
+		if(this.day < daysInMonth[this.month - 1]){
 			this.day += 1;
 			return;
 		}
@@ -211,8 +208,11 @@ public class Time implements Comparable<Time>{
 	}
 
 	public int dayOfWeek(){
-		if(this.month == UNUSED && this.year == UNUSED && this.day == UNUSED){
+		if(this.month == UNUSED || this.year == UNUSED || this.day == UNUSED){
 			this.day=0;
+			
+			//throw new RuntimeException( "Tried to find the day of week for an unspecified date: " + this.toString());
+			
 		}
 		if(this.month==UNUSED && this.year==UNUSED){
 			return this.day;
@@ -260,7 +260,7 @@ public class Time implements Comparable<Time>{
 		int result = 0;
 		int m = 1;
 		while (m < this.month){
-			result += daysIn(m);
+			result += daysInMonth[m-1];
 			m += 1;
 		}
 		if(m >= 3 && this.isLeapYear() ){
@@ -413,8 +413,9 @@ public class Time implements Comparable<Time>{
 			do {
 				String possible = matcher.group();
 				String[] split = possible.split("\\D");
-				int day = Integer.parseInt(split[1]);
-				int month = Integer.parseInt(split[0]);
+				int day = Integer.parseInt(split[0]);
+				//we want month 12 to actually be 11 and january to be 0.
+				int month = Integer.parseInt(split[1]) - 1;
 				int year = Integer.parseInt(split[2]);
 				if(year < 500){
 					if(year < 50){
@@ -424,12 +425,12 @@ public class Time implements Comparable<Time>{
 						year = year + 1900;
 					}
 				}
-				if(month < 1 || month > 12){
+				if(month < 0 || month > 11){
 					month = UNUSED;
 					dateSuccessful = false;
 					continue;
 				}
-				if(day < 0 || day > daysIn(month)){
+				if(day < 0 || day > daysInMonth[month]){
 					if(day != UNUSED){
 						continue;
 					}
@@ -477,17 +478,13 @@ public class Time implements Comparable<Time>{
 					timeSuccessful = false;
 					continue;
 				}
-				if(newMinute > 60 || newMinute < 0){
+				if(newMinute > 60 || newMinute < 1){
 					newMinute = UNUSED;
 					timeSuccessful = false;
 					continue;
 				}
 				timeSuccessful = true;
 			} while (matcher.find(matcher.start(0) + 1) && !timeSuccessful);
-		}
-		
-		if(!dateSuccessful && !timeSuccessful){
-			//System.out.println(s);
 		}
 		
 		
@@ -542,12 +539,9 @@ public class Time implements Comparable<Time>{
 
 
 	public static void main(String[] args){
-		Time t = Time.tryRead("11:00AM");
-		Time s = Time.tryRead("04/28/18");
+		Time t = Time.tryRead("10:30AM");
+		Time s = Time.tryRead("10:30PM");
 
-		System.out.println(t);
-		t.nextDay();
-		t.nextDay();
 		System.out.println(t);
 		System.out.println(s);
 
@@ -580,6 +574,9 @@ public class Time implements Comparable<Time>{
 
 
 	}
+
+
+
 
 
 }
