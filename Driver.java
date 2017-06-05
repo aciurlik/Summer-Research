@@ -265,21 +265,24 @@ public class Driver{
 		}
 	}
 
-	public void GUIAddCourseWithRequirement(ScheduleElement s, SemesterPanel container, String action) {
-		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
-		Course[] toAdd = new Course[listOfCourses.size()];
-		for(int i =0; i<listOfCourses.size(); i++){
-			toAdd[i]=listOfCourses.get(i);
+
+
+	public Course GUIAddCourseWithRequirement(ArrayList <Course> finallistOfCourses, String action) {
+		Course[] toAdd = new Course[finallistOfCourses.size()];
+
+		for(int i =0; i<finallistOfCourses.size(); i++){
+			toAdd[i]=finallistOfCourses.get(i);
 		}
 
-		if(listOfCourses.size()>0){
+		if(finallistOfCourses.size()>0){
 			Course c = (Course)JOptionPane.showInputDialog(popUP, action , action , JOptionPane.PLAIN_MESSAGE, icon, toAdd, "Dr. Fray");
 
 			if(c!=null && c instanceof Course){
-				sch.replaceElement(container.sem, s, c);
-				this.update();
+				return c;
+
 			}
 		}
+		return null;
 
 	}
 

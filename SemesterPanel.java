@@ -285,7 +285,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		d.GUIRemoveElement(e, this);
 		//this.updatePanel(true);
 	}
-
+	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
@@ -302,6 +302,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 
 	}
+
+	
 
 
 }

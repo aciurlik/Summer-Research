@@ -30,7 +30,7 @@ public class RequirementPanel extends JPanel {
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
 
-
+		
 		//Make sure any click on the requirementPanel 
 		// will begin a dragEvent.
 		MouseListener listener = ComponentDragHandler.getDragListener();

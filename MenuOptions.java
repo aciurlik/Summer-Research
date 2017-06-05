@@ -26,7 +26,7 @@ public class MenuOptions {
 	public static final  String removeInstruct = "Delete Semester";
 
 	//Schedule Element Panel
-	public static final  String addCourseWithRequirement = "Add a course";
+	public static final  String addCourseWithRequirement = "Choose a course";
 
 
 	//Suprise Me 

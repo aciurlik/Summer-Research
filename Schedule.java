@@ -797,6 +797,11 @@ public class Schedule {
 
 	}
 
+	public ArrayList<Course> filterAlreadyChosenCourses(ArrayList<Course> collectionOfCourses){
+		collectionOfCourses.removeAll(this.getAllElements());
+		return collectionOfCourses;
+	}
+	
 	public boolean SemesterAlreadyExists(SemesterDate semesterDate) {
 		for(Semester s: this.semesters){
 			if(s.semesterDate.equals(semesterDate)){
