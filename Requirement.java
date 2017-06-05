@@ -53,7 +53,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 			return true;
 		}
 		return false;
-		
+
 	}
 	public void setName(String name){
 		this.name = name;
@@ -181,7 +181,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		//Get the list of objects in this string, after chopping off the first and last characters 
 		// (hopefully "{" and "}" ) and ignoring anything outside brackets ("{" or "}").
 		Iterator<String> i = SaverLoader.fromJSON(SaverLoader.peel(s)).iterator();
-		
+
 		//Peal off each piece of data from this iterator of strings.
 		int numToChoose = Integer.parseInt(SaverLoader.peel(i.next()));
 		Iterable<String> prefixes = SaverLoader.fromJSON(SaverLoader.peel(i.next()));
@@ -200,6 +200,11 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return result;
 	}
 
+	public int getCreditHours() {
+		// TODO Auto-generated method stub
+		return 4;
+	}
+
 	@Override
 	public String saveAsJSON() {
 		return String.format(
@@ -209,7 +214,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 				doubleDipNumber,
 				name);
 	}
-	
+
 	public static void main(String[] args){
 		Requirement r = Requirement.testRequirement();
 		System.out.println(r.saveAsJSON());
@@ -217,4 +222,6 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		System.out.println(z.saveAsJSON());
 		System.out.println(z.saveAsJSON().equals(r.saveAsJSON()));
 	}
+
+
 }

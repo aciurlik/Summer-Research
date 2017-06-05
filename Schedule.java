@@ -7,13 +7,13 @@ import java.util.HashSet;
 public class Schedule {
 	ArrayList<Major> majorsList;
 	ArrayList<Semester> semesters;
-
+	Driver d; 
 
 	CourseList masterList;
 
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
 	boolean reqsFulfilledValid; // the return value of getRequirementsFulfilled 
-		// is valid for all schedule elements
+	// is valid for all schedule elements
 
 	public static Schedule testSchedule(){
 
@@ -54,9 +54,12 @@ public class Schedule {
 			firstSemester = firstSemester.next();
 		}
 
+
 	}
-	
-	
+
+	public void setDriver(Driver d){
+		this.d = d;
+	}
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -111,24 +114,26 @@ public class Schedule {
 	 * @param oldElement
 	 * @param newElement
 	 */
-	public void replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
-
-		checkErrorsWhenReplacing(s, s, oldElement, newElement);
-
-		s.replace(oldElement, newElement);
-		if(this.reqsFulfilledValid){
-			//keep the reqsFufilled set valid
-			updateRequirementsSatisfied(newElement);
+	public boolean replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
+		if	(checkErrorsWhenReplacing(s, s, oldElement, newElement)){
+			return false;
 		}
-		if(this.reqsValid){
-			//Keep the requirements valid. No use doing the work if they aren't valid.
-			for(Requirement r : oldElement.getRequirementsFulfilled()){
-				r.numFinished --;
+		if(s.replace(oldElement, newElement)){
+			if(this.reqsFulfilledValid){
+				//keep the reqsFufilled set valid
+				updateRequirementsSatisfied(newElement);
 			}
-			for(Requirement r : newElement.getRequirementsFulfilled()){
-				r.numFinished ++;
+			if(this.reqsValid){
+				//Keep the requirements valid. No use doing the work if they aren't valid.
+				for(Requirement r : oldElement.getRequirementsFulfilled()){
+					r.numFinished --;
+				}
+				for(Requirement r : newElement.getRequirementsFulfilled()){
+					r.numFinished ++;
+				}
 			}
 		}
+		return true;
 	}
 	/**
 	 * In semester S, remove ScheduleElement e.
@@ -150,7 +155,7 @@ public class Schedule {
 			reqsValid = false;
 		}
 	}
-	
+
 	public void addScheduleElement(ScheduleElement element, Semester sem) {
 		this.checkErrorsWhenAdding(element, sem);
 		sem.add(element);
@@ -162,14 +167,14 @@ public class Schedule {
 			}
 		}
 	}
-	
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Adding and removing Majors
 	///////////////////////////////
 	///////////////////////////////
-	
-	
+
+
 	public void addMajor(Major newMajor){
 		majorsList.add(newMajor);
 		//Tell the courses which requirements they satisfy
@@ -184,8 +189,8 @@ public class Schedule {
 		reqsValid = false;
 		reqsFulfilledValid = false;
 	}
-	
-	
+
+
 	/*				^		^		^
 	 * 				|		|		|
 	 * 				|		|		|
@@ -196,63 +201,91 @@ public class Schedule {
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
-	*/
-	
-	
-		
+	 */
+
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	General error checks for GUI events
 	///////////////////////////////
 	///////////////////////////////
-	
-	public void checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
-		this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement);
-		newS.checkOverlap(newElement);
-		checkDuplicates(newElement);
+	public boolean userOverride(scheduleError s){
+		if(this.d != null){
+			return(d.userRequestError(s.error, s.instructions));
+		}
+		else{
+			return true;
+		}
 	}
 
-	
-	public void checkErrorsWhenAdding(ScheduleElement e, Semester s){
-		checkPrerequsitesFor(e, s.semesterDate);
-		s.checkOverlap(e);
-		checkDuplicates(e);
+
+
+	public boolean checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
+		if(this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement)){
+			return true;
+		}
+
+
+		if (checkDuplicates(newElement, false)){
+			return true;
+		}
+
+		if(newS.checkOverlap(newElement)){
+			return true;
+		}
+
+		return false;
 	}
 
-	public void checkErrorsWhenRemoving(ScheduleElement e, Semester s){
-		this.checkPrerequsitesRemoving(e, s);
+
+	public boolean checkErrorsWhenAdding(ScheduleElement e, Semester s){
+		if(checkPrerequsitesFor(e, s.semesterDate)){
+			return true;
+		}
+		if(s.checkOverlap(e)){
+			return true;
+		}
+		if(checkDuplicates(e,false)){
+			return true;
+		}
+		return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+	public boolean checkErrorsWhenRemoving(ScheduleElement e, Semester s){
+		return(this.checkPrerequsitesRemoving(e, s));
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Nice getters
 	///////////////////////////////
 	///////////////////////////////
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * Find the list of all ScheduleElements in any semester of this Schedule.
 	 * @return
@@ -264,7 +297,7 @@ public class Schedule {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Find the list of all requirements in any major of this schedule.
 	 * May include duplicate requirements if two majors share a requirement.
@@ -277,62 +310,66 @@ public class Schedule {
 		}
 		return result;
 	}
-	
-	
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Prerequisite error checking
 	///////////////////////////////
 	///////////////////////////////
-	
+
 	/**
 	 * Check every element to see if it has all the prereqs it needs.
 	 */
-	public void checkAllPrerequsites(){
+	public Object[] checkAllPrerequsites(){
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
-				boolean success = masterList.checkPrereqsShallow(e.getPrefix(), taken);
+				boolean success = masterList.missingPrereqsShallow(e.getPrefix(), taken).isEmpty();
 				if(!success){
 					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
-					
-					throw new PrerequsiteException(needed,e);
+					Object[] result = new Object[]{e, needed};
+
 				}
 			}
 		}
+		return null;
 	}
-	public void checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
+
+	public boolean checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
+			return(!this.userOverride(new scheduleError(MenuOptions.preReqError, e, needed)));
 			//throw new PrerequsiteException(needed, e);
 		}
+		return false;
 	}
 	public HashSet<Prefix> prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
@@ -345,35 +382,42 @@ public class Schedule {
 			return needed;
 		}
 	}
-	
-	public void checkPrerequsitesRemoving(ScheduleElement e, Semester s){
+
+	public boolean checkPrerequsitesRemoving(ScheduleElement e, Semester s){
 		Prefix currentP = e.getPrefix();
 		for(Semester other : this.semesters){
 			if(other.getDate().compareTo(s.getDate()) >= 0 ){
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-						throw new PrerequsiteException(needed, oElement);
+						return(!this.userOverride(new scheduleError(MenuOptions.preReqError, e, needed)));
 					}
 				}
 			}
 		}
+		return false;
 	}
-	public void checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
+
+	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
 			ScheduleElement oldE, ScheduleElement newE){
 		//If newP is null or if the prefixes are different, we're really just doing an
 		// add and a remove.
 		Prefix newP = newE.getPrefix();
 		if(newP == null){
-			checkPrerequsitesRemoving(oldE, oldSem);
-			checkPrerequsitesFor(newE, newSem.semesterDate);
+			return(checkPrerequsitesRemoving(oldE, oldSem));
+			//	checkPrerequsitesFor(newE, newSem.semesterDate);
 		}
 		//If they're equal, we're really moving the time we take this class.
 		// Check to see if anything happening before the new placement but
 		// after the old placement now has a prerequsite not filled.
 		if(newP.equals(oldE.getPrefix())){
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
-				return;
+				HashSet<Prefix> taken  = this.prefixesTakenBefore(newSem.semesterDate);
+				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
+				HashSet<Prefix> missing =masterList.missingPrereqsShallow(oldE.getPrefix(), taken);
+				if(!missing.isEmpty()){
+					return((this.userOverride(new scheduleError(MenuOptions.preReqError, newE, missing))));
+				}
 			}
 			for(Semester s : this.semesters){
 				//prefixes between oldSem and newSem inclusive.
@@ -385,17 +429,19 @@ public class Schedule {
 				for(Prefix p : afterOld){
 					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
 						//throw new PrerequsiteException(new Prefix[]{newP}, p);
+						return(!this.userOverride( new scheduleError(MenuOptions.preReqError ,p, newP)));
 					}
 				}
 			}
 		}
 		else{
-			checkPrerequsitesRemoving(oldE, oldSem);
-			checkPrerequsitesFor(newE, newSem.semesterDate);
+			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesFor(newE, newSem.semesterDate));
+
 		}
+		return false;
 	}
-	
-	
+
+
 	/**
 	 * All prefixes taken before or including this semester.
 	 * @param sd
@@ -443,25 +489,25 @@ public class Schedule {
 		}
 		return result;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Duplicate error checking
@@ -474,25 +520,40 @@ public class Schedule {
 	 * Check all semesters for duplicates.
 	 * If one is found, throw an exception.
 	 */
-	public void checkDuplicates(){
+	public boolean  checkDuplicates(){
 		for( ScheduleElement element : getAllElements()){
-			checkDuplicates(element);
+			if(checkDuplicates(element, true)){
+				return checkDuplicates(element, true);
+			}
 		}
+		return false;
 	}
-	public void checkDuplicates(ScheduleElement e){
-		int exactDuplicateCount = 0;
+
+
+	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded){
+		int exactDuplicateCount = 1;
+		if(alreadyAdded){
+			exactDuplicateCount = 0;
+		}
+
 		for(ScheduleElement e1 : getAllElements()){
 			if(e1 == e){
 				exactDuplicateCount++;
 				if(exactDuplicateCount > 1){
-					//throw new DuplicateException(e1, e);
+					ScheduleElement[] result = {e, e1};
+					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
+						ScheduleElement[] results = {e, e1};
+						return(!this.userOverride(new scheduleError(MenuOptions.duplicateError, results)));
+					}
 				}
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
-				throw new DuplicateException(e1, e);
+				ScheduleElement[] result = {e, e1};
+				return (!this.userOverride(new scheduleError(MenuOptions.duplicateError, result)));
 			}
 		}
+		return false;
 	}
 
 
@@ -508,14 +569,18 @@ public class Schedule {
 	 * Check all semesters to see if any elements in them
 	 * have overlapping times (are taken at the same time)
 	 */
-	public void checkOverlap(){
+	public boolean checkOverlap(){
 		for(Semester s : semesters){
-			s.checkOverlap(null);
+			if(s.checkOverlap(null)){
+				return s.checkOverlap(null);
+			}
+
 		}
+		return false;
 	}
 
-	
-	
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Keeping requirements up to date
@@ -554,7 +619,7 @@ public class Schedule {
 		}
 		reqsValid = true;
 	}
-	
+
 	/**
 	 * Count the number of currently placed schedule elements
 	 * satisfying this requirement.
@@ -572,7 +637,7 @@ public class Schedule {
 		}
 		return r.numFinished;
 	}
-	
+
 
 	/**
 	 * Get the number of requirements still left to put in the schedule.
@@ -591,7 +656,7 @@ public class Schedule {
 		return result;
 	}
 
-	
+
 
 	/**
 	 * Find all the requirements that this ScheduleElement satisfies.
@@ -604,8 +669,8 @@ public class Schedule {
 		}
 		return e.getRequirementsFulfilled();
 	}
-	
-	
+
+
 	/**
 	 * /**
 	 * Tells this scheduleElement the list of requirements that it satisfies.
@@ -628,7 +693,7 @@ public class Schedule {
 	private void updateRequirementsSatisfied(Requirement r){
 		//TODO fill this out.
 	}
-	
+
 	private void updateRequirementsSatisfied(Course c){
 		c.clearReqsSatisfied();
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
@@ -691,8 +756,8 @@ public class Schedule {
 		HashSet<Requirement> result = new HashSet<Requirement>(this.getAllRequirements());
 		return new ArrayList<Requirement>(result);
 	}
-	
-	
+
+
 	public ArrayList<Major> getMajors(){
 		//Update major requirements.
 		// This may need to be done even if requirementsList is valid,
@@ -740,6 +805,8 @@ public class Schedule {
 		}
 		return false;
 	}
+
+
 
 
 

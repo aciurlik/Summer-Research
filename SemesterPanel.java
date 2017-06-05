@@ -62,7 +62,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			public void actionPerformed(ActionEvent e){
 
 				show();
-				
+
 			}
 		}
 				);
@@ -74,7 +74,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.add(defaultPanel);
 		this.updatePanel();
 	}
-	
+
 	public void show(){
 		remove(hidePanel);
 		add(defaultPanel);
@@ -131,9 +131,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
-    else{
-      hide();
-    }
+		else{
+			hide();
+		}
 
 	}
 
@@ -182,7 +182,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		if(season == null){
 			season="Error";
 		}
-		
+
 		season +=  " " + sem.semesterDate.year;
 		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
 		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
@@ -199,14 +199,14 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			JLabel dropLabel = newDropLabel();
 			defaultPanel.add(dropLabel);
 		}
-		
+
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
-		
+
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
-			
+
 			for (int i= 0; i<DropsNeeded; i++){
 				JLabel dropLabel = newDropLabel();
 				defaultPanel.add(dropLabel);
@@ -225,7 +225,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			JButton removeCourse = new JButton(MenuOptions.removeInstruct);
 			removeCourse.setActionCommand(MenuOptions.removeInstruct);
 			removeCourse.addActionListener(this);
-			
+
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new FlowLayout());
 			buttonPanel.setBackground(defaultPanel.getBackground());
@@ -236,11 +236,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			if(sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber == SemesterDate.SUMMERTWO){
 				changeCourse = makeAddChangeButton(MenuOptions.addInstruct);
 			}
-			
+
 			JButton supriseMe = new JButton(MenuOptions.supriseMe);
 			supriseMe.setActionCommand(MenuOptions.supriseMe);
 			supriseMe.addActionListener(this);
-			
+
 			buttonPanel.add(supriseMe);
 			buttonPanel.add(changeCourse);
 			buttonPanel.add(removeCourse);

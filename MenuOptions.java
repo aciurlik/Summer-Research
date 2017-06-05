@@ -1,5 +1,10 @@
 import javax.swing.JButton;
 
+
+//https://stackoverflow.com/questions/16267562/making-a-jpanel-into-a-joptionpane-ok-option
+
+
+
 public class MenuOptions {
 	//Both Additions and Menu
 	public static final  String addMajor = "Add Major";
@@ -13,21 +18,21 @@ public class MenuOptions {
 	public static final  String summerSessionOne = "Summer Session One";
 	public static final  String summerSessionTwo = "Summer Session Two";
 	public static final  String mayX = "May X";
-	
+
 	//Semester Panel
 	public static final  String addInstruct = "Add a Course";
 	public static final  String supriseMe = "Suprise Me!";
 	public static final  String changeInstruct = "Change Course";
 	public static final  String removeInstruct = "Delete Semester";
-	
+
 	//Schedule Element Panel
 	public static final  String addCourseWithRequirement = "Add a course";
-	
-	
+
+
 	//Suprise Me 
 	public static final  String Want = "I want it";
 	public static final  String Challenge = "Take the Challenge";
-	
+
 	//Only Menu Bar 
 	public static final  String openSchedule = "Open Schedule";
 	public static final  String newSchedule = "New Schedule";
@@ -37,4 +42,10 @@ public class MenuOptions {
 	public static final  String removeTrack = "Remove Track";
 	public static final  String removeMinor = "Remove Minor";
 	public static final  String exploreMayX = "Explore MayX Opportunities";
+
+	//Duplicate Errors
+	public static final String duplicateError = "Duplicate Error";
+	public static final String preReqError = "Prerequisite Error";
+	public static final String overlapError = "Overlap Error";
+	public static final String overloadError = "Overload Error";
 }

@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Semester implements Comparable<Semester>{
@@ -7,12 +8,21 @@ public class Semester implements Comparable<Semester>{
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
 	private int OverloadLimit;
-	
-	
+
+
 	public Semester(SemesterDate sD, Schedule s){
 		elements = new ArrayList<ScheduleElement>();
 		this.semesterDate = sD;
 		this.schedule = s;
+		if(this.semesterDate.sNumber == SemesterDate.FALL || this.semesterDate.sNumber == SemesterDate.SPRING){
+			OverloadLimit = 20;
+		}
+		if(this.semesterDate.sNumber == SemesterDate.SUMMERONE|| this.semesterDate.sNumber == SemesterDate.SUMMERTWO){
+			OverloadLimit = 8;
+		}
+		if(this.semesterDate.sNumber == SemesterDate.MAYX ){
+			OverloadLimit = 4;
+		}
 	}
 
 	public ArrayList<ScheduleElement> getElements(){
@@ -30,58 +40,97 @@ public class Semester implements Comparable<Semester>{
 	 * 
 	 * @param addition
 	 */
-	public void checkOverlap(ScheduleElement addition){
+	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
+		Course toAdd = null;
+		Course offending = null;
 		ArrayList<Course> courses = new ArrayList<Course>();
 		for (ScheduleElement e : this.elements){
 			if(e instanceof Course){
 				courses.add((Course)e);
+				toAdd=(Course) e;
 			}
 		}
 		if(addition != null && (addition instanceof Course)){
 			courses.add((Course) addition);
 		}
-		for (int i = 0; i < courses.size() ; i ++){
-			for(int j = i; j < courses.size() ; j ++){
-				if(courses.get(i).overlaps(courses.get(j))){
-					//throw new OverlapException(elements.get(i), elements.get(j));
+		int overlapCounter = 0;
+		if(addition == null){
+			for (int i = 0; i < courses.size() ; i ++){
+				for(int j = i+1; j < courses.size() ; j ++){
+					if(courses.get(i).overlaps(courses.get(j))){
+						if(courses.get(i).equals(toAdd)){
+							offending = courses.get(j);
+
+						}
+						else{
+							offending = courses.get(i);
+						}
+						overlapCounter++;
+					}
 				}
 			}
 		}
+		if(addition != null){
+			for(int i= 0; i<courses.size(); i++){
+				if(courses.get(i).overlaps(addition));
+				overlapCounter++;
+			}
+		}
+		if(overlapCounter > 0){
+			Course[] overlap = {toAdd, offending };
+			return(!this.schedule.userOverride(new scheduleError(MenuOptions.overlapError, overlap)));
+		}
+		return false;
 	}
-	
-	public void checkOverload(ScheduleElement addition){
-		if(this.semesterDate.sNumber == SemesterDate.FALL || this.semesterDate.sNumber == SemesterDate.SPRING){
-			OverloadLimit = 20;
-		}
-		if(this.semesterDate.sNumber == SemesterDate.SUMMERONE|| this.semesterDate.sNumber == SemesterDate.SUMMERTWO){
-			OverloadLimit = 8;
-		}
-		if(this.semesterDate.sNumber == SemesterDate.MAYX ){
-			OverloadLimit = 4;
-		}
+
+
+
+
+	public boolean checkOverload(ScheduleElement addition){
+
 		int totalHours = 0;
-		
+
 		if(addition instanceof Course){
 			Course toAdd = (Course) addition;
 			totalHours= totalHours + toAdd.getCreditHours();
 		}
-		
+		if(addition instanceof Requirement){
+			Requirement toAdd = (Requirement) addition;
+			totalHours = totalHours + toAdd.getCreditHours();
+		}
 		for(ScheduleElement e : this.elements){
 			if(e instanceof Course){
 				totalHours = totalHours + ((Course) e).getCreditHours();
 			}
+			if(e instanceof Requirement){
+				totalHours = totalHours + ((Requirement) e).getCreditHours();
+			}
 		}
-		if (totalHours > OverloadLimit){
-			throw new OverloadException();
+		if(totalHours > OverloadLimit){
+			return (!this.schedule.userOverride(new scheduleError(MenuOptions.overloadError, addition, this.OverloadLimit)));
+		}
+		else{
+			return false;
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
 
 	public int compareTo(Semester other){
 		return this.semesterDate.compareTo(other.semesterDate);
 	}
-	
-	
+
+
 	/**
 	 * Add a schedule element to this semester.
 	 * This method should only be called by Schedule.
@@ -89,37 +138,50 @@ public class Semester implements Comparable<Semester>{
 	 * @return
 	 */
 	public boolean add(ScheduleElement e){
-		this.checkOverload(e);
-		//this.schedule.checkErrorsWhenAdding(e,this);
-		this.elements.add(e);
-		//this.schedule.added(e, this);
-		return true;
-
+		if(!this.checkOverload(e)){
+			this.elements.add(e);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
+
+
+
+
+
+
 	public boolean remove(ScheduleElement e){
 		//this.schedule.checkErrorsWhenRemoving(e, this);
 		this.elements.remove(e);
 		return true;
 	}
-	
-	
-	
-	
+
+
+
+
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
-		this.checkOverload(newElement);
+		if(!this.checkOverload(newElement)){
+			int i = this.elements.indexOf(oldElement);
+			this.elements.set(i, newElement);
+			return true;
+		}
+		else{
+			return false;
+		}
+
 		//this.schedule.checkErrorsWhenAdding(newElement, this);
 		//this.schedule.checkErrorsWhenRemoving(oldElement, this);
-		int i = this.elements.indexOf(oldElement);
-		this.elements.set(i, newElement);
-		return true;
+
 	}
-	
+
 
 	public ArrayList<Course> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
 		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
 	}
-	
+
 	@Override
 	public boolean equals(Object other){
 		if(!(other instanceof Semester)){
