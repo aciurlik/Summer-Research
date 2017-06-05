@@ -51,8 +51,8 @@ public class Driver{
 
 
 		//Make data
-		Schedule test = Schedule.testSchedule();		
-		sch=test;
+		sch = Schedule.testSchedule();		
+		sch.setDriver(this);
 
 
 		JFrame frame = new JFrame();
@@ -71,10 +71,10 @@ public class Driver{
 		left.add(extras);
 		frame.add(left, BorderLayout.WEST);
 
-		schP = new SchedulePanel(test, this);
+		schP = new SchedulePanel(sch, this);
 
 		frame.add(schP, BorderLayout.NORTH);
-		reqs = new RequirementListPanel(test, this);
+		reqs = new RequirementListPanel(sch, this);
 		frame.add(reqs, BorderLayout.CENTER);
 
 		this.update();
@@ -264,19 +264,25 @@ public class Driver{
 		}
 	}
 
-	public void GUIAddCourseWithRequirement(ScheduleElement s, SemesterPanel container, String action) {
-		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
-		Course[] toAdd = new Course[listOfCourses.size()];
-		for(int i =0; i<listOfCourses.size(); i++){
-			toAdd[i]=listOfCourses.get(i);
+
+
+	public Course GUIAddCourseWithRequirement(ArrayList <Course> finallistOfCourses, String action) {
+		Course[] toAdd = new Course[finallistOfCourses.size()];
+
+		for(int i =0; i<finallistOfCourses.size(); i++){
+			toAdd[i]=finallistOfCourses.get(i);
 		}
-		if(listOfCourses.size()>0){
+
+		if(finallistOfCourses.size()>0){
 			Course c = (Course)JOptionPane.showInputDialog(popUP, action , action , JOptionPane.PLAIN_MESSAGE, icon, toAdd, "Dr. Fray");
+
 			if(c!=null && c instanceof Course){
-				sch.replaceElement(container.sem, s, c);
-				this.update();
+				return c;
+
 			}
 		}
+		return null;
+
 	}
 
 
@@ -339,9 +345,13 @@ public class Driver{
 
 	}
 
-	public void SummerOverloadDialog(){
-		JOptionPane.showMessageDialog(popUP, summerOverload, "Summer Overload", JOptionPane.INFORMATION_MESSAGE, icon);
+	public boolean userRequestError(String header, String instruct){
+		int n = JOptionPane.showConfirmDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
+		return (n==JOptionPane.OK_OPTION);
+
 	}
+
+
 	public void updateAll(){
 		schP.update(sch);
 		reqs.update(sch);

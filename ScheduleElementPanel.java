@@ -25,20 +25,23 @@ public class ScheduleElementPanel extends JPanel {
 	private SemesterPanel container;
 	private Dimension buttonSize = new Dimension(20, 20);
 	private String removeButtonText = "x";
+	public ScheduleElementPanel reference = this;
 
 
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox<ScheduleElement>  requirementDropDown;
 	JButton addCourse = new JButton (MenuOptions.addCourseWithRequirement);
 
-
+	
 
 
 	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
 
 		super();
 		this.s=s;
+		this.reference=this;
 		this.container = container;
+		this.setBackground(FurmanOfficial.grey(30));
 
 
 
@@ -99,21 +102,32 @@ public class ScheduleElementPanel extends JPanel {
 	 * This should only be called if the schedule element is a requirement.
 	 */
 	public void updateDropDown(){
-
-		if(container.getSemester().getCoursesSatisfying((Requirement)s).size()>0){
+		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
+		ArrayList<Course> finallistOfCourses = container.sem.schedule.filterAlreadyChosenCourses(listOfCourses);
+		if(finallistOfCourses.size()>0){
 			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					container.d.GUIAddCourseWithRequirement(s, container, e.getActionCommand());
+					Course c = container.d.GUIAddCourseWithRequirement(finallistOfCourses, e.getActionCommand());
+					container.d.GUIElementChanged(container, reference , c);
 				}
 			});
 			this.add(addCourse);
 		}	
+		else{
+			JLabel noCourse = new JLabel("No courses avaliable");
+			noCourse.setFont(FurmanOfficial.getFont(12));
+			noCourse.setBackground(FurmanOfficial.darkPurple);
+			noCourse.setOpaque(true);
+			noCourse.setForeground(Color.white);
+			this.add(noCourse);
+		}
 	}
 
 	public void removeSelf(){
 		container.removeElement(this);
 	}
+
 
 	public class SEPDragHandler extends ComponentDragHandler{
 

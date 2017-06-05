@@ -16,7 +16,7 @@ public class Course implements ScheduleElement{
 	protected Time[] meetingTime; //two times where the day, month, and year are unused.
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
 	Time[] examTime; // month, day, year, and so on are all used.
-	
+
 	String professor;
 
 	HashSet<Requirement> reqsSatisfied;
@@ -65,7 +65,7 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
-	
+
 
 
 
@@ -93,7 +93,7 @@ public class Course implements ScheduleElement{
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Given a code of the form "MWF" make the correct
 	 * meeting days list.
@@ -153,7 +153,7 @@ public class Course implements ScheduleElement{
 		if(examTime != null){
 			result.addInterval(new Interval<Time>(examTime[0], examTime[1]));
 		}
-		
+
 		//note - some courses may have meeting times with all values unused.
 		// For example, music courses often don't specify times.
 		if(meetingDays != null && meetingTime != null){
@@ -271,7 +271,7 @@ public class Course implements ScheduleElement{
 		}
 		result.append(";");
 		if(this.examTime!=null){
-		result.append(this.examTime[0].toString());
+			result.append(this.examTime[0].toString());
 		}
 		result.append(";");
 		result.append(this.creditHours + ";");
@@ -322,7 +322,7 @@ public class Course implements ScheduleElement{
 			foundExamTime = true;
 			examTimeString = chunks[chunkNumber];
 		}
-		
+
 
 		chunkNumber++;
 		int creditHours = Integer.parseInt(chunks[chunkNumber]);
@@ -377,29 +377,29 @@ public class Course implements ScheduleElement{
 		String professor = furmanData.get(12);
 		String GERs = furmanData.get(14);
 		String prerequsites = furmanData.get(16);
-		
+
 		String[] sectionValues = section.split("-");
 		Prefix p = new Prefix(sectionValues[0], sectionValues[1]);
 		String sectionNumber = sectionValues[2];
-	
+
 		SemesterDate semester = SemesterDate.fromFurman(semesterString);
-		
+
 		Time totalStartTime = Time.combine(times[0], times[1]);
 		Time totalEndTime = Time.combine(times[0], times[3]);
 		Time[] meetingTime = new Time[]{totalStartTime, totalEndTime};
-		
-		
+
+
 		Course result =  new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
 		if(meetingTime[0].hours != Time.UNUSED){
 			result.setMeetingTime(meetingTime);
 		}
 		return result;
-		
-		
-		
-		
+
+
+
+
 	}
-	
+
 	/**
 	 * Return an array of times:
 	 * StartDate
@@ -419,9 +419,9 @@ public class Course implements ScheduleElement{
 		Time startDate = Time.tryRead(startDateString);
 		Time endTime = Time.tryRead(endTimeString);
 		Time endDate = Time.tryRead(endDateString);
-		
+
 		return new Time[]{startDate, startTime, endDate, endTime};
-		
+
 	}
 
 

@@ -95,7 +95,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		button.setFont(FurmanOfficial.getFont(buttonsFontSize));
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
-		button.setBackground(FurmanOfficial.darkPurple);
+		button.setBackground(FurmanOfficial.darkPurple(180));
 		button.setBorderPainted(false);
 		button.setPreferredSize(new Dimension(153, 20));
 		button.setOpaque(true);

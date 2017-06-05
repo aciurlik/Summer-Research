@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -22,14 +23,14 @@ public class CourseList  {
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
-	
+
 	private Dictionary<Prefix, Prefix[]> prereqs ;
 
 
 
 	public static CourseList testList(){
-		
-		
+
+
 		/*Course[] list = new Course[]{
 				Course.readFrom("MTH-220-02;Fray;[1, 3, 5];10:30:A,50;20/6/2017 11:30:0;4;2017-2"),
 				Course.readFrom("MTH-250-02;Fray;[1, 3, 5];10:30:A,50;20/6/2018 11:30:0;4;2018-4"),
@@ -44,8 +45,8 @@ public class CourseList  {
 		for(Course c : list){
 			result.add(c);
 		}
-		*/
-		
+		 */
+
 		//result.addCoursesIn(new File("Mayx2017.csv"));
 		//result.addCoursesIn(new File("Fall2017.csv"));
 		return readAll();
@@ -62,7 +63,7 @@ public class CourseList  {
 				}
 				return false;
 			}
-			
+
 		})){
 			result.addCoursesIn(semesterFile);
 		}
@@ -73,8 +74,8 @@ public class CourseList  {
 		this.listOfCourses = new ArrayList<Course>();
 		this.prereqs = new Hashtable<Prefix, Prefix[]>();
 	}
-	
-	
+
+
 	public Prefix[] getPrereqsShallow(Prefix p){
 		if(p == null){
 			return new Prefix[0];
@@ -85,7 +86,7 @@ public class CourseList  {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Find all the prerequsites of this prefix using a breadth first
 	 * search.
@@ -130,10 +131,10 @@ public class CourseList  {
 	 * @param taken
 	 * @return
 	 */
-	public boolean checkPrereqsShallow(Prefix main, HashSet<Prefix> taken){
-		return missingPrereqsShallow(main, taken).isEmpty();
-	}
-	
+	//public boolean checkPrereqsShallow(Prefix main, HashSet<Prefix> taken){
+	//	return missingPrereqsShallow(main, taken).isEmpty();
+	//}
+
 	/**
 	 * See if this hashSet of prefixes has all the prereqs necessary for
 	 * the main prefix. If not, return false.
@@ -141,9 +142,9 @@ public class CourseList  {
 	 * @param taken
 	 * @return
 	 */
-	public boolean checkPrereqsDeep(Prefix main, HashSet<Prefix> taken){
-		return missingPrereqsDeep(main, taken).isEmpty();
-	}
+	//public boolean checkPrereqsDeep(Prefix main, HashSet<Prefix> taken){
+	//	return missingPrereqsDeep(main, taken).isEmpty();
+	//}
 	/**
 	 * Find the entire set of prereqs that would need to be taken to 
 	 * allow main to be taken.
@@ -161,8 +162,8 @@ public class CourseList  {
 		}
 		return result;
 	}
-	
-	
+
+
 	public HashSet<Prefix> missingPrereqsShallow(Prefix main, HashSet<Prefix> taken){
 		HashSet<Prefix> result = new HashSet<Prefix>();
 		Prefix[] allNeeded = getPrereqsShallow(main);
@@ -173,13 +174,13 @@ public class CourseList  {
 		}
 		return result;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 
 	public boolean add(Course c){
 		return listOfCourses.add(c);
@@ -241,10 +242,10 @@ public class CourseList  {
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
-	
-	
-	
-	
+
+
+
+
 	public void addCoursesIn(File furmanCoursesFile){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
@@ -252,9 +253,9 @@ public class CourseList  {
 		try {
 			br = new BufferedReader(new FileReader(furmanCoursesFile));
 			//skip the first line of field names
-			
+
 			br.readLine();
-			
+
 			String line = br.readLine();
 
 			//Read in each course
@@ -292,14 +293,14 @@ public class CourseList  {
 			return;
 		}
 	}
-	
+
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
-		
+
 		for(Course cour : c.listOfCourses){
-			System.out.println(cour.saveString());
+			//System.out.println(cour.saveString());
 		}
-		
+
 	}
 
 
