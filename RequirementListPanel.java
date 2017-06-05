@@ -36,6 +36,17 @@ public class RequirementListPanel extends JPanel{
 	public JScrollPane scroll;
 	public JPanel inner;
 	public Driver d;
+	
+
+	JPanel scrollPanel = new JPanel();
+	JPanel addExtraSemesterButtonPanel = new JPanel();
+	JButton addSemesterButton = new JButton("+");
+	JPanel infoPanel; //reqs left, credit hours, and CLPs
+	public int infoPanelFontSize = 20;
+	public JLabel creditHoursLabel;
+	public String cHText = "     Credit Hours Left: ";
+	public JLabel reqsLeftLabel;
+	public String reqsText = "Requirements Left: ";
 	//public Schedule schedule;
 
 
@@ -45,9 +56,10 @@ public class RequirementListPanel extends JPanel{
 	// it may be safely changed, so long as the last entry is at the end of a column.
 
 	public RequirementListPanel(Schedule s, Driver d){
+		
 		//this.schedule = s;
 		this.d = d;
-
+		this.setBackground(FurmanOfficial.grey(60));
 		//Put the main RequirementList panel, called inner, inside a scroll pane.
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
@@ -56,15 +68,29 @@ public class RequirementListPanel extends JPanel{
 
 		this.setLayout(new BorderLayout());
 
+	
 		//put all the requirement panels into inner.
 
 
 		scroll.setPreferredSize(new Dimension(800,200));
 		this.add(scroll, BorderLayout.CENTER);
 
-
+		
+		this.infoPanel = new JPanel();
+		creditHoursLabel = new JLabel();
+		creditHoursLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		reqsLeftLabel = new JLabel();
+		reqsLeftLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		this.infoPanel.add(reqsLeftLabel);
+		this.infoPanel.add(creditHoursLabel);
+		this.infoPanel.setBackground(this.getBackground());
+		this.add(infoPanel, BorderLayout.NORTH);
+		
 		update(s);
 	}
+	
+	
+	
 
 	/**
 	 * Find the next location to place a component in the gridbag.
@@ -107,6 +133,9 @@ public class RequirementListPanel extends JPanel{
 			gbc.gridy = heightCounter;
 			heightCounter++;
 			this.inner.add(majorPanel, gbc);
+			
+			this.creditHoursLabel.setText(this.cHText + (128 - schedule.getCreditHoursComplete()));
+			this.reqsLeftLabel.setText(this.reqsText + schedule.totalRequirementsLeft());
 		}
 	}
 

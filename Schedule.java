@@ -366,7 +366,12 @@ public class Schedule {
 	public boolean checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
-			return(!this.userOverride(new ScheduleError(MenuOptions.preReqError, e, needed)));
+			ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+			preReq.setOffendingCourse(e);
+			preReq.setNeededCourses(needed);
+			preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
+			return(!this.userOverride(preReq));
+			
 			//throw new PrerequsiteException(needed, e);
 		}
 		return false;
@@ -390,7 +395,11 @@ public class Schedule {
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-						return(!this.userOverride(new ScheduleError(MenuOptions.preReqError, e, needed)));
+						ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+						preReq.setOffendingCourse(e);
+						preReq.setNeededCourses(needed);
+						preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
+						return(!this.userOverride(preReq));
 					}
 				}
 			}
@@ -416,7 +425,11 @@ public class Schedule {
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
 				HashSet<Prefix> missing =masterList.missingPrereqsShallow(oldE.getPrefix(), taken);
 				if(!missing.isEmpty()){
-					return((this.userOverride(new ScheduleError(MenuOptions.preReqError, newE, missing))));
+					ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+					preReq.setOffendingCourse(newE);
+					preReq.setNeededCourses(missing);
+					preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
+					return((this.userOverride(preReq)));
 				}
 			}
 			for(Semester s : this.semesters){
@@ -429,7 +442,11 @@ public class Schedule {
 				for(Prefix p : afterOld){
 					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
 						//throw new PrerequsiteException(new Prefix[]{newP}, p);
-						return(!this.userOverride( new ScheduleError(MenuOptions.preReqError ,p, newP)));
+						ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+						preReq.setCourse(p);
+						preReq.setMissingCourse(newP);
+						preReq.setInstructions(p.toString() + " had prerequisite " + newP.toString() );
+						return(!this.userOverride(preReq));
 					}
 				}
 			}
@@ -543,14 +560,20 @@ public class Schedule {
 					ScheduleElement[] result = {e, e1};
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
-						return(!this.userOverride(new ScheduleError(MenuOptions.duplicateError, results)));
+						ScheduleError duplicate = new ScheduleError(MenuOptions.duplicateError);
+						duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
+						duplicate.setDuplicateCourses(results);
+						return(!this.userOverride(duplicate));
 					}
 				}
 				continue;
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 				ScheduleElement[] result = {e, e1};
-				return (!this.userOverride(new ScheduleError(MenuOptions.duplicateError, result)));
+				ScheduleError duplicate = new ScheduleError(MenuOptions.duplicateError);
+				duplicate.setDuplicateCourses(result);
+				duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
+				return (!this.userOverride(duplicate));
 			}
 		}
 		return false;

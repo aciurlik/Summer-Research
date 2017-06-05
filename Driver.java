@@ -41,7 +41,7 @@ public class Driver{
 
 
 	public Driver() {
-
+	
 		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
@@ -67,6 +67,7 @@ public class Driver{
 		//Adds Additions Panel and belltower
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
+		left.setBackground(FurmanOfficial.grey(60));
 		left.add(belltowerLabel);
 		left.add(extras);
 		frame.add(left, BorderLayout.WEST);
@@ -354,8 +355,12 @@ public class Driver{
 
 
 	public void updateAll(){
+	
 		schP.update(sch);
+		System.out.println("Start");
+	
 		reqs.update(sch);
+		System.out.println("Stop");
 	}
 
 	public void repaintAll(){

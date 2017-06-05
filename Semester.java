@@ -60,7 +60,10 @@ public class Semester implements Comparable<Semester>{
 						overlapCounter++;
 						if(overlapCounter > 0){
 							Course[] overlap ={courses.get(i), courses.get(j) };
-							return(!this.schedule.userOverride(new ScheduleError(MenuOptions.overlapError, overlap)));
+							ScheduleError overlaped = new ScheduleError(MenuOptions.overlapError);
+							overlaped.setDuplicateCourses(overlap);
+							overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
+							return(!this.schedule.userOverride(overlaped));
 						}
 
 					}
@@ -73,7 +76,10 @@ public class Semester implements Comparable<Semester>{
 					overlapCounter++;
 					if(overlapCounter > 0){
 						Course[] overlap ={courses.get(i), (Course) addition };
-						return(!this.schedule.userOverride(new ScheduleError(MenuOptions.overlapError, overlap)));
+						ScheduleError overlaped = new ScheduleError(MenuOptions.overlapError);
+						overlaped.setDuplicateCourses(overlap);
+						overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
+						return(!this.schedule.userOverride(overlaped));
 					}
 				}
 			}
@@ -106,20 +112,16 @@ public class Semester implements Comparable<Semester>{
 			}
 		}
 		if(totalHours > OverloadLimit){
-			return (!this.schedule.userOverride(new ScheduleError(MenuOptions.overloadError, addition, this.OverloadLimit)));
+			ScheduleError overload = new ScheduleError(MenuOptions.overloadError);
+			overload.setOverloadLimit(this.OverloadLimit);
+			overload.setOffendingCourse(addition);
+			overload.setInstructions("Adding" + addition.getDisplayString() + "exceeds this semesters overload limit of " + this.OverloadLimit );
+			return (!this.schedule.userOverride(overload));
 		}
 		else{
 			return false;
 		}
 	}
-
-
-
-
-
-
-
-
 
 
 

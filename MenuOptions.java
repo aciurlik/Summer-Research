@@ -23,8 +23,11 @@ public class MenuOptions {
 	public static final  String addInstruct = "Add a Course";
 	public static final  String supriseMe = "Suprise Me!";
 	public static final  String changeInstruct = "Change Course";
-	public static final  String removeInstruct = "Delete Semester";
-
+	public static final  String deleteSemester = "x";
+	public static final  String hideSemester = "-";
+	public static final  String showSemester = "+";
+	
+	
 	//Schedule Element Panel
 	public static final  String addCourseWithRequirement = "Choose a course";
 

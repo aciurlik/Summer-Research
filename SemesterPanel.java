@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -27,7 +28,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private String addAClass = "Drop a requirement here";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
+	JPanel topPanel;
 	JPanel hidePanel;
+	JLabel fallSpring;
+	JButton deleteSemesterButton;
 	Driver d;
 	Semester sem;
 	private JButton changeCourse;
@@ -53,9 +57,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
 		this.hidePanel = new JPanel();
-		this.hidePanel.setBackground(FurmanOfficial.lightPurple(255));
-		String showText = "Show Semester";
-		JButton showSemester = new JButton(showText);
+		this.hidePanel.setBackground(FurmanOfficial.grey(50));
+		JButton showSemester = new JButton(MenuOptions.showSemester);
+		showSemester.setActionCommand(MenuOptions.showSemester);
+		showSemester.setPreferredSize(new Dimension(15, 15));
 		showSemester.setFont(FurmanOfficial.getFont(12));
 		showSemester.addActionListener(new ActionListener(){
 			@Override
@@ -68,6 +73,36 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				);
 
 		hidePanel.add(showSemester);
+		
+
+		fallSpring = new JLabel("", JLabel.CENTER);
+		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
+		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
+		deleteSemesterButton.addActionListener(this);
+		deleteSemesterButton.setEnabled(false);
+		
+		JButton hideSem = new JButton(MenuOptions.hideSemester);
+		hideSem.setPreferredSize(new Dimension(15,15));
+		hideSem.addActionListener(this);
+		deleteSemesterButton.setPreferredSize(new Dimension(15, 15));
+		
+		
+		JPanel PanelforButtons = new JPanel();
+		PanelforButtons.setBackground(defaultPanel.getBackground());
+		PanelforButtons.setOpaque(false);
+		
+		PanelforButtons.add(deleteSemesterButton);
+		PanelforButtons.add(hideSem);
+		
+		JLabel FallSpring = new JLabel();
+		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
+		
+		topPanel = new JPanel();
+		topPanel.setLayout(new BorderLayout());
+		topPanel.add(PanelforButtons, BorderLayout.WEST);
+		
+		topPanel.setBackground(defaultPanel.getBackground());
+		topPanel.add(fallSpring, BorderLayout.CENTER);
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,500));
@@ -81,8 +116,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		localRepaint();
 	}
 	public void hide(){
-		add(hidePanel);
 		remove(defaultPanel);
+		add(hidePanel);
 		localRepaint();
 	}
 	public void localRepaint(){
@@ -119,7 +154,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(MenuOptions.removeInstruct)){
+		if(e.getActionCommand().equals(MenuOptions.deleteSemester)){
 			d.GUIRemoveSemester(this);
 		}
 		else if(e.getActionCommand().equals(MenuOptions.changeInstruct) || e.getActionCommand().equals(MenuOptions.addInstruct)){
@@ -128,9 +163,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		else if(e.getActionCommand().equals(MenuOptions.supriseMe)){
 			d.GUISupriseWindow(this.sem);
 		}
-
-
-
 		else{
 			hide();
 		}
@@ -184,10 +216,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 
 		season +=  " " + sem.semesterDate.year;
-		JLabel FallSpring = new JLabel(season, JLabel.CENTER);
-		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
-		defaultPanel.add(FallSpring);
+		fallSpring.setText(season);
+		
+		topPanel.setBackground(defaultPanel.getBackground());
 
+		defaultPanel.add(topPanel, BorderLayout.CENTER);
 		//Add all Schedule elements
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
@@ -195,37 +228,35 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			element.updatePanel();
 		}
 		//Adds Drop Spaces 
-		if(sem.elements.size()==4){
+		/**
+		 * 
+		 * if(sem.elements.size()==4){
 			JLabel dropLabel = newDropLabel();
 			defaultPanel.add(dropLabel);
 		}
-
+		 */
+		
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
-
-			for (int i= 0; i<DropsNeeded; i++){
-				JLabel dropLabel = newDropLabel();
-				defaultPanel.add(dropLabel);
+			JLabel dropLabel = newDropLabel();
+			defaultPanel.add(dropLabel);
+			for (int i= 0; i<DropsNeeded-1; i++){
+				JLabel emptyLabel = new JLabel();
+				defaultPanel.add(emptyLabel);
 			}
-			if(sem.semesterDate.sNumber != SemesterDate.SUMMERONE && sem.semesterDate.sNumber != SemesterDate.SUMMERTWO){
-				//Add button to hide Semester
-				JButton deleteSemester= new JButton("Hide Semester");
-				defaultPanel.add(deleteSemester);
-				deleteSemester.addActionListener(this);
-			}
+			
+			
 
 		}
 
 		//Adds special buttons to MayX 
 		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
-			JButton removeCourse = new JButton(MenuOptions.removeInstruct);
-			removeCourse.setActionCommand(MenuOptions.removeInstruct);
-			removeCourse.addActionListener(this);
-
+			deleteSemesterButton.setEnabled(true);
+			
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.setLayout(new FlowLayout());
 			buttonPanel.setBackground(defaultPanel.getBackground());
@@ -243,7 +274,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 			buttonPanel.add(supriseMe);
 			buttonPanel.add(changeCourse);
-			buttonPanel.add(removeCourse);
+		
 
 			defaultPanel.add(buttonPanel);
 
