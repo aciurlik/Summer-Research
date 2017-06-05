@@ -3,52 +3,101 @@ import java.util.HashSet;
 public class ScheduleError {
 	String error = null; 
 	ScheduleElement[] duplicateCourses = null;
-	Prefix course = null;
+	Prefix offendingPCourse = null;
 	Prefix missingCourse = null; 
 	ScheduleElement offendingCourse = null;
 	HashSet<Prefix> neededCourses = null;
 	int overloadLimit = 0;
 	String instructions;
 
-	//Duplicate Error and overlaps 
-	public ScheduleError(String s, ScheduleElement[] offendingCourses){
-		this.error=s;
-		this.duplicateCourses = offendingCourses;
-		if(this.error.equals(MenuOptions.duplicateError)){
-			this.instructions=duplicateCourses[0].getDisplayString() + " duplicates " +  duplicateCourses[1];		
-		}
-		if(this.error.equals(MenuOptions.overlapError)){
-			this.instructions=duplicateCourses[0].getDisplayString() + " overlaps " + duplicateCourses[1];	
-		}
-
+	 
+	public ScheduleError(String s){
+		this.error = s;
 	}
-
-	//Prereq Error
-	public ScheduleError(String prereqerror, Prefix p, Prefix newP) {
-		this.error = prereqerror;
-		this.course=p;
-		this.missingCourse=newP;
-		this.instructions = this.course.toString() + " has prerequisite " + this.missingCourse.toString();
+	
+	
 
 
-
-	}
-	//Prereq Error
-	public ScheduleError(String prereqerror, ScheduleElement newE, HashSet<Prefix> missing) {
-		this.error = prereqerror;
-		this.offendingCourse = newE;
-		this.neededCourses = missing;
-		this.instructions = newE.getDisplayString() + " needs " + missing.toString() + " as a prerequisise";
-
-
+	public String getError() {
+		return error;
 	}
 
 
-	//Overload Error
-	public ScheduleError(String overloaderror, ScheduleElement addition, int overloadLimit) {
-		this.error = overloaderror;
-		this.offendingCourse = addition;
-		this.overloadLimit=overloadLimit;
-		this.instructions = addition.getDisplayString() + " would exceeded the overload limit of " + overloadLimit;		
+	public void setError(String error) {
+		this.error = error;
 	}
+
+
+	public ScheduleElement[] getDuplicateCourses() {
+		return duplicateCourses;
+	}
+
+
+	public void setDuplicateCourses(ScheduleElement[] duplicateCourses) {
+		this.duplicateCourses = duplicateCourses;
+	}
+
+
+	public Prefix getCourse() {
+		return offendingPCourse;
+	}
+
+
+	public void setCourse(Prefix course) {
+		this.offendingPCourse = course;
+	}
+
+
+	public Prefix getMissingCourse() {
+		return missingCourse;
+	}
+
+
+	public void setMissingCourse(Prefix missingCourse) {
+		this.missingCourse = missingCourse;
+	}
+
+
+	public ScheduleElement getOffendingCourse() {
+		return offendingCourse;
+	}
+
+
+	public void setOffendingCourse(ScheduleElement offendingCourse) {
+		this.offendingCourse = offendingCourse;
+	}
+
+
+	public HashSet<Prefix> getNeededCourses() {
+		return neededCourses;
+	}
+
+
+	public void setNeededCourses(HashSet<Prefix> neededCourses) {
+		this.neededCourses = neededCourses;
+	}
+
+
+	public int getOverloadLimit() {
+		return overloadLimit;
+	}
+
+
+	public void setOverloadLimit(int overloadLimit) {
+		this.overloadLimit = overloadLimit;
+	}
+
+
+	public String getInstructions() {
+		return instructions;
+	}
+
+
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+	
 }
+
+
+	

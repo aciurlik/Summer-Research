@@ -1,12 +1,4 @@
-/*
- * 
- * https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/layout/GridBagLayoutDemoProject/src/layout/GridBagLayoutDemo.java
- * https://docs.oracle.com/javase/tutorial/uiswing/layout/gridbag.html
- * 
-package scheduler;
-/*
- * GridBagLayoutDemo.java requires no other files.
- */
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -44,9 +36,11 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	public String cHText = "     Credit Hours Left: ";
 	public JLabel reqsLeftLabel;
 	public String reqsText = "Requirements Left: ";
+	public ArrayList<SemesterPanel> allSemesterPanels;
 	Driver d;
-	
-	
+	int Count=1;
+
+
 
 
 	public SchedulePanel(Schedule sch, Driver d) {
@@ -56,27 +50,18 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		this.d = d;
 		this.sch=sch;
 
-		
-		
+
+
 		this.setBackground(Color.white);
 		//This will be deleted once we set it relative to the whole. 
 		//this.setPreferredSize(new Dimension(700, 400));
 		this.setLayout(new BorderLayout());
 
-		this.infoPanel = new JPanel();
-		creditHoursLabel = new JLabel();
-		creditHoursLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
-		reqsLeftLabel = new JLabel();
-		reqsLeftLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
-		this.infoPanel.add(reqsLeftLabel);
-		this.infoPanel.add(creditHoursLabel);
-		this.infoPanel.setBackground(this.getBackground());
-		
-		this.add(infoPanel, BorderLayout.NORTH);
+		allSemesterPanels= new ArrayList<SemesterPanel>();
 
 		scrollPanel.setBackground(Color.white);
-		
-		
+
+
 		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
 		addExtraSemesterButtonPanel.setBackground(FurmanOfficial.lightPurple(50));
 		JButton addSemester = new JButton("+");
@@ -103,11 +88,12 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		d.GUISemesterPanelAdded();
 
 	}
-	
+
 
 
 
 	public void update(Schedule sch) {
+		
 		scrollPanel.removeAll();
 		scrollPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -115,21 +101,50 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		gbc.gridy = 0;
 		gbc.fill = gbc.VERTICAL;
 		gbc.insets = new Insets(5,5,5,5);
-		
+	
+	
 		for(Semester s: sch.semesters){
-			SemesterPanel semester = new SemesterPanel(s, this.d);
-			scrollPanel.add(semester, gbc);
-			gbc.gridx ++;
+			System.out.println(findPanelFor(s));
+			SemesterPanel foundp = this.findPanelFor(s);
+			if(foundp != null){
+				System.out.println(foundp);
+				foundp.updatePanel();
+				scrollPanel.add(foundp, gbc);
+				gbc.gridx++;
+			
+			
+			}
+			else{
+			
+			
+				SemesterPanel semester = new SemesterPanel(s, this.d);
+				
+				
+				allSemesterPanels.add(semester);
+				
+				scrollPanel.add(semester, gbc);
+				gbc.gridx ++;
+			
+
+			}
 		}
+		
 		gbc.fill = gbc.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
-		
-		this.creditHoursLabel.setText(this.cHText + (230 - sch.getCreditHoursComplete()));
-		this.reqsLeftLabel.setText(this.reqsText + sch.totalRequirementsLeft());
+
+
 	}
 
 
+	public SemesterPanel findPanelFor(Semester s){
+		for(int i=0; i<allSemesterPanels.size(); i++ ){
+			if(allSemesterPanels.get(i).sem.equals(s)){
+				return(allSemesterPanels.get(i));
+			}
+		}
+		return null;
 
+	}
 
 
 
