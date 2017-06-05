@@ -98,7 +98,6 @@ public class Driver{
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
 		this.update();
-
 	}
 
 

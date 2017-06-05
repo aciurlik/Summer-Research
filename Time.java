@@ -211,11 +211,8 @@ public class Time implements Comparable<Time>{
 	}
 
 	public int dayOfWeek(){
-		if(this.month == UNUSED || this.year == UNUSED || this.day == UNUSED){
+		if(this.month == UNUSED && this.year == UNUSED && this.day == UNUSED){
 			this.day=0;
-			
-			//throw new RuntimeException( "Tried to find the day of week for an unspecified date: " + this.toString());
-			
 		}
 		if(this.month==UNUSED && this.year==UNUSED){
 			return this.day;
@@ -548,6 +545,9 @@ public class Time implements Comparable<Time>{
 		Time t = Time.tryRead("11:00AM");
 		Time s = Time.tryRead("04/28/18");
 
+		System.out.println(t);
+		t.nextDay();
+		t.nextDay();
 		System.out.println(t);
 		System.out.println(s);
 

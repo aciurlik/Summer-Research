@@ -34,6 +34,8 @@ public class Semester implements Comparable<Semester>{
 	}
 
 	/**
+	 * TODO remake this method so it only checks if the given class has
+	 * overlap, not if the whole semester has overlap.
 	 * Check for any overlap among the Courses in this semester.
 	 * If addition is not equal to null, check if there would be
 	 *   overlap were addition to be added.
@@ -105,11 +107,13 @@ public class Semester implements Comparable<Semester>{
 				totalHours = totalHours + ((Requirement) e).getCreditHours();
 			}
 		}
+
 		if(totalHours > OverloadLimit){
 			return (!this.schedule.userOverride(new scheduleError(MenuOptions.overloadError, addition, this.OverloadLimit)));
 		}
 		else{
 			return false;
+
 		}
 	}
 
