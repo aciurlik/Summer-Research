@@ -1,6 +1,6 @@
 import java.util.HashSet;
 
-public class scheduleError {
+public class ScheduleError {
 	String error = null; 
 	ScheduleElement[] duplicateCourses = null;
 	Prefix course = null;
@@ -11,10 +11,9 @@ public class scheduleError {
 	String instructions;
 
 	//Duplicate Error and overlaps 
-	public scheduleError(String s, ScheduleElement[] offendingCourses){
+	public ScheduleError(String s, ScheduleElement[] offendingCourses){
 		this.error=s;
 		this.duplicateCourses = offendingCourses;
-		
 		if(this.error.equals(MenuOptions.duplicateError)){
 			this.instructions=duplicateCourses[0].getDisplayString() + " duplicates " +  duplicateCourses[1];		
 		}
@@ -25,7 +24,7 @@ public class scheduleError {
 	}
 
 	//Prereq Error
-	public scheduleError(String prereqerror, Prefix p, Prefix newP) {
+	public ScheduleError(String prereqerror, Prefix p, Prefix newP) {
 		this.error = prereqerror;
 		this.course=p;
 		this.missingCourse=newP;
@@ -35,7 +34,7 @@ public class scheduleError {
 
 	}
 	//Prereq Error
-	public scheduleError(String prereqerror, ScheduleElement newE, HashSet<Prefix> missing) {
+	public ScheduleError(String prereqerror, ScheduleElement newE, HashSet<Prefix> missing) {
 		this.error = prereqerror;
 		this.offendingCourse = newE;
 		this.neededCourses = missing;
@@ -46,7 +45,7 @@ public class scheduleError {
 
 
 	//Overload Error
-	public scheduleError(String overloaderror, ScheduleElement addition, int overloadLimit) {
+	public ScheduleError(String overloaderror, ScheduleElement addition, int overloadLimit) {
 		this.error = overloaderror;
 		this.offendingCourse = addition;
 		this.overloadLimit=overloadLimit;

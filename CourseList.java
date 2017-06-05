@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -298,7 +297,7 @@ public class CourseList  {
 		CourseList c = CourseList.readAll(); //CourseList.testList();
 
 		for(Course cour : c.listOfCourses){
-			//System.out.println(cour.saveString());
+			System.out.println(cour.saveString());
 		}
 
 	}
