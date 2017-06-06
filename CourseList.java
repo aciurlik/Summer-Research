@@ -19,6 +19,9 @@ import java.util.Scanner;
  */
 
 public class CourseList  {
+	public static final int BA = 0;
+	public static final int BS = 1;
+	public static final int BM = 2;
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
@@ -240,16 +243,24 @@ public class CourseList  {
 		return result;
 	}
 	
-	public Major getGERMajor(){
+	public Major getGERMajor(int MajorType){
 		Major m = new Major("GER");
 		for(Requirement r : allGERRequirements()){
+			if(r.name.equals(MenuOptions.humanBehavior)){
+				r.numToChoose=2;
+			}
+			
+			//r is a requirement of the form NumToChoose{1} choices {Mth150, Mth 140, Mth 120} DDn{0} Name {MR}
 			m.addRequirement(r);
 		}
 		return m;
 	}
+	
+	
 	public Requirement getGERRequirement(String code){
 		return this.GERRequirements.get(code);
 	}
+	
 	
 	public void courseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.split(" ");

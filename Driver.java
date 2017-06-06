@@ -41,7 +41,7 @@ public class Driver{
 
 
 	public Driver() {
-	
+
 		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
@@ -332,15 +332,18 @@ public class Driver{
 
 	public void GUIChallengeExcepted(Semester s, Course c){
 		if(s.semesterDate.sNumber==SemesterDate.MAYX){
-			s.elements.clear();
+			//s.elements.clear();
+			sch.addScheduleElement(c, s);
+
 
 		}
 		if(s.semesterDate.sNumber == SemesterDate.SUMMERONE || s.semesterDate.sNumber == SemesterDate.SUMMERTWO){
 
 			sch.addScheduleElement(c, s);
-			this.update();
-		}
 
+		}	
+
+		this.update();
 	}
 
 	public boolean userRequestError(String header, String instruct){
@@ -351,10 +354,10 @@ public class Driver{
 
 
 	public void updateAll(){
-	
+
 		schP.update(sch);
 		reqs.update(sch);
-		
+
 	}
 
 	public void repaintAll(){

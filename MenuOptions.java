@@ -51,4 +51,8 @@ public class MenuOptions {
 	public static final String preReqError = "Prerequisite Error";
 	public static final String overlapError = "Overlap Error";
 	public static final String overloadError = "Overload Error";
+	
+	//CourseList
+	//GER
+	public static final String humanBehavior = "HB";
 }
