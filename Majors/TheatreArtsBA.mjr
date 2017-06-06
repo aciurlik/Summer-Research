@@ -1,0 +1,12 @@
+Theatre Arts-BA
+REQ:{Number to Choose: {1} Choices: {{THA-101}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-115}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-116}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-120}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-210}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-211}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-310}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{THA-430}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {4} Choices: {{THA-001}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{THA-315}{THA-316}{THA-317}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{ART-111}{ART-113}{ART-124}{ENG-303}{ENG-342}{ENG-343}{THA-112}{THA-113}{THA-140}{THA-220}{THA-223}{THA-224}{THA-230}{THA-240}{THA-320}{THA-350}{THA-410}{THA-440}{THA-501}} DDN: {0} Requirement Name:{Theatre Elective}}
