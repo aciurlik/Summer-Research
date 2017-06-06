@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 
 public class AdditionsPanel extends JPanel implements ActionListener{
 	/**
@@ -38,7 +39,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.setLayout((new GridLayout(optionsNumber+headerNumber+2, 1, 3, 3)));
 		JLabel empty = new JLabel("          ");
 		this.add(empty);
-		this.setBackground(Color.white);
+		this.setBackground(FurmanOfficial.bouzarthGrey);
 		JLabel header = new JLabel(AdditionsHeader);
 		header.setHorizontalAlignment(JLabel.CENTER);
 		header.setFont(FurmanOfficial.getFont(headerFontSize));
@@ -89,17 +90,18 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 	public JButton addButton(String s){
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setBackground(Color.white);
+		buttonPanel.setBackground(this.getBackground());
 
 		JButton button = new JButton(s);
 		button.setFont(FurmanOfficial.getFont(buttonsFontSize));
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
-		button.setBackground(FurmanOfficial.darkPurple(180));
+		button.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		button.setBorderPainted(false);
 		button.setPreferredSize(new Dimension(153, 20));
 		button.setOpaque(true);
 		button.addActionListener(this);
+		button.setBorder(new BevelBorder(BevelBorder.RAISED));
 
 		buttonPanel.add(button);
 		this.add(buttonPanel);

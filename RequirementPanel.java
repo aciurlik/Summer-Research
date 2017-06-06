@@ -65,7 +65,7 @@ public class RequirementPanel extends JPanel {
 			this.setBackground(FurmanOfficial.grey(200));
 		}
 		else{
-			this.setBackground(FurmanOfficial.darkPurple(230));
+			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
 
 		this.add(shown);

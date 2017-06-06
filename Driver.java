@@ -67,7 +67,7 @@ public class Driver{
 		//Adds Additions Panel and belltower
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
-		left.setBackground(FurmanOfficial.grey(60));
+		left.setBackground(FurmanOfficial.bouzarthGrey);
 		left.add(belltowerLabel);
 		left.add(extras);
 		frame.add(left, BorderLayout.WEST);

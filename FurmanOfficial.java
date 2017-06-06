@@ -14,6 +14,9 @@ public class FurmanOfficial {
 	public static final Color grey = new Color(91,91,91);
 	public static final int[] greyRGB = {91, 91, 91};
 	
+	public static final Color bouzarthDarkPurple = darkPurple(230);
+	public static final Color bouzarthGrey = grey(60);
+	
 	/**
 	 * Rescale this RGB value according to the given alpha
 	 * as if it were placed on a white background.
