@@ -357,10 +357,8 @@ public class Driver{
 	public void updateAll(){
 	
 		schP.update(sch);
-		System.out.println("Start");
-	
 		reqs.update(sch);
-		System.out.println("Stop");
+		
 	}
 
 	public void repaintAll(){

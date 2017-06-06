@@ -93,7 +93,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 
 	public void update(Schedule sch) {
-		
+
 		scrollPanel.removeAll();
 		scrollPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -101,34 +101,32 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		gbc.gridy = 0;
 		gbc.fill = gbc.VERTICAL;
 		gbc.insets = new Insets(5,5,5,5);
-	
-	
+
+
 		for(Semester s: sch.semesters){
-			System.out.println(findPanelFor(s));
 			SemesterPanel foundp = this.findPanelFor(s);
 			if(foundp != null){
-				System.out.println(foundp);
 				foundp.updatePanel();
 				scrollPanel.add(foundp, gbc);
 				gbc.gridx++;
-			
-			
+
+
 			}
 			else{
-			
-			
+
+
 				SemesterPanel semester = new SemesterPanel(s, this.d);
-				
-				
+
+
 				allSemesterPanels.add(semester);
-				
+
 				scrollPanel.add(semester, gbc);
 				gbc.gridx ++;
-			
+
 
 			}
 		}
-		
+
 		gbc.fill = gbc.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
 
