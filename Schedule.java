@@ -8,8 +8,8 @@ public class Schedule {
 	ArrayList<Major> majorsList;
 	ArrayList<Semester> semesters;
 	Driver d; 
-
 	CourseList masterList;
+	
 
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
 	boolean reqsFulfilledValid; // the return value of getRequirementsFulfilled 
@@ -46,7 +46,7 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
-		this.addMajor(masterList.getGERMajor());
+		this.addMajor(masterList.getGERMajor(0));
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();

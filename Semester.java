@@ -21,7 +21,7 @@ public class Semester implements Comparable<Semester>{
 			OverloadLimit = 8;
 		}
 		if(this.semesterDate.sNumber == SemesterDate.MAYX ){
-			OverloadLimit = 4;
+			OverloadLimit = 2;
 		}
 	}
 
