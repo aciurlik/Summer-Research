@@ -14,6 +14,7 @@ public class Course implements ScheduleElement{
 	protected int[] meetingDays; //specified by the constants in the Time class, 
 	//  as in Time.SUNDAY.
 	protected Time[] meetingTime; //two times where the day, month, and year are unused.
+	protected String name;
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
 	Time[] examTime; // month, day, year, and so on are all used.
 
@@ -65,9 +66,10 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
-
-
-
+	
+	public void setName(String name){
+		this.name = name;
+	}
 
 	public Prefix getPrefix(){
 
@@ -229,6 +231,9 @@ public class Course implements ScheduleElement{
 		StringBuilder result = new StringBuilder();
 		result.append(coursePrefix.toString());
 		result.append(String.format("-" + this.sectionNumber + " "));
+		if(name != null){
+			result.append(name + " ");
+		}
 		result.append(this.meetingDaysCode() + " ");
 		if(this.meetingTime != null){
 			result.append( this.meetingTime[0].clockTime() + " ");
@@ -243,7 +248,7 @@ public class Course implements ScheduleElement{
 	}
 
 	public String saveString(){
-		/*
+		/*  TODO add name
 		 creditHours;
 		 coursePrefix;
 		 sectionNumber;
@@ -392,6 +397,9 @@ public class Course implements ScheduleElement{
 		Course result =  new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
 		if(meetingTime[0].hours != Time.UNUSED){
 			result.setMeetingTime(meetingTime);
+		}
+		if(!title.equals("")){
+			result.setName(title);
 		}
 		return result;
 

@@ -24,6 +24,8 @@ public class CourseList  {
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
 
 	private Dictionary<Prefix, Prefix[]> prereqs ;
+	
+	public Hashtable<String, Requirement> GERRequirements;
 
 
 
@@ -50,6 +52,13 @@ public class CourseList  {
 		//result.addCoursesIn(new File("Fall2017.csv"));
 		return readAll();
 	}
+	
+	
+	public CourseList (){
+		this.listOfCourses = new ArrayList<Course>();
+		this.prereqs = new Hashtable<Prefix, Prefix[]>();
+		this.GERRequirements = new Hashtable<String, Requirement>();
+	}
 
 	public static CourseList readAll(){
 		CourseList result = new CourseList();
@@ -69,10 +78,7 @@ public class CourseList  {
 		return result;
 	}
 
-	public CourseList (){
-		this.listOfCourses = new ArrayList<Course>();
-		this.prereqs = new Hashtable<Prefix, Prefix[]>();
-	}
+	
 
 
 	public Prefix[] getPrereqsShallow(Prefix p){
@@ -223,6 +229,41 @@ public class CourseList  {
 		}
 		return SemesterList;
 	}
+	
+	public ArrayList<Requirement> allGERRequirements(){
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		for(String key : this.GERRequirements.keySet()){
+			Requirement next = this.GERRequirements.get(key);
+			next.setName(key);
+			result.add(next);
+		}
+		return result;
+	}
+	
+	public Major getGERMajor(){
+		Major m = new Major("GER");
+		for(Requirement r : allGERRequirements()){
+			m.addRequirement(r);
+		}
+		return m;
+	}
+	public Requirement getGERRequirement(String code){
+		return this.GERRequirements.get(code);
+	}
+	
+	public void courseSatisfiesGER(String GERs, Course c){
+		String[] allGERs = GERs.split(" ");
+		for(String s : allGERs){
+			Requirement old = this.GERRequirements.get(s);
+			if(old == null){
+				GERRequirements.put(s, new Requirement(new Prefix[]{c.coursePrefix},1));
+			}
+			else{
+				//Add this to the requirement
+				old.addChoice(c.getPrefix());
+			}
+		}
+	}
 
 
 	public  ArrayList<Course> getCoursesIn(Semester s){
@@ -263,11 +304,17 @@ public class CourseList  {
 				String sectionNumber = data.get(1);
 				//Check if we've found a new course
 				if(! sectionNumber.equals( lastSectionNumber)){
+					//If it's a new course, make a new one.
 					lastSectionNumber = sectionNumber;
 					if(lastCourse != null){
 						this.add(lastCourse);
 					}
 					lastCourse = Course.readFromFurmanData(data);
+					//Also, see if this course satisfies any GERs.
+					String GERs = data.get(14);
+					if(!GERs.equals("")){
+						courseSatisfiesGER(data.get(14), lastCourse);
+					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
 				else{
@@ -295,10 +342,14 @@ public class CourseList  {
 
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
-
-		for(Course cour : c.listOfCourses){
-			System.out.println(cour.saveString());
+		
+		for(Requirement r : c.allGERRequirements()){
+			System.out.println(r.name + "," + r.saveAsJSON());
 		}
+		
+		/*for(Course cour : c.listOfCourses){
+			System.out.println(cour.saveString());
+		}*/
 
 	}
 
