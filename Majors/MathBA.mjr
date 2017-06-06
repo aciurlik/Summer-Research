@@ -2,6 +2,5 @@ Math-BA
 REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
 REQ:{Number to Choose: {1} Choices: {{MTH-260}} DDN: {0} Requirement Name:{null}}
 REQ:{Number to Choose: {1} Choices: {{ MTH-350}{MTH-450}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ MTH-360}{MTH-460}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {7} Choices: {{ MTH-151}{ MTH-250}{ MTH-320}{ MTH-335}{ MTH-337}{ MTH-340}{ MTH-341}{ MTH-350}{ MTH-360}{ MTH-420}{ MTH-435}{ MTH-450}{ MTH-450}{ MTH-451}{ MTH-460}{ MTH-461}{ MTH-504}{MTH-160}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {2} Choices: {{ CHM-110}{ CHM-115}{ CHM-120}{ EES-112}{ EES-113}{ EES-115}{ PHY-111}{ PHY-112}{ PSY-320}{ SUS-120}{BIO-111}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{MTH-360}{MTH-460}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {7} Choices: {{MTH-151}{MTH-250}{MTH-320}{MTH-335}{MTH-337}{MTH-340}{MTH-341}{MTH-350}{MTH-360}{MTH-420}{MTH-435}{MTH-450}{MTH-450}{MTH-451}{MTH-460}{MTH-461}{MTH-504}{MTH-160}} DDN: {0} Requirement Name:{null}}

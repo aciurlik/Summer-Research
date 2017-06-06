@@ -1,0 +1,12 @@
+Biology-BS
+REQ:{Number to Choose: {1} Choices: {{BIO-111}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-221}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-222}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-502}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {2} Choices: {{BIO-503}{BIO-075}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{CHM-110}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{CHM-120}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{CHM-115}{CHM-220}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-300}{BIO-303}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-320}{BIO-321}{BIO-322}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{BIO-340}{BIO-343}{BIO-344}} DDN: {0} Requirement Name:{null}}

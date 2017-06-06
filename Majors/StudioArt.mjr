@@ -1,0 +1,11 @@
+Studio Art-BA
+REQ:{Number to Choose: {1} Choices: {{ART-111}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-112}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-113}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-124}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-130}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-131}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-205}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-330}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-401}} DDN: {1} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{ART-111}{ART-112}{ART-113}{ART-124}{ART-130}{ART-131}{ART-205}{ART-330}{ART-401}{THA-115}{THA-116}{THA-315}{THA-316}{THA-317}} DDN: {1} Requirement Name:{12 hours of studio art}}
