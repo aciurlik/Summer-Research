@@ -104,11 +104,12 @@ public class ScheduleElementPanel extends JPanel {
 	public void updateDropDown(){
 		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
 		ArrayList<Course> finallistOfCourses = container.sem.schedule.filterAlreadyChosenCourses(listOfCourses);
+		final Course[] allPossibleCourses = finallistOfCourses.toArray(new Course[finallistOfCourses.size()]);
 		if(finallistOfCourses.size()>0){
 			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					Course c = container.d.GUIAddCourseWithRequirement(finallistOfCourses, e.getActionCommand());
+					Course c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
 					container.d.GUIElementChanged(container, reference , c);
 				}
 			});

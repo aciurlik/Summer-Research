@@ -1,12 +1,13 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 
 
 
 public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable{
-	Prefix[] choices;
+	HashSet<Prefix> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
@@ -26,8 +27,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 
 	public Requirement(Prefix[] choices, int numToChoose){
-		this.choices = choices;
-		Arrays.sort(this.choices);
+		this.choices = new HashSet<Prefix>(Arrays.asList(choices));
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = Requirement.defaultDDN;
 	}
@@ -65,6 +65,10 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	public int getDoubleDipNumber(){
 		return this.doubleDipNumber;
 	}
+	
+	public void addChoice(Prefix p){
+		choices.add(p);
+	}
 
 	public boolean isComplete(){
 		return numToChoose <= numFinished;
@@ -95,20 +99,20 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 			return numChooseDifference;
 		}
 		//Finally, compare based on prefixes.
-		for (int i = 0; i < this.choices.length ; i ++){
-			if(other.choices.length >= i){
-				//this one has more, so other should come first. 
-				// that means other < this
+		// first number of prefixes, then containment.
+		if(this.choices.size() != other.choices.size()){
+			return this.choices.size() - other.choices.size();
+		}
+		// check if this is contained in that.
+		// if not, return that it's greater. 
+		// Note that this ruins the total ordering property, 
+		// two requirements can be greater than each other.
+		for(Prefix p : this.choices){
+			if(!other.choices.contains(p)){
 				return 1;
-			}
-			int diff = this.choices[i].compareTo(other.choices[i]);
-			if(diff != 0){
-				return diff;
 			}
 		}
 		return 0;
-
-
 	}
 
 	@Override
@@ -126,12 +130,14 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		if(this.name != null){
 			return this.name;
 		}
-		if(choices.length == 1){
-			return choices[0].toString();
+		ArrayList<Prefix> choiceList = new ArrayList<Prefix>(choices);
+		Collections.sort(choiceList);
+		if(choiceList.size() == 1){
+			return choiceList.get(0).toString();
 		}
 		else{ //choices has length at least 2.
 			String choicesString = "";
-			for(Prefix p : choices){
+			for(Prefix p : choiceList){
 				choicesString += p.toString() + ",";
 			}
 			choicesString = choicesString.substring(0,choicesString.length() - 1);
@@ -144,7 +150,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	public String saveString(){
 		Object[] data = {
 				numToChoose,
-				Arrays.toString(choices),
+				choices.toString(),
 				numFinished,
 				doubleDipNumber};
 		return SaverLoader.saveString(SAVE_DELIMETERS, data);
@@ -210,7 +216,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return String.format(
 				"{Number to Choose: {%s} Choices: {%s} DDN: {%s} Requirement Name:{%s}}",
 				numToChoose,
-				SaverLoader.toJSON((Iterable)Arrays.asList(choices)),
+				SaverLoader.toJSON(new ArrayList<JSONable>(choices)),
 				doubleDipNumber,
 				name);
 	}

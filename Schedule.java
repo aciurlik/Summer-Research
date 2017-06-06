@@ -46,6 +46,7 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
+		this.addMajor(masterList.getGERMajor());
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();

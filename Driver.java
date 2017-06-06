@@ -268,14 +268,10 @@ public class Driver{
 
 
 
-	public Course GUIAddCourseWithRequirement(ArrayList <Course> finallistOfCourses, String action) {
-		Course[] toAdd = new Course[finallistOfCourses.size()];
+	public Course GUIChooseCourse(Course[] finallistOfCourses, String action) {
+		Course[] toAdd = finallistOfCourses;
 
-		for(int i =0; i<finallistOfCourses.size(); i++){
-			toAdd[i]=finallistOfCourses.get(i);
-		}
-
-		if(finallistOfCourses.size()>0){
+		if(toAdd.length>0){
 			Course c = (Course)JOptionPane.showInputDialog(popUP, action , action , JOptionPane.PLAIN_MESSAGE, icon, toAdd, "Dr. Fray");
 
 			if(c!=null && c instanceof Course){
