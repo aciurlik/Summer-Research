@@ -1,0 +1,6 @@
+Communication-BA
+REQ:{Number to Choose: {1} Choices: {{COM-101}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{COM-121}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{COM-201}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {3} Choices: {{COM-301}{COM-311}{COM-312}{COM-315}{COM-316}{COM-318}{COM-321}{COM-323}{COM-325}{COM-331}{COM-335}{COM-337}{COM-341}{COM-343}{COM-350}{COM-351}{COM-353}{COM-355}{COM-360}{COM-401}{COM-412}{COM-414}{COM-421}{COM-431}{COM-432}{COM-434}{COM-450}{COM-460}{COM-461}{COM-470}{COM-475}} DDN: {1} Requirement Name:{300-499 Electives}}
+REQ:{Number to Choose: {3} Choices: {{COM-301}{COM-311}{COM-312}{COM-315}{COM-316}{COM-318}{COM-321}{COM-323}{COM-325}{COM-331}{COM-335}{COM-337}{COM-341}{COM-343}{COM-350}{COM-351}{COM-353}{COM-355}{COM-360}{COM-401}{COM-412}{COM-414}{COM-421}{COM-431}{COM-432}{COM-434}{COM-450}{COM-460}{COM-461}{COM-470}{COM-475}{ENG-212}{COM-501}{COM-502}{COM-503}{COM-505}{COM-509}} DDN: {1} Requirement Name:{COM Electives}}

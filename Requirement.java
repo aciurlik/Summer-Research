@@ -26,12 +26,35 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return new Requirement(new Prefix[]{new Prefix("MTH", 220)}, 1);
 	}
 
+	
+	
 	public Requirement(Prefix[] choices, int numToChoose){
-		this.choices = new HashSet<Prefix>(Arrays.asList(choices));
+		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
+
+	}
+
+	
+	
+	public Requirement(HashSet<Prefix> choices, int numToChoose){
+		this.choices = choices;
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = Requirement.defaultDDN;
 	}
 
+	
+	public Requirement cloneRequirement(Requirement r) {
+		
+		Requirement newR = new Requirement (r.choices, r.numToChoose);
+		newR.doubleDipNumber=r.doubleDipNumber;
+		newR.name = r.name;
+		newR.numFinished = r.numFinished;
+		return newR;
+	}
+	
+	
+	
+	
+	
 	public boolean isSatisfiedBy(ScheduleElement e){
 		if(e instanceof Course){
 			Course c = (Course)e;
