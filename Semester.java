@@ -115,7 +115,7 @@ public class Semester implements Comparable<Semester>{
 			ScheduleError overload = new ScheduleError(MenuOptions.overloadError);
 			overload.setOverloadLimit(this.OverloadLimit);
 			overload.setOffendingCourse(addition);
-			overload.setInstructions("Adding" + addition.getDisplayString() + "exceeds this semesters overload limit of " + this.OverloadLimit );
+			overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semesters overload limit of " + this.OverloadLimit );
 			return (!this.schedule.userOverride(overload));
 		}
 		else{

@@ -45,6 +45,7 @@ public class MenuOptions {
 	public static final  String removeTrack = "Remove Track";
 	public static final  String removeMinor = "Remove Minor";
 	public static final  String exploreMayX = "Explore MayX Opportunities";
+	public static final  String help ="Help";
 
 	//Duplicate Errors
 	public static final String duplicateError = "Duplicate Error";

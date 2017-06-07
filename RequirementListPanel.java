@@ -39,8 +39,6 @@ public class RequirementListPanel extends JPanel{
 	
 
 	JPanel scrollPanel = new JPanel();
-	JPanel addExtraSemesterButtonPanel = new JPanel();
-	JButton addSemesterButton = new JButton("+");
 	JPanel infoPanel; //reqs left, credit hours, and CLPs
 	public int infoPanelFontSize = 20;
 	public JLabel creditHoursLabel;
@@ -126,9 +124,6 @@ public class RequirementListPanel extends JPanel{
 		for(Major m : majors){
 
 			MajorPanel majorPanel = new MajorPanel(m, d);
-
-
-
 			gbc.gridx = 0;
 			gbc.gridy = heightCounter;
 			heightCounter++;
