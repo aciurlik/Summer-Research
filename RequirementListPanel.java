@@ -40,7 +40,6 @@ public class RequirementListPanel extends JPanel{
 
 	JPanel scrollPanel = new JPanel();
 	JPanel infoPanel; //reqs left, credit hours, and CLPs
-	public int infoPanelFontSize = 20;
 	public JLabel creditHoursLabel;
 	public String cHText = "     Credit Hours Left: ";
 	public JLabel reqsLeftLabel;
@@ -70,15 +69,15 @@ public class RequirementListPanel extends JPanel{
 		//put all the requirement panels into inner.
 
 
-		scroll.setPreferredSize(new Dimension(800,200));
+		//scroll.setPreferredSize(new Dimension(700,150));
 		this.add(scroll, BorderLayout.CENTER);
 
 		
 		this.infoPanel = new JPanel();
 		creditHoursLabel = new JLabel();
-		creditHoursLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		creditHoursLabel.setFont(FurmanOfficial.bigHeaderFont);
 		reqsLeftLabel = new JLabel();
-		reqsLeftLabel.setFont(FurmanOfficial.getFont(this.infoPanelFontSize));
+		reqsLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
 		this.infoPanel.add(reqsLeftLabel);
 		this.infoPanel.add(creditHoursLabel);
 		this.infoPanel.setBackground(this.getBackground());
@@ -116,6 +115,7 @@ public class RequirementListPanel extends JPanel{
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(3,3,3,3);
+		gbc.anchor = GridBagConstraints.LINE_START;
 
 		ArrayList<Major> majors = schedule.getMajors();
 		int heightCounter = 1;

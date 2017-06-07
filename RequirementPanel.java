@@ -21,11 +21,12 @@ import javax.swing.border.BevelBorder;
  */
 public class RequirementPanel extends JPanel {
 	public Requirement req;
-	int fontSize = 14;
+	public Driver d;
 
-	public RequirementPanel(Requirement req){
+	public RequirementPanel(Requirement req, Driver d){
 		super();
 		this.req = req;
+		this.d = d;
 
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
@@ -51,7 +52,7 @@ public class RequirementPanel extends JPanel {
 		}
 		JLabel shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
-		shown.setFont(FurmanOfficial.getFont(fontSize));
+		shown.setFont(FurmanOfficial.normalFont);
 		shown.setToolTipText(fullText);
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
@@ -90,8 +91,7 @@ public class RequirementPanel extends JPanel {
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
-			// TODO Auto-generated method stub
-
+			d.dragStarted(req);
 		}
 
 		@Override
@@ -100,7 +100,7 @@ public class RequirementPanel extends JPanel {
 
 			//	source.revalidate();
 			//	source.repaint();
-
+			d.dragEnded();
 
 
 		}

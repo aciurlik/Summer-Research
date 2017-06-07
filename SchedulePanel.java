@@ -88,6 +88,17 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		d.GUISemesterPanelAdded();
 
 	}
+	
+	public void dragStarted(ScheduleElement e){
+		for(SemesterPanel s : this.allSemesterPanels){
+			s.dragStarted(e);
+		}
+	}
+	public void dragEnded(){
+		for(SemesterPanel s : this.allSemesterPanels){
+			s.dragEnded();
+		}
+	}
 
 
 

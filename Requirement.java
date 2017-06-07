@@ -40,6 +40,10 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		this.numToChoose = numToChoose;
 		this.doubleDipNumber = Requirement.defaultDDN;
 	}
+	
+	public Requirement(Prefix p){
+		this(new Prefix[]{p}, 1);
+	}
 
 	
 	public Requirement cloneRequirement(Requirement r) {
@@ -98,6 +102,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 
 
+	//TODO Let the user decide which comparisons should come first.
 	//This comparison method is used to sort the 
 	// requirementList displayed to the user.
 	@Override
@@ -115,17 +120,19 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		if(dipDifference != 0){
 			return dipDifference;
 		}
-
-		//Compare based on numToChoose
+		//Then compare based on numToChoose
 		int numChooseDifference = this.numToChoose - other.numToChoose;
 		if(numChooseDifference != 0){
 			return numChooseDifference;
 		}
-		//Finally, compare based on prefixes.
+		
+		
+		//then compare based on prefixes.
 		// first number of prefixes, then containment.
 		if(this.choices.size() != other.choices.size()){
 			return this.choices.size() - other.choices.size();
 		}
+		
 		// check if this is contained in that.
 		// if not, return that it's greater. 
 		// Note that this ruins the total ordering property, 
@@ -135,6 +142,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 				return 1;
 			}
 		}
+		
 		return 0;
 	}
 

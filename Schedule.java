@@ -141,8 +141,10 @@ public class Schedule {
 	 * @param e
 	 * @param s
 	 */
-	public void removeElement (ScheduleElement e, Semester s){
-		this.checkErrorsWhenRemoving(e, s);
+	public boolean removeElement (ScheduleElement e, Semester s){
+		if(this.checkErrorsWhenRemoving(e, s)){
+			return false;
+		}
 		s.remove(e);
 		if(reqsFulfilledValid){
 			if(reqsValid){
@@ -155,10 +157,13 @@ public class Schedule {
 		else{
 			reqsValid = false;
 		}
+		return true;
 	}
 
-	public void addScheduleElement(ScheduleElement element, Semester sem) {
-		this.checkErrorsWhenAdding(element, sem);
+	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
+		if(this.checkErrorsWhenAdding(element, sem)){
+			return false;
+		}
 		sem.add(element);
 		updateRequirementsSatisfied(element);
 		if(reqsValid){
@@ -167,6 +172,17 @@ public class Schedule {
 				r.numFinished ++;
 			}
 		}
+		return true;
+	}
+	
+	
+	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
+		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
+			return false;
+		}
+		newSem.add(element);
+		return true;
+		
 	}
 
 	///////////////////////////////
@@ -236,9 +252,17 @@ public class Schedule {
 		}
 
 
-		if (checkDuplicates(newElement, false)){
-			return true;
+		if(newElement == oldElement){
+			if (checkDuplicates(newElement, true)){
+				return true;
+			}
 		}
+		else{
+			if (checkDuplicates(newElement, false)){
+				return true;
+			}
+		}
+		
 
 		if(newS.checkOverlap(newElement)){
 			return true;

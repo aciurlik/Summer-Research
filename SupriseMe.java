@@ -46,7 +46,7 @@ public class SupriseMe extends JPanel implements ActionListener {
 		this.setBackground(FurmanOfficial.darkPurple);
 		JLabel suprise = new JLabel("FEELING LUCKY?", JLabel.CENTER);
 
-		suprise.setFont(FurmanOfficial.getFont(20));
+		suprise.setFont(FurmanOfficial.bigHeaderFont);
 		suprise.setForeground(Color.white);
 		this.add(suprise, BorderLayout.NORTH);
 

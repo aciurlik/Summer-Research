@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -200,6 +201,19 @@ public abstract class ComponentDragHandler extends TransferHandler {
 		}
 		afterDrop(source, dragged, action == TransferHandler.MOVE);
 	}
-
+	/*
+	
+	@Override
+	public boolean importData(TransferSupport support){
+		boolean result = super.importData(support);
+		
+	}
+	
+	@Override
+	private static DropTargetListener getDropTargetListener() {
+		
+	}
+	*/
+	
 
 }
