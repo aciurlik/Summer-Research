@@ -118,7 +118,7 @@ public class ScheduleElementPanel extends JPanel {
 		else{
 			JLabel noCourse = new JLabel("No courses avaliable");
 			noCourse.setFont(FurmanOfficial.getFont(12));
-			noCourse.setBackground(FurmanOfficial.darkPurple);
+			noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
 			this.add(noCourse);

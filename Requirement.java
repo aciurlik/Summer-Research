@@ -138,9 +138,9 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		else{ //choices has length at least 2.
 			String choicesString = "";
 			for(Prefix p : choiceList){
-				choicesString += p.toString() + ",";
+				choicesString += p.toString() + ", ";
 			}
-			choicesString = choicesString.substring(0,choicesString.length() - 1);
+			choicesString = choicesString.substring(0,choicesString.length() - 2);
 			return String.format("%d of %s", numToChoose, choicesString);
 		}
 	}
