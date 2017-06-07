@@ -152,11 +152,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		submenu.add(menuItem);
 
 
-		menuItem = new JMenuItem(MenuOptions.removeMajor);
-		JPopupMenu removeMajorPopup = new JPopupMenu(MenuOptions.removeMajor);
-		menuItem.addActionListener(this);
-		removeMajorPopup.add(menuItem);
-		submenu.add(menuItem);
 
 		menu.add(submenu);
 
@@ -171,12 +166,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		submenu.add(menuItem);
 
 
-		menuItem = new JMenuItem(MenuOptions.removeMinor);
-		JPopupMenu minorRemovePopup = new JPopupMenu();
-		menuItem.addActionListener(this);
-		minorRemovePopup.add(menuItem);
-		submenu.add(menuItem);
-
 		menu.add(submenu);
 
 		submenu = new JMenu("Track");
@@ -186,18 +175,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		trackPopup.add(menuItem);
 		submenu.add(menuItem);
 
-		menuItem = new JMenuItem(MenuOptions.removeTrack);
-		JPopupMenu trackRemovePopup = new JPopupMenu();
-		menuItem.addActionListener(this);
-		trackRemovePopup.add(menuItem);
-		submenu.add(menuItem);
+	
 
 		menu.add(submenu);
 
 
 		//Add Help
 		menu = new JMenu("Help");
-		menu.setMnemonic(KeyEvent.VK_N);
+		JPopupMenu helpMePopup = new JPopupMenu(MenuOptions.help);
+		menu.addActionListener(this);
+		helpMePopup.add(menu);
 		this.add(menu);
 
 
@@ -228,9 +215,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		if(e.getActionCommand().equals(MenuOptions.addMayX) || e.getActionCommand().equals(MenuOptions.addSummerClass)){
 			d.GUIYearsPopUP(e.getActionCommand());
 		}
-		if(e.getActionCommand().equals(MenuOptions.removeMajor) || e.getActionCommand().equals(MenuOptions.removeMinor) || (e.getActionCommand().equals(MenuOptions.removeTrack))){
-			d.GUIRemoveMajorDialogBox(e.getActionCommand());
-		}
+		
 		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
 			d.GUIPopUP(e.getActionCommand());
 		}
@@ -245,6 +230,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		}
 		if(e.getActionCommand().equals(MenuOptions.printSchedule)){
 			System.out.println("Watch me print this bad boy");
+		}
+		if(e.getActionCommand().equals(MenuOptions.help)){
+			System.out.println("HElp yourself");
 		}
 	}
 

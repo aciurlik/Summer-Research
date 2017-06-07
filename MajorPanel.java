@@ -67,6 +67,11 @@ public class MajorPanel extends JPanel {
 		JPanel topRightPanel = new JPanel();
 		topRightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		JButton remove = new JButton("x");
+		//Makes it so you can't exit GER's 
+		if(m.name.equals("GER")){
+			remove.setEnabled(false);
+
+		}
 		remove.setBackground(FurmanOfficial.darkPurple);
 		remove.setPreferredSize(new Dimension (15, 15));
 		remove.addActionListener(new ActionListener(){
@@ -97,8 +102,7 @@ public class MajorPanel extends JPanel {
 		}
 		bottom.add(heightFlex, BorderLayout.WEST);
 		this.add(bottom, BorderLayout.CENTER);
-		
-	}
+
 	
 	/*
 	public int getPreferredHeight(){
@@ -106,6 +110,7 @@ public class MajorPanel extends JPanel {
 		result += top.getPreferredSize().height;
 		result += bottom.getPreferredSize().height;
 		return result;
+
 	}
 	*/
 
