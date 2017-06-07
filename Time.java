@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,16 @@ public class Time implements Comparable<Time>{
 	public static final int UNUSED = -1;
 	public static final int AM = 0;
 	public static final int PM = 1;
+	
+
+	public static final char[] dayCodes = {'U', 'M', 'T', 'W', 'R', 'F', 'S'};
+	public static HashMap<Character, Integer> reverseDayCodes;
+	static {
+		reverseDayCodes = new HashMap<Character, Integer>();
+		for(int i = 0; i < dayCodes.length ; i ++){
+			reverseDayCodes.put(dayCodes[i], i);
+		}
+	}
 	
 	//If a field is unused, it will have this value.
 	// However, some methods have undefined behavior if particular fields are unused.
@@ -382,6 +393,22 @@ public class Time implements Comparable<Time>{
 		}
 		return 0;
 	}
+	
+
+	/**
+	 * Given a code of the form "MWF" make the correct
+	 * meeting days list.
+	 * @param dayCode
+	 * @return
+	 */
+	public static int[] meetingDaysFrom(String dayCode){
+		char[] days = dayCode.toCharArray();
+		int[] result = new int[days.length];
+		for(int i = 0; i < result.length ; i ++){
+			result[i] = reverseDayCodes.get(days[i]);
+		}
+		return result;
+	}
 
 	public String toString(){
 		//TODO make this fancier
@@ -520,7 +547,6 @@ public class Time implements Comparable<Time>{
 				combine(date.minutes, time.minutes),
 				combine(date.seconds, time.seconds)
 				);
-		
 	}
 	
 	private static int combine(int v1, int v2){
