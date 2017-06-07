@@ -55,4 +55,6 @@ public class MenuOptions {
 	//CourseList
 	//GER
 	public static final String humanBehavior = "HB";
+	public static final String nautralWorld = "NW";
+	public static final String	nautralWorldLab = "NWL";
 }

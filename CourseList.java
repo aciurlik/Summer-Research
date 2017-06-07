@@ -27,7 +27,7 @@ public class CourseList  {
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
 
 	private Dictionary<Prefix, Prefix[]> prereqs ;
-	
+
 	public Hashtable<String, Requirement> GERRequirements;
 
 
@@ -55,8 +55,8 @@ public class CourseList  {
 		//result.addCoursesIn(new File("Fall2017.csv"));
 		return readAll();
 	}
-	
-	
+
+
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 		this.prereqs = new Hashtable<Prefix, Prefix[]>();
@@ -81,7 +81,7 @@ public class CourseList  {
 		return result;
 	}
 
-	
+
 
 
 	public Prefix[] getPrereqsShallow(Prefix p){
@@ -232,7 +232,7 @@ public class CourseList  {
 		}
 		return SemesterList;
 	}
-	
+
 	public ArrayList<Requirement> allGERRequirements(){
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(String key : this.GERRequirements.keySet()){
@@ -242,26 +242,52 @@ public class CourseList  {
 		}
 		return result;
 	}
-	
+
 	public Major getGERMajor(int MajorType){
+		ArrayList<Requirement> toMakeCopy = allGERRequirements();
+		ArrayList<Requirement>  changeableGERRequirements = new ArrayList<Requirement>();
+		for(Requirement r: toMakeCopy){
+			Requirement newR = r.cloneRequirement(r);
+			changeableGERRequirements.add(newR);
+		}
+
+
 		Major m = new Major("GER");
-		for(Requirement r : allGERRequirements()){
-			if(r.name.equals(MenuOptions.humanBehavior)){
-				r.numToChoose=2;
+		for(Requirement r : changeableGERRequirements){
+			if(r.name!="WC"|| r.name!="NE"){
+				if(r.name.equals("HB")){
+					r.numToChoose=2;
+				}
+				if(r.name.equals("NW")){
+					r.choices.addAll(GERRequirements.get("NWL").choices);
+					r.doubleDipNumber=1;
+
+				}
+				r.doubleDipNumber=2;
 			}
-			
+			if(r.name.equals("WC")){
+				r.doubleDipNumber=1;
+			}
+			if(r.name.equals("NE")){
+				r.doubleDipNumber=1;
+			}
+
 			//r is a requirement of the form NumToChoose{1} choices {Mth150, Mth 140, Mth 120} DDn{0} Name {MR}
 			m.addRequirement(r);
 		}
 		return m;
 	}
-	
-	
+
+
+
+
+
+
 	public Requirement getGERRequirement(String code){
 		return this.GERRequirements.get(code);
 	}
-	
-	
+
+
 	public void courseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.split(" ");
 		for(String s : allGERs){
@@ -353,11 +379,11 @@ public class CourseList  {
 
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
-		
+
 		for(Requirement r : c.allGERRequirements()){
 			System.out.println(r.name + "," + r.saveAsJSON());
 		}
-		
+
 		/*for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
 		}*/
