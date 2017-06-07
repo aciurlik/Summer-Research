@@ -60,6 +60,11 @@ public class MajorPanel extends JPanel {
 		JPanel removeP = new JPanel();
 		removeP.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		JButton remove = new JButton("x");
+		//Makes it so you can't exit GER's 
+		if(m.name.equals("GER")){
+			remove.setEnabled(false);
+
+		}
 		remove.setBackground(FurmanOfficial.darkPurple);
 		remove.setPreferredSize(new Dimension (15, 15));
 		remove.addActionListener(new ActionListener(){
@@ -82,9 +87,6 @@ public class MajorPanel extends JPanel {
 		}
 		this.add(bottom, BorderLayout.CENTER);
 
-		JPanel red = new JPanel();
-		red.setBackground(Color.red);
-		red.setSize(300, 2000);
 
 
 

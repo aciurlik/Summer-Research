@@ -183,6 +183,14 @@ public class Schedule {
 		//Tell the new requirements if some taken course satisfies them.
 		reqsValid = false;
 	}
+	
+	public void addAtMajor(Major newMajor, int index){
+		majorsList.add(index, newMajor);
+		//Tell the courses which requirements they satisfy
+		reqsFulfilledValid = false;
+		//Tell the new requirements if some taken course satisfies them.
+		reqsValid = false;
+	}
 
 
 	public void removeMajor(Major major) {
