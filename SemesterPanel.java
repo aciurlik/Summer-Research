@@ -5,11 +5,18 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,8 +30,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
-	public int seasonFontSize = 16;
-	public int dropLabelFontSize = 12;
 	private String addAClass = "Drop a requirement here";
 	private String classTitle;
 	JPanel defaultPanel = new JPanel();
@@ -61,7 +66,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		JButton showSemester = new JButton(MenuOptions.showSemester);
 		showSemester.setActionCommand(MenuOptions.showSemester);
 		showSemester.setPreferredSize(new Dimension(15, 15));
-		showSemester.setFont(FurmanOfficial.getFont(12));
+		showSemester.setFont(FurmanOfficial.normalFont);
 		showSemester.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
@@ -95,7 +100,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		PanelforButtons.add(hideSem);
 		
 		JLabel FallSpring = new JLabel();
-		FallSpring.setFont(FurmanOfficial.getFont(seasonFontSize));
+		FallSpring.setFont(FurmanOfficial.bigHeaderFont);
 		
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
@@ -133,6 +138,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		if(defaultPanel != null){
 
 			defaultPanel.setBackground(c);
+			if(topPanel != null){
+				topPanel.setBackground(c);
+			}
 		}
 	}
 
@@ -149,6 +157,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public int getRequirementNumber() {
 		return requirementNumber;
 	}
+	
 
 
 
@@ -287,7 +296,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public JLabel newDropLabel(){
 		JLabel dropLabel = new JLabel(addAClass);
 		dropLabel.setTransferHandler(new SemesterPanelDropHandler());
-		dropLabel.setFont(FurmanOfficial.getFont(dropLabelFontSize));
+		dropLabel.setFont(FurmanOfficial.normalFont);
 		return dropLabel;
 	}
 
@@ -317,6 +326,54 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		//this.updatePanel(true);
 	}
 	
+	
+	public void dragStarted(ScheduleElement e){
+		if(this.canTake(e)){
+			this.setHilighted(true);
+		}
+	}
+	public void dragEnded(){
+		this.setHilighted(false);
+	}
+	
+	public void setHilighted(boolean b){
+		if(b){
+			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
+		}
+		else{
+			this.setBackground(semesterColor(this.sem));
+		}
+	}
+	/**
+	 * This method is used to determine whether this panel should
+	 * hilight itself while the user is dragging e.
+	 * @param e
+	 * @return
+	 */
+	public boolean canTake(ScheduleElement e){
+		//Turn this into a requirement.
+		Requirement r;
+		if(e instanceof Requirement){
+			r = (Requirement) e;
+		}
+		else if (e instanceof Course){
+			r = new Requirement(e.getPrefix());
+		}
+		else{
+			r = null;
+		}
+		if(r == null){
+			return false;
+		}
+		//Figure out if this semester has an instance of this requirement.
+		else{
+			return this.canTake(r);
+		}
+	}
+	public boolean canTake(Requirement r){
+		return !this.sem.getCoursesSatisfying(r).isEmpty();
+	}
+	
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
@@ -331,11 +388,21 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			}
 
 		}
+		
 
+		@Override
+		public boolean canImport(Component c) {
+			if(c instanceof RequirementPanel){
+				return true;
+			}
+			else if(c instanceof ScheduleElementPanel){
+				return true;
+			}
+			return false;
+		}
 	}
-
 	
-
+	
 
 }
 

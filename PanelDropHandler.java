@@ -1,6 +1,8 @@
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DropTargetListener;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
@@ -45,19 +47,26 @@ import javax.swing.TransferHandler.TransferSupport;
  * @author dannyrivers
  *
  */
-public abstract class PanelDropHandler extends TransferHandler{
+public abstract class PanelDropHandler extends TransferHandler {
 
 	@Override
 	public boolean canImport(TransferSupport support)
 	{
 		if (!support.isDrop())
 		{
+			
 			return false;
 		}
-
-		boolean canImport = support.isDataFlavorSupported(ComponentDragHandler.COMPONENT_FLAVOR);
-		return canImport;
+		
+		if(!support.isDataFlavorSupported(ComponentDragHandler.COMPONENT_FLAVOR)){
+			
+			return false;
+		}
+		
+		return true;
 	}
+	
+	public abstract boolean canImport(Component c);
 
 
 	/**
@@ -112,4 +121,6 @@ public abstract class PanelDropHandler extends TransferHandler{
 
 		return true;
 	}
+	
+	
 }

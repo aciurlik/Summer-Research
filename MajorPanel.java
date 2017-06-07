@@ -17,6 +17,9 @@ import javax.swing.border.MatteBorder;
 public class MajorPanel extends JPanel {
 	public  Major major;
 	public Driver d;
+	
+	JPanel top;
+	JPanel bottom;
 
 
 	public MajorPanel(Major m, Driver d){
@@ -45,20 +48,24 @@ public class MajorPanel extends JPanel {
 		//Make this major's panel
 
 		this.setLayout(new BorderLayout());
-		JPanel header = new JPanel();
-		header.setLayout(new FlowLayout(FlowLayout.LEFT));
-		JPanel top = new JPanel ();
-
-
+		
+		//Holds all the things on the top
+		top = new JPanel ();
 		top.setLayout(new BorderLayout());
 		top.setBorder(new CompoundBorder(new EmptyBorder(4, 4, 4, 4), new MatteBorder(0, 0, 1, 0, Color.BLACK)));
-		JLabel topLabel =new JLabel(m.name + "         " + reqsLeft + " Unscheduled"); 
-		topLabel.setFont(FurmanOfficial.getFont(16));
-		header.add(topLabel);
-		top.add(header, BorderLayout.WEST);
+		
+		
+		//Holds the things at the top left (currently major name and # unscheduled)
+		JPanel topLeftPanel = new JPanel(); 
+		topLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		JLabel topLeftLabel =new JLabel(m.name + "         " + reqsLeft + " Unscheduled"); 
+		topLeftLabel.setFont(FurmanOfficial.smallHeaderFont);
+		topLeftPanel.add(topLeftLabel);
 
-		JPanel removeP = new JPanel();
-		removeP.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		//The panel at the top right (currently the remove button)
+		JPanel topRightPanel = new JPanel();
+		topRightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		JButton remove = new JButton("x");
 		remove.setBackground(FurmanOfficial.darkPurple);
 		remove.setPreferredSize(new Dimension (15, 15));
@@ -69,27 +76,38 @@ public class MajorPanel extends JPanel {
 
 			}
 		});
-		removeP.add(remove);
-		top.add(removeP, BorderLayout.EAST);
+		topRightPanel.add(remove);
+		
+		
+		
+		top.add(topLeftPanel, BorderLayout.WEST);
+		top.add(topRightPanel, BorderLayout.EAST);
 
 
 		this.add(top, BorderLayout.NORTH);
 
 
-		JPanel bottom = new JPanel();
+		//Holds the requirements
+		bottom = new JPanel();
+		bottom.setLayout(new BorderLayout());
+		JPanel heightFlex = new JPanel();
+		//heightFlex.setLayout(new WrapLayout());
 		for(Requirement r : reqList){
-			bottom.add(new RequirementPanel(r));
+			heightFlex.add(new RequirementPanel(r,d));
 		}
+		bottom.add(heightFlex, BorderLayout.WEST);
 		this.add(bottom, BorderLayout.CENTER);
-
-		JPanel red = new JPanel();
-		red.setBackground(Color.red);
-		red.setSize(300, 2000);
-
-
-
-
+		
 	}
+	
+	/*
+	public int getPreferredHeight(){
+		int result = 0;
+		result += top.getPreferredSize().height;
+		result += bottom.getPreferredSize().height;
+		return result;
+	}
+	*/
 
 	public void removeSelf(){
 		d.GUIRemoveMajor(this);

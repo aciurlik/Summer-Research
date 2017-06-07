@@ -17,6 +17,10 @@ public class FurmanOfficial {
 	public static final Color bouzarthDarkPurple = darkPurple(230);
 	public static final Color bouzarthGrey = grey(60);
 	
+	public static final Font bigHeaderFont = getFont(18);
+	public static final Font smallHeaderFont = getFont(14);
+	public static final Font normalFont = getFont(12);
+	
 	/**
 	 * Rescale this RGB value according to the given alpha
 	 * as if it were placed on a white background.
@@ -51,9 +55,23 @@ public class FurmanOfficial {
 				);
 	}
 	
-	public static final Font closeFont = new Font("Helvatica", Font.PLAIN, 12);
-
-	
+	/**
+	 * Most calls should be replaced with one of :
+	 * FurmanOfficial.bigHeaderFont
+	 * FurmanOfficial.smallHeaderFont
+	 * FurmanOfficial.normalFont
+	 * 
+	 * so that the presentation is standard across different buttons.
+	 * 
+	 * If your font size is between 10 and 24, use one of these fields instead.
+	 * 
+	 * 
+	 * Calls to this method may be used for extreme cases, like 
+	 * the surprise me panel (which has a font size 45). 
+	 * 
+	 * @param point
+	 * @return
+	 */
 	public static Font getFont(int point){
 		return new Font("Helvatica", Font.PLAIN, point);
 	}

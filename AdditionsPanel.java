@@ -19,8 +19,6 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public String classAddition = new String("Major/Minor");
 	public int optionsNumber = 8;
 	public int headerNumber = 2;
-	public int buttonsFontSize = 11;
-	public int headerFontSize = 14;
 	Driver d;
 	private JButton AddMajorButton;
 	private JButton AddMayXButton;
@@ -36,13 +34,11 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 		super();
 		this.d=d;
-		this.setLayout((new GridLayout(optionsNumber+headerNumber+2, 1, 3, 3)));
-		JLabel empty = new JLabel("          ");
-		this.add(empty);
+		this.setLayout((new GridLayout(optionsNumber+headerNumber, 1, 3, 3)));
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 		JLabel header = new JLabel(AdditionsHeader);
 		header.setHorizontalAlignment(JLabel.CENTER);
-		header.setFont(FurmanOfficial.getFont(headerFontSize));
+		header.setFont(FurmanOfficial.smallHeaderFont);
 		this.add(header);
 
 
@@ -71,7 +67,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		//Major/Minor Heading 
 		JLabel classAdditions = new JLabel(classAddition);
 		classAdditions.setHorizontalAlignment(JLabel.CENTER);
-		classAdditions.setFont(FurmanOfficial.getFont(headerFontSize));
+		classAdditions.setFont(FurmanOfficial.smallHeaderFont);
 		this.add(classAdditions);
 
 		//Add Minor
@@ -84,8 +80,6 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.AddTrackButton =this.addButton(MenuOptions.addTrack);
 		AddTrackButton.setActionCommand(MenuOptions.addTrack);
 
-		this.add(empty);
-
 	}
 
 	public JButton addButton(String s){
@@ -93,7 +87,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		buttonPanel.setBackground(this.getBackground());
 
 		JButton button = new JButton(s);
-		button.setFont(FurmanOfficial.getFont(buttonsFontSize));
+		button.setFont(FurmanOfficial.normalFont);
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
 		button.setBackground(FurmanOfficial.bouzarthDarkPurple);

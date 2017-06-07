@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 public class ScheduleElementPanel extends JPanel {
 	private int updateCount = 0;
 	private ScheduleElement s;
-	private SemesterPanel container;
+	public SemesterPanel container;
 	private Dimension buttonSize = new Dimension(20, 20);
 	private String removeButtonText = "x";
 	public ScheduleElementPanel reference = this;
@@ -42,7 +42,6 @@ public class ScheduleElementPanel extends JPanel {
 		this.reference=this;
 		this.container = container;
 		this.setBackground(FurmanOfficial.grey(30));
-
 
 
 
@@ -73,7 +72,7 @@ public class ScheduleElementPanel extends JPanel {
 
 	public void updatePanel(){ //This can be taken out later
 		JLabel elementLabel = new JLabel(s.getDisplayString());
-		elementLabel.setFont(FurmanOfficial.getFont(12));
+		elementLabel.setFont(FurmanOfficial.normalFont);
 		this.add(elementLabel);
 		if(s instanceof Requirement) {
 			updateDropDown();
@@ -110,14 +109,16 @@ public class ScheduleElementPanel extends JPanel {
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					Course c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
-					container.d.GUIElementChanged(container, reference , c);
+					if(c != null){
+						container.d.GUIElementChanged(container, reference , c);
+					}
 				}
 			});
 			this.add(addCourse);
 		}	
 		else{
 			JLabel noCourse = new JLabel("No courses avaliable");
-			noCourse.setFont(FurmanOfficial.getFont(12));
+			noCourse.setFont(FurmanOfficial.normalFont);
 			noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
@@ -134,20 +135,26 @@ public class ScheduleElementPanel extends JPanel {
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
-
+			//alert the driver of the change
+			//container.d.dragStarted(toBeDragged);
+			container.d.dragStarted(s);
 		}
 
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
 			container.removeElement((ScheduleElementPanel) dragged);
-			//container.d.reqs.update();
-			//container.d.reqs.revalidate();
-			//	container.d.reqs.repaint();
+			container.d.dragEnded();
 
 		}
 
 	}
+	
+	
+	/*void dndDone(){
+		System.out.println("hi");
+	}
+	*/
 
 
 

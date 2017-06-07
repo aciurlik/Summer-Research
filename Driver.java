@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ public class Driver{
 	String headInstructCourse = "Pick a course";
 	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
+	ScheduleElement beingDragged;
 
 
 
@@ -45,7 +47,7 @@ public class Driver{
 		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
-		Image newImage = image.getScaledInstance(100,400 , java.awt.Image.SCALE_SMOOTH);
+		Image newImage = image.getScaledInstance(100,300 , java.awt.Image.SCALE_SMOOTH);
 		icon = new ImageIcon(newImage);
 		JLabel belltowerLabel = new JLabel(icon);
 
@@ -60,7 +62,7 @@ public class Driver{
 
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
-		menu.setFont(FurmanOfficial.getFont(12));
+		menu.setFont(FurmanOfficial.normalFont);
 		frame.setJMenuBar(menu);
 		frame.setContentPane(menu.createContentPane());
 
@@ -104,7 +106,8 @@ public class Driver{
 
 
 	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel semesterPanel) {
-		sch.addScheduleElement(p.getElement(), semesterPanel.sem);
+		Semester old = p.container.sem;
+		sch.moveElement(p.getElement(), old, semesterPanel.sem);
 		this.update();
 	}
 
@@ -120,6 +123,7 @@ public class Driver{
 		this.update();
 
 	}
+	
 
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
@@ -234,6 +238,16 @@ public class Driver{
 
 
 	}
+	
+	public void dragStarted(ScheduleElement e){
+		this.schP.dragStarted(e);
+	}
+	public void dragEnded(){
+		this.schP.dragEnded();
+	}
+	
+	
+	
 
 	public void createYearDialogBox(String s){
 		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
