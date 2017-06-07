@@ -102,8 +102,8 @@ public class MajorPanel extends JPanel {
 		}
 		bottom.add(heightFlex, BorderLayout.WEST);
 		this.add(bottom, BorderLayout.CENTER);
-		
 	}
+
 	
 	/*
 	public int getPreferredHeight(){

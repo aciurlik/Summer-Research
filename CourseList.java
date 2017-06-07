@@ -393,6 +393,10 @@ public class CourseList  {
 					else{
 						//Set labTime = startTime thru endTime, no dates.
 						lastCourse.setLabTime(new Time[]{times[1], times[3]});
+						String meetingTimesString = data.get(9);
+						if(!meetingTimesString.equals("")){
+							lastCourse.setLabDay(Time.meetingDaysFrom(meetingTimesString)[0]);
+						}
 					}
 				}
 				line = br.readLine();
