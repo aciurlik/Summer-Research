@@ -123,7 +123,7 @@ public class Driver{
 		this.update();
 
 	}
-	
+
 
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
@@ -133,24 +133,43 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-		//if m is lets you choose between BS/BM/BA{
-		//get that value from the major of from the schedule 
-		String[] toAdd={"BA", "BM", "BS"};
-		String GERNeeded = (String)JOptionPane.showInputDialog(popUP, "What type of degree would you like",  "Degree Type", JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
-		int MajorType = 0;
-		if(GERNeeded.equals("BS")){
-			MajorType = CourseList.BS;
+		if(m.majorType.equals(m.MINOR)||m.majorType.equals(m.TRACK)){
+			this.sch.addMajor(m);
+			this.update();
 		}
-		if(GERNeeded.equals("BM")){
-			MajorType = CourseList.BM;
+		if(m.degreeTypes.size()==1){
+			this.sch.removeMajor(sch.masterList.getGERMajor(0));
+			this.sch.addAtMajor(sch.masterList.getGERMajor(m.degreeTypes.get(0)), 0);
+			sch.addMajor(m);
+			this.update();
 		}
-		if(GERNeeded.equals("BA")){
-			MajorType = CourseList.BA;
+		if(m.degreeTypes.size()>1){
+			ArrayList<String> toAdd= new ArrayList<String>();
+			for(int i = 0; i<m.degreeTypes.size(); i++){
+				
+				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
+			}
+			String[] choices = new String[toAdd.size()];
+			for(int p = 0; p<toAdd.size(); p ++){
+				choices[p]=toAdd.get(p);
+
+
+			}
+			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, "What type of degree would you like",  "Degree Type", JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+			int MajorType = 0;
+			if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
+				
+				MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
+			}
+			this.sch.removeMajor(sch.masterList.getGERMajor(0));
+			this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
+			m.setChosenDegree(MajorType);
+			sch.addMajor(m);
+			this.update();
 		}
-		this.sch.removeMajor(sch.masterList.getGERMajor(0));
-		this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
-		sch.addMajor(m);
-		this.update();
+
+
+
 
 	}
 
@@ -254,16 +273,16 @@ public class Driver{
 
 
 	}
-	
+
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 	}
 	public void dragEnded(){
 		this.schP.dragEnded();
 	}
-	
-	
-	
+
+
+
 
 	public void createYearDialogBox(String s){
 		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
