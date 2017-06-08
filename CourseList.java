@@ -22,6 +22,7 @@ public class CourseList  {
 	public static final int BA = 0;
 	public static final int BS = 1;
 	public static final int BM = 2;
+	public static final int None = 4;
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
@@ -56,7 +57,7 @@ public class CourseList  {
 		return readAll();
 	}
 
-
+	
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 		this.prereqs = new Hashtable<Prefix, Prefix[]>();
@@ -212,8 +213,33 @@ public class CourseList  {
 	}
 
 
-
-
+	public static String getDegreeTypeString(int i){
+		if(i == BS){
+			return "BS";
+		}
+		if(i == BA){
+			return "BA";
+		}
+		if(i == BM){
+			return "BM";
+		}
+		return "null";
+	}
+	
+	
+	
+	public static int getDegreeTypeNumber(String s){
+		if(s.equals("BM")){
+			return CourseList.BM;
+		}
+		if(s.equals("BS")){
+			return CourseList.BS;
+		}
+		if(s.equals("BA")){
+			return CourseList.BA;
+		}
+		return -1;
+	}
 
 	/**
 	 * Return only those members of input which are in the given semester.
@@ -363,7 +389,7 @@ public class CourseList  {
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
 
-
+	
 
 
 	public void addCoursesIn(File furmanCoursesFile){
