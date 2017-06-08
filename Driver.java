@@ -135,20 +135,20 @@ public class Driver{
 	public void GUIAddMajor(Major m) {
 		//if m is lets you choose between BS/BM/BA{
 		//get that value from the major of from the schedule 
-		String[] toAdd={"BA", "BM", "BS"};
-		String GERNeeded = (String)JOptionPane.showInputDialog(popUP, "What type of degree would you like",  "Degree Type", JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
-		int MajorType = 0;
-		if(GERNeeded.equals("BS")){
-			MajorType = CourseList.BS;
-		}
-		if(GERNeeded.equals("BM")){
-			MajorType = CourseList.BM;
-		}
-		if(GERNeeded.equals("BA")){
-			MajorType = CourseList.BA;
-		}
-		this.sch.removeMajor(sch.masterList.getGERMajor(0));
-		this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
+		//String[] toAdd={"BA", "BM", "BS"};
+		//String GERNeeded = (String)JOptionPane.showInputDialog(popUP, "What type of degree would you like",  "Degree Type", JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
+	//	int MajorType = 0;
+	//	if(GERNeeded.equals("BS")){
+		//	MajorType = CourseList.BS;
+	//	}
+	//	if(GERNeeded.equals("BM")){
+		//	MajorType = CourseList.BM;
+	//	}
+	///	if(GERNeeded.equals("BA")){
+	//		MajorType = CourseList.BA;
+	//	}
+	//	this.sch.removeMajor(sch.masterList.getGERMajor(0));
+	//	this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
 		sch.addMajor(m);
 		this.update();
 

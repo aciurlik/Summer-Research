@@ -257,12 +257,24 @@ public class CourseList  {
 			//Adjust MR for BS
 			if(MajorType==BS){
 				if(r.name.equals("MR")){
-
-					if(MajorType==BS){
 						r.choices.clear();
 						r.choices.add(new Prefix("MTH", 145));
 						r.choices.add(new Prefix("MTH", 150));
 					}
+				if(r.name.equals("NW")){
+				      r.choices.clear();
+				      r.choices.add(new Prefix("CHM", 110));
+				      r.choices.add(new Prefix("CHM", 115));
+				      r.choices.add(new Prefix("CHM", 120));
+				      r.choices.add(new Prefix("EES", 112));
+				      r.choices.add(new Prefix("EES", 113));
+				      r.choices.add(new Prefix("EES", 115));
+				      r.choices.add(new Prefix("PHY", 111));
+				      r.choices.add(new Prefix("PHY", 112));
+				      r.choices.add(new Prefix("PSY", 320));
+				      r.choices.add(new Prefix("SUS", 120));
+				 	
+				}
 				}
 
 
@@ -280,7 +292,7 @@ public class CourseList  {
 				}
 				//Sets double dip number for all to be the same
 				r.doubleDipNumber=2;
-			}
+			
 			//Sets WC and NE double dip to be the same. 
 			if(r.name.equals("WC")){
 				r.doubleDipNumber=1;
@@ -288,17 +300,20 @@ public class CourseList  {
 			if(r.name.equals("NE")){
 				r.doubleDipNumber=1;
 			}
-			
-			
-		//	if(MajorType == this.BM){
-		//		if(r.name.equals("MR")){
-		//			m.reqList.remove(r);
-		//		}
-		//	}
-		
+
+			// Takes off MR and NWL for BM
+			if(MajorType != BM){
+				m.addRequirement(r);
+			}
+			else if (!r.name.equals("MR") && !r.name.equals("NWL")) {
+				m.addRequirement(r);
+
+			}
+
+
 
 			//r is a requirement of the form NumToChoose{1} choices {Mth150, Mth 140, Mth 120} DDn{0} Name {MR}
-			m.addRequirement(r);
+
 		}
 
 		return m;
@@ -307,7 +322,8 @@ public class CourseList  {
 
 
 
-
+	
+	 
 
 
 	public Requirement getGERRequirement(String code){
