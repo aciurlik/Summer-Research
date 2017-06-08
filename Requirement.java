@@ -1,17 +1,23 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 
 
 
-public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable{
-	HashSet<Requirement> choices;
+public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable, RequirementInterface{
+	HashSet<RequirementInterface> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
 	String name;
+	boolean storedCompletionValue;
+	int storedCoursesLeft;
+	double storedPercentComplete;
+	
+	public static final double tolerance = 1000 * Double.MIN_VALUE;
 	/**
 	 *
 	 */
@@ -24,7 +30,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	
 	
 	public Requirement(){
-		this.choices = new HashSet<Requirement>();
+		this.choices = new HashSet<RequirementInterface>();
 	}
 
 	
@@ -41,9 +47,9 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 
 	
-	public Requirement cloneRequirement() {
+	public RequirementInterface cloneRequirement() {
 		Requirement newR = new Requirement();
-		for(Requirement lower : this.choices){
+		for(RequirementInterface lower : this.choices){
 			newR.addRequirement(lower.cloneRequirement());
 		}
 		newR.name = this.name + "";
@@ -51,76 +57,152 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 	
 	
-	public void addRequirement(Requirement r){
+	public void addRequirement(RequirementInterface r){
 		this.choices.add(r);
 	}
 	
 	
 	
-	
-	
-	public boolean isSatisfiedBy(ScheduleElement e){
-		if(e instanceof Course){
-			Course c = (Course)e;
-
-			for (Prefix p : choices){
-				if(c.coursePrefix.compareTo(p) == 0){
-					return true;
-				}
-			}
-			return false;
-		}
-		else if (e instanceof Requirement){
-			if(this.choices.equals(((Requirement)e).choices)){
-				return true;
-			}
-			return false;
-		}
-		else if(e.getRequirementsFulfilled().contains(this)){
-			return true;
-		}
-		return false;
-
-	}
 	public void setName(String name){
 		this.name = name;
 	}
-
-	public void setDoubleDipNumber(int newVal){
-		this.doubleDipNumber = newVal;
-	}
-	public int getDoubleDipNumber(){
-		return this.doubleDipNumber;
+	
+	
+	
+	
+	/**  TODO needs to be tested
+	 * Check if these prefixes satisfy this requirement.
+	 * Requirements are optimists - if this set of taken things
+	 *  has any shot of satisfying this requirement, then the requirement.
+	 *  will say that it does. 
+	 * @param taken
+	 * @return
+	 */
+	public boolean isComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+		boolean result = minCoursesNeeded(taken, numPlannedLater, storeValue) <= 0;
+		if(storeValue){
+			this.storedCompletionValue = result;
+		}
+		return result;
 	}
 	
-	public void addChoice(Prefix p){
-		choices.add(p);
+	
+	/** TODO needs to be tested
+	 * Find the minimum number of courses you would need to completely
+	 * satisfy this requirement, given this set of things you've already taken.
+	 */
+	public int minCoursesNeeded(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+		int result = fastestCompletionSet(taken).size() - numPlannedLater;
+		if(storeValue){
+			this.storedCoursesLeft = result;
+		}
+		return result;
+	}
+	/**  TODO needs to be tested
+	 * Find the set of prefixes that would most quickly complete this requirement
+	 * @return
+	 */
+	public HashSet<Prefix> fastestCompletionSet(HashSet<Prefix> taken){
+		//If you have n to choose of k choices, then you need the 
+		// n fastest completion sets from all your choices.
+		ArrayList<HashSet<Prefix>> subSets = new ArrayList<HashSet<Prefix>>();
+		for(RequirementInterface r : choices){
+			subSets.add(r.fastestCompletionSet(taken));
+		}
+		Collections.sort(subSets,new Comparator<HashSet>(){
+			@Override
+			public int compare(HashSet o1, HashSet o2) {
+				return o1.size() - o2.size();
+			}
+		});
+		HashSet<Prefix> result = new HashSet<Prefix>();
+		for(int i = 0; i < this.numToChoose ; i ++){
+			result.addAll(subSets.get(i));
+		}
+		return result;
+	}
+	
+	/** TODO needs to be tested
+	 * Find what % this requirement is complete if you get the best-case scenario for
+	 * each of the numPlannedLater courses.
+	 * @param taken
+	 * @param numPlannedLater
+	 * @param storeValue
+	 * @return
+	 */
+	public double percentComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+		HashSet<Prefix> workingSet = new HashSet<Prefix>(taken);
+		for(int i = 0; i < numPlannedLater ; i ++){
+			if(Math.abs(percentComplete(workingSet) - 1.0) < tolerance ){
+				return 1.0;
+			}
+			Prefix next = findBestToTake(workingSet);
+			workingSet.add(next);
+		}
+		double result = percentComplete(workingSet);
+		if(storeValue){
+			storedPercentComplete = result;
+		}
+		return result;
+	}
+	
+	/** TODO needs to be tested
+	 * Figure out what % complete this requirement is.
+	 */
+	public double percentComplete(HashSet<Prefix> taken){
+		ArrayList<Double> subPercents = new ArrayList<Double>();
+		for(RequirementInterface r : this.choices){
+			subPercents.add(r.percentComplete(taken));
+		}
+		Collections.sort(subPercents);
+		int miniPercent = 0;
+		for(int i = 0 ; i < subPercents.size() && i < numToChoose ; i ++){
+			int index = subPercents.size() - (i + 1);
+			miniPercent += subPercents.get(index);
+		}
+		return ((double)miniPercent)  / numToChoose;
+	}
+	
+	/** TODO needs to be tested
+	 * Find the prefix that would bring this requirement closest to completion.
+	 * Return the prefix and the % it would add in an Object[]
+	 * @param taken
+	 * @return
+	 */
+	public Prefix findBestToTake(HashSet<Prefix> taken){
+		for(Prefix p : fastestCompletionSet(taken)){
+			return p;
+		}
+		return null;
 	}
 
-	public boolean isComplete(){
-		return numToChoose <= numFinished;
-	}
 
-
+	
+	
+	
 	//TODO Let the user decide which comparisons should come first.
 	//This comparison method is used to sort the 
 	// requirementList displayed to the user.
 	@Override
 	public int compareTo(Requirement other) {
 		//first compare based on whether they're complete, completed coming later
-		if(this.isComplete() && !other.isComplete()){
+		if(this.storedCompletionValue && !other.storedCompletionValue){
 			return 1;
 		}
-		if(!this.isComplete() && other.isComplete()){
+		if(!this.storedCompletionValue && other.storedCompletionValue){
 			return -1;
 		}
-		//then compare based on doubleDipNumber, as this will separate 
-		// GER from major and each major from the others.
-		int dipDifference = this.doubleDipNumber - other.doubleDipNumber;
-		if(dipDifference != 0){
-			return dipDifference;
+		
+		//Then compare based on % complete
+		double percentDifference = storedPercentComplete - other.storedPercentComplete;
+		if(percentDifference < tolerance){
+			return -1;
 		}
-		//Then compare based on numToChoose
+		if(percentDifference > tolerance){
+			return 1;
+		}
+		
+		//Then compare based on number to choose
 		int numChooseDifference = this.numToChoose - other.numToChoose;
 		if(numChooseDifference != 0){
 			return numChooseDifference;
@@ -137,13 +219,12 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		// if not, return that it's greater. 
 		// Note that this ruins the total ordering property, 
 		// two requirements can be greater than each other.
-		for(Prefix p : this.choices){
-			if(!other.choices.contains(p)){
-				return 1;
-			}
-		}
+		//TODO add containment check
 		
+		
+		//TODO add check for exact equality
 		return 0;
+		
 	}
 
 	@Override

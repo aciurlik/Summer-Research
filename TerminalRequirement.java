@@ -1,5 +1,5 @@
 
-public class TerminalRequirement extends Requirement {
+public class TerminalRequirement implements RequirementInterface {
 	public Prefix p;
 	public int number;
 	
@@ -18,7 +18,7 @@ public class TerminalRequirement extends Requirement {
 	
 	
 	@Override
-	public Requirement cloneRequirement(){
+	public RequirementInterface cloneRequirement(){
 		return new TerminalRequirement(new Prefix(p.getSubject(), p.getNumber()), number);
 	}
 	
