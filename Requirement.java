@@ -7,18 +7,11 @@ import java.util.Iterator;
 
 
 public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable{
-	HashSet<Prefix> choices;
+	HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
-	int numFinished;
-	int doubleDipNumber;
 	String name;
-
-	public static final int defaultDDN = 0;
-
-
-
 	/**
 	 *
 	 */
@@ -28,31 +21,38 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 
 	
 	
+	
+	
+	public Requirement(){
+		this.choices = new HashSet<Requirement>();
+	}
+
+	
 	public Requirement(Prefix[] choices, int numToChoose){
 		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
-
 	}
-
-	
-	
 	public Requirement(HashSet<Prefix> choices, int numToChoose){
-		this.choices = choices;
+		this();
+		for(Prefix p : choices){
+			TerminalRequirement r = new TerminalRequirement(p);
+			this.choices.add(r);
+		}
 		this.numToChoose = numToChoose;
-		this.doubleDipNumber = Requirement.defaultDDN;
-	}
-	
-	public Requirement(Prefix p){
-		this(new Prefix[]{p}, 1);
 	}
 
 	
-	public Requirement cloneRequirement(Requirement r) {
-		
-		Requirement newR = new Requirement (r.choices, r.numToChoose);
-		newR.doubleDipNumber=r.doubleDipNumber;
-		newR.name = r.name;
-		newR.numFinished = r.numFinished;
+	public Requirement cloneRequirement() {
+		Requirement newR = new Requirement();
+		for(Requirement lower : this.choices){
+			newR.addRequirement(lower.cloneRequirement());
+		}
+		newR.name = this.name + "";
 		return newR;
+	}
+	
+	
+	public void addRequirement(Requirement r){
+		this.choices.add(r);
 	}
 	
 	
