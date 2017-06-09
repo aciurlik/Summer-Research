@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Stack;
 
 
 
@@ -259,33 +260,106 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 
 	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
 
+	
+	/**
+	 * Strings of the form
+	 * (MTH 220, MTH 330, MTH 400) --> implied 'or' = 1 of
+	 * 2 of (MTH 220, MTH 330)
+	 * 2 of ( (MTH 150), 2 of (MTH 145, MTH 120) )
+	 * ( MTH 150, 2 of (MTH 145, MTH 120) ) --> implied 'or' = 1 of
+	 * (MTH 150)
+	 * @return
+	 */
 	public String saveString(){
-		Object[] data = {
-				numToChoose,
-				choices.toString(),
-				numFinished,
-				doubleDipNumber};
-		return SaverLoader.saveString(SAVE_DELIMETERS, data);
+		
+		//Add the prefix
+		StringBuilder result = new StringBuilder();
+		if(this.numToChoose == 1){
+			result.append("(");
+		}
+		else{
+			result.append(numToChoose + "of (");
+		}
+		//Add the guts of this requirement - each sub-requirement
+		int index = 0;
+		int size = choices.size();
+		for(RequirementInterface r : this.choices){
+			result.append(r.saveString() + ", ");
+			if(index == size - 1 && size > 1){
+				//This would be where you could add 'or' to the string
+			}
+			index += 1;
+		}
+		//add the postfix
+		result.append(")");
+		return result.toString();
 	}
 
-	public static Requirement readFrom(String saveString){
-		String[] parsed = SaverLoader.parseString(SAVE_DELIMETERS, saveString);
-		int newNumToChoose = Integer.parseInt(parsed[0]);
-		ArrayList<Prefix> newChoices = new ArrayList<Prefix>();
-		String prefixArrayString = parsed[1];
-		for(String prefixString : prefixArrayString.substring(1,prefixArrayString.length() - 1).split(",") ){
-			newChoices.add(Prefix.readFrom(prefixString));
-		}
-		Requirement result = new Requirement(newChoices.toArray(new Prefix[newChoices.size()]), newNumToChoose);
-		try{
-			result.numFinished = Integer.parseInt(parsed[2]);
-			result.setDoubleDipNumber(Integer.parseInt(parsed[3]));
-		}
-		catch (Exception e){
+	public RequirementInterface readFrom(String saveString){
+		Stack<String> tokens = tokenize(saveString);
+		return parse(tokens);
+	
 
+	}
+	
+	public static Stack<String> tokenize(String s){
+		//Tokens are: 
+		// '(' 
+		// ')' 
+		// '[0-9]+of' 
+		// ',[or]*'
+		// a terminal requirement's save string
+		
+		//remove all whitespace.
+		s = s.replaceAll("\\s", "");
+		//Add whitespace around tokens (we'll split on whitespace in a sec)
+		s = s.replaceAll("\\(", " ( ");
+		s = s.replaceAll("\\)", " ) ");
+		s = s.replaceAll(",[or]*", " , ");
+		// If you see the string "6of", replace it with "6of ".
+		// Hopefully all other replaces will handle the space before the
+		// first digit of the number (a parenthesis should preceed that digit).
+		s = s.replaceAll("(?<=[0-9])of", "of ");
+		
+		Stack<String> result = new Stack<String>();
+		for(String token : s.split("\\s+")){
+			result.push(token);
 		}
 		return result;
-
+		
+	}
+	
+	public static RequirementInterface parse(Stack<String> tokens){
+		String next = tokens.peek();
+		if(next.equals("(")){
+			Requirement result = new Requirement();
+			result.numToChoose = 1;
+			result.addRequirement(parse(tokens));
+			next = tokens.pop();
+			while(next.equals(",")){
+				result.addRequirement(parse(tokens));
+				next = tokens.pop();
+			}
+			if(!next.equals(")")){
+				throw new RuntimeException("missing ) while parsing requirement");
+			}
+			return result;
+		}
+		else if(next.matches("[0-9]+of")){
+			int numToChoose = Integer.parseInt(
+					next.substring(0, next.length() - 2));
+			tokens.pop();
+			RequirementInterface temp = parse(tokens);
+			if(! (temp instanceof Requirement)){
+				throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
+			}
+			Requirement result = (Requirement)temp;
+			result.numToChoose = numToChoose;
+			return result;
+		}
+		else{
+			return new TerminalRequirement(tokens.pop());
+		}
 	}
 
 	@Override
@@ -313,7 +387,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 			name = null;
 		}
 		Requirement result = new Requirement(choices.toArray(new Prefix[choices.size()]), numToChoose);
-		result.setDoubleDipNumber(doubleDipNumber);
+		
 		result.setName(name);
 		return result;
 	}
@@ -334,11 +408,10 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	}
 
 	public static void main(String[] args){
-		Requirement r = Requirement.testRequirement();
-		System.out.println(r.saveAsJSON());
-		Requirement z = Requirement.readFromJSON(r.saveAsJSON());
-		System.out.println(z.saveAsJSON());
-		System.out.println(z.saveAsJSON().equals(r.saveAsJSON()));
+		String test = "1 of (MTH 140, MTH 240, or MTH 330)";
+		for(String s : Requirement.tokenize(test)){
+			System.out.println(s);
+		}
 	}
 
 
