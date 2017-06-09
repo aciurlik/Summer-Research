@@ -19,9 +19,12 @@ import java.util.Scanner;
  */
 
 public class CourseList  {
-	public static final int BA = 0;
-	public static final int BS = 1;
-	public static final int BM = 2;
+	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
+	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
+	//added the one with the higer degree Type value will dictate the GER list
+	public static final int BA = 1;
+	public static final int BS = 2;
+	public static final int BM = 0;
 	public static final int None = 4;
 
 
