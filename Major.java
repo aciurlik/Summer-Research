@@ -37,19 +37,6 @@ public class Major {
 		this.reqList = new ArrayList<Requirement>();
 	}
 
-	/**
-	 * Sets the type of this major.
-	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
-	 * @param majorType
-	 */
-	public void setType(String majorType){
-		this.majorType = majorType;
-	}
-
-	public boolean isType(String majorType){
-		return this.majorType.equals(majorType);
-	}
-
 	public void addDegreeType(String degreeType){
 		if(degreeType.equals("BM")){
 			this.degreeTypes.add(CourseList.BM);
