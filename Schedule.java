@@ -28,6 +28,8 @@ public class Schedule {
 		return result;
 	}
 
+	
+
 	/**
 	 * Make a new schedule of semesters where firstSemester is the first shown semester 
 	 * and currentSemester is the first semester that might be scheduled
@@ -234,6 +236,11 @@ public class Schedule {
 			}
 		}
 		return highestDegree;
+	}
+
+	public static int getPercentDone(int iconHeight) {
+		
+		return (iconHeight-1);
 	}
 
 
@@ -887,6 +894,10 @@ public class Schedule {
 		}
 		return false;
 	}
+
+
+
+
 
 
 
