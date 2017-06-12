@@ -14,7 +14,10 @@ public class FurmanOfficial {
 	public static final Color grey = new Color(91,91,91);
 	public static final int[] greyRGB = {91, 91, 91};
 	
+	
+	
 	public static final Color bouzarthDarkPurple = darkPurple(230);
+	
 	public static final Color bouzarthGrey = grey(60);
 	
 	public static final Font bigHeaderFont = getFont(18);
@@ -28,6 +31,15 @@ public class FurmanOfficial {
 	 * @param alpha
 	 * @return
 	 */
+	
+	public static Color bouzarthDarkWithAlpha(int alpha){
+		int red=bouzarthDarkPurple.getRed();
+		int blue=bouzarthDarkPurple.getBlue();
+		int green=bouzarthDarkPurple.getGreen();
+		return(new Color(red, green, blue, alpha));
+		
+	}
+	
 	public static int rescale(int originalValue, int alpha){
 		double scalar = alpha / 255.0;
 		int result = (int)(originalValue * scalar + 255 * (1- scalar));

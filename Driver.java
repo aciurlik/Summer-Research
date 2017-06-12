@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Image;
@@ -43,13 +44,36 @@ public class Driver{
 
 
 	public Driver() {
-
+		int givenHeight = 300;
+		int givenWidth =100;
 		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
-		Image newImage = image.getScaledInstance(100,300 , java.awt.Image.SCALE_SMOOTH);
+		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
+		
 		icon = new ImageIcon(newImage);
+		
+		
+		int percentDone=Schedule.getPercentDone(icon.getIconHeight());
+		
 		JLabel belltowerLabel = new JLabel(icon);
+		belltowerLabel.setOpaque(true);
+		
+
+		
+		JPanel overlap = new JPanel();
+		
+		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(200));
+		
+
+	    overlap.setSize(icon.getIconWidth(), percentDone);
+	    overlap.setLocation(0, icon.getIconHeight()-percentDone);
+		overlap.setOpaque(true);
+		
+		belltowerLabel.add(overlap);
+		
+		
+		
 
 
 		//Make data
@@ -414,7 +438,8 @@ public class Driver{
 
 
 	public boolean userRequestError(String header, String instruct){
-		int n = JOptionPane.showConfirmDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
+		Object[] options = {"Ignore", "Cancel"};
+		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
