@@ -86,24 +86,27 @@ public class CourseList  {
 		}
 		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){
-			//"any first year writing seminar" is common
-			//
-			//Might help understand meaning, check out the commas: 
-			// ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340
-			// ACC-111, ECN-111 or 225, MTH-141 or 150
-			if(originalRequirementString.matches("\\w\\w\\w\\-\\w\\w\\w")){
-				ourVersion = "(" + originalRequirementString + ")";
+			//try to parse this requirement from the raw data
+			try{
+				Requirement r = Requirement.readFromFurmanPrereqs(originalRequirementString);
+				ourVersion = r.toString();
 				this.addPrereqMeaning(originalRequirementString, ourVersion);
-			}
-			else if(originalRequirementString.equals("audition required")){
-				//This is weird but common, so I'm handling
-				// it explicitly. It won't be saved in savedPrereqMeanings.
-				Requirement result = new Requirement();
-				result.addRequirement(new TerminalRequirement(new Prefix("audition", "")));
-				return result;
-			}
-			else{
-				//The user's definition will be saved automatically.
+			}catch (Exception e){
+				//Handle special strings
+				// These will not be saved in savedPrereqMeanings.
+				
+				//"any first year writing seminar" is common
+				
+				//"appropriate placement" is common
+				
+				//"audition required" is common
+				if(originalRequirementString.equals("audition required")){
+					Requirement result = new Requirement();
+					result.addRequirement(new TerminalRequirement(new Prefix("audition", "")));
+					return result;
+				}
+				//If none of the special strings happened, we 
+				//should ask the user and save their choice.
 				return askUserToDefine(originalRequirementString);
 			}
 		}
@@ -599,7 +602,6 @@ public class CourseList  {
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
 
-		System.out.println("MTH-301".matches("\\w\\w\\w\\-\\w\\w\\w"));
 		for(Prefix p : c.rawPrereqs.keySet()){
 			c.getPrereqsShallow(p);
 		}
