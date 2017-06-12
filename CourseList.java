@@ -1,10 +1,14 @@
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -26,173 +30,211 @@ public class CourseList  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
+	
+	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
-
-	private Dictionary<Prefix, Prefix[]> prereqs ;
-
+	private Hashtable<Prefix, String> rawPrereqs;
+	private Hashtable<String, String> savedPrereqMeanings;
 	public Hashtable<String, HashSet<Prefix>> GERRequirements;
 
 
 
 	public static CourseList testList(){
-
-
-		/*Course[] list = new Course[]{
-				Course.readFrom("MTH-220-02;Fray;[1, 3, 5];10:30:A,50;20/6/2017 11:30:0;4;2017-2"),
-				Course.readFrom("MTH-250-02;Fray;[1, 3, 5];10:30:A,50;20/6/2018 11:30:0;4;2018-4"),
-				Course.readFrom("MTH-360-02;Fray;[1, 3, 5];11:30:A,50;20/6/2018 13:30:0;4;2018-2"),
-				Course.readFrom("MTH-350-02;Fray;[1, 3, 5];11:30:A,50;20/6/2019 11:30:0;4;2019-2"),
-				Course.readFrom("MTH-460-02;Fray;[1, 3, 5];12:30:A,50;20/6/2018 13:30:0;4;2018-2"),
-				Course.readFrom("MTH-450-02;Fray;[1, 3, 5];12:30:A,50;20/6/2018 13:30:0;4;2018-2"),
-				Course.readFrom("MTH-504-02;Fray;[1, 3, 5];1:30:P,50;20/6/2018 13:30:0;4;2018-2"),
-				Course.readFrom("MTH-151-02;Fray;[1, 3, 5];1:30:P,50;20/6/2018 13:30:0;4;2018-2")
-		};
-
-		for(Course c : list){
-			result.add(c);
-		}
-		 */
-
-		//result.addCoursesIn(new File("Mayx2017.csv"));
-		//result.addCoursesIn(new File("Fall2017.csv"));
 		return readAll();
 	}
 
 	
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
-		this.prereqs = new Hashtable<Prefix, Prefix[]>();
+		this.rawPrereqs = new Hashtable<Prefix, String>();
+		this.savedPrereqMeanings = new Hashtable<String, String>();
+			loadPrereqMeanings(this.prereqMeaningsFile);
 		this.GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 	}
-
-	public static CourseList readAll(){
-		CourseList result = new CourseList();
-		File f = new File("CourseCatologs");
-		for ( File semesterFile : f.listFiles(new FilenameFilter(){
-			@Override
-			public boolean accept(File dir, String name) {
-				if(name.contains(".csv")){
-					return true;
-				}
-				return false;
-			}
-
-		})){
-			result.addCoursesIn(semesterFile);
-		}
-		return result;
-	}
-
-
-
-
-	public Prefix[] getPrereqsShallow(Prefix p){
-		if(p == null){
-			return new Prefix[0];
-		}
-		Prefix[] result = this.prereqs.get(p);
-		if(result == null){
-			result = new Prefix[0];
-		}
-		return result;
-	}
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  Prereq stuff
+	//////////////////////////////
+	//////////////////////////////
+	
+	
+	
 	/**
-	 * Find all the prerequsites of this prefix using a breadth first
-	 * search.
+	 * Make a requirement for all the prerequsites for this course.
 	 * @param p
 	 * @return
 	 */
-	public HashSet<Prefix> getPrereqsDeep(Prefix p){
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		HashSet<Prefix> newList = new HashSet<Prefix>();
-		for( Prefix x : getPrereqsShallow(p)){
-			newList.add(x);
-		}
+	public Requirement getPrereqsShallow(Prefix p){
 		if(p == null){
-			return result;
+			return null;
 		}
-		//Each iteration, add newList to result and
-		// find all the new prereqs implied.
-		while(!newList.isEmpty()){
-			//replacement new list
-			HashSet<Prefix> repNewList = new HashSet<Prefix>();
-			for(Prefix x : newList){
-				//if result already contains this piece of newList,
-				// we shouldn't add its prereqs (or we might get into an infinite
-				// loop if both MTH 220 requires MTH 110, 
-				// and MTH 110 requires MTH 220.
-				if(result.add(x)){
-					for(Prefix y : getPrereqsShallow(x)){
-						repNewList.add(y);
-					}
-				}
+		String originalRequirementString = this.rawPrereqs.get(p);
+		if(originalRequirementString == null){
+			return null;
+		}
+		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
+		if(ourVersion == null){
+			//"any first year writing seminar" is common
+			//
+			//Might help understand meaning, check out the commas: 
+			// ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340
+			// ACC-111, ECN-111 or 225, MTH-141 or 150
+			if(originalRequirementString.matches("\\w\\w\\w\\-\\w\\w\\w")){
+				ourVersion = "(" + originalRequirementString + ")";
+				this.addPrereqMeaning(originalRequirementString, ourVersion);
 			}
-			newList = new HashSet<Prefix>(repNewList);
-			repNewList = new HashSet<Prefix>();
+			else if(originalRequirementString.equals("audition required")){
+				//This is weird but common, so I'm handling
+				// it explicitly. It won't be saved in savedPrereqMeanings.
+				Requirement result = new Requirement();
+				result.addRequirement(new TerminalRequirement(new Prefix("audition", "")));
+				return result;
+			}
+			else{
+				//The user's definition will be saved automatically.
+				return askUserToDefine(originalRequirementString);
+			}
 		}
-		return result;
+		return Requirement.readFrom(ourVersion);
 	}
-
+	
+	
+	
 	/**
-	 * See if this hashSet of prefixes has all the immediate
-	 * prereqs for main. If not, return false.
+	 * Figure out what prefixes to display as 'needed' to the user
+	 * if they try to put this course in a place where only
+	 * the courses in taken might act as prerequisites for it.
+	 * @return
+	 */
+	public HashSet<Prefix> neededListShallow(Prefix p, HashSet<Prefix> taken){
+		return getPrereqsShallow(p).fastestCompletionSet(taken);
+	}
+	/**
+	 * Figure out what prefixes to display as 'needed' to the user
+	 * if they try to put this prefix in a place where only the courses
+	 * in taken might act as prerequisites for it.
 	 * @param p
 	 * @param taken
 	 * @return
 	 */
-	//public boolean checkPrereqsShallow(Prefix main, HashSet<Prefix> taken){
-	//	return missingPrereqsShallow(main, taken).isEmpty();
-	//}
+	public HashSet<Prefix> neededListDeep(Prefix p, HashSet<Prefix> taken){
+		return neededListShallow(p,taken);
+	}
+	
+	
 
-	/**
-	 * See if this hashSet of prefixes has all the prereqs necessary for
-	 * the main prefix. If not, return false.
-	 * @param main
-	 * @param taken
-	 * @return
-	 */
-	//public boolean checkPrereqsDeep(Prefix main, HashSet<Prefix> taken){
-	//	return missingPrereqsDeep(main, taken).isEmpty();
-	//}
-	/**
-	 * Find the entire set of prereqs that would need to be taken to 
-	 * allow main to be taken.
-	 * @param main
-	 * @param taken
-	 * @return
-	 */
-	public HashSet<Prefix> missingPrereqsDeep(Prefix main, HashSet<Prefix> taken){
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		HashSet<Prefix> allNeeded = getPrereqsDeep(main);
-		for (Prefix p : allNeeded){
-			if(!taken.contains(p)){
-				result.add(p);
+	
+	
+	
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  Prereq meanings
+	//////////////////////////////
+	//////////////////////////////
+	//  This section handles saving and loading
+	//  the translation of weird prerequsites, like
+	//	"ACC 122, 133, MTH 150 or MTH 145"
+	//  into valid, unambiguous requirement strings.
+	//
+	
+	public boolean addRawPrereq(Course c, String prereqString){
+		this.rawPrereqs.put(c.getPrefix(), prereqString);
+		return true;
+	}
+
+	
+	
+	public Requirement askUserToDefine(String originalRequirementString){
+		System.out.print("\nI need help here, what does this mean?\n" + originalRequirementString + "\n>>>");
+		//TODO ask the user
+		Scanner scan = new Scanner(System.in);
+		String userInput = scan.nextLine();
+		
+		Requirement result = null;
+		boolean valid = false;
+		while(!valid){
+			try{
+				result = Requirement.readFrom(userInput);	
+				valid = true;
+			}catch (Exception e){
+				if(userInput.toUpperCase().equals("QUIT") || 
+						userInput.toUpperCase().equals("SKIP")){
+					System.out.println("Ok, I'll skip this one until next time");
+					return new Requirement();
+				}
+				System.out.print(e.getMessage() + "\n" + originalRequirementString + "\n>>>");
+				userInput = scan.nextLine();
+				valid = false;
 			}
 		}
+		addPrereqMeaning(originalRequirementString, userInput);
 		return result;
+		
+	}
+	
+	public void addPrereqMeaning(String originalString, String ourMeaning){
+		savedPrereqMeanings.put(originalString,ourMeaning);
+		savePrereqMeanings(this.prereqMeaningsFile);
+	}
+	
+	public void loadPrereqMeanings(String fileName){
+		File f = new File(fileName);
+		if(!f.exists()){
+			try{
+				f.createNewFile();
+			}catch(Exception e){}
+			savedPrereqMeanings = new Hashtable<String, String>();
+			savePrereqMeanings(fileName);
+			return;
+		}
+		try{
+			FileInputStream fis = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fis);
+			savedPrereqMeanings = (Hashtable<String, String>) in.readObject();
+			in.close();
+		}catch(Exception e){
+			System.out.println("There was an error loading the saved meanings");
+			e.printStackTrace();
+		}
+	}
+	public void savePrereqMeanings(String fileName){
+		try{
+			FileOutputStream fos = new FileOutputStream(fileName, false); //overwrite, don't append.
+			ObjectOutputStream out = new ObjectOutputStream(fos);
+			out.writeObject(savedPrereqMeanings);
+			out.close();
+		}
+		catch(Exception e){
+			System.out.println("There was an error saving the meanings of your prereq strings");
+			e.printStackTrace();
+		}
 	}
 
 
-	public HashSet<Prefix> missingPrereqsShallow(Prefix main, HashSet<Prefix> taken){
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		Prefix[] allNeeded = getPrereqsShallow(main);
-		for (Prefix p : allNeeded){
-			if(!taken.contains(p)){
-				result.add(p);
-			}
-		}
-		return result;
-	}
 
 
-
-
-
-
-
+	
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  List methods
+	//////////////////////////////
+	//////////////////////////////
 
 	public boolean add(Course c){
 		return listOfCourses.add(c);
@@ -214,6 +256,58 @@ public class CourseList  {
 		Course c = listOfCourses.remove(i);
 		return c;
 	}
+	
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  Filter methods
+	//////////////////////////////
+	//////////////////////////////
+	
+	/**
+	 * Return only those members of input which are in the given semester.
+	 * @param input
+	 * @param s
+	 * @return
+	 */
+	public ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
+		ArrayList<Course> SemesterList = new ArrayList<Course>();
+
+		for(Course course : input){
+			if ( course.getSemester().compareTo(s.getDate()) == 0){
+
+				SemesterList.add(course);
+			}
+		}
+		return SemesterList;
+	}
+	
+	public  ArrayList<Course> getCoursesIn(Semester s){
+		return onlyThoseIn(listOfCourses,s);
+	}
+
+	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
+		ArrayList<Course> result = new ArrayList<Course>();
+		for(Course c : input){
+			if(r.isSatisfiedBy(c.getPrefix())){
+				result.add(c);
+			}
+		}
+		return result;
+	}
+	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
+		return onlyThoseSatisfying(this.listOfCourses,r);
+	}
+	
+	
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  GER stuff
+	//////////////////////////////
+	//////////////////////////////
 
 
 	public static String getDegreeTypeString(int i){
@@ -244,23 +338,7 @@ public class CourseList  {
 		return -1;
 	}
 
-	/**
-	 * Return only those members of input which are in the given semester.
-	 * @param input
-	 * @param s
-	 * @return
-	 */
-	public ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
-		ArrayList<Course> SemesterList = new ArrayList<Course>();
 
-		for(Course course : input){
-			if ( course.getSemester().compareTo(s.getDate()) == 0){
-
-				SemesterList.add(course);
-			}
-		}
-		return SemesterList;
-	}
 
 
 	/**
@@ -421,24 +499,33 @@ public class CourseList  {
 	}
 
 
-	public  ArrayList<Course> getCoursesIn(Semester s){
-		return onlyThoseIn(listOfCourses,s);
-	}
 
-	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
-		ArrayList<Course> result = new ArrayList<Course>();
-		for(Course c : input){
-			if(r.isSatisfiedBy(c.getPrefix())){
-				result.add(c);
+	
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  Reading
+	//////////////////////////////
+	//////////////////////////////
+
+	
+	public static CourseList readAll(){
+		CourseList result = new CourseList();
+		File f = new File("CourseCatologs");
+		for ( File semesterFile : f.listFiles(new FilenameFilter(){
+			@Override
+			public boolean accept(File dir, String name) {
+				if(name.contains(".csv")){
+					return true;
+				}
+				return false;
 			}
+
+		})){
+			result.addCoursesIn(semesterFile);
 		}
 		return result;
 	}
-	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
-		return onlyThoseSatisfying(this.listOfCourses,r);
-	}
-
-	
 
 
 	public void addCoursesIn(File furmanCoursesFile){
@@ -470,6 +557,10 @@ public class CourseList  {
 					if(!GERs.equals("")){
 						setCourseSatisfiesGER(data.get(14), lastCourse);
 					}
+					String prerequsitesString = data.get(16);
+					if(!prerequsitesString.equals("")){
+						this.addRawPrereq(lastCourse, prerequsitesString.trim());
+					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
 				else{
@@ -498,12 +589,19 @@ public class CourseList  {
 			return;
 		}
 	}
+	
+	//////////////////////////////
+	//////////////////////////////
+	/////  Testing
+	//////////////////////////////
+	//////////////////////////////
 
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
 
-		for(Prefix p : c.GERRequirements.get("NWL")){
-			
+		System.out.println("MTH-301".matches("\\w\\w\\w\\-\\w\\w\\w"));
+		for(Prefix p : c.rawPrereqs.keySet()){
+			c.getPrereqsShallow(p);
 		}
 		/*for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
