@@ -5,7 +5,7 @@
  * @author dannyrivers
  *
  */
-public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
+public class Prefix implements Comparable<Prefix>{
 	private String subject;
 	private String courseNumber; //Became a string when we found a few strange courses.
 
@@ -34,6 +34,26 @@ public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 		String[] pair = prefixString.split("-");
 		return new Prefix (pair[0], pair[1]);
 	}
+	
+	@Override
+	public boolean equals(Object o){
+		if(o==null){
+			return false;
+		}
+		if(!(o instanceof Prefix)){
+			return false;
+		}
+		return this.equals((Prefix)o);
+	}
+	public boolean equals(Prefix other){
+		return this.subject.equals(other.subject) && this.courseNumber.equals(other.courseNumber);
+	}
+	
+	@Override
+	public int hashCode(){
+		return subject.hashCode() + courseNumber.hashCode();
+	}
+	
 
 	@Override
 	public int compareTo(Prefix other) {
@@ -47,11 +67,6 @@ public class Prefix implements Comparable<Prefix>, JSONable<Prefix>{
 	
 	public static Prefix readFromJSON(String s) {
 		return readFrom(SaverLoader.peel(s));
-	}
-
-	@Override
-	public String saveAsJSON() {
-		return this.toString();
 	}
 
 }

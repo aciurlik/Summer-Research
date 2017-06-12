@@ -210,10 +210,6 @@ public class Driver{
 			sch.addMajor(m);
 			this.update();
 		}
-
-
-
-
 	}
 
 	public void GUIPopUP(String s){

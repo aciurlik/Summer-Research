@@ -357,7 +357,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			r = (Requirement) e;
 		}
 		else if (e instanceof Course){
-			r = new Requirement(e.getPrefix());
+			r = new TerminalRequirement(e.getPrefix());
 		}
 		else{
 			r = null;

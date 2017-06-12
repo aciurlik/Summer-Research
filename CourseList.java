@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class CourseList  {
 	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
 	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
-	//added the one with the higer degree Type value will dictate the GER list
+	//added, the one with the higer degree Type value will dictate the GER list
 	public static final int BA = 1;
 	public static final int BS = 2;
 	public static final int BM = 0;
@@ -32,7 +32,7 @@ public class CourseList  {
 
 	private Dictionary<Prefix, Prefix[]> prereqs ;
 
-	public Hashtable<String, Requirement> GERRequirements;
+	public Hashtable<String, HashSet<Prefix>> GERRequirements;
 
 
 
@@ -64,7 +64,7 @@ public class CourseList  {
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 		this.prereqs = new Hashtable<Prefix, Prefix[]>();
-		this.GERRequirements = new Hashtable<String, Requirement>();
+		this.GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 	}
 
 	public static CourseList readAll(){
@@ -262,36 +262,84 @@ public class CourseList  {
 		return SemesterList;
 	}
 
-	public ArrayList<Requirement> allGERRequirements(){
-		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		for(String key : this.GERRequirements.keySet()){
-			Requirement next = this.GERRequirements.get(key);
-			next.setName(key);
-			result.add(next);
-		}
-		return result;
-	}
 
-	public Major getGERMajor(int MajorType){
-		ArrayList<Requirement> toMakeCopy = allGERRequirements();
-		ArrayList<Requirement>  changeableGERRequirements = new ArrayList<Requirement>();
-		for(Requirement r: toMakeCopy){
-			Requirement newR = r.cloneRequirement(r);
-			changeableGERRequirements.add(newR);
-		}
-
-
+	/**
+	 * Get the GER major associated with the given type, where
+	 * type is one of Major.BA, Major.BS, or Major.BM
+	 * 
+	 * see
+	 * http://www.furman.edu/academics/academics/academic-resources/Pages/General-Education-Requirements.aspx
+	 * for the source of most of our information. 
+	 *
+	 * @param MajorType
+	 * @return
+	 */
+	public Major getGERMajor(int majorType){
 		Major m = new Major("GER");
-		for(Requirement r : changeableGERRequirements){
-			//Adjust MR for BS
-			if(MajorType==BS){
-				if(r.name.equals("MR")){
-						r.choices.clear();
-						r.choices.add(new Prefix("MTH", 145));
-						r.choices.add(new Prefix("MTH", 150));
-					}
-				if(r.name.equals("NW")){
-				      r.choices.clear();
+		
+		
+		outerloop:
+		for(String key : GERRequirements.keySet()){
+			//Special cases first, then default behavior.
+			// default behavior is to add every prefix in the 
+			// list to each requirement, and to do nothing to 
+			// double dip numbers (if double dip numbers exist).
+			
+			Requirement r = new Requirement();
+			r.setName(key);
+			boolean includeDefaultPrefixes = true;
+			
+			
+			
+			switch(key){
+			case "MR":
+				// "Students with a BS must complete this requirement with a calculus course"
+				// "Students with a BM do not need to fulfill this requirement."
+				switch ( majorType){
+				case Major.BS:
+					//For BS, the MR requirement is predefined
+					r = (Requirement)Requirement.readFrom("1 of (MTH 150, MTH 145)");
+					includeDefaultPrefixes = false;
+					break;
+				case Major.BM:
+					// For BM, there is no MR requirement.
+					continue outerloop;
+				case Major.BA:
+				default:
+					//For BA and any unknown majorType, 
+					// you can take any of the MR courses.
+					includeDefaultPrefixes = true;
+
+				}
+				break;
+			case "NW":
+				/* From the Furman GER checklist, NW requires:
+				 * 		"Two courses, at least one with a 
+				 * 		separate labratory component."
+				 * 
+				 * To handle this, we make 2 requirements, one of which
+				 * 		is NW and the other is NWL. You need one course from
+				 * 		each requirement, and they aren't allowed to double dip.
+				 * 		Every prefix in the NWL requirement also satisfies 
+				 * 		the NW requirement.
+				 * 
+				 * In addition, "Students seeking the Bachelor of Music degree 
+				 * must complete only one course to meet this requirement, 
+				 * while Bachelor of Science degree candidates must complete 
+				 * this requirement in courses appropriate for majors in 
+				 * the natural science disciplines. "
+				 * 
+				 */
+				switch(majorType){
+				case Major.BS:
+					// only courses "appropriate for majors in the 
+					// natural science disciplines," which currently (6/11/2017) means
+					//
+					// "courses numbered 110 or greater in Biology, Chemistry, 
+					//  Earth and Environmental Science, Neuroscience, Physics, 
+					//  "Sustainability Science."
+             /*
+            	r.choices.clear();
 				      r.choices.add(new Prefix("CHM", 110));
 				      r.choices.add(new Prefix("CHM", 115));
 				      r.choices.add(new Prefix("CHM", 120));
@@ -301,76 +349,74 @@ public class CourseList  {
 				      r.choices.add(new Prefix("PHY", 111));
 				      r.choices.add(new Prefix("PHY", 112));
 				      r.choices.add(new Prefix("PSY", 320));
-				      r.choices.add(new Prefix("SUS", 120));
-				 	
-				}
-				}
-
-
-				//Adds two HB to every Major Type
-				if(r.name!="WC"|| r.name!="NE"){
-					if(r.name.equals("HB")){
-						r.numToChoose=2;
+				      r.choices.add(new Prefix("SUS", 120));   
+            */
+					for(Prefix p : GERRequirements.get("NWL")){
+						if(p.getNumber().compareTo("110") >= 0){
+							r.choices.add(new TerminalRequirement(p));
+            }
+					}
+					for(Prefix p : GERRequirements.get("NW")){
+						if(p.getNumber().compareTo("110") >= 0){
+							r.choices.add(new TerminalRequirement(p));
+						}
+					}
+					includeDefaultPrefixes = false;
+					break;
+				case Major.BA:
+				case Major.BM:
+				default:
+					for(Prefix p : GERRequirements.get("NWL")){
+						r.choices.add(new TerminalRequirement(p));
 					}
 				}
-				//Adds labs to NW satisfiers for all 
-				if(r.name.equals("NW")){
-					r.choices.addAll(GERRequirements.get("NWL").choices);
-					r.doubleDipNumber=1;
-
+				//TODO set the double dip number of NW and NWL to be different.
+				// r.setDoubleDipNumber
+				break;
+			case "NWL":
+				//Music majors don't need this requirement.
+				// they only need the NW requirement.
+				if(majorType== Major.BM){
+					continue outerloop;
 				}
-				//Sets double dip number for all to be the same
-				r.doubleDipNumber=2;
-			
-			//Sets WC and NE double dip to be the same. 
-			if(r.name.equals("WC")){
-				r.doubleDipNumber=1;
-			}
-			if(r.name.equals("NE")){
-				r.doubleDipNumber=1;
-			}
-
-			// Takes off MR and NWL for BM
-			if(MajorType != BM){
-				m.addRequirement(r);
-			}
-			else if (!r.name.equals("MR") && !r.name.equals("NWL")) {
-				m.addRequirement(r);
+				break;
+			case "HB":
+				//every major type needs 2 hb.
+				r.numToChoose = 2;
+				break;
+			case "WC":
+			case "NE":
+				// TODO set doubleDipNumber differently from all the others
 
 			}
-
-
-
-			//r is a requirement of the form NumToChoose{1} choices {Mth150, Mth 140, Mth 120} DDn{0} Name {MR}
-
+			if(includeDefaultPrefixes){
+				for(Prefix p : GERRequirements.get(key)){
+					r.choices.add(new TerminalRequirement(p));
+				}
+			}
+			m.addRequirement(r);
 		}
-
 		return m;
 	}
 
 
+	/**
+	 * Given the collection of GERs that this course satisfies
+	 * 		i.e., MTH 110-01 ... "NWL NW WC"
+	 * add this course to the requirement for each GER.
+	 * @param GERs
+	 * @param c
+	 */
+	public void setCourseSatisfiesGER(String GERs, Course c){
+		String[] allGERs = GERs.trim().split(" ");
 
-
-	
-	 
-
-
-	public Requirement getGERRequirement(String code){
-		return this.GERRequirements.get(code);
-	}
-
-
-	public void courseSatisfiesGER(String GERs, Course c){
-		String[] allGERs = GERs.split(" ");
 		for(String s : allGERs){
-			Requirement old = this.GERRequirements.get(s);
+			HashSet<Prefix> old = this.GERRequirements.get(s);
 			if(old == null){
-				GERRequirements.put(s, new Requirement(new Prefix[]{c.coursePrefix},1));
+				old = new HashSet<Prefix>();
+				GERRequirements.put(s, old);
 			}
-			else{
-				//Add this to the requirement
-				old.addChoice(c.getPrefix());
-			}
+			old.add(c.getPrefix());
 		}
 	}
 
@@ -382,7 +428,7 @@ public class CourseList  {
 	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c : input){
-			if(r.isSatisfiedBy(c)){
+			if(r.isSatisfiedBy(c.getPrefix())){
 				result.add(c);
 			}
 		}
@@ -422,7 +468,7 @@ public class CourseList  {
 					//Also, see if this course satisfies any GERs.
 					String GERs = data.get(14);
 					if(!GERs.equals("")){
-						courseSatisfiesGER(data.get(14), lastCourse);
+						setCourseSatisfiesGER(data.get(14), lastCourse);
 					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
@@ -456,10 +502,9 @@ public class CourseList  {
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
 
-		for(Requirement r : c.allGERRequirements()){
-			System.out.println(r.name + "," + r.saveAsJSON());
+		for(Prefix p : c.GERRequirements.get("NWL")){
+			
 		}
-
 		/*for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
 		}*/
