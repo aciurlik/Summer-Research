@@ -21,7 +21,9 @@ import java.util.Scanner;
 public class CourseList  {
 	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
 	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
-	//added, the one with the higer degree Type value will dictate the GER list
+
+	//added the one with the higer degree Type value will dictate the GER list
+
 	public static final int BA = 1;
 	public static final int BS = 2;
 	public static final int BM = 0;
@@ -71,6 +73,7 @@ public class CourseList  {
 		CourseList result = new CourseList();
 		File f = new File("CourseCatologs");
 		for ( File semesterFile : f.listFiles(new FilenameFilter(){
+
 			@Override
 			public boolean accept(File dir, String name) {
 				if(name.contains(".csv")){
@@ -228,9 +231,7 @@ public class CourseList  {
 		}
 		return "null";
 	}
-	
-	
-	
+
 	public static int getDegreeTypeNumber(String s){
 		if(s.equals("BM")){
 			return CourseList.BM;
@@ -276,6 +277,7 @@ public class CourseList  {
 	 */
 	public Major getGERMajor(int majorType){
 		Major m = new Major("GER");
+
 		
 		
 		outerloop:
@@ -388,6 +390,7 @@ public class CourseList  {
 			case "NE":
 				// TODO set doubleDipNumber differently from all the others
 
+
 			}
 			if(includeDefaultPrefixes){
 				for(Prefix p : GERRequirements.get(key)){
@@ -409,6 +412,7 @@ public class CourseList  {
 	 */
 	public void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
+
 
 		for(String s : allGERs){
 			HashSet<Prefix> old = this.GERRequirements.get(s);
@@ -444,6 +448,7 @@ public class CourseList  {
 	public void addCoursesIn(File furmanCoursesFile){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
+		Course duplicateCourse =null;
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(furmanCoursesFile));
@@ -465,6 +470,23 @@ public class CourseList  {
 						this.add(lastCourse);
 					}
 					lastCourse = Course.readFromFurmanData(data);
+					if(data.get(0).contains("Summer")){
+						if(lastCourse.meetingTime==null || lastCourse.meetingTime[0].isAllUnused()  ){
+							Course newDuplicateCourse = Course.readFromFurmanData(data);
+							if( newDuplicateCourse != duplicateCourse){
+								if(duplicateCourse != null){
+									this.add(duplicateCourse);
+									
+								}
+								duplicateCourse=newDuplicateCourse;
+
+
+							}
+
+							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+							
+						}
+					}
 					//Also, see if this course satisfies any GERs.
 					String GERs = data.get(14);
 					if(!GERs.equals("")){
@@ -493,10 +515,18 @@ public class CourseList  {
 				line = br.readLine();
 			}
 			br.close();
+			if(lastCourse != null){
+				this.add(lastCourse);
+				
+			}
+			if(duplicateCourse != null){
+				this.add(duplicateCourse);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+		
 	}
 
 	public static void main(String[] args){
