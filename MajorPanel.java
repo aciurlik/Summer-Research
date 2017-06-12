@@ -39,14 +39,11 @@ public class MajorPanel extends JPanel {
 		//Calculte the requirements left in this major
 		int reqsLeft = 0;
 		for(Requirement r : reqList){
-			if(r.numFinished < r.numToChoose){
-				reqsLeft += r.numToChoose - r.numFinished;
-			}
+			reqsLeft += r.storedCoursesLeft;
 		}
 
 
 		//Make this major's panel
-
 		this.setLayout(new BorderLayout());
 		
 		//Holds all the things on the top

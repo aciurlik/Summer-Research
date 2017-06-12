@@ -7,34 +7,32 @@ import java.util.Iterator;
 import java.util.Stack;
 
 
-
-public class Requirement implements Comparable<Requirement>, ScheduleElement, JSONable, RequirementInterface{
-	HashSet<RequirementInterface> choices;
+public class Requirement implements ScheduleElement, Comparable<Requirement>{
+	HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
 	String name;
-	boolean storedCompletionValue;
+	boolean storedIsComplete;
 	int storedCoursesLeft;
 	double storedPercentComplete;
 	
+	//Used to check if %complete is close to 0.
 	public static final double tolerance = 1000 * Double.MIN_VALUE;
-	/**
-	 *
-	 */
-	public static Requirement testRequirement(){
-		return new Requirement(new Prefix[]{new Prefix("MTH", 220)}, 1);
-	}
-
-	
-	
 	
 	
 	public Requirement(){
-		this.choices = new HashSet<RequirementInterface>();
+		this.choices = new HashSet<Requirement>();
+		this.numToChoose = 1;
 	}
 
 	
+	/**
+	 * An old constructor for backwards compatability.
+	 * Can be removed.
+	 * @param choices
+	 * @param numToChoose
+	 */
 	public Requirement(Prefix[] choices, int numToChoose){
 		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
 	}
@@ -46,31 +44,58 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		}
 		this.numToChoose = numToChoose;
 	}
-
 	
-	public RequirementInterface cloneRequirement() {
-		Requirement newR = new Requirement();
-		for(RequirementInterface lower : this.choices){
-			newR.addRequirement(lower.cloneRequirement());
-		}
-		newR.name = this.name + "";
-		return newR;
-	}
-	
-	
-	public void addRequirement(RequirementInterface r){
+	public void addRequirement(Requirement r){
 		this.choices.add(r);
 	}
-	
 	
 	
 	public void setName(String name){
 		this.name = name;
 	}
+	public String getName() {
+		return this.name;
+	}
 	
 	
 	
+	private Object[] separate(Iterable<ScheduleElement> taken){
+		HashSet<Prefix> takenPrefixes = new HashSet<Prefix>();
+		int numPlanned = 0;
+		for(ScheduleElement s : taken){
+			Prefix p = s.getPrefix();
+			if(p!= null){
+				takenPrefixes.add(p);
+			}
+			else{
+				if(s == this){
+					//TODO figure out about subset requirements.
+					numPlanned ++;
+				}
+			}
+		}
+		return new Object[]{takenPrefixes, numPlanned};
+	}
 	
+	//INFINITELOOPHAZARD
+	/**
+	 * Check whether this set of schedule elements completes this requirements.
+	 * If storeValue is true, this requirement will store the value it calculates
+	 *   in the field storedCompletionValue.
+	 * @param taken
+	 * @param storeValue
+	 * @return
+	 */
+	public boolean isComplete(Iterable<ScheduleElement> taken, boolean storeValue){
+		//Find all the prefixes,
+		// and count how many things will magically satisfy this requirement
+		Object[] separated = separate(taken);
+		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>)separated[0];
+		int numPlanned = (int) separated[1];
+		return isComplete(takenPrefixes, numPlanned, storeValue);
+	}
+	
+	//INFINITELOOPHAZARD
 	/**  TODO needs to be tested
 	 * Check if these prefixes satisfy this requirement.
 	 * Requirements are optimists - if this set of taken things
@@ -79,26 +104,43 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	 * @param taken
 	 * @return
 	 */
-	public boolean isComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+	private boolean isComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
 		boolean result = minCoursesNeeded(taken, numPlannedLater, storeValue) <= 0;
 		if(storeValue){
-			this.storedCompletionValue = result;
+			this.storedIsComplete = result;
 		}
 		return result;
 	}
 	
+	//INFINITELOOPHAZARD
+	/**
+	 * Find the minimum number of courses you would need to completely
+	 * satisfy this requirement, given this set of things you've already taken.
+	 * @param taken
+	 * @param storeValue
+	 * @return
+	 */
+	public int minCoursesNeeded(Iterable<ScheduleElement> taken, boolean storeValue){
+		Object[] separated = separate(taken);
+		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>)separated[0];
+		int numPlanned = (int)separated[1];
+		return minCoursesNeeded(takenPrefixes, numPlanned, storeValue);
+	}
 	
+	//INFINITELOOPHAZARD
 	/** TODO needs to be tested
 	 * Find the minimum number of courses you would need to completely
 	 * satisfy this requirement, given this set of things you've already taken.
 	 */
-	public int minCoursesNeeded(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+	private int minCoursesNeeded(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
 		int result = fastestCompletionSet(taken).size() - numPlannedLater;
 		if(storeValue){
 			this.storedCoursesLeft = result;
 		}
 		return result;
 	}
+	
+	//INFINITELOOPHAZARD
 	/**  TODO needs to be tested
 	 * Find the set of prefixes that would most quickly complete this requirement
 	 * @return
@@ -107,7 +149,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		//If you have n to choose of k choices, then you need the 
 		// n fastest completion sets from all your choices.
 		ArrayList<HashSet<Prefix>> subSets = new ArrayList<HashSet<Prefix>>();
-		for(RequirementInterface r : choices){
+		for(Requirement r : choices){
 			subSets.add(r.fastestCompletionSet(taken));
 		}
 		Collections.sort(subSets,new Comparator<HashSet>(){
@@ -123,6 +165,23 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return result;
 	}
 	
+	
+	/**
+	 *  Find, given the best case scenario, the maximum % complete this
+	 *  requirement could be given this collection of schedule elements.
+	 * @param taken
+	 * @param storeValue
+	 * @return
+	 */
+	public double percentComplete(Iterable<ScheduleElement> taken, boolean storeValue){
+		Object[] separated = separate(taken);
+		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>) separated[0];
+		int numPlanned = (int)separated[1];
+		return percentComplete(takenPrefixes, numPlanned, storeValue);
+	}
+	
+	
+	//INFINITELOOPHAZARD
 	/** TODO needs to be tested
 	 * Find what % this requirement is complete if you get the best-case scenario for
 	 * each of the numPlannedLater courses.
@@ -147,12 +206,13 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return result;
 	}
 	
+	//INFINITELOOPHAZARD
 	/** TODO needs to be tested
 	 * Figure out what % complete this requirement is.
 	 */
 	public double percentComplete(HashSet<Prefix> taken){
 		ArrayList<Double> subPercents = new ArrayList<Double>();
-		for(RequirementInterface r : this.choices){
+		for(Requirement r : this.choices){
 			subPercents.add(r.percentComplete(taken));
 		}
 		Collections.sort(subPercents);
@@ -164,6 +224,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return ((double)miniPercent)  / numToChoose;
 	}
 	
+	//INFINITELOOPHAZARD
 	/** TODO needs to be tested
 	 * Find the prefix that would bring this requirement closest to completion.
 	 * Return the prefix and the % it would add in an Object[]
@@ -176,7 +237,27 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		}
 		return null;
 	}
+	
+	
+	//INFINITELOOPHAZARD
+	public boolean isSatisfiedBy(Prefix p) {
+		for(Requirement r : this.choices){
+			if(r.isSatisfiedBy(p)){
+				return true;
+			}
+		}
+		return false;
+	}
 
+	
+	
+	
+	
+	/////////////////////////////////
+	/////////////////////////////////
+	///// CompareTo 
+	/////////////////////////////////
+	/////////////////////////////////
 
 	
 	
@@ -185,12 +266,17 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 	//This comparison method is used to sort the 
 	// requirementList displayed to the user.
 	@Override
-	public int compareTo(Requirement other) {
-		//first compare based on whether they're complete, completed coming later
-		if(this.storedCompletionValue && !other.storedCompletionValue){
+	public int compareTo(Requirement o) {
+		if(! (o instanceof Requirement)){
+			//Requirements are greater than terminalRequirements.
 			return 1;
 		}
-		if(!this.storedCompletionValue && other.storedCompletionValue){
+		Requirement other = (Requirement)o;
+		//first compare based on whether they're complete, completed coming later
+		if(this.storedIsComplete && !other.storedIsComplete){
+			return 1;
+		}
+		if(!this.storedIsComplete && other.storedIsComplete){
 			return -1;
 		}
 		
@@ -227,15 +313,22 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return 0;
 		
 	}
+	
+	/////////////////////////////////
+	/////////////////////////////////
+	/////Methods from ScheduleElement
+	/////////////////////////////////
+	/////////////////////////////////
 
 	@Override
 	public Prefix getPrefix() {
 		return null;
 	}
 
+	
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
-		return false;
+		return this == other;
 	}
 
 	@Override
@@ -243,31 +336,103 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		if(this.name != null){
 			return this.name;
 		}
-		ArrayList<Prefix> choiceList = new ArrayList<Prefix>(choices);
-		Collections.sort(choiceList);
-		if(choiceList.size() == 1){
-			return choiceList.get(0).toString();
+		String result = this.saveString();
+		if(this.numToChoose == 1){
+			result = result.substring(1, result.length() - 1);
 		}
-		else{ //choices has length at least 2.
-			String choicesString = "";
-			for(Prefix p : choiceList){
-				choicesString += p.toString() + ", ";
-			}
-			choicesString = choicesString.substring(0,choicesString.length() - 2);
-			return String.format("%d of %s", numToChoose, choicesString);
-		}
+		return result;
 	}
-
-	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
-
 	
+
+	@Override
+	public ArrayList<Requirement> getRequirementsFulfilled() {
+		ArrayList<Requirement> result = new ArrayList<Requirement>(1);
+		result.add(this);
+		return result;
+	}
+	
+	
+	public int getCreditHours() {
+		// TODO Auto-generated method stub
+		return 4;
+	}
+	
+	
+	
+	
+	/////////////////////////////////
+	/////////////////////////////////
+	///// Saving and Reading methods
+	/////////////////////////////////
+	/////////////////////////////////
+	
+	
+	
+	/** REQUIREMENT SAVING AND READING TUTORIAL
+	 * 
+	 * The language of requirements.
+	 * 
+	 * All requirements are made of 2 parts:
+	 * 		a number to choose
+	 * 		a list of choices (some of which may themselves be requirements)
+	 * 
+	 * For example, the requirement 
+	 * 		2 of (MTH 145, MTH 220)
+	 *  	is a valid requirement. It has 2 to choose, and 
+	 *  	has 2 choices, either MTH 145 or MTH 220.
+	 *  	This requirement might be interpreted as
+	 * 			"Take MTH 145 and MTH 220."
+	 * 
+	 * In general, to differentiate between 'or' and 'and', just change 
+	 * 		the number to choose.
+	 * 		2 of (MTH 145, MTH 220) --> MTH 145 and MTH 220
+	 * 		1 of (MTH 145, MTH 220) --> MTH 145 or MTH 220
+	 * 
+	 * Requirements may be nested, for example
+	 * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
+	 * 
+	 * Notice that impossible requirements may be written down, for example
+	 * 		2 of (MTH 110)
+	 * 		cannot logically be satisfied.
+	 * 
+	 * We may omit the number to choose if desired. In this case, it defaults to one. 
+	 * 		(MTH 140, MTH 110)
+	 * 			is the same as
+	 * 		1 of (MTH 140, MTH 110)
+	 * 			Which might be read
+	 * 		MTH 140 or MTH 110
+	 * 
+	 * All whitespace is ignored.
+	 * 
+	 * A list of choices must be enclosed in parenthesis, and
+	 * must be separated by commas. The following are INVALID.
+	 * 		NOT GOOD     MTH 140, MTH 110 
+	 * 		Correction   (MTH 140, MTH 110)
+	 * 
+	 * 		NOT GOOD     1 of MTH 220
+	 * 		Correction   1 of ( MTH 220      )
+	 * 
+	 * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
+	 * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
+	 * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
+	 * 
+	 * 		NOT GOOD     1 of (MTH 140 MTH 220)
+	 * 		Correction	 1 of (MTH 140, MTH 220)
+	 * 			
+	 * 
+	 * Additionally, though it is not recommended, you may include the text
+	 *   'or' before the last choice in a list of choices. This must immediately follow the comma.
+	 * 		2 of (MTH 110, MTH 220,  or   MTH 330)
+	 * 		This is a valid requirement.
+	 * 
+	 */
+	
+	
+	
+	//INFINITELOOPHAZARD
 	/**
-	 * Strings of the form
-	 * (MTH 220, MTH 330, MTH 400) --> implied 'or' = 1 of
-	 * 2 of (MTH 220, MTH 330)
-	 * 2 of ( (MTH 150), 2 of (MTH 145, MTH 120) )
-	 * ( MTH 150, 2 of (MTH 145, MTH 120) ) --> implied 'or' = 1 of
-	 * (MTH 150)
+	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
+	 * Make a save string for this requirement.
 	 * @return
 	 */
 	public String saveString(){
@@ -278,28 +443,55 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 			result.append("(");
 		}
 		else{
-			result.append(numToChoose + "of (");
+			result.append(numToChoose + " of (");
 		}
 		//Add the guts of this requirement - each sub-requirement
-		int index = 0;
-		int size = choices.size();
-		for(RequirementInterface r : this.choices){
-			result.append(r.saveString() + ", ");
-			if(index == size - 1 && size > 1){
-				//This would be where you could add 'or' to the string
-			}
-			index += 1;
+		
+		
+		//handle the first n-2 requirements
+		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
+		Collections.sort(choiceList);
+		for(int i = 0; i < choiceList.size() - 2 ; i ++){
+			result.append(choiceList.get(i).saveString());
+			result.append(", ");
 		}
-		//add the postfix
+		//handle the last 2 requirements (may have 0, 1, or 2 last ones
+		//  depending on the number of choices.)
+		if(choiceList.size() > 2){
+			result.append(choiceList.get(choiceList.size() - 2).saveString());
+			result.append(", or ");
+			result.append(choiceList.get(choiceList.size() - 1).saveString());
+		}
+		else if (choiceList.size() == 2){
+			result.append(choiceList.get(choiceList.size() - 2).saveString());
+			result.append(", ");
+			result.append(choiceList.get(choiceList.size() - 1).saveString());
+		}
+		else if(choiceList.size() == 1){
+			result.append(choiceList.get(0).saveString());
+		}
+		else{ //choiceList.size() == 0
+			return "()";
+		}
 		result.append(")");
 		return result.toString();
 	}
 
-	public RequirementInterface readFrom(String saveString){
-		Stack<String> tokens = tokenize(saveString);
-		return parse(tokens);
 	
-
+	//INFINITELOOPHAZARD
+	/**
+	 * see the REQUIREMENT SAVING AND READING TUTORIAL in the Requirement Class.
+	 * Read this requirement from such a string.
+	 * @param saveString
+	 * @return
+	 */
+	public static Requirement readFrom(String saveString){
+		Stack<String> tokens = tokenize(saveString);
+		Requirement result = parse(tokens);
+		if(!tokens.isEmpty()){
+			throw new RuntimeException("End of string while parsing requirement");
+		}
+		return result;
 	}
 	
 	public static Stack<String> tokenize(String s){
@@ -321,25 +513,33 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		// first digit of the number (a parenthesis should preceed that digit).
 		s = s.replaceAll("(?<=[0-9])of", "of ");
 		
-		Stack<String> result = new Stack<String>();
+		s = s.trim();
+		
+		Stack<String> reversed = new Stack<String>();
 		for(String token : s.split("\\s+")){
-			result.push(token);
+			reversed.push(token);
 		}
+		
+		//Reverse the stack so that the first character comes out first.
+		Stack<String> result = new Stack<String>();
+		while(!reversed.isEmpty()){
+			String t = reversed.pop();
+			result.push(t);
+		}
+		
 		return result;
 		
 	}
 	
-	public static RequirementInterface parse(Stack<String> tokens){
-		String next = tokens.peek();
+	public static Requirement parse(Stack<String> tokens){
+		String next = tokens.pop();
 		if(next.equals("(")){
 			Requirement result = new Requirement();
 			result.numToChoose = 1;
-			result.addRequirement(parse(tokens));
-			next = tokens.pop();
-			while(next.equals(",")){
+			do{
 				result.addRequirement(parse(tokens));
 				next = tokens.pop();
-			}
+			}while(next.equals(","));
 			if(!next.equals(")")){
 				throw new RuntimeException("missing ) while parsing requirement");
 			}
@@ -348,8 +548,7 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		else if(next.matches("[0-9]+of")){
 			int numToChoose = Integer.parseInt(
 					next.substring(0, next.length() - 2));
-			tokens.pop();
-			RequirementInterface temp = parse(tokens);
+			Requirement temp = parse(tokens);
 			if(! (temp instanceof Requirement)){
 				throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
 			}
@@ -358,17 +557,20 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 			return result;
 		}
 		else{
-			return new TerminalRequirement(tokens.pop());
+			return TerminalRequirement.readFrom(next);
 		}
 	}
+	
 
-	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled() {
-		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		result.add(this);
-		return result;
-	}
-
+	
+	
+	
+	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
+	/**
+	 * Read from a JSON save string (kept for backwards compatability)
+	 * @param s
+	 * @return
+	 */
 	public static Requirement readFromJSON(String s) {
 		//Get the list of objects in this string, after chopping off the first and last characters 
 		// (hopefully "{" and "}" ) and ignoring anything outside brackets ("{" or "}").
@@ -392,27 +594,25 @@ public class Requirement implements Comparable<Requirement>, ScheduleElement, JS
 		return result;
 	}
 
-	public int getCreditHours() {
-		// TODO Auto-generated method stub
-		return 4;
-	}
-
-	@Override
-	public String saveAsJSON() {
-		return String.format(
-				"{Number to Choose: {%s} Choices: {%s} DDN: {%s} Requirement Name:{%s}}",
-				numToChoose,
-				SaverLoader.toJSON(new ArrayList<JSONable>(choices)),
-				doubleDipNumber,
-				name);
-	}
-
 	public static void main(String[] args){
-		String test = "1 of (MTH 140, MTH 240, or MTH 330)";
-		for(String s : Requirement.tokenize(test)){
-			System.out.println(s);
+		String test3 = "(MTH-250)";
+		System.out.println("Reading from: " + test3);
+		Requirement req = (Requirement)readFrom(test3);
+		
+		
+		String test = "1 of ( 2 of (ACC - 230, ACC10 ) , MTH 140, MTH 240, or MTH 330)";
+		String test2 = "(MTH140, MTH240, MTH330, or 2 of (ACC-230, ACC10))";
+		System.out.println("Reading from: " + test);
+		Requirement r = (Requirement) readFrom(test);
+		System.out.println(r.saveString());
+		
+		System.out.println("Reading from " + test2);
+		r = (Requirement) readFrom(test);
+		System.out.println(r.saveString());
+		for(Requirement x : r.choices){
+			System.out.println(x.saveString());
 		}
 	}
-
-
+	
+	
 }

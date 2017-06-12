@@ -31,19 +31,22 @@ public class RequirementPanel extends JPanel {
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
 
-		
 		//Make sure any click on the requirementPanel 
 		// will begin a dragEvent.
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
 
+		this.setBorder(new BevelBorder(BevelBorder.RAISED));
+		
+		update(req);
 
+	}
+	
+	
+	public void update(Requirement req){
+		this.req =req;
 
 		String fullText = req.getDisplayString();
-
-		if(req.numToChoose > 1){
-			fullText = String.format("(%d more) ", req.numToChoose - req.numFinished) + fullText;
-		}
 
 		int numChars = 20;
 		String labelText = fullText;
@@ -55,20 +58,21 @@ public class RequirementPanel extends JPanel {
 		shown.setFont(FurmanOfficial.normalFont);
 		shown.setToolTipText(fullText);
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
-
-		this.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-
-
-
-
-		if(this.req.isComplete()){
+		
+		
+		
+		//Do something based on whether the requirement is complete.
+		//TODO figure out how to use storedPercentComplete to
+		// color the requirement.
+		if(this.req.storedIsComplete){
 			this.setBackground(FurmanOfficial.grey(200));
 		}
 		else{
 			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
+		
 
+		this.removeAll();
 		this.add(shown);
 
 	}

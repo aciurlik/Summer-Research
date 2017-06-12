@@ -2,6 +2,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
+/*
+ * 
+ * 
+ * This class is on its way out.
+ * 
+ * As soon as we transfer all stored majors over into the new format, 
+ * this class should be deleted.
+ */
 public class SaverLoader {
 
 	/**
@@ -43,26 +51,6 @@ object[0].toString() delimiter[0] object[1].toString() .... delimiter[n-1] objec
 			rest = rest.substring(endIndex);
 		}
 		return result.toArray(new String[ result.size()]);
-	}
-	
-	
-	/**
-	 * Given an iterable, make a string of the form
-	 * 
-	 * {  obj1  obj2  obj3  }
-	 * 
-	 * Each object is responsible for adding its own surrounding brackets.
-	 * @param iterable
-	 * @return
-	 */
-	public static String toJSON(Iterable<JSONable> iterable){
-		StringBuilder result = new StringBuilder();
-		for (JSONable j : iterable){
-			result.append("{");
-			result.append(j.saveAsJSON());
-			result.append("}");
-		}
-		return result.toString();
 	}
 	
 	
