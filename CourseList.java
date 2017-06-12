@@ -19,6 +19,13 @@ import java.util.Scanner;
  */
 
 public class CourseList  {
+	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
+	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
+	//added, the one with the higer degree Type value will dictate the GER list
+	public static final int BA = 1;
+	public static final int BS = 2;
+	public static final int BM = 0;
+	public static final int None = 4;
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
@@ -53,7 +60,7 @@ public class CourseList  {
 		return readAll();
 	}
 
-
+	
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 		this.prereqs = new Hashtable<Prefix, Prefix[]>();
@@ -209,8 +216,33 @@ public class CourseList  {
 	}
 
 
-
-
+	public static String getDegreeTypeString(int i){
+		if(i == BS){
+			return "BS";
+		}
+		if(i == BA){
+			return "BA";
+		}
+		if(i == BM){
+			return "BM";
+		}
+		return "null";
+	}
+	
+	
+	
+	public static int getDegreeTypeNumber(String s){
+		if(s.equals("BM")){
+			return CourseList.BM;
+		}
+		if(s.equals("BS")){
+			return CourseList.BS;
+		}
+		if(s.equals("BA")){
+			return CourseList.BA;
+		}
+		return -1;
+	}
 
 	/**
 	 * Return only those members of input which are in the given semester.
@@ -266,7 +298,7 @@ public class CourseList  {
 				switch ( majorType){
 				case Major.BS:
 					//For BS, the MR requirement is predefined
-					r = (Requirement)Requirement.readFrom("1 of (MTH 150, 2 of (MTH 145, MTH 120))");
+					r = (Requirement)Requirement.readFrom("1 of (MTH 150, MTH 145)");
 					includeDefaultPrefixes = false;
 					break;
 				case Major.BM:
@@ -277,6 +309,7 @@ public class CourseList  {
 					//For BA and any unknown majorType, 
 					// you can take any of the MR courses.
 					includeDefaultPrefixes = true;
+
 				}
 				break;
 			case "NW":
@@ -305,10 +338,23 @@ public class CourseList  {
 					// "courses numbered 110 or greater in Biology, Chemistry, 
 					//  Earth and Environmental Science, Neuroscience, Physics, 
 					//  "Sustainability Science."
+             /*
+            	r.choices.clear();
+				      r.choices.add(new Prefix("CHM", 110));
+				      r.choices.add(new Prefix("CHM", 115));
+				      r.choices.add(new Prefix("CHM", 120));
+				      r.choices.add(new Prefix("EES", 112));
+				      r.choices.add(new Prefix("EES", 113));
+				      r.choices.add(new Prefix("EES", 115));
+				      r.choices.add(new Prefix("PHY", 111));
+				      r.choices.add(new Prefix("PHY", 112));
+				      r.choices.add(new Prefix("PSY", 320));
+				      r.choices.add(new Prefix("SUS", 120));   
+            */
 					for(Prefix p : GERRequirements.get("NWL")){
 						if(p.getNumber().compareTo("110") >= 0){
 							r.choices.add(new TerminalRequirement(p));
-						}
+            }
 					}
 					for(Prefix p : GERRequirements.get("NW")){
 						if(p.getNumber().compareTo("110") >= 0){
@@ -341,6 +387,7 @@ public class CourseList  {
 			case "WC":
 			case "NE":
 				// TODO set doubleDipNumber differently from all the others
+
 			}
 			if(includeDefaultPrefixes){
 				for(Prefix p : GERRequirements.get(key)){
@@ -362,6 +409,7 @@ public class CourseList  {
 	 */
 	public void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
+
 		for(String s : allGERs){
 			HashSet<Prefix> old = this.GERRequirements.get(s);
 			if(old == null){
@@ -390,7 +438,7 @@ public class CourseList  {
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
 
-
+	
 
 
 	public void addCoursesIn(File furmanCoursesFile){

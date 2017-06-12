@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Scanner;
 
 
@@ -11,10 +12,16 @@ public class Major {
 	String name;
 	int groupNumber;
 	ArrayList<Requirement> reqList;
+	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
 	
+	public int chosenDegree;
+	
+
+
 	public static final String NORMAL_MAJOR = "Major";
 	public static final String MINOR = "Minor";
 	public static final String TRACK = "Track";
+	
 	String majorType;
 	
 	public static final int BA = 0;
@@ -29,7 +36,43 @@ public class Major {
 		this.majorType = NORMAL_MAJOR;
 		this.reqList = new ArrayList<Requirement>();
 	}
+
+	/**
+	 * Sets the type of this major.
+	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
+	 * @param majorType
+	 */
+	public void setType(String majorType){
+		this.majorType = majorType;
+	}
+
+	public boolean isType(String majorType){
+		return this.majorType.equals(majorType);
+	}
+
+	public void addDegreeType(String degreeType){
+		if(degreeType.equals("BM")){
+			this.degreeTypes.add(CourseList.BM);
+		}
+		if(degreeType.equals("BS")){
+			this.degreeTypes.add(CourseList.BS);
+		}
+		if(degreeType.equals("BA")){
+			this.degreeTypes.add(CourseList.BA);
+		}
+
+	}
+
 	
+	
+	public int getChosenDegree() {
+		return chosenDegree;
+	}
+
+	public void setChosenDegree(int chosenDegree) {
+		this.chosenDegree = chosenDegree;
+	}
+
 	public static Major testMajor(){
 		Major result = new Major("Math-BS");
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 250)}, 1));
@@ -58,7 +101,7 @@ public class Major {
 				new Prefix("MTH",461),
 				new Prefix("MTH",504)
 		}, 		
-		7);
+				7);
 		electives.setName("MTH Electives");
 		result.addRequirement(electives);
 		return result;
@@ -81,8 +124,11 @@ public class Major {
 		this.reqList.add(r);
 	}
 
+	
+	
 
 	static final String typeString = "Type: ";
+	static final String degreeTypeString = "Possible Degree(s):";
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
@@ -103,18 +149,24 @@ public class Major {
 		return result.toString();
 	}
 
-	
+
 	public static Major readFrom(String saveString){
 		String[] lines = saveString.split("[\n]+");
 		Major result = new Major(lines[0]);
 		int startIndex = 1;
-		
 		if(lines[startIndex].contains(typeString)){
 			result.setType(lines[startIndex].substring(typeString.length()));
-			startIndex ++;
+			startIndex ++;	
 		}
-		
-		
+		if(lines[startIndex].contains(degreeTypeString)){
+			String cat = lines[startIndex].substring(degreeTypeString.length());
+			String noSpace = cat.replaceAll("\\s+","");
+			String[] degreeType = noSpace.split(",");
+			for(String s: degreeType){
+				result.addDegreeType(s);
+			}
+			startIndex++;
+		}
 		for(int i = startIndex; i < lines.length ; i ++){
 			int colonIndex = lines[i].indexOf(":");
 			int firstSpace = lines[i].indexOf(" ");
@@ -128,9 +180,10 @@ public class Major {
 		}
 		return result;
 	}
-	
+
+
 	public static Major readFrom(File f){
-		
+
 		Scanner scan;
 		try {
 			scan = new Scanner(f);
@@ -149,7 +202,7 @@ public class Major {
 	public String toString(){
 		return this.name;
 	}
-	
+
 	@Override 
 	public boolean equals(Object o){
 		if(!(o instanceof Major)){
@@ -162,9 +215,9 @@ public class Major {
 		else{
 			return false;
 		}
-		
+
 	}
-	
+
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
@@ -174,7 +227,10 @@ public class Major {
 		
 		//ListOfMajors m = ListOfMajors.testList();
 		//System.out.println(m.getCompleteMajorsList().get(1).saveString());
+
 	}
-	
-	
+
+
+
+
 }

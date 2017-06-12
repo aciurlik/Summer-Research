@@ -9,7 +9,7 @@ public class Schedule {
 	ArrayList<Semester> semesters;
 	Driver d; 
 	CourseList masterList;
-	
+
 
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
 	boolean reqsFulfilledValid; // the return value of getRequirementsFulfilled 
@@ -46,7 +46,7 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
-		this.addMajor(masterList.getGERMajor(0));
+		this.addMajor(masterList.getGERMajor(CourseList.BA));
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
@@ -161,15 +161,15 @@ public class Schedule {
 		reqsValid = false;
 		return true;
 	}
-	
-	
+
+
 	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
 		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
 			return false;
 		}
 		newSem.add(element);
 		return true;
-		
+
 	}
 
 	///////////////////////////////
@@ -180,13 +180,17 @@ public class Schedule {
 
 
 	public void addMajor(Major newMajor){
-		majorsList.add(newMajor);
+	addAtMajor(newMajor, majorsList.size());
+	if(!newMajor.name.equals("GER")){
+			majorsList.remove(0);
+			addAtMajor(masterList.getGERMajor(this.determineGER()), 0);
+		}
 		//Tell the courses which requirements they satisfy
 		reqsFulfilledValid = false;
 		//Tell the new requirements if some taken course satisfies them.
 		reqsValid = false;
 	}
-	
+
 	public void addAtMajor(Major newMajor, int index){
 		majorsList.add(index, newMajor);
 		//Tell the courses which requirements they satisfy
@@ -200,6 +204,23 @@ public class Schedule {
 		majorsList.remove(major);
 		reqsValid = false;
 		reqsFulfilledValid = false;
+		if(!major.name.equals("GER")){
+			majorsList.remove(0);
+			addAtMajor(masterList.getGERMajor(this.determineGER()), 0);
+		}
+	}
+
+	public int determineGER(){
+		int highestDegree = -1;
+		for(Major m: this.majorsList){
+			if(!m.name.equals("GER")){
+				if(m.getChosenDegree() > highestDegree){
+					highestDegree=m.getChosenDegree();
+				}
+
+			}
+		}
+		return highestDegree;
 	}
 
 
@@ -249,7 +270,7 @@ public class Schedule {
 				return true;
 			}
 		}
-		
+
 
 		if(newS.checkOverlap(newElement)){
 			return true;
@@ -391,7 +412,7 @@ public class Schedule {
 			preReq.setNeededCourses(needed);
 			preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
 			return(!this.userOverride(preReq));
-			
+
 			//throw new PrerequsiteException(needed, e);
 		}
 		return false;
@@ -835,7 +856,7 @@ public class Schedule {
 		collectionOfCourses.removeAll(this.getAllElements());
 		return collectionOfCourses;
 	}
-	
+
 	public boolean SemesterAlreadyExists(SemesterDate semesterDate) {
 		for(Semester s: this.semesters){
 			if(s.semesterDate.equals(semesterDate)){
