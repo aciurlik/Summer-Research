@@ -410,6 +410,7 @@ public class Course implements ScheduleElement{
 
 		}
 
+
 		Course result =  new Course(p, sectionNumber, professor, Time.meetingDaysFrom(meetingDays), creditHours, semester);
 		if(meetingTime[0].hours != Time.UNUSED){
 			result.setMeetingTime(meetingTime);

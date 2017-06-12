@@ -23,6 +23,11 @@ public class Major {
 	public static final String TRACK = "Track";
 	
 	String majorType;
+	
+	public static final int BA = 0;
+	public static final int BS = 1;
+	public static final int BM = 2;
+	int degreeType;
 
 	public static final int MajorDDNRange = 100;
 
@@ -31,21 +36,6 @@ public class Major {
 		this.majorType = NORMAL_MAJOR;
 		this.reqList = new ArrayList<Requirement>();
 
-
-	
-	}
-
-	/**
-	 * Sets the type of this major.
-	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
-	 * @param majorType
-	 */
-	public void setType(String majorType){
-		this.majorType = majorType;
-	}
-
-	public boolean isType(String majorType){
-		return this.majorType.equals(majorType);
 	}
 
 	public void addDegreeType(String degreeType){
@@ -69,26 +59,7 @@ public class Major {
 
 	public void setChosenDegree(int chosenDegree) {
 		this.chosenDegree = chosenDegree;
-	}
 
-	public void addRequirement(Requirement r){
-		int dipNumber = r.doubleDipNumber;
-		addRequirement(r, dipNumber%MajorDDNRange);
-	}
-	/**
-	 * Add this requirement with the specified doubleDipNumber
-	 * 
-	 * This method will automatically attempt to prevent clashing between
-	 * doubleDipNumbers of requirements in different majors.
-	 * To help with this, it is best if doubleDipNumber is less than 100.
-	 * However, doubleDipNumber of 0 is the default (and will be treated as if there is
-	 * no double dip number.)
-	 * @param r
-	 * @param doubleDipNumber
-	 */
-	public void addRequirement(Requirement r, int doubleDipNumber){
-		r.setDoubleDipNumber(groupNumber * MajorDDNRange + doubleDipNumber);
-		this.reqList.add(r);
 	}
 
 	public static Major testMajor(){
@@ -121,9 +92,27 @@ public class Major {
 		}, 		
 				7);
 		electives.setName("MTH Electives");
-		result.addRequirement(electives, 2);
+		result.addRequirement(electives);
 		return result;
 	}
+	
+	/**
+	 * Sets the type of this major.
+	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
+	 * @param majorType
+	 */
+	public void setType(String majorType){
+		this.majorType = majorType;
+	}
+	
+	public boolean isType(String majorType){
+		return this.majorType.equals(majorType);
+	}
+
+	public void addRequirement(Requirement r){
+		this.reqList.add(r);
+	}
+
 
 	
 	
@@ -134,8 +123,18 @@ public class Major {
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
 		result.append(typeString + this.majorType + "\n");
-		for (Requirement r : this.reqList){
-			result.append("REQ:" + r.saveAsJSON() + "\n");
+		for (int i = 0; i  <this.reqList.size() ; i ++){
+			Requirement r = this.reqList.get(i);
+			result.append("R" + i);
+			//Either REQ3 Name:1 of (MTH)
+			// or    REQ3:1 of (MTH)
+			String s = r.getName();
+			if(s != null){
+				result.append(" " + s + ":" + r.saveString() + "\n");
+			}
+			else{
+				result.append(":" + r.saveString() + "\n");
+			}
 		}
 		return result.toString();
 	}
@@ -148,6 +147,17 @@ public class Major {
 		if(lines[startIndex].contains(typeString)){
 			result.setType(lines[startIndex].substring(typeString.length()));
 			startIndex ++;	
+
+		}
+		if(lines[startIndex].contains(degreeTypeString)){
+			String cat = lines[startIndex].substring(degreeTypeString.length());
+			String noSpace = cat.replaceAll("\\s+","");
+			String[] degreeType = noSpace.split(",");
+			for(String s: degreeType){
+				result.addDegreeType(s);
+			}
+			startIndex++;
+
 		}
 		if(lines[startIndex].contains(degreeTypeString)){
 			String cat = lines[startIndex].substring(degreeTypeString.length());
@@ -161,11 +171,14 @@ public class Major {
 
 
 		for(int i = startIndex; i < lines.length ; i ++){
-			if(lines[i].length() < 3){
-				continue;
+			int colonIndex = lines[i].indexOf(":");
+			int firstSpace = lines[i].indexOf(" ");
+			String reqString = lines[i].substring(colonIndex + 1);
+			Requirement newRequirement = Requirement.readFrom(reqString);
+			if(firstSpace != -1 && firstSpace < colonIndex){
+				String name = lines[i].substring(firstSpace, colonIndex).trim();
+				newRequirement.setName(name);
 			}
-			Requirement newRequirement = Requirement.readFromJSON(lines[i].substring(4));
-			newRequirement.numFinished = 0;
 			result.addRequirement(newRequirement);
 		}
 		return result;
@@ -211,12 +224,10 @@ public class Major {
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
+		
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
 
-		ListOfMajors m = ListOfMajors.testList();
-		System.out.println(m.getCompleteMajorsList().get(0).saveString());
-		System.out.println(m.getCompleteMajorsList().get(0).degreeTypes.toString());
 
 	}
 

@@ -122,19 +122,7 @@ public class Schedule {
 			return false;
 		}
 		if(s.replace(oldElement, newElement)){
-			if(this.reqsFulfilledValid){
-				//keep the reqsFufilled set valid
-				updateRequirementsSatisfied(newElement);
-			}
-			if(this.reqsValid){
-				//Keep the requirements valid. No use doing the work if they aren't valid.
-				for(Requirement r : oldElement.getRequirementsFulfilled()){
-					r.numFinished --;
-				}
-				for(Requirement r : newElement.getRequirementsFulfilled()){
-					r.numFinished ++;
-				}
-			}
+			this.reqsValid = false;
 		}
 		return true;
 	}
@@ -149,12 +137,10 @@ public class Schedule {
 		}
 		s.remove(e);
 		if(reqsFulfilledValid){
-			if(reqsValid){
-				//Keep reqs valid
-				for (Requirement r : e.getRequirementsFulfilled()){
-					r.numFinished -= 1;
-				}
-			}
+			//could make this more efficient by only updating 
+			// requirements that return true for
+			// isSatisfiedBy(e);
+			this.reqsValid = false;
 		}
 		else{
 			reqsValid = false;
@@ -169,11 +155,12 @@ public class Schedule {
 		sem.add(element);
 		updateRequirementsSatisfied(element);
 		if(reqsValid){
-			//keep them valid
-			for (Requirement r : element.getRequirementsFulfilled()){
-				r.numFinished ++;
-			}
+			//could make this more efficient by only updating 
+			// requirements that return true for
+			// isSatisfiedBy(e);
+			reqsValid = false;
 		}
+		reqsValid = false;
 		return true;
 	}
 
@@ -301,7 +288,7 @@ public class Schedule {
 
 
 	public boolean checkErrorsWhenAdding(ScheduleElement e, Semester s){
-		if(checkPrerequsitesFor(e, s.semesterDate)){
+		if(checkPrerequsitesAdding(e, s.semesterDate)){
 			return true;
 		}
 		if(s.checkOverlap(e)){
@@ -424,7 +411,7 @@ public class Schedule {
 		return null;
 	}
 
-	public boolean checkPrerequsitesFor(ScheduleElement e, SemesterDate sD){
+	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
 			ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
@@ -470,17 +457,23 @@ public class Schedule {
 
 	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
 			ScheduleElement oldE, ScheduleElement newE){
-		//If newP is null or if the prefixes are different, we're really just doing an
+		//If one of the prefixes is null or 
+		// if the prefixes are different, 
+		// we're really just doing an
 		// add and a remove.
 		Prefix newP = newE.getPrefix();
 		if(newP == null){
 			return(checkPrerequsitesRemoving(oldE, oldSem));
 			//	checkPrerequsitesFor(newE, newSem.semesterDate);
 		}
+		Prefix oldP = oldE.getPrefix();
+		if(oldP == null){
+			return checkPrerequsitesAdding(newE, newSem.semesterDate);
+		}
 		//If they're equal, we're really moving the time we take this class.
 		// Check to see if anything happening before the new placement but
 		// after the old placement now has a prerequsite not filled.
-		if(newP.equals(oldE.getPrefix())){
+		if(newP.equals(oldP)){
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				HashSet<Prefix> taken  = this.prefixesTakenBefore(newSem.semesterDate);
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
@@ -513,8 +506,7 @@ public class Schedule {
 			}
 		}
 		else{
-			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesFor(newE, newSem.semesterDate));
-
+			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesAdding(newE, newSem.semesterDate));
 		}
 		return false;
 	}
@@ -684,22 +676,21 @@ public class Schedule {
 
 	/**
 	 * Forces a full update of all of the requirements,
-	 * ensuring that all majors know which courses have been
-	 * taken that satisfy any of their requirements.
+	 * ensuring that all majors know which relevant 
+	 * courses have been taken .
 	 *  
 	 */
 	public void updateReqs(){
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
+		//This cannot be a set because we need duplicate requirements
+		// to potentially be satisfied twice.
+		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 		for(Requirement r : this.getAllRequirements()){
-			r.numFinished = 0;
-		}
-		//update all requirements satisfied by this schedule element.
-		for(ScheduleElement e : getAllElements()){
-			for (Requirement r : getRequirementsSatisfied(e)){
-				r.numFinished ++;
-			}
+			r.isComplete(allTakenElements, true);
+			r.percentComplete(allTakenElements, true);
+			r.minCoursesNeeded(allTakenElements,  true);
 		}
 		reqsValid = true;
 	}
@@ -713,13 +704,10 @@ public class Schedule {
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
-		r.numFinished = 0;
-		for(ScheduleElement e : getAllElements()){
-			if(r.isSatisfiedBy(e)){
-				r.numFinished ++;
-			}
-		}
-		return r.numFinished;
+		ArrayList<ScheduleElement> allTakenElements = getAllElements();
+		r.isComplete(allTakenElements, true);
+		r.percentComplete(allTakenElements, true);
+		return r.minCoursesNeeded(allTakenElements,  true);
 	}
 
 
@@ -733,9 +721,7 @@ public class Schedule {
 		}
 		int result = 0;
 		for(Requirement r : this.getUniqueRequirementsList()){
-			if(r.numFinished < r.numToChoose){
-				result += r.numToChoose - r.numFinished;
-			}
+			result += r.storedCoursesLeft;
 		}
 		return result;
 	}
@@ -783,35 +769,29 @@ public class Schedule {
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
 			for(Requirement r : m.reqList){
-				if(r.isSatisfiedBy(c)){
+				if(r.isSatisfiedBy(c.getPrefix())){
 					allSatisfied.add(r);
 				}
 			}
 		}
-		//We don't want to add any requirement with a double dip issue, those
-		// should be handled by the user.
-		HashSet<Integer> doubleDipIssues = new HashSet<Integer>();
-		HashSet<Integer> doubleDipNumbers = new HashSet<Integer>();
-		for(Requirement r : allSatisfied){
-			if(! doubleDipNumbers.add(r.doubleDipNumber)){
-				doubleDipIssues.add(r.doubleDipNumber);
+		// If this course satisfies two requirements that don't play well with
+		// each other, then we don't want to add them to the list.
+		// Rather, the user will be prompted to tell us which one they want
+		// to be satisfied.
+		ArrayList<Requirement> toRemove = new ArrayList<Requirement>();
+		for(int i = 0; i < allSatisfied.size() ; i ++){
+			for(int j = i+1 ; j < allSatisfied.size(); j ++){
+				if(this.dontPlayNice(allSatisfied.get(i), allSatisfied.get(j))){
+					toRemove.add(allSatisfied.get(i));
+					toRemove.add(allSatisfied.get(j));
+				}
 			}
 		}
-		//allow any doubleDip numbers that use the default DDN
-		// because you're allowed to double dip from requirements with the 
-		// default number.
-		for(Integer i : doubleDipIssues){
-			if(i%Major.MajorDDNRange == Requirement.defaultDDN){
-				doubleDipIssues.remove(i);
-			}
-		}
-		//Any time there's a question of which requirement a course should satisfy,
-		// ignore it and leave it up to the user (and the GUI) to specify.
-		for (Requirement r : allSatisfied){
-			if(! doubleDipIssues.contains(r.doubleDipNumber)){
-				c.satisfies(r);
-			}
-		}
+	}
+	
+	public boolean dontPlayNice(Requirement r1, Requirement r2){
+		//TODO fill this in
+		return false;
 	}
 
 

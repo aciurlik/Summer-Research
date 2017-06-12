@@ -62,8 +62,9 @@ public class Driver{
 
 		
 		JPanel overlap = new JPanel();
-		
+
 		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
+
 		
 
 	    overlap.setSize(icon.getIconWidth(), percentDone);
@@ -163,7 +164,7 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-		System.out.println(sch.semesters.get(0).elements.size());
+
 		if(m.majorType.equals(m.MINOR)||m.majorType.equals(m.TRACK)){
 			this.sch.addMajor(m);
 			this.update();
@@ -199,6 +200,7 @@ public class Driver{
 				choices[p]=toAdd.get(p);
 
 
+
 			}
 			if(m.degreeTypes.size()>1){
 				instructions = "What type of degree would you like";
@@ -217,10 +219,6 @@ public class Driver{
 			sch.addMajor(m);
 			this.update();
 		}
-
-
-
-
 	}
 
 	public void GUIPopUP(String s){
