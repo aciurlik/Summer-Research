@@ -61,6 +61,15 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 		}
 	}
 
+	
+	public boolean contains(T other){
+		if(this.start.compareTo(other)==-1 && this.end.compareTo(other)==1){
+			return true;
+		}
+		return false;
+	}
+	
+	
 
 	/*
 	 * (non-Javadoc)
