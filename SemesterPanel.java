@@ -112,7 +112,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,500));
 		this.add(defaultPanel);
-		this.updatePanel();
+		this.updatePanel(sem);
 	}
 
 	public void show(){
@@ -209,7 +209,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 	//Redraw this panel based on the semester sem.
-	public void updatePanel(){
+	public void updatePanel(Semester sem){
+		this.sem= sem;
 
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));

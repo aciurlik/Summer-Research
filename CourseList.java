@@ -19,9 +19,13 @@ import java.util.Scanner;
  */
 
 public class CourseList  {
-	public static final int BA = 0;
-	public static final int BS = 1;
-	public static final int BM = 2;
+	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
+	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
+	//added the one with the higer degree Type value will dictate the GER list
+	public static final int BA = 1;
+	public static final int BS = 2;
+	public static final int BM = 0;
+	public static final int None = 4;
 
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
@@ -67,6 +71,7 @@ public class CourseList  {
 		CourseList result = new CourseList();
 		File f = new File("CourseCatologs");
 		for ( File semesterFile : f.listFiles(new FilenameFilter(){
+
 			@Override
 			public boolean accept(File dir, String name) {
 				if(name.contains(".csv")){
@@ -212,8 +217,33 @@ public class CourseList  {
 	}
 
 
+	public static String getDegreeTypeString(int i){
+		if(i == BS){
+			return "BS";
+		}
+		if(i == BA){
+			return "BA";
+		}
+		if(i == BM){
+			return "BM";
+		}
+		return "null";
+	}
 
 
+
+	public static int getDegreeTypeNumber(String s){
+		if(s.equals("BM")){
+			return CourseList.BM;
+		}
+		if(s.equals("BS")){
+			return CourseList.BS;
+		}
+		if(s.equals("BA")){
+			return CourseList.BA;
+		}
+		return -1;
+	}
 
 	/**
 	 * Return only those members of input which are in the given semester.
@@ -257,42 +287,42 @@ public class CourseList  {
 			//Adjust MR for BS
 			if(MajorType==BS){
 				if(r.name.equals("MR")){
-						r.choices.clear();
-						r.choices.add(new Prefix("MTH", 145));
-						r.choices.add(new Prefix("MTH", 150));
-					}
+					r.choices.clear();
+					r.choices.add(new Prefix("MTH", 145));
+					r.choices.add(new Prefix("MTH", 150));
+				}
 				if(r.name.equals("NW")){
-				      r.choices.clear();
-				      r.choices.add(new Prefix("CHM", 110));
-				      r.choices.add(new Prefix("CHM", 115));
-				      r.choices.add(new Prefix("CHM", 120));
-				      r.choices.add(new Prefix("EES", 112));
-				      r.choices.add(new Prefix("EES", 113));
-				      r.choices.add(new Prefix("EES", 115));
-				      r.choices.add(new Prefix("PHY", 111));
-				      r.choices.add(new Prefix("PHY", 112));
-				      r.choices.add(new Prefix("PSY", 320));
-				      r.choices.add(new Prefix("SUS", 120));
-				 	
-				}
-				}
-
-
-				//Adds two HB to every Major Type
-				if(r.name!="WC"|| r.name!="NE"){
-					if(r.name.equals("HB")){
-						r.numToChoose=2;
-					}
-				}
-				//Adds labs to NW satisfiers for all 
-				if(r.name.equals("NW")){
-					r.choices.addAll(GERRequirements.get("NWL").choices);
-					r.doubleDipNumber=1;
+					r.choices.clear();
+					r.choices.add(new Prefix("CHM", 110));
+					r.choices.add(new Prefix("CHM", 115));
+					r.choices.add(new Prefix("CHM", 120));
+					r.choices.add(new Prefix("EES", 112));
+					r.choices.add(new Prefix("EES", 113));
+					r.choices.add(new Prefix("EES", 115));
+					r.choices.add(new Prefix("PHY", 111));
+					r.choices.add(new Prefix("PHY", 112));
+					r.choices.add(new Prefix("PSY", 320));
+					r.choices.add(new Prefix("SUS", 120));
 
 				}
-				//Sets double dip number for all to be the same
-				r.doubleDipNumber=2;
-			
+			}
+
+
+			//Adds two HB to every Major Type
+			if(r.name!="WC"|| r.name!="NE"){
+				if(r.name.equals("HB")){
+					r.numToChoose=2;
+				}
+			}
+			//Adds labs to NW satisfiers for all 
+			if(r.name.equals("NW")){
+				r.choices.addAll(GERRequirements.get("NWL").choices);
+				r.doubleDipNumber=1;
+
+			}
+			//Sets double dip number for all to be the same
+			r.doubleDipNumber=2;
+
 			//Sets WC and NE double dip to be the same. 
 			if(r.name.equals("WC")){
 				r.doubleDipNumber=1;
@@ -322,8 +352,8 @@ public class CourseList  {
 
 
 
-	
-	 
+
+
 
 
 	public Requirement getGERRequirement(String code){
@@ -369,6 +399,7 @@ public class CourseList  {
 	public void addCoursesIn(File furmanCoursesFile){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
+		Course duplicateCourse =null;
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(furmanCoursesFile));
@@ -390,6 +421,23 @@ public class CourseList  {
 						this.add(lastCourse);
 					}
 					lastCourse = Course.readFromFurmanData(data);
+					if(data.get(0).contains("Summer")){
+						if(lastCourse.meetingTime==null || lastCourse.meetingTime[0].isAllUnused()  ){
+							Course newDuplicateCourse = Course.readFromFurmanData(data);
+							if( newDuplicateCourse != duplicateCourse){
+								if(duplicateCourse != null){
+									this.add(duplicateCourse);
+									
+								}
+								duplicateCourse=newDuplicateCourse;
+
+
+							}
+
+							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+							
+						}
+					}
 					//Also, see if this course satisfies any GERs.
 					String GERs = data.get(14);
 					if(!GERs.equals("")){
@@ -409,15 +457,27 @@ public class CourseList  {
 					else{
 						//Set labTime = startTime thru endTime, no dates.
 						lastCourse.setLabTime(new Time[]{times[1], times[3]});
+						String meetingTimesString = data.get(9);
+						if(!meetingTimesString.equals("")){
+							lastCourse.setLabDay(Time.meetingDaysFrom(meetingTimesString)[0]);
+						}
 					}
 				}
 				line = br.readLine();
 			}
 			br.close();
+			if(lastCourse != null){
+				this.add(lastCourse);
+				
+			}
+			if(duplicateCourse != null){
+				this.add(duplicateCourse);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+		
 	}
 
 	public static void main(String[] args){

@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,16 @@ public class Time implements Comparable<Time>{
 	public static final int UNUSED = -1;
 	public static final int AM = 0;
 	public static final int PM = 1;
+	
+
+	public static final char[] dayCodes = {'U', 'M', 'T', 'W', 'R', 'F', 'S'};
+	public static HashMap<Character, Integer> reverseDayCodes;
+	static {
+		reverseDayCodes = new HashMap<Character, Integer>();
+		for(int i = 0; i < dayCodes.length ; i ++){
+			reverseDayCodes.put(dayCodes[i], i);
+		}
+	}
 	
 	//If a field is unused, it will have this value.
 	// However, some methods have undefined behavior if particular fields are unused.
@@ -382,6 +393,22 @@ public class Time implements Comparable<Time>{
 		}
 		return 0;
 	}
+	
+
+	/**
+	 * Given a code of the form "MWF" make the correct
+	 * meeting days list.
+	 * @param dayCode
+	 * @return
+	 */
+	public static int[] meetingDaysFrom(String dayCode){
+		char[] days = dayCode.toCharArray();
+		int[] result = new int[days.length];
+		for(int i = 0; i < result.length ; i ++){
+			result[i] = reverseDayCodes.get(days[i]);
+		}
+		return result;
+	}
 
 	public String toString(){
 		//TODO make this fancier
@@ -520,7 +547,6 @@ public class Time implements Comparable<Time>{
 				combine(date.minutes, time.minutes),
 				combine(date.seconds, time.seconds)
 				);
-		
 	}
 	
 	private static int combine(int v1, int v2){
@@ -529,7 +555,34 @@ public class Time implements Comparable<Time>{
 		}
 		return v1;
 	}
+	
+	
+	public Time findMidPoint(Time other){
+		int avgSec = (int)((this.toSec() + other.toSec())/2);
+		return(timeFromSeconds(avgSec));
+	
+	}
 
+	private Time timeFromSeconds(int seconds) {
+		int Secs = seconds%secsInMin;
+		int secondsLeft= seconds-Secs;
+		int Minute = (secondsLeft)%secsInHour;
+		secondsLeft=secondsLeft-(Minute*secsInMin);
+		int Hour = secondsLeft%secsInDay;
+		secondsLeft=secondsLeft-(Hour*secsInMin);
+		int Days = (int)secondsLeft/secsInDay;
+		Time  startTime = new Time(2000, 1, 1, Secs, Minute, Hour);
+		return(startTime.addDays(Days));
+		
+	}
+	
+	public boolean isAllUnused(){
+		if(this.day==Time.UNUSED && this.hours==Time.UNUSED && this.minutes==Time.UNUSED && this.month==Time.UNUSED && this.seconds==Time.UNUSED && this.year==Time.UNUSED){
+			return true;
+		}
+		return false;
+	}
+	
 	public static Time readFrom(String s){
 		String[] split = s.split(" ");
 		String[] larges = split[0].split("/");
@@ -551,6 +604,9 @@ public class Time implements Comparable<Time>{
 		System.out.println(t);
 		System.out.println(s);
 
+		
+	
+		
 
 		//		double year = 31536000;
 		//		double day = 60 * 60 * 24;

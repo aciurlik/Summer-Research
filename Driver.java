@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Image;
@@ -43,13 +44,36 @@ public class Driver{
 
 
 	public Driver() {
-
+		int givenHeight = 300;
+		int givenWidth =100;
 		//Belltower icon and scaling
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
-		Image newImage = image.getScaledInstance(100,300 , java.awt.Image.SCALE_SMOOTH);
+		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
+		
 		icon = new ImageIcon(newImage);
+		
+		
+		int percentDone=Schedule.getPercentDone(icon.getIconHeight());
+		
 		JLabel belltowerLabel = new JLabel(icon);
+		belltowerLabel.setOpaque(true);
+		
+
+		
+		JPanel overlap = new JPanel();
+		
+		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
+		
+
+	    overlap.setSize(icon.getIconWidth(), percentDone);
+	    overlap.setLocation(0, icon.getIconHeight()-percentDone);
+		overlap.setOpaque(true);
+		
+		belltowerLabel.add(overlap);
+		
+		
+		
 
 
 		//Make data
@@ -91,12 +115,18 @@ public class Driver{
 		CourseList l = CourseList.testList();
 		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(sch.masterList, sch.semesters.get(0).semesterDate, null);
-		sch = current;
+		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
+		setSchedule(current);
 		this.update();
 
 	}
 
+
+	private void setSchedule(Schedule current) {
+		sch=current;
+		this.sch.setDriver(this);
+		
+	}
 
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
@@ -123,7 +153,7 @@ public class Driver{
 		this.update();
 
 	}
-	
+
 
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
@@ -133,24 +163,63 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-		//if m is lets you choose between BS/BM/BA{
-		//get that value from the major of from the schedule 
-		//String[] toAdd={"BA", "BM", "BS"};
-		//String GERNeeded = (String)JOptionPane.showInputDialog(popUP, "What type of degree would you like",  "Degree Type", JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
-	//	int MajorType = 0;
-	//	if(GERNeeded.equals("BS")){
-		//	MajorType = CourseList.BS;
-	//	}
-	//	if(GERNeeded.equals("BM")){
-		//	MajorType = CourseList.BM;
-	//	}
-	///	if(GERNeeded.equals("BA")){
-	//		MajorType = CourseList.BA;
-	//	}
-	//	this.sch.removeMajor(sch.masterList.getGERMajor(0));
-	//	this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
-		sch.addMajor(m);
-		this.update();
+		System.out.println(sch.semesters.get(0).elements.size());
+		if(m.majorType.equals(m.MINOR)||m.majorType.equals(m.TRACK)){
+			this.sch.addMajor(m);
+			this.update();
+		}
+		if(m.degreeTypes.size()==1){
+			m.setChosenDegree(m.degreeTypes.get(0));
+			sch.addMajor(m);
+			this.update();
+		}
+		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
+			ArrayList<String> toAdd= new ArrayList<String>();
+			String instructions = null;
+			String header = null;
+
+
+			for(int i = 0; i<m.degreeTypes.size(); i++){
+				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
+				
+			}
+
+			
+
+			if(m.degreeTypes.size()==0){
+				toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
+				toAdd.add(CourseList.getDegreeTypeString(CourseList.BA));
+				toAdd.add(CourseList.getDegreeTypeString(CourseList.BM));
+				instructions = "Your major was not given a degree type. Please look-up your major and choose the appropriate option.";
+				header = "WARNING";
+			}
+			
+			String[] choices = new String[toAdd.size()];
+			for(int p = 0; p<toAdd.size(); p ++){
+				choices[p]=toAdd.get(p);
+
+
+			}
+			if(m.degreeTypes.size()>1){
+				instructions = "What type of degree would you like";
+				header = "Degree Type";
+			}
+			
+			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+			int MajorType = 0;
+			if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
+
+				MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
+			}
+			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
+			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
+			m.setChosenDegree(MajorType);
+			sch.addMajor(m);
+			this.update();
+		}
+
+
+
 
 	}
 
@@ -179,13 +248,10 @@ public class Driver{
 				Desktop.getDesktop().browse(new URL("http://www.furman.edu/academics/may-experience/Pages/default.aspx").toURI());
 			}
 		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -254,16 +320,16 @@ public class Driver{
 
 
 	}
-	
+
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 	}
 	public void dragEnded(){
 		this.schP.dragEnded();
 	}
-	
-	
-	
+
+
+
 
 	public void createYearDialogBox(String s){
 		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
@@ -376,8 +442,11 @@ public class Driver{
 		this.update();
 	}
 
+
+
 	public boolean userRequestError(String header, String instruct){
-		int n = JOptionPane.showConfirmDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
+		Object[] options = {"Ignore", "Cancel"};
+		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}

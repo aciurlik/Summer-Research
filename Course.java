@@ -16,21 +16,15 @@ public class Course implements ScheduleElement{
 	protected Time[] meetingTime; //two times where the day, month, and year are unused.
 	protected String name;
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
+	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
+
 
 	String professor;
 
 	HashSet<Requirement> reqsSatisfied;
 	HashSet<Requirement> userSpecifiedReqs;
 
-	public static final char[] dayCodes = {'U', 'M', 'T', 'W', 'R', 'F', 'S'};
-	public static HashMap<Character, Integer> reverseDayCodes;
-	static {
-		reverseDayCodes = new HashMap<Character, Integer>();
-		for(int i = 0; i < dayCodes.length ; i ++){
-			reverseDayCodes.put(dayCodes[i], i);
-		}
-	}
 
 
 	/**
@@ -66,7 +60,7 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
-	
+
 	public void setName(String name){
 		this.name = name;
 	}
@@ -84,29 +78,13 @@ public class Course implements ScheduleElement{
 		return this.semester;
 	}
 
-
 	public String meetingDaysCode(){
 		String result = "";
 		if (meetingDays==null){
 			return result;
 		}
 		for (int day : meetingDays){
-			result += dayCodes[day];
-		}
-		return result;
-	}
-
-	/**
-	 * Given a code of the form "MWF" make the correct
-	 * meeting days list.
-	 * @param dayCode
-	 * @return
-	 */
-	public static int[] meetingDaysFrom(String dayCode){
-		char[] days = dayCode.toCharArray();
-		int[] result = new int[days.length];
-		for(int i = 0; i < result.length ; i ++){
-			result[i] = reverseDayCodes.get(days[i]);
+			result += Time.dayCodes[day];
 		}
 		return result;
 	}
@@ -135,13 +113,18 @@ public class Course implements ScheduleElement{
 	}
 	public void setLabTime(int dayOfWeek, int hour, boolean AM, int minutes, int durationMinutes){
 		Time startTime = new Time( hour, AM, minutes, 0);
-		startTime.setYear(this.semester.getYear());
-		startTime.setMonth(this.semester.getStartMonth());
-		startTime.advanceToNext(dayOfWeek);
 		this.labTime = new Time[]{startTime, startTime.addMinutes(durationMinutes)};
+		this.setLabDay(dayOfWeek);
 	}
 	public void setLabTime(Time[] t){
 		this.labTime = t;
+	}
+	/**
+	 * Should only be called after setting labTime.
+	 * @param labDay
+	 */
+	public void setLabDay(int labDay){
+		this.labDay = labDay;
 	}
 
 	//////////////
@@ -150,6 +133,12 @@ public class Course implements ScheduleElement{
 	public Intervals<Time> allTakenTimes(){
 		Intervals<Time> result = new Intervals<Time>();
 		if(labTime != null){
+			labTime[0].day = labDay;
+			labTime[1].day = labDay;
+			labTime[0].month = Time.UNUSED;
+			labTime[0].year = Time.UNUSED;
+			labTime[1].month = Time.UNUSED;
+			labTime[1].year = Time.UNUSED;
 			result.addInterval(new Interval<Time>(labTime[0], labTime[1]));
 		}
 		if(examTime != null){
@@ -369,6 +358,8 @@ public class Course implements ScheduleElement{
 
 	}
 	public static Course readFromFurmanData(ArrayList<String> furmanData){
+		int counter = 3;
+		//	System.out.println("THIS IS ME" + furmanData.toString());
 		String semesterString = furmanData.get(0); // EX "Fall 2017 - Day"
 		String section = furmanData.get(1); // EX "ACC-111-01"
 		String title = furmanData.get(3);  // EX "Financial Accounting Prncpls"
@@ -390,11 +381,36 @@ public class Course implements ScheduleElement{
 		SemesterDate semester = SemesterDate.fromFurman(semesterString);
 
 		Time totalStartTime = Time.combine(times[0], times[1]);
+		//System.out.println("THIS IS  ME" + times[0].month);
 		Time totalEndTime = Time.combine(times[0], times[3]);
 		Time[] meetingTime = new Time[]{totalStartTime, totalEndTime};
 
 
-		Course result =  new Course(p, sectionNumber, professor, meetingDaysFrom(meetingDays), creditHours, semester);
+
+		if(semester.sNumber==(SemesterDate.SUMMERONE) || semester.sNumber==(SemesterDate.SUMMERTWO)){
+			Time SummerSessionOne = new Time(times[0].year, 6, 16, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+			Time SummerSessionTwo = new Time(times[0].year, 7, 25, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+			Interval<Time> sessionInterval = new  Interval<Time>(times[0], times[2]);
+
+		
+			if(sessionInterval.contains(SummerSessionOne)){
+				
+				semester = new SemesterDate(semester.year, SemesterDate.SUMMERONE);
+				Time midpoint = times[0].findMidPoint(times[2]);
+				SummerSessionOne = SummerSessionOne.findMidPoint(midpoint);
+				
+				
+			}
+			if(sessionInterval.contains(SummerSessionTwo)){
+				semester = new SemesterDate(semester.year,SemesterDate.SUMMERTWO);
+				Time midpoint = times[0].findMidPoint(times[2]);
+				SummerSessionTwo = SummerSessionTwo.findMidPoint(midpoint);
+			}
+
+
+		}
+
+		Course result =  new Course(p, sectionNumber, professor, Time.meetingDaysFrom(meetingDays), creditHours, semester);
 		if(meetingTime[0].hours != Time.UNUSED){
 			result.setMeetingTime(meetingTime);
 		}

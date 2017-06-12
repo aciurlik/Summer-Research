@@ -6,9 +6,11 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class SupriseMe extends JPanel implements ActionListener {
@@ -33,8 +35,16 @@ public class SupriseMe extends JPanel implements ActionListener {
 
 		frame = new JFrame();
 		
+		
 
 		ArrayList<Course> getReady = sch.masterList.getCoursesIn(s);
+		if(getReady.size()==0){
+			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+			JOptionPane.showMessageDialog(frame, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+			
+		}
+		
+		if(getReady.size()>0){
 		Random rand = new Random();
 		c = getReady.get(rand.nextInt(getReady.size()));
 		String string = c.toString();
@@ -75,6 +85,7 @@ public class SupriseMe extends JPanel implements ActionListener {
 		frame.revalidate();
 		frame.repaint();
 		frame.setVisible(true);
+		}
 
 
 	}
@@ -98,37 +109,16 @@ public class SupriseMe extends JPanel implements ActionListener {
 				newCourse.add(sup);
 				try{
 					Thread.sleep(300);
-					newCourse.revalidate();
-					newCourse.repaint();
-					this.revalidate();
-					this.repaint();
-					frame.revalidate();
-					frame.repaint();
+					
 				}
 				catch(InterruptedException p){
 					p.printStackTrace();
 				}
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
+			
 				frame.add(this);
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
 				frame.pack();
 
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
+				
 				frame.setVisible(true);
 
 			}
@@ -142,6 +132,7 @@ public class SupriseMe extends JPanel implements ActionListener {
 		if(e.getActionCommand().equals(MenuOptions.Want)){
 			d.GUIChallengeExcepted(s, c);
 			frame.dispose();
+		
 		}
 
 	}
