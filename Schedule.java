@@ -677,7 +677,9 @@ public class Schedule {
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
-		HashSet<ScheduleElement> allTakenElements = new HashSet<ScheduleElement>(getAllElements());
+		//This cannot be a set because we need duplicate requirements
+		// to potentially be satisfied twice.
+		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 		for(Requirement r : this.getAllRequirements()){
 			r.isComplete(allTakenElements, true);
 			r.percentComplete(allTakenElements, true);
@@ -695,7 +697,7 @@ public class Schedule {
 		if(! reqsFulfilledValid){
 			updateAllReqsFulfilled();
 		}
-		HashSet<ScheduleElement> allTakenElements = new HashSet<ScheduleElement>(getAllElements());
+		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 		r.isComplete(allTakenElements, true);
 		r.percentComplete(allTakenElements, true);
 		return r.minCoursesNeeded(allTakenElements,  true);

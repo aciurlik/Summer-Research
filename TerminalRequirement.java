@@ -31,10 +31,21 @@ public class TerminalRequirement extends Requirement {
 	
 	
 	
+	/**
+	 * Takes a string of the form MTH-140 or MTH140 
+	 * 
+	 * If no '-' is in the string, it looks for the first switch between an alpha
+	 * character and a numeric character. This means that, for example, ACC-BLK has to 
+	 * contain its '-'.
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public static TerminalRequirement readFrom(String s){
 		//TODO needs to be replaced to handle cases like MTH > 200
+		//System.out.println(s);
 		if(!s.contains("-")){
-			s = s.replaceAll("(?<=\\d)\\w", "-");
+			s = s.replaceAll("(?<=[a-zA-Z])(?=\\d)", "-");
 		}
 		String[] split = s.split("-");
 		Prefix p = new Prefix(split[0], split[1]); //in case of BLK

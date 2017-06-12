@@ -87,6 +87,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public boolean isComplete(Iterable<ScheduleElement> taken, boolean storeValue){
+		
 		//Find all the prefixes,
 		// and count how many things will magically satisfy this requirement
 		Object[] separated = separate(taken);
@@ -96,7 +97,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	}
 	
 	//INFINITELOOPHAZARD
-	/**  TODO needs to be tested
+	/** 
 	 * Check if these prefixes satisfy this requirement.
 	 * Requirements are optimists - if this set of taken things
 	 *  has any shot of satisfying this requirement, then the requirement.
@@ -128,7 +129,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	}
 	
 	//INFINITELOOPHAZARD
-	/** TODO needs to be tested
+	/**
 	 * Find the minimum number of courses you would need to completely
 	 * satisfy this requirement, given this set of things you've already taken.
 	 */
@@ -141,7 +142,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	}
 	
 	//INFINITELOOPHAZARD
-	/**  TODO needs to be tested
+	/** 
 	 * Find the set of prefixes that would most quickly complete this requirement
 	 * @return
 	 */
@@ -182,7 +183,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	
 	
 	//INFINITELOOPHAZARD
-	/** TODO needs to be tested
+	/** 
 	 * Find what % this requirement is complete if you get the best-case scenario for
 	 * each of the numPlannedLater courses.
 	 * @param taken
@@ -191,6 +192,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public double percentComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
+		//While this requirement isn't 100% complete, add numPlannedLater
+		// imaginary courses to the working set.
 		HashSet<Prefix> workingSet = new HashSet<Prefix>(taken);
 		for(int i = 0; i < numPlannedLater ; i ++){
 			if(Math.abs(percentComplete(workingSet) - 1.0) < tolerance ){
@@ -207,16 +210,20 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	}
 	
 	//INFINITELOOPHAZARD
-	/** TODO needs to be tested
+	/**
 	 * Figure out what % complete this requirement is.
 	 */
 	public double percentComplete(HashSet<Prefix> taken){
+		//We need the top numToChoose percents.
+		// Once we find these n values, say a, b, and c, we want
+		// 1/3 a + 1/3 b + 1/3 c, or in general,
+		// sum( largest n subPercents) / numToChoose.
 		ArrayList<Double> subPercents = new ArrayList<Double>();
 		for(Requirement r : this.choices){
 			subPercents.add(r.percentComplete(taken));
 		}
 		Collections.sort(subPercents);
-		int miniPercent = 0;
+		double miniPercent = 0;
 		for(int i = 0 ; i < subPercents.size() && i < numToChoose ; i ++){
 			int index = subPercents.size() - (i + 1);
 			miniPercent += subPercents.get(index);
@@ -328,7 +335,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
-		return this == other;
+		return false;
 	}
 
 	@Override
@@ -385,11 +392,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * 
 	 * In general, to differentiate between 'or' and 'and', just change 
 	 * 		the number to choose.
-	 * 		2 of (MTH 145, MTH 220) --> MTH 145 and MTH 220
-	 * 		1 of (MTH 145, MTH 220) --> MTH 145 or MTH 220
+	 * 		2 of (MTH 145, MTH 220) --> means MTH 145 and MTH 220
+	 * 		1 of (MTH 145, MTH 220) --> means MTH 145 or MTH 220
 	 * 
 	 * Requirements may be nested, for example
 	 * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
+	 * 		Commas and parenthesis differentiate between different levels of requirements
 	 * 
 	 * Notice that impossible requirements may be written down, for example
 	 * 		2 of (MTH 110)
@@ -399,7 +407,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * 		(MTH 140, MTH 110)
 	 * 			is the same as
 	 * 		1 of (MTH 140, MTH 110)
-	 * 			Which might be read
+	 * 			Which might be interpreted as
 	 * 		MTH 140 or MTH 110
 	 * 
 	 * All whitespace is ignored.
@@ -414,7 +422,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * 
 	 * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
 	 * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
+	 * 			Which is equivalent to
+	 * 				2 of (MTH 140, MTH 220, MTH 110, MTH 213)
 	 * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
+	 * 			Which is not equivalent to the simpler requirement.
 	 * 
 	 * 		NOT GOOD     1 of (MTH 140 MTH 220)
 	 * 		Correction	 1 of (MTH 140, MTH 220)
@@ -424,6 +435,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 *   'or' before the last choice in a list of choices. This must immediately follow the comma.
 	 * 		2 of (MTH 110, MTH 220,  or   MTH 330)
 	 * 		This is a valid requirement.
+	 * 		Saying 'or' may cause confusion for cases like this:
+	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
 	 * 
 	 */
 	
@@ -538,10 +551,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			result.numToChoose = 1;
 			do{
 				result.addRequirement(parse(tokens));
+				if(tokens.isEmpty()){
+					throw new RuntimeException("Missing ) while parsing requirement");
+				}
 				next = tokens.pop();
 			}while(next.equals(","));
 			if(!next.equals(")")){
-				throw new RuntimeException("missing ) while parsing requirement");
+				throw new RuntimeException("Missing ) while parsing requirement");
 			}
 			return result;
 		}
@@ -593,25 +609,110 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		result.setName(name);
 		return result;
 	}
+	
+	
+	public static void testReading(){
+		String[] tests = new String[]{
+				"(MTH 110)",
+				"(MTH-110)",
+				"MTH110",
+				"2 of (MTH 110, MTH 120, MTH 130)",
+				"2 of (MTH-110, MTH 120, MTH 130)",
+				"2 of (ACC-110, MTH 120, MTH 130)",
+				"2 of (MTH-110, MTH 120, or MTH 130)",
+				"2 of (MTH 110, (MTH 120), (MTH 130))",
+				"2 of (MTH 110, (MTH 120, MTH 130))",
+				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+				"3 of (MTH 110, MTH 120, MTH 130)",
+				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
+				"2 of (BIO 110, BIO 112, BIO 120)",
+				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)"
+		};
+		Prefix[] prefixes = new Prefix[]{
+				new Prefix("MTH", "110"),
+				new Prefix("MTH", "120"),
+				new Prefix("MTH", "130"),
+				new Prefix("MTH", "140"),
+				new Prefix("MTH", "150"),
+				new Prefix("MTH", "160")
+		};
+		HashSet<Prefix> takens = new HashSet<Prefix>();
+		takens.add(prefixes[0]);//MTH 110
+		takens.add(prefixes[1]);//MTH 120
+		
+		System.out.print("Taken prefixes: ");
+		for(Prefix p : takens){
+			System.out.print(p + " ");
+		}
+		System.out.println();
+		System.out.println();
+		
+		for(String toRead : tests){
+			boolean needsToBeShown = false;
+			System.out.println("ReadingFrom \"" +toRead + "\"");
+			Requirement r = Requirement.readFrom(toRead);
+			boolean complete = r.isComplete(takens, 0, true);
+			double percentComplete = r.percentComplete(takens, 0, true);
+			HashSet<Prefix> completionSet = r.fastestCompletionSet(takens);
+			
+			boolean completeAfter = r.isComplete(takens, completionSet.size(), false);
+			double percentAfter = r.percentComplete(takens, completionSet.size(), false);
+			
+			
+			double tol = Double.MIN_VALUE * 10000;
+			if(complete && ( percentComplete < 1.0 - tol || completionSet.size() != 0)){
+				needsToBeShown = true;
+			}
+			if(!complete && percentComplete > 1.0 + tol && completionSet.size() <= 0 ){
+				needsToBeShown = true;
+			}
+			if(percentComplete < 1.0 - tol && completionSet.size() == 0 ){
+				needsToBeShown = true;
+			}
+			if(percentComplete > 1.0 - tol && completionSet.size() != 0){
+				needsToBeShown = true;
+			}
+			if(completeAfter != true){
+				needsToBeShown = true;
+			}
+			if(percentAfter < 1.0 - tol){
+				needsToBeShown = true;
+			}
+			
+			if(r.storedIsComplete != complete){
+				needsToBeShown = true;
+			}
+			if(r.storedCoursesLeft != completionSet.size()){
+				needsToBeShown = true;
+			}
+			if(r.storedPercentComplete != percentComplete){
+				needsToBeShown = true;
+			}
+			
+			needsToBeShown = true;
+			
+
+			if(needsToBeShown){
+				System.out.println("Complete?" + complete);
+				System.out.println("Percent Complete:" + percentComplete);
+				System.out.println("Fastest completion set:");
+				for(Prefix p : completionSet){
+					System.out.println("  " + p);
+				}
+				System.out.println("Complete with scheduled requirements?" + completeAfter);
+				System.out.println("Percent complete with scheduled requirements:" + percentAfter);
+				System.out.println("Stored courses left:" + r.storedCoursesLeft);
+				
+			}
+			else{
+				System.out.println("No obvious errors found");
+			}
+			System.out.println();
+		}
+	}
 
 	public static void main(String[] args){
-		String test3 = "(MTH-250)";
-		System.out.println("Reading from: " + test3);
-		Requirement req = (Requirement)readFrom(test3);
-		
-		
-		String test = "1 of ( 2 of (ACC - 230, ACC10 ) , MTH 140, MTH 240, or MTH 330)";
-		String test2 = "(MTH140, MTH240, MTH330, or 2 of (ACC-230, ACC10))";
-		System.out.println("Reading from: " + test);
-		Requirement r = (Requirement) readFrom(test);
-		System.out.println(r.saveString());
-		
-		System.out.println("Reading from " + test2);
-		r = (Requirement) readFrom(test);
-		System.out.println(r.saveString());
-		for(Requirement x : r.choices){
-			System.out.println(x.saveString());
-		}
+		testReading();
 	}
 	
 	

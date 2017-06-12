@@ -46,8 +46,22 @@ public class RequirementPanel extends JPanel {
 	public void update(Requirement req){
 		this.req =req;
 
-		String fullText = req.getDisplayString();
-
+		
+		//The full text (displayed on hover over) will be
+		// chopped down to size in order to fit in the requirement panel
+		String fullText = "";
+		
+		
+		int percentComplete = (int) Math.round(req.storedPercentComplete * 100);
+		
+		if(percentComplete > 0 && percentComplete < 100){
+			fullText = "(" + percentComplete + "%)" ;
+			fullText += req.storedCoursesLeft + "left\n";
+		}
+		fullText += req.getDisplayString();
+		
+		
+		
 		int numChars = 20;
 		String labelText = fullText;
 		if(labelText.length() > numChars){
