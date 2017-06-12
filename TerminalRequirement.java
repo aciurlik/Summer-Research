@@ -47,14 +47,19 @@ public class TerminalRequirement extends Requirement {
 		if(!s.contains("-")){
 			s = s.replaceAll("(?<=[a-zA-Z])(?=\\d)", "-");
 		}
+		if(!s.contains("-")){
+			throw new RuntimeException("A terminal requirement has to include a '-', or else both letters and numbers");
+		}
 		String[] split = s.split("-");
+		if(split.length > 2){
+			throw new RuntimeException("You need a comma between terminal requirements");
+		}
 		Prefix p = new Prefix(split[0], split[1]); //in case of BLK
 		TerminalRequirement result = new TerminalRequirement(p);
 		if(split[1].matches("\\d+")){
 			result.number = Integer.parseInt(split[1]);
 		}
 		return result;
-		
 	}
 	
 	public String saveString(){

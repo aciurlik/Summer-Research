@@ -395,20 +395,26 @@ public class Schedule {
 
 	/**
 	 * Check every element to see if it has all the prereqs it needs.
+	 * Returns a list of the following form
+	 * [ [e1, needed1] , [e2, needed2], [e3, ...]
+	 * or null if no prerequsite issues were found.
 	 */
 	public Object[] checkAllPrerequsites(){
+		ArrayList<Object> result = new ArrayList<Object>();
 		HashSet<Prefix> taken = new HashSet<Prefix>();
+		Collections.sort(semesters);
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
-				boolean success = masterList.missingPrereqsShallow(e.getPrefix(), taken).isEmpty();
-				if(!success){
-					HashSet<Prefix> needed = masterList.missingPrereqsShallow(e.getPrefix(), taken);
-					Object[] result = new Object[]{e, needed};
-
+				HashSet<Prefix> needed = masterList.neededListShallow(e.getPrefix(), taken);
+				if(!needed.isEmpty()){
+					result.add(new Object[]{e, needed});
 				}
 			}
 		}
-		return null;
+		if(result.isEmpty()){
+			return null;
+		}
+		return result.toArray();
 	}
 
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
@@ -431,7 +437,7 @@ public class Schedule {
 		else{
 			HashSet<Prefix> taken = prefixesTakenBefore(sD);
 			taken.addAll(prefixesTakenIn(sD));
-			HashSet<Prefix> needed = masterList.missingPrereqsDeep(p, taken);
+			HashSet<Prefix> needed = masterList.neededListDeep(p, taken);
 			return needed;
 		}
 	}
@@ -477,7 +483,7 @@ public class Schedule {
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				HashSet<Prefix> taken  = this.prefixesTakenBefore(newSem.semesterDate);
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
-				HashSet<Prefix> missing =masterList.missingPrereqsShallow(oldE.getPrefix(), taken);
+				HashSet<Prefix> missing =masterList.neededListShallow(oldE.getPrefix(), taken);
 				if(!missing.isEmpty()){
 					ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
 					preReq.setOffendingCourse(newE);
