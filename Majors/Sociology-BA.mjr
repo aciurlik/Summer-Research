@@ -1,0 +1,10 @@
+Sociology-BA
+REQ:{Number to Choose: {1} Choices: {{SOC-101}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-301}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-302}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-303}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-470}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-241}{SOC-242}{SOC-243}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{SOC-201}{SOC-211}{SOC-212}{SOC-213}{SOC-215}{SOC-220}{SOC-223}{SOC-225}{SOC-231}{SOC-232}{SOC-233}{SOC-234}{SOC-235}{SOC-241}{SOC-242}{SOC-243}{SOC-251}{SOC-260}{SOC-261}{SOC-262}} DDN: {3} Requirement Name:{200 Elective}}
+REQ:{Number to Choose: {1} Choices: {{SOC-470}{SOC-475}} DDN: {3} Requirement Name:{400 Elective}}
+REQ:{Number to Choose: {1} Choices: {{SOC-201}{SOC-211}{SOC-212}{SOC-213}{SOC-215}{SOC-220}{SOC-223}{SOC-225}{SOC-231}{SOC-232}{SOC-233}{SOC-234}{SOC-235}{SOC-241}{SOC-242}{SOC-243}{SOC-251}{SOC-260}{SOC-261}{SOC-262}{SOC-470}{SOC-475}{SOC-301}{SOC-302}{SOC-303}{SOC-120}{SOC-150}{SOC-501}{SOC-503}} DDN: {3} Requirement Name:{Other Sociology Elective}}
