@@ -28,7 +28,7 @@ public class Schedule {
 		return result;
 	}
 
-	
+
 
 	/**
 	 * Make a new schedule of semesters where firstSemester is the first shown semester 
@@ -182,8 +182,8 @@ public class Schedule {
 
 
 	public void addMajor(Major newMajor){
-	addAtMajor(newMajor, majorsList.size());
-	if(!newMajor.name.equals("GER")){
+		addAtMajor(newMajor, majorsList.size());
+		if(!newMajor.name.equals("GER")){
 			majorsList.remove(0);
 			addAtMajor(masterList.getGERMajor(this.determineGER()), 0);
 		}
@@ -226,7 +226,7 @@ public class Schedule {
 	}
 
 	public static int getPercentDone(int iconHeight) {
-		
+
 		return (iconHeight-1);
 	}
 
@@ -423,7 +423,7 @@ public class Schedule {
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
 			preReq.setNeededCourses(needed);
-		//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
+			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
 			return(!this.userOverride(preReq));
 
 			//throw new PrerequsiteException(needed, e);
@@ -455,7 +455,7 @@ public class Schedule {
 						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 						preReq.setOffendingCourse(e);
 						preReq.setNeededCourses(needed);
-				//		preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
+						//		preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
 						return(!this.userOverride(preReq));
 					}
 				}
@@ -483,6 +483,7 @@ public class Schedule {
 		// Check to see if anything happening before the new placement but
 		// after the old placement now has a prerequsite not filled.
 		if(newP.equals(oldP)){
+			//If we're moving the course backward in time 
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				HashSet<Prefix> taken  = this.prefixesTakenBefore(newSem.semesterDate);
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
@@ -491,33 +492,45 @@ public class Schedule {
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(missing);
-				//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
-					return((this.userOverride(preReq)));
+					//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
+					return((!this.userOverride(preReq)));
 				}
 			}
-			for(Semester s : this.semesters){
-				//prefixes between oldSem and newSem inclusive.
-				HashSet<Prefix> beforeNew = this.prefixesTakenBefore(newSem.semesterDate);
-				HashSet<Prefix> afterOld = this.prefixesTakenAfter(oldSem.semesterDate);
-				HashSet<Prefix> old = this.prefixesTakenIn(oldSem);
-				afterOld.addAll(old);
-				afterOld.retainAll(beforeNew);
-				for(Prefix p : afterOld){
-					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
-						//throw new PrerequsiteException(new Prefix[]{newP}, p);
-						ScheduleError preReq = new ScheduleError(ScheduleError.preReqErrorPrefix);
-						preReq.setCourse(p);
-						preReq.setMissingCourse(newP);
+			//If we're moving the course forward in time. The only courses that need to be checked are those in between the new position and
+			//the old position of the moving course, this is because any other course has already had an error thrown, and therefore has been checked by the user. 
+
+			//prefixes between oldSem and newSem inclusive.
+			HashSet<Prefix> beforeNew = this.prefixesTakenBefore(newSem.semesterDate);
+			HashSet<Prefix> afterOld = this.prefixesTakenAfter(oldSem.semesterDate);
+			HashSet<Prefix> old = this.prefixesTakenIn(oldSem);
+			afterOld.addAll(old);
+			afterOld.retainAll(beforeNew);
+			HashSet<Prefix>needed = new HashSet();
+
+
+			for(Prefix p : afterOld){
+
+				if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
+					//throw new PrerequsiteException(new Prefix[]{newP}, p);
+					needed.add(p);
+
+
 					//	preReq.setInstructions(p.toString() + " had prerequisite " + newP.toString() );
-						return(!this.userOverride(preReq));
-					}
+
 				}
+
 			}
+			if(!needed.isEmpty()){
+				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
+				preReq.setNeededCourses(needed);
+				return(!this.userOverride(preReq));
+			}
+			return false;
+
 		}
 		else{
 			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesAdding(newE, newSem.semesterDate));
 		}
-		return false;
 	}
 
 
@@ -623,7 +636,7 @@ public class Schedule {
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
-					//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
+						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setDuplicateCourses(results);
 						return(!this.userOverride(duplicate));
 					}
@@ -634,7 +647,7 @@ public class Schedule {
 				ScheduleElement[] result = {e, e1};
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 				duplicate.setDuplicateCourses(result);
-			//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
+				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
 				return (!this.userOverride(duplicate));
 			}
 		}
@@ -797,7 +810,7 @@ public class Schedule {
 			}
 		}
 	}
-	
+
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
 		//TODO fill this in
 		return false;

@@ -12,7 +12,7 @@ public class MenuOptions {
 	public static final  String addTrack = "Add Track";
 	public static final  String addInternship = "Explore Internships";
 	public static final  String addResearch = "Explore Research";
-	public static final  String addStudyAway = "Explore Study Away";
+	public static final  String addStudyAway = "Add Study Away";
 	public static final  String addMayX = "Add MayX";
 	public static final  String addSummerClass = "Add Summer Class";
 	public static final  String summerSessionOne = "Summer Session One";

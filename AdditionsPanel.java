@@ -42,11 +42,6 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.add(header);
 
 
-
-		//Explore Study Away
-		this.ExploreStudyAwayButton = this.addButton(MenuOptions.addStudyAway);
-		ExploreStudyAwayButton.setActionCommand(MenuOptions.addStudyAway);
-
 		//Explore Research
 		this.ExploreResearchButton = this.addButton(MenuOptions.addResearch);
 		ExploreResearchButton.setActionCommand(MenuOptions.addResearch);
@@ -63,6 +58,10 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		this.AddSummerClassButton = this.addButton(MenuOptions.addSummerClass);
 		AddSummerClassButton.setActionCommand(MenuOptions.addSummerClass);
 
+		
+		//Explore Study Away
+		this.ExploreStudyAwayButton = this.addButton(MenuOptions.addStudyAway);
+		ExploreStudyAwayButton.setActionCommand(MenuOptions.addStudyAway);
 
 		//Major/Minor Heading 
 		JLabel classAdditions = new JLabel(classAddition);

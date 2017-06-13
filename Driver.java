@@ -171,58 +171,60 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-		if(m.majorType.equals(m.MINOR)||m.majorType.equals(m.TRACK)){
+		if(m.majorType.equals(m.MINOR)){
 			this.sch.addMajor(m);
 			this.update();
 		}
-		if(m.degreeTypes.size()==1){
-			m.setChosenDegree(m.degreeTypes.get(0));
-			sch.addMajor(m);
-			this.update();
-		}
-		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
-			ArrayList<String> toAdd= new ArrayList<String>();
-			String instructions = null;
-			String header = null;
-
-
-			for(int i = 0; i<m.degreeTypes.size(); i++){
-				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
-
+		else{
+			if(m.degreeTypes.size()==1){
+				m.setChosenDegree(m.degreeTypes.get(0));
+				sch.addMajor(m);
+				this.update();
 			}
+			if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
+				ArrayList<String> toAdd= new ArrayList<String>();
+				String instructions = null;
+				String header = null;
+
+
+				for(int i = 0; i<m.degreeTypes.size(); i++){
+					toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
+
+				}
 
 
 
-			if(m.degreeTypes.size()==0){
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BA));
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BM));
-				instructions = "Your major was not given a degree type. Please look-up your major and choose the appropriate option.";
-				header = "WARNING";
+				if(m.degreeTypes.size()==0){
+					toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
+					toAdd.add(CourseList.getDegreeTypeString(CourseList.BA));
+					toAdd.add(CourseList.getDegreeTypeString(CourseList.BM));
+					instructions = "Your major was not given a degree type. Please look-up your major and choose the appropriate option.";
+					header = "WARNING";
+				}
+
+				String[] choices = new String[toAdd.size()];
+				for(int p = 0; p<toAdd.size(); p ++){
+					choices[p]=toAdd.get(p);
+
+
+				}
+				if(m.degreeTypes.size()>1){
+					instructions = "What type of degree would you like";
+					header = "Degree Type";
+				}
+
+				String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+				int MajorType = 0;
+				if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
+
+					MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
+				}
+				//this.sch.removeMajor(sch.masterList.getGERMajor(0));
+				//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
+				m.setChosenDegree(MajorType);
+				sch.addMajor(m);
+				this.update();
 			}
-
-			String[] choices = new String[toAdd.size()];
-			for(int p = 0; p<toAdd.size(); p ++){
-				choices[p]=toAdd.get(p);
-
-
-			}
-			if(m.degreeTypes.size()>1){
-				instructions = "What type of degree would you like";
-				header = "Degree Type";
-			}
-
-			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
-			int MajorType = 0;
-			if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
-
-				MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
-			}
-			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
-			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
-			m.setChosenDegree(MajorType);
-			sch.addMajor(m);
-			this.update();
 		}
 	}
 
@@ -466,12 +468,12 @@ public class Driver{
 		}
 		if(s.error.equals(ScheduleError.preReqError)){
 			header = "Prerequisites Error";
-			instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s)" + s.neededCourses.toString();
+			instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
 		}
-		if(s.error.equals(ScheduleError.preReqErrorPrefix)){
-			header = "Prerequisites Error";
-			instruct = s.offendingCourse.getDisplayString() + " had prerequisite " + s.missingCourse.toString();
-		}
+		//if(s.error.equals(ScheduleError.preReqErrorPrefix)){
+		//	header = "Prerequisites Error";
+		//instruct = s.offendingCourse.getDisplayString() + " had prerequisite " + s.missingCourse.toString();
+		//}
 		if(s.error.equals(ScheduleError.duplicateError)){
 			header = "Duplicate Error";
 			instruct = s.duplicateCourses[0].getDisplayString() + " duplicates " +s.duplicateCourses[1].getDisplayString();
