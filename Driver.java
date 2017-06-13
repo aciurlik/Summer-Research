@@ -62,9 +62,8 @@ public class Driver{
 
 		
 		JPanel overlap = new JPanel();
-
-		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
-
+		
+		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(200));
 		
 
 	    overlap.setSize(icon.getIconWidth(), percentDone);
@@ -116,18 +115,12 @@ public class Driver{
 		CourseList l = CourseList.testList();
 		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
-		setSchedule(current);
+		Schedule current = new Schedule(sch.masterList, sch.semesters.get(0).semesterDate, null);
+		sch = current;
 		this.update();
 
 	}
 
-
-	private void setSchedule(Schedule current) {
-		sch=current;
-		this.sch.setDriver(this);
-		
-	}
 
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
@@ -164,7 +157,6 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-
 		if(m.majorType.equals(m.MINOR)||m.majorType.equals(m.TRACK)){
 			this.sch.addMajor(m);
 			this.update();
@@ -198,7 +190,6 @@ public class Driver{
 			String[] choices = new String[toAdd.size()];
 			for(int p = 0; p<toAdd.size(); p ++){
 				choices[p]=toAdd.get(p);
-
 
 
 			}

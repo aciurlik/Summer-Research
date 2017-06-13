@@ -35,7 +35,6 @@ public class Major {
 		this.name = name;
 		this.majorType = NORMAL_MAJOR;
 		this.reqList = new ArrayList<Requirement>();
-
 	}
 
 	public void addDegreeType(String degreeType){
@@ -59,7 +58,6 @@ public class Major {
 
 	public void setChosenDegree(int chosenDegree) {
 		this.chosenDegree = chosenDegree;
-
 	}
 
 	public static Major testMajor(){
@@ -113,7 +111,6 @@ public class Major {
 		this.reqList.add(r);
 	}
 
-
 	
 	
 
@@ -147,17 +144,6 @@ public class Major {
 		if(lines[startIndex].contains(typeString)){
 			result.setType(lines[startIndex].substring(typeString.length()));
 			startIndex ++;	
-
-		}
-		if(lines[startIndex].contains(degreeTypeString)){
-			String cat = lines[startIndex].substring(degreeTypeString.length());
-			String noSpace = cat.replaceAll("\\s+","");
-			String[] degreeType = noSpace.split(",");
-			for(String s: degreeType){
-				result.addDegreeType(s);
-			}
-			startIndex++;
-
 		}
 		if(lines[startIndex].contains(degreeTypeString)){
 			String cat = lines[startIndex].substring(degreeTypeString.length());
@@ -168,8 +154,6 @@ public class Major {
 			}
 			startIndex++;
 		}
-
-
 		for(int i = startIndex; i < lines.length ; i ++){
 			int colonIndex = lines[i].indexOf(":");
 			int firstSpace = lines[i].indexOf(" ");
@@ -227,7 +211,9 @@ public class Major {
 		
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
-
+		
+		//ListOfMajors m = ListOfMajors.testList();
+		//System.out.println(m.getCompleteMajorsList().get(1).saveString());
 
 	}
 

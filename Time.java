@@ -555,34 +555,7 @@ public class Time implements Comparable<Time>{
 		}
 		return v1;
 	}
-	
-	
-	public Time findMidPoint(Time other){
-		int avgSec = (int)((this.toSec() + other.toSec())/2);
-		return(timeFromSeconds(avgSec));
-	
-	}
 
-	private Time timeFromSeconds(int seconds) {
-		int Secs = seconds%secsInMin;
-		int secondsLeft= seconds-Secs;
-		int Minute = (secondsLeft)%secsInHour;
-		secondsLeft=secondsLeft-(Minute*secsInMin);
-		int Hour = secondsLeft%secsInDay;
-		secondsLeft=secondsLeft-(Hour*secsInMin);
-		int Days = (int)secondsLeft/secsInDay;
-		Time  startTime = new Time(2000, 1, 1, Secs, Minute, Hour);
-		return(startTime.addDays(Days));
-		
-	}
-	
-	public boolean isAllUnused(){
-		if(this.day==Time.UNUSED && this.hours==Time.UNUSED && this.minutes==Time.UNUSED && this.month==Time.UNUSED && this.seconds==Time.UNUSED && this.year==Time.UNUSED){
-			return true;
-		}
-		return false;
-	}
-	
 	public static Time readFrom(String s){
 		String[] split = s.split(" ");
 		String[] larges = split[0].split("/");
@@ -604,9 +577,6 @@ public class Time implements Comparable<Time>{
 		System.out.println(t);
 		System.out.println(s);
 
-		
-	
-		
 
 		//		double year = 31536000;
 		//		double day = 60 * 60 * 24;

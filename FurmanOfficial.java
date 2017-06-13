@@ -33,10 +33,9 @@ public class FurmanOfficial {
 	 */
 	
 	public static Color bouzarthDarkWithAlpha(int alpha){
-
-		int red=darkPurple.getRed();
-		int blue=darkPurple.getBlue();
-		int green=darkPurple.getGreen();
+		int red=bouzarthDarkPurple.getRed();
+		int blue=bouzarthDarkPurple.getBlue();
+		int green=bouzarthDarkPurple.getGreen();
 		return(new Color(red, green, blue, alpha));
 		
 	}
