@@ -40,6 +40,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	Driver d;
 	Semester sem;
 	private JButton changeCourse;
+	final static int height=300;
 
 	public int preferredHeight = 300;
 
@@ -110,7 +111,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		topPanel.add(fallSpring, BorderLayout.CENTER);
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
-		this.setPreferredSize(new Dimension(300,500));
+		this.setPreferredSize(new Dimension(300,height));
 		this.add(defaultPanel);
 		this.updatePanel(sem);
 	}
@@ -264,31 +265,40 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 
 		//Adds special buttons to MayX 
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
+	//	if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			deleteSemesterButton.setEnabled(true);
 			
 			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new FlowLayout());
+			buttonPanel.setLayout(new GridLayout(2,1,5,5));
 			buttonPanel.setBackground(defaultPanel.getBackground());
 
 			if(sem.semesterDate.sNumber == SemesterDate.MAYX){
 				changeCourse = makeAddChangeButton(MenuOptions.changeInstruct);
 			}
-			if(sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber == SemesterDate.SUMMERTWO){
+			
+			if(sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber == SemesterDate.SUMMERTWO || sem.semesterDate.sNumber == SemesterDate.FALL 
+					|| sem.semesterDate.sNumber == SemesterDate.SPRING){
 				changeCourse = makeAddChangeButton(MenuOptions.addInstruct);
 			}
 
 			JButton supriseMe = new JButton(MenuOptions.supriseMe);
+			if(CourseList.testList().getCoursesIn(sem).size()==0){
+				supriseMe.setEnabled(false);
+				changeCourse.setEnabled(false);
+			}
 			supriseMe.setActionCommand(MenuOptions.supriseMe);
 			supriseMe.addActionListener(this);
 
-			buttonPanel.add(supriseMe);
-			buttonPanel.add(changeCourse);
-		
+			
+			
+		//	buttonPanel.add(supriseMe);
+		//buttonPanel.add(changeCourse);
+		defaultPanel.add(supriseMe);
+		defaultPanel.add(changeCourse);
 
-			defaultPanel.add(buttonPanel);
+		//	defaultPanel.add(buttonPanel);
 
-		}
+	//	}
 
 
 

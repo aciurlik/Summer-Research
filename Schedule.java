@@ -252,7 +252,7 @@ public class Schedule {
 	///////////////////////////////
 	public boolean userOverride(ScheduleError s){
 		if(this.d != null){
-			return(d.userRequestError(s.error, s.instructions));
+			return(d.userRequestError(s));
 		}
 		else{
 			return true;
@@ -414,10 +414,10 @@ public class Schedule {
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
-			ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
 			preReq.setNeededCourses(needed);
-			preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
+		//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
 			return(!this.userOverride(preReq));
 
 			//throw new PrerequsiteException(needed, e);
@@ -443,10 +443,10 @@ public class Schedule {
 				for(ScheduleElement oElement : s.getElements()){
 					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
 					if(needed.contains(currentP)){
-						ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 						preReq.setOffendingCourse(e);
 						preReq.setNeededCourses(needed);
-						preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
+				//		preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
 						return(!this.userOverride(preReq));
 					}
 				}
@@ -479,10 +479,10 @@ public class Schedule {
 				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
 				HashSet<Prefix> missing =masterList.missingPrereqsShallow(oldE.getPrefix(), taken);
 				if(!missing.isEmpty()){
-					ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(missing);
-					preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
+				//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
 					return((this.userOverride(preReq)));
 				}
 			}
@@ -496,10 +496,10 @@ public class Schedule {
 				for(Prefix p : afterOld){
 					if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
 						//throw new PrerequsiteException(new Prefix[]{newP}, p);
-						ScheduleError preReq = new ScheduleError(MenuOptions.preReqError);
+						ScheduleError preReq = new ScheduleError(ScheduleError.preReqErrorPrefix);
 						preReq.setCourse(p);
 						preReq.setMissingCourse(newP);
-						preReq.setInstructions(p.toString() + " had prerequisite " + newP.toString() );
+					//	preReq.setInstructions(p.toString() + " had prerequisite " + newP.toString() );
 						return(!this.userOverride(preReq));
 					}
 				}
@@ -613,8 +613,8 @@ public class Schedule {
 					ScheduleElement[] result = {e, e1};
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
-						ScheduleError duplicate = new ScheduleError(MenuOptions.duplicateError);
-						duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
+						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+					//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setDuplicateCourses(results);
 						return(!this.userOverride(duplicate));
 					}
@@ -623,9 +623,9 @@ public class Schedule {
 			}
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 				ScheduleElement[] result = {e, e1};
-				ScheduleError duplicate = new ScheduleError(MenuOptions.duplicateError);
+				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 				duplicate.setDuplicateCourses(result);
-				duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
+			//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
 				return (!this.userOverride(duplicate));
 			}
 		}

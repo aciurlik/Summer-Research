@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -50,31 +51,31 @@ public class Driver{
 		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
 		Image image = icon.getImage();
 		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
-		
+
 		icon = new ImageIcon(newImage);
-		
-		
+
+
 		int percentDone=Schedule.getPercentDone(icon.getIconHeight());
-		
+
 		JLabel belltowerLabel = new JLabel(icon);
 		belltowerLabel.setOpaque(true);
-		
 
-		
+
+
 		JPanel overlap = new JPanel();
 
 		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
 
-		
 
-	    overlap.setSize(icon.getIconWidth(), percentDone);
-	    overlap.setLocation(0, icon.getIconHeight()-percentDone);
+
+		overlap.setSize(icon.getIconWidth(), percentDone);
+		overlap.setLocation(0, icon.getIconHeight()-percentDone);
 		overlap.setOpaque(true);
-		
+
 		belltowerLabel.add(overlap);
-		
-		
-		
+
+
+
 
 
 		//Make data
@@ -100,8 +101,10 @@ public class Driver{
 		frame.add(left, BorderLayout.WEST);
 
 		schP = new SchedulePanel(sch, this);
+		//schP.setPreferredSize(new Dimension(500, 500));
 
 		frame.add(schP, BorderLayout.NORTH);
+
 		reqs = new RequirementListPanel(sch, this);
 		frame.add(reqs, BorderLayout.CENTER);
 
@@ -126,7 +129,7 @@ public class Driver{
 	private void setSchedule(Schedule current) {
 		sch=current;
 		this.sch.setDriver(this);
-		
+
 	}
 
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
@@ -182,10 +185,10 @@ public class Driver{
 
 			for(int i = 0; i<m.degreeTypes.size(); i++){
 				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
-				
+
 			}
 
-			
+
 
 			if(m.degreeTypes.size()==0){
 				toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
@@ -194,7 +197,7 @@ public class Driver{
 				instructions = "Your major was not given a degree type. Please look-up your major and choose the appropriate option.";
 				header = "WARNING";
 			}
-			
+
 			String[] choices = new String[toAdd.size()];
 			for(int p = 0; p<toAdd.size(); p ++){
 				choices[p]=toAdd.get(p);
@@ -206,7 +209,7 @@ public class Driver{
 				instructions = "What type of degree would you like";
 				header = "Degree Type";
 			}
-			
+
 			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 			int MajorType = 0;
 			if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
@@ -341,22 +344,28 @@ public class Driver{
 	public void addCourseDialogBox(String season, Semester s){	
 		ArrayList<Course> addCourses = new ArrayList<Course>();
 		addCourses = CourseList.testList().getCoursesIn(s);
-		Course[] toAdd = new Course[addCourses.size()];
-		for(int i = 0; i<addCourses.size(); i++){
-			toAdd[i]= addCourses.get(i);
+		if(addCourses.size()==0){
+			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+			JOptionPane.showMessageDialog(popUP, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
 		}
 		if(addCourses.size()>0){
-			Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
-			if((c != null) && (c instanceof Course)){
-				//Removes all courses that have already been added in case of MayX 
-				if(season.equals(MenuOptions.changeInstruct)){
-					s.elements.clear();
-				}
+			Course[] toAdd = new Course[addCourses.size()];
+			for(int i = 0; i<addCourses.size(); i++){
+				toAdd[i]= addCourses.get(i);
+			}
+			if(addCourses.size()>0){
+				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
+				if((c != null) && (c instanceof Course)){
+					//Removes all courses that have already been added in case of MayX 
+					if(season.equals(MenuOptions.changeInstruct)){
+						s.elements.clear();
+					}
 
-				sch.addScheduleElement(c, s);
-				this.update();
+					sch.addScheduleElement(c, s);
+					this.update();
 
-			}	
+				}	
+			}
 		}
 	}
 
@@ -431,7 +440,7 @@ public class Driver{
 
 
 		}
-		if(s.semesterDate.sNumber == SemesterDate.SUMMERONE || s.semesterDate.sNumber == SemesterDate.SUMMERTWO){
+		else{
 
 			sch.addScheduleElement(c, s);
 
@@ -442,7 +451,29 @@ public class Driver{
 
 
 
-	public boolean userRequestError(String header, String instruct){
+	public boolean userRequestError(ScheduleError s){
+		String header=null;
+		String instruct= null; 
+		if(s.error.equals(ScheduleError.overloadError)){
+			header = "Overload Error";
+			instruct="Adding " + s.offendingCourse.getDisplayString() + " exceeds this semester's overload limit of " + s.overloadLimit;
+		}
+		if(s.error.equals(ScheduleError.overlapError)){
+			header = "Overlap Error";
+			instruct = (s.duplicateCourses[0].getDisplayString() + " overlaps " + s.duplicateCourses[1].getDisplayString());
+		}
+		if(s.error.equals(ScheduleError.preReqError)){
+			header = "Prerequisites Error";
+			instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s)" + s.neededCourses.toString();
+		}
+		if(s.error.equals(ScheduleError.preReqErrorPrefix)){
+			header = "Prerequisites Error";
+			instruct = s.offendingCourse.getDisplayString() + " had prerequisite " + s.missingCourse.toString();
+		}
+		if(s.error.equals(ScheduleError.duplicateError)){
+			header = "Duplicate Error";
+			instruct = s.duplicateCourses[0].getDisplayString() + " duplicates " +s.duplicateCourses[1].getDisplayString();
+		}
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);

@@ -15,6 +15,7 @@ import java.util.Collections;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 
@@ -37,6 +38,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	public JLabel reqsLeftLabel;
 	public String reqsText = "Requirements Left: ";
 	public ArrayList<SemesterPanel> allSemesterPanels;
+	int insetsWidth = 5;
 	Driver d;
 	int Count=1;
 
@@ -74,9 +76,14 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 
 		JScrollPane scrollPane = new JScrollPane(scrollPanel);
-		scrollPane.setPreferredSize(new Dimension(700, 300));
+		JScrollBar scrollBar = new JScrollBar();
+		int scrollWidth = scrollBar.getPreferredSize().width;
+		//scrollPane.setPreferredSize(new Dimension(700, 310));
+		scrollPane.setSize(new Dimension(700,SemesterPanel.height+4*insetsWidth+scrollWidth));
+		this.setPreferredSize(new Dimension(700,SemesterPanel.height+4*insetsWidth+scrollWidth));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		
 		this.add(scrollPane, BorderLayout.CENTER); 
 
 	}
@@ -111,7 +118,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = gbc.VERTICAL;
-		gbc.insets = new Insets(5,5,5,5);
+		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
 
 
 		for(Semester s: sch.semesters){
