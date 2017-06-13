@@ -16,17 +16,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	boolean storedIsComplete;
 	int storedCoursesLeft;
 	double storedPercentComplete;
-	
+
 	//Used to check if %complete is close to 0.
 	public static final double tolerance = 1000 * Double.MIN_VALUE;
-	
-	
+
+
 	public Requirement(){
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
 	}
 
-	
+
 	/**
 	 * An old constructor for backwards compatability.
 	 * Can be removed.
@@ -44,21 +44,21 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		this.numToChoose = numToChoose;
 	}
-	
+
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
 	}
-	
-	
+
+
 	public void setName(String name){
 		this.name = name;
 	}
 	public String getName() {
 		return this.name;
 	}
-	
-	
-	
+
+
+
 	private Object[] separate(Iterable<ScheduleElement> taken){
 		HashSet<Prefix> takenPrefixes = new HashSet<Prefix>();
 		int numPlanned = 0;
@@ -76,7 +76,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return new Object[]{takenPrefixes, numPlanned};
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Check whether this set of schedule elements completes this requirements.
@@ -87,7 +87,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public boolean isComplete(Iterable<ScheduleElement> taken, boolean storeValue){
-		
+
 		//Find all the prefixes,
 		// and count how many things will magically satisfy this requirement
 		Object[] separated = separate(taken);
@@ -95,7 +95,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		int numPlanned = (int) separated[1];
 		return isComplete(takenPrefixes, numPlanned, storeValue);
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/** 
 	 * Check if these prefixes satisfy this requirement.
@@ -112,7 +112,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return result;
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Find the minimum number of courses you would need to completely
@@ -127,7 +127,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		int numPlanned = (int)separated[1];
 		return minCoursesNeeded(takenPrefixes, numPlanned, storeValue);
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Find the minimum number of courses you would need to completely
@@ -140,7 +140,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return result;
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/** 
 	 * Find the set of prefixes that would most quickly complete this requirement
@@ -165,8 +165,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return result;
 	}
-	
-	
+
+
 	/**
 	 *  Find, given the best case scenario, the maximum % complete this
 	 *  requirement could be given this collection of schedule elements.
@@ -180,8 +180,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		int numPlanned = (int)separated[1];
 		return percentComplete(takenPrefixes, numPlanned, storeValue);
 	}
-	
-	
+
+
 	//INFINITELOOPHAZARD
 	/** 
 	 * Find what % this requirement is complete if you get the best-case scenario for
@@ -208,7 +208,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return result;
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Figure out what % complete this requirement is.
@@ -230,7 +230,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return ((double)miniPercent)  / numToChoose;
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/** TODO needs to be tested
 	 * Find the prefix that would bring this requirement closest to completion.
@@ -244,8 +244,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return null;
 	}
-	
-	
+
+
 	//INFINITELOOPHAZARD
 	public boolean isSatisfiedBy(Prefix p) {
 		for(Requirement r : this.choices){
@@ -256,19 +256,19 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return false;
 	}
 
-	
-	
-	
-	
+
+
+
+
 	/////////////////////////////////
 	/////////////////////////////////
 	///// CompareTo 
 	/////////////////////////////////
 	/////////////////////////////////
 
-	
-	
-	
+
+
+
 	//TODO Let the user decide which comparisons should come first.
 	//This comparison method is used to sort the 
 	// requirementList displayed to the user.
@@ -286,7 +286,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		if(!this.storedIsComplete && other.storedIsComplete){
 			return -1;
 		}
-		
+
 		//Then compare based on % complete
 		double percentDifference = storedPercentComplete - other.storedPercentComplete;
 		if(percentDifference < tolerance){
@@ -295,32 +295,32 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		if(percentDifference > tolerance){
 			return 1;
 		}
-		
+
 		//Then compare based on number to choose
 		int numChooseDifference = this.numToChoose - other.numToChoose;
 		if(numChooseDifference != 0){
 			return numChooseDifference;
 		}
-		
-		
+
+
 		//then compare based on prefixes.
 		// first number of prefixes, then containment.
 		if(this.choices.size() != other.choices.size()){
 			return this.choices.size() - other.choices.size();
 		}
-		
+
 		// check if this is contained in that.
 		// if not, return that it's greater. 
 		// Note that this ruins the total ordering property, 
 		// two requirements can be greater than each other.
 		//TODO add containment check
-		
-		
+
+
 		//TODO add check for exact equality
 		return 0;
-		
+
 	}
-	
+
 	/////////////////////////////////
 	/////////////////////////////////
 	/////Methods from ScheduleElement
@@ -332,7 +332,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return null;
 	}
 
-	
+
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
 		return false;
@@ -349,7 +349,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return result;
 	}
-	
+
 
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled() {
@@ -357,24 +357,24 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		result.add(this);
 		return result;
 	}
-	
-	
+
+
 	public int getCreditHours() {
 		// TODO Auto-generated method stub
 		return 4;
 	}
-	
-	
-	
-	
+
+
+
+
 	/////////////////////////////////
 	/////////////////////////////////
 	///// Saving and Reading methods
 	/////////////////////////////////
 	/////////////////////////////////
-	
-	
-	
+
+
+
 	/** REQUIREMENT SAVING AND READING TUTORIAL
 	 * 
 	 * The language of requirements.
@@ -439,9 +439,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
 	 * 
 	 */
-	
-	
-	
+
+
+
 	//INFINITELOOPHAZARD
 	/**
 	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
@@ -449,7 +449,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public String saveString(){
-		
+
 		//Add the prefix
 		StringBuilder result = new StringBuilder();
 		if(this.numToChoose == 1){
@@ -459,8 +459,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			result.append(numToChoose + " of (");
 		}
 		//Add the guts of this requirement - each sub-requirement
-		
-		
+
+
 		//handle the first n-2 requirements
 		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
 		Collections.sort(choiceList);
@@ -490,7 +490,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return result.toString();
 	}
 
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * see the REQUIREMENT SAVING AND READING TUTORIAL in the Requirement Class.
@@ -499,14 +499,21 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public static Requirement readFrom(String saveString){
-		Stack<String> tokens = tokenize(saveString);
-		Requirement result = parse(tokens);
-		if(!tokens.isEmpty()){
-			throw new RuntimeException("End of string while parsing requirement");
+		try{
+			return Requirement.readFromJSON(saveString);
 		}
-		return result;
+		catch(Exception e){
+			Stack<String> tokens = tokenize(saveString);
+			Requirement result = parse(tokens);
+			if(!tokens.isEmpty()){
+				throw new RuntimeException("End of string while parsing requirement");
+
+			}
+			return result;
+		}
+
 	}
-	
+
 	public static Stack<String> tokenize(String s){
 		//Tokens are: 
 		// '(' 
@@ -514,7 +521,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		// '[0-9]+of' 
 		// ',[or]*'
 		// a terminal requirement's save string
-		
+
 		//remove all whitespace.
 		s = s.replaceAll("\\s", "");
 		//Add whitespace around tokens (we'll split on whitespace in a sec)
@@ -525,25 +532,25 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		// Hopefully all other replaces will handle the space before the
 		// first digit of the number (a parenthesis should preceed that digit).
 		s = s.replaceAll("(?<=[0-9])of", "of ");
-		
+
 		s = s.trim();
-		
+
 		Stack<String> reversed = new Stack<String>();
 		for(String token : s.split("\\s+")){
 			reversed.push(token);
 		}
-		
+
 		//Reverse the stack so that the first character comes out first.
 		Stack<String> result = new Stack<String>();
 		while(!reversed.isEmpty()){
 			String t = reversed.pop();
 			result.push(t);
 		}
-		
+
 		return result;
-		
+
 	}
-	
+
 	public static Requirement parse(Stack<String> tokens){
 		String next = tokens.pop();
 		if(next.equals("(")){
@@ -576,7 +583,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			return TerminalRequirement.readFrom(next);
 		}
 	}
-	
+
 	/**
 	 * Example inputs:
 	 * 
@@ -599,14 +606,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			return Requirement.readFrom("(" + furmanString + ")");
 		}
 		else{
-		throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
+			throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
 		}
 	}
-	
 
-	
-	
-	
+
+
+
+
 	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
 	/**
 	 * Read from a JSON save string (kept for backwards compatability)
@@ -631,12 +638,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			name = null;
 		}
 		Requirement result = new Requirement(choices.toArray(new Prefix[choices.size()]), numToChoose);
-		
+
 		result.setName(name);
 		return result;
 	}
-	
-	
+
+
 	public static void testReading(){
 		String[] tests = new String[]{
 				"(MTH 110)",
@@ -665,14 +672,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		HashSet<Prefix> takens = new HashSet<Prefix>();
 		takens.add(prefixes[0]);//MTH 110
 		takens.add(prefixes[1]);//MTH 120
-		
+
 		System.out.print("Taken prefixes: ");
 		for(Prefix p : takens){
 			System.out.print(p + " ");
 		}
 		System.out.println();
 		System.out.println();
-		
+
 		for(String toRead : tests){
 			boolean needsToBeShown = false;
 			System.out.println("ReadingFrom \"" +toRead + "\"");
@@ -680,11 +687,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			boolean complete = r.isComplete(takens, 0, true);
 			double percentComplete = r.percentComplete(takens, 0, true);
 			HashSet<Prefix> completionSet = r.fastestCompletionSet(takens);
-			
+
 			boolean completeAfter = r.isComplete(takens, completionSet.size(), false);
 			double percentAfter = r.percentComplete(takens, completionSet.size(), false);
-			
-			
+
+
 			double tol = Double.MIN_VALUE * 10000;
 			if(complete && ( percentComplete < 1.0 - tol || completionSet.size() != 0)){
 				needsToBeShown = true;
@@ -704,7 +711,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			if(percentAfter < 1.0 - tol){
 				needsToBeShown = true;
 			}
-			
+
 			if(r.storedIsComplete != complete){
 				needsToBeShown = true;
 			}
@@ -714,9 +721,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			if(r.storedPercentComplete != percentComplete){
 				needsToBeShown = true;
 			}
-			
+
 			needsToBeShown = true;
-			
+
 
 			if(needsToBeShown){
 				System.out.println("Complete?" + complete);
@@ -728,7 +735,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				System.out.println("Complete with scheduled requirements?" + completeAfter);
 				System.out.println("Percent complete with scheduled requirements:" + percentAfter);
 				System.out.println("Stored courses left:" + r.storedCoursesLeft);
-				
+
 			}
 			else{
 				System.out.println("No obvious errors found");
@@ -740,6 +747,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public static void main(String[] args){
 		testReading();
 	}
-	
-	
+
+
 }

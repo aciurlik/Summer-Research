@@ -4,7 +4,7 @@ public class ScheduleError {
 	String error = null; 
 	ScheduleElement[] duplicateCourses = null;
 	Prefix offendingPCourse = null;
-	Prefix missingCourse = null; 
+//	Prefix missingCourse = null; 
 	ScheduleElement offendingCourse = null;
 	HashSet<Prefix> neededCourses = null;
 	int overloadLimit = 0;
@@ -53,14 +53,14 @@ public class ScheduleError {
 	}
 
 
-	public Prefix getMissingCourse() {
-		return missingCourse;
-	}
+//	public Prefix getMissingCourse() {
+//		return missingCourse;
+//	}
 
 
-	public void setMissingCourse(Prefix missingCourse) {
-		this.missingCourse = missingCourse;
-	}
+//	public void setMissingCourse(Prefix missingCourse) {
+//		this.missingCourse = missingCourse;
+//	}
 
 
 	public ScheduleElement getOffendingCourse() {
