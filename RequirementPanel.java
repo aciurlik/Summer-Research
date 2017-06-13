@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
@@ -8,6 +9,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 import javax.swing.border.BevelBorder;
@@ -22,6 +24,11 @@ import javax.swing.border.BevelBorder;
 public class RequirementPanel extends JPanel {
 	public Requirement req;
 	public Driver d;
+	int percentComplete;
+	JLabel shown;
+	
+	public static final Color GreyedOut = FurmanOfficial.grey(200);
+	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
 	public RequirementPanel(Requirement req, Driver d){
 		super();
@@ -35,12 +42,37 @@ public class RequirementPanel extends JPanel {
 		// will begin a dragEvent.
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
-
-		this.setBorder(new BevelBorder(BevelBorder.RAISED));
+		
+		this.setBackground(background);
 		
 		update(req);
 
 	}
+	
+	
+	@Override 
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		
+		
+		//paint a grey block over the proportion of this
+		int width = this.getWidth();
+		int height = this.getHeight();
+		//We want the rectangle like this
+		// 
+		//  (0,0)------|         (width,0)
+		//  |          |
+		//  |__________|          (width, height)
+		//
+		
+		Color c = g.getColor();
+		g.setColor(GreyedOut);
+		g.fillRect(0, 0, (width * percentComplete)/100, height);
+		g.setColor(c);
+		
+		
+	}
+	
 	
 	
 	public void update(Requirement req){
@@ -52,8 +84,7 @@ public class RequirementPanel extends JPanel {
 		String fullText = "";
 		
 		
-		int percentComplete = (int) Math.round(req.storedPercentComplete * 100);
-		
+		this.percentComplete =(int) Math.round(req.storedPercentComplete * 100); 
 		if(percentComplete > 0 && percentComplete < 100){
 			fullText = "(" + percentComplete + "%)" ;
 			fullText += req.storedCoursesLeft + "left\n";
@@ -67,23 +98,11 @@ public class RequirementPanel extends JPanel {
 		if(labelText.length() > numChars){
 			labelText = labelText.substring(0,numChars-3) + "...";
 		}
-		JLabel shown = new JLabel(labelText);
+		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
 		shown.setToolTipText(fullText);
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
-		
-		
-		
-		//Do something based on whether the requirement is complete.
-		//TODO figure out how to use storedPercentComplete to
-		// color the requirement.
-		if(this.req.storedIsComplete){
-			this.setBackground(FurmanOfficial.grey(200));
-		}
-		else{
-			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
-		}
 		
 
 		this.removeAll();
