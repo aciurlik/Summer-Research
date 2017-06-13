@@ -577,6 +577,32 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 	}
 	
+	/**
+	 * Example inputs:
+	 * 
+	 *  "ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340"
+	 *  "ACC-111, ECN-111 or 225, MTH-141 or 150"
+	 *  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
+	 *  
+	 *  This method has to be very careful because syntax might be
+	 *  department dependent. The above examples show a clear syntax,
+	 *  but it's not clear that all strings following that syntax are
+	 *  definitely what they seem. 
+	 *  
+	 *  
+	 *  
+	 * @param furmanString
+	 * @return
+	 */
+	public static Requirement readFromFurmanPrereqs(String furmanString){
+		if(furmanString.matches("\\w\\w\\w\\-\\w\\w\\w")){
+			return Requirement.readFrom("(" + furmanString + ")");
+		}
+		else{
+		throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
+		}
+	}
+	
 
 	
 	
