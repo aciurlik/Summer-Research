@@ -438,6 +438,9 @@ public class Schedule {
 			HashSet<Prefix> taken = prefixesTakenBefore(sD);
 			taken.addAll(prefixesTakenIn(sD));
 			HashSet<Prefix> needed = masterList.neededListDeep(p, taken);
+			if(needed == null){
+				needed= new HashSet<Prefix>();
+			}
 			return needed;
 		}
 	}
