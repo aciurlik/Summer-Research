@@ -122,7 +122,11 @@ public class CourseList  {
 	 * @return
 	 */
 	public HashSet<Prefix> neededListShallow(Prefix p, HashSet<Prefix> taken){
-		return getPrereqsShallow(p).fastestCompletionSet(taken);
+		Requirement r = getPrereqsShallow(p);
+		if(r == null){
+			return null;
+		}
+		return r.fastestCompletionSet(taken);
 	}
 	/**
 	 * Figure out what prefixes to display as 'needed' to the user
@@ -151,7 +155,6 @@ public class CourseList  {
 	//  This section handles saving and loading
 	//  the translation of weird prerequsites, like
 	//	"ACC 122, 133, MTH 150 or MTH 145" and
-	//  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
 	//  into valid, unambiguous requirement strings.
 	//
 	
