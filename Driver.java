@@ -243,7 +243,7 @@ public class Driver{
 
 				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/internship/FindingInternships/Pages/default.aspx").toURI());
 			}
-			if(actionCommand.equals(MenuOptions.addStudyAway)){
+			if(actionCommand.equals(MenuOptions.exploreStudyAway)){
 				Desktop.getDesktop().browse(new URL("https://studyaway.furman.edu/index.cfm?FuseAction=Programs.SimpleSearch").toURI());
 			}
 			if(actionCommand.equals(MenuOptions.addResearch)){
@@ -296,6 +296,8 @@ public class Driver{
 			season= SemesterDate.MAYX;
 			seasonName = MenuOptions.mayX;
 		}
+		
+
 
 
 		//Gets available years
@@ -306,12 +308,15 @@ public class Driver{
 		int end = sch.semesters.get(last).semesterDate.year;
 
 		for(int i=  sch.semesters.get(1).semesterDate.year; i<= end; i++){
-			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
+			
+				if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
 
-				availableYears.add(i);
+					availableYears.add(i);
+				}
+			
 			}
 
-		}
+		
 		yearsDialog = new Integer[availableYears.size()];
 		for(int i=0; i<availableYears.size(); i++){
 			yearsDialog[i]= availableYears.get(i);

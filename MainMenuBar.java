@@ -65,7 +65,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		submenu = new JMenu("Study Abroad");
 
-		menuItem = new JMenuItem(MenuOptions.addStudyAway);
+		menuItem = new JMenuItem(MenuOptions.exploreStudyAway);
 		JPopupMenu exploreStudyAway = new JPopupMenu();
 		menuItem.addActionListener(this);
 		exploreStudyAway.add(menuItem);
@@ -209,7 +209,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.addStudyAway) || e.getActionCommand().equals(MenuOptions.addInternship)){
+		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.addInternship)){
 			d.GUIOutsideLink(e.getActionCommand());
 		}
 		if(e.getActionCommand().equals(MenuOptions.addMayX) || e.getActionCommand().equals(MenuOptions.addSummerClass)){
