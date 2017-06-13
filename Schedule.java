@@ -149,6 +149,7 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
+		
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
 		}
