@@ -60,9 +60,9 @@ public class Semester implements Comparable<Semester>{
 						overlapCounter++;
 						if(overlapCounter > 0){
 							Course[] overlap ={courses.get(i), courses.get(j) };
-							ScheduleError overlaped = new ScheduleError(MenuOptions.overlapError);
+							ScheduleError overlaped = new ScheduleError(ScheduleError.overlapError);
 							overlaped.setDuplicateCourses(overlap);
-							overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
+							//overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
 							return(!this.schedule.userOverride(overlaped));
 						}
 
@@ -76,9 +76,9 @@ public class Semester implements Comparable<Semester>{
 					overlapCounter++;
 					if(overlapCounter > 0){
 						Course[] overlap ={courses.get(i), (Course) addition };
-						ScheduleError overlaped = new ScheduleError(MenuOptions.overlapError);
+						ScheduleError overlaped = new ScheduleError(ScheduleError.overlapError);
 						overlaped.setDuplicateCourses(overlap);
-						overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
+						//overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
 						return(!this.schedule.userOverride(overlaped));
 					}
 				}
@@ -112,10 +112,10 @@ public class Semester implements Comparable<Semester>{
 			}
 		}
 		if(totalHours > OverloadLimit){
-			ScheduleError overload = new ScheduleError(MenuOptions.overloadError);
+			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
 			overload.setOverloadLimit(this.OverloadLimit);
 			overload.setOffendingCourse(addition);
-			overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
+		//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
 			return (!this.schedule.userOverride(overload));
 		}
 		else{

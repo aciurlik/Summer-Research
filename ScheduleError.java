@@ -9,6 +9,11 @@ public class ScheduleError {
 	HashSet<Prefix> neededCourses = null;
 	int overloadLimit = 0;
 	String instructions;
+	public static final String duplicateError = "Duplicate Error";
+	public static final String preReqError = "Prerequisite Error";
+	public static final String overlapError = "Overlap Error";
+	public static final String overloadError = "Overload Error";
+	public static final String preReqErrorPrefix = "Prerequisite Error";
 
 	 
 	public ScheduleError(String s){
@@ -88,14 +93,7 @@ public class ScheduleError {
 	}
 
 
-	public String getInstructions() {
-		return instructions;
-	}
 
-
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
 	
 }
 
