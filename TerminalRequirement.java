@@ -48,10 +48,12 @@ public class TerminalRequirement extends Requirement {
 			s = s.replaceAll("(?<=[a-zA-Z])(?=\\d)", "-");
 		}
 		if(!s.contains("-")){
+			System.out.println(s);
 			throw new RuntimeException("A terminal requirement has to include a '-', or else both letters and numbers");
 		}
 		String[] split = s.split("-");
 		if(split.length > 2){
+			System.out.println(s);
 			throw new RuntimeException("You need a comma between terminal requirements");
 		}
 		Prefix p = new Prefix(split[0], split[1]); //in case of BLK
