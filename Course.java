@@ -19,7 +19,6 @@ public class Course implements ScheduleElement{
 	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
 
-
 	String professor;
 
 	HashSet<Requirement> reqsSatisfied;
@@ -60,7 +59,7 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
-
+	
 	public void setName(String name){
 		this.name = name;
 	}
@@ -358,8 +357,6 @@ public class Course implements ScheduleElement{
 
 	}
 	public static Course readFromFurmanData(ArrayList<String> furmanData){
-		int counter = 3;
-		//	System.out.println("THIS IS ME" + furmanData.toString());
 		String semesterString = furmanData.get(0); // EX "Fall 2017 - Day"
 		String section = furmanData.get(1); // EX "ACC-111-01"
 		String title = furmanData.get(3);  // EX "Financial Accounting Prncpls"
@@ -381,34 +378,8 @@ public class Course implements ScheduleElement{
 		SemesterDate semester = SemesterDate.fromFurman(semesterString);
 
 		Time totalStartTime = Time.combine(times[0], times[1]);
-		//System.out.println("THIS IS  ME" + times[0].month);
 		Time totalEndTime = Time.combine(times[0], times[3]);
 		Time[] meetingTime = new Time[]{totalStartTime, totalEndTime};
-
-
-
-		if(semester.sNumber==(SemesterDate.SUMMERONE) || semester.sNumber==(SemesterDate.SUMMERTWO)){
-			Time SummerSessionOne = new Time(times[0].year, 6, 16, Time.UNUSED, Time.UNUSED, Time.UNUSED);
-			Time SummerSessionTwo = new Time(times[0].year, 7, 25, Time.UNUSED, Time.UNUSED, Time.UNUSED);
-			Interval<Time> sessionInterval = new  Interval<Time>(times[0], times[2]);
-
-		
-			if(sessionInterval.contains(SummerSessionOne)){
-				
-				semester = new SemesterDate(semester.year, SemesterDate.SUMMERONE);
-				Time midpoint = times[0].findMidPoint(times[2]);
-				SummerSessionOne = SummerSessionOne.findMidPoint(midpoint);
-				
-				
-			}
-			if(sessionInterval.contains(SummerSessionTwo)){
-				semester = new SemesterDate(semester.year,SemesterDate.SUMMERTWO);
-				Time midpoint = times[0].findMidPoint(times[2]);
-				SummerSessionTwo = SummerSessionTwo.findMidPoint(midpoint);
-			}
-
-
-		}
 
 
 		Course result =  new Course(p, sectionNumber, professor, Time.meetingDaysFrom(meetingDays), creditHours, semester);
