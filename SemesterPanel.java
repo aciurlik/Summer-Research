@@ -22,6 +22,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class SemesterPanel extends JPanel implements ActionListener{
 
@@ -42,6 +44,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	Semester sem;
 	private JButton changeCourse;
 	final static int height=300;
+	JTextArea notes = new JTextArea();
+	
+
 
 	public int preferredHeight = 300;
 
@@ -59,8 +64,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
-		
-		
+
+
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
@@ -206,9 +211,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 	//Redraw this panel based on the semester sem.
 	public void updatePanel(){
-
+		JLabel dropLabel = newDropLabel();
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
+
 
 		//Figure out the season and add it
 
@@ -231,11 +237,11 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		JPanel menuPanel = new JPanel();
 		menuPanel.setOpaque(false);
 		menuPanel.setLayout(new BorderLayout());
-		
+
 		SemesterMenuBar menu = new SemesterMenuBar(this, defaultPanel);
 		menuPanel.add(menu, BorderLayout.NORTH);
 		defaultPanel.add(menuPanel);
-	
+
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
 			defaultPanel.add(element);
@@ -250,13 +256,17 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 		 */
 
+
+
+
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
+
 		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
-			JLabel dropLabel = newDropLabel();
+
 			defaultPanel.add(dropLabel);
 			for (int i= 0; i<DropsNeeded-1; i++){
 				JLabel emptyLabel = new JLabel();
@@ -265,7 +275,10 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 
+
+
 		}
+
 
 		//Adds special buttons to MayX 
 
@@ -273,11 +286,27 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			deleteSemesterButton.setEnabled(true);
 		}
 
-			
+
+		if(sem.studyAway){
 
 
-		
+			dropLabel.setForeground(Color.white);
+			fallSpring.setForeground(Color.white);
+			fallSpring.setText("Study Away " + sem.semesterDate.getSeason(sem.semesterDate.sNumber)+ " "+ sem.semesterDate.year);
+
+
+
+		}
+		if(sem.hasNotes){
+			defaultPanel.add(notes);
+		}
+		topPanel.setBackground(this.correctBackgroundColor(sem));
+		defaultPanel.setBackground(this.correctBackgroundColor(this.sem));
+
 	}
+
+
+
 
 	public JLabel newDropLabel(){
 		JLabel dropLabel = new JLabel(addAClass);
@@ -327,7 +356,18 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
 		else{
-			this.setBackground(semesterColor(this.sem));
+
+			correctBackgroundColor(this.sem);
+		}
+	}
+
+
+	public Color correctBackgroundColor(Semester s){
+		if(s.studyAway){
+			return FurmanOfficial.grey;
+		}
+		else{
+			return semesterColor(this.sem);
 		}
 	}
 	/**

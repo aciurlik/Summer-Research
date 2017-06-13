@@ -8,6 +8,30 @@ public class Semester implements Comparable<Semester>{
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
 	private int OverloadLimit;
+	public boolean hasNotes = false;
+	public String notes = "";
+	
+	
+	
+	
+	
+	public boolean isHasNotes() {
+		return hasNotes;
+	}
+
+	public void setHasNotes(boolean hasNotes) {
+		this.hasNotes = hasNotes;
+	}
+
+	public boolean isStudyAway() {
+		return studyAway;
+	}
+
+	public void setStudyAway(boolean studyAway) {
+		this.studyAway = studyAway;
+	}
+
+	public boolean studyAway = false;
 
 
 	public Semester(SemesterDate sD, Schedule s){

@@ -38,6 +38,7 @@ public class Driver{
 	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
+	int Counter = 0;
 
 
 
@@ -334,6 +335,7 @@ public class Driver{
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 	}
+	
 	public void dragEnded(){
 		this.schP.dragEnded();
 	}
@@ -346,11 +348,11 @@ public class Driver{
 		if((y != null) && (y !=0)){
 			Semester addedSemester = sch.addNewSemesterInsideSch(y,season);
 			this.update();
-			addCourseDialogBox(s, addedSemester);
+			addCourseDialogBox(addedSemester);
 		}
 	}
 
-	public void addCourseDialogBox(String season, Semester s){	
+	public void addCourseDialogBox(Semester s){	
 		ArrayList<Course> addCourses = new ArrayList<Course>();
 		addCourses = CourseList.testList().getCoursesIn(s);
 		if(addCourses.size()==0){
@@ -363,10 +365,10 @@ public class Driver{
 				toAdd[i]= addCourses.get(i);
 			}
 			if(addCourses.size()>0){
-				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
+				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + s.semesterDate.getSeason(s.semesterDate.sNumber),  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
 				if((c != null) && (c instanceof Course)){
 					//Removes all courses that have already been added in case of MayX 
-					if(season.equals(MenuOptions.changeInstruct)){
+					if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
 						s.elements.clear();
 					}
 
@@ -457,8 +459,26 @@ public class Driver{
 
 		this.update();
 	}
+	
+	
 
+	public void GUImakeSemesterStudyAway(Semester sem) {
+		sem.setStudyAway(true);
+		this.update();
+		
+	}
+	
+	public void GUIremoveSemesterStudyAway(Semester sem) {
+		
+		sem.setStudyAway(false);
+		this.update();
+	}
 
+	public void GUIaddNotes(Semester sem) {
+		sem.setHasNotes(true);
+		this.update();
+		
+	}
 
 	public boolean userRequestError(ScheduleError s){
 		String header=null;
@@ -491,9 +511,14 @@ public class Driver{
 
 
 	public void updateAll(){
+		if(Counter>0){
+		System.out.println("1" + schP.allSemesterPanels.get(0).defaultPanel.getBackground());	}
 		schP.update(sch);
 		reqs.update(sch);
-		
+		if(Counter>0){
+		System.out.println("3" + schP.allSemesterPanels.get(0).defaultPanel.getBackground());	
+		}
+		Counter++;
 	}
 
 	public void repaintAll(){
@@ -519,6 +544,12 @@ public class Driver{
 
 
 	}
+
+
+
+	
+	
+
 
 
 

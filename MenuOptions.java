@@ -13,7 +13,7 @@ public class MenuOptions {
 	public static final  String addInternship = "Explore Internships";
 	public static final  String addResearch = "Explore Research";
 	public static final  String exploreStudyAway = "Explore Study Away";
-	public static final  String StudyAway = "Add Study Away";
+
 	public static final  String addMayX = "Add MayX";
 	public static final  String addSummerClass = "Add Summer Class";
 	public static final  String summerSessionOne = "Summer Session One";
@@ -24,6 +24,10 @@ public class MenuOptions {
 	public static final  String addInstruct = "Add a Course";
 	public static final  String supriseMe = "Suprise Me!";
 	public static final  String changeInstruct = "Change Course";
+	public static final  String addStudyAway = "Add Study Away";
+	public static final  String addNotes = "Add Note";
+	public static final  String removeStudyAway = "Remove Study Away";
+	
 	public static final  String deleteSemester = "x";
 	public static final  String hideSemester = "-";
 	public static final  String showSemester = "+";
