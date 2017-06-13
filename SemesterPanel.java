@@ -20,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 
 public class SemesterPanel extends JPanel implements ActionListener{
@@ -58,7 +59,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
-
+		
+		
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
@@ -87,11 +89,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		deleteSemesterButton.addActionListener(this);
 		deleteSemesterButton.setEnabled(false);
 		
+		
+		
+		
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
 		hideSem.setPreferredSize(new Dimension(15,15));
 		hideSem.addActionListener(this);
 		deleteSemesterButton.setPreferredSize(new Dimension(15, 15));
 		
+
 		
 		JPanel PanelforButtons = new JPanel();
 		PanelforButtons.setBackground(defaultPanel.getBackground());
@@ -99,6 +105,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		
 		PanelforButtons.add(deleteSemesterButton);
 		PanelforButtons.add(hideSem);
+		
 		
 		JLabel FallSpring = new JLabel();
 		FallSpring.setFont(FurmanOfficial.bigHeaderFont);
@@ -167,12 +174,6 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		if(e.getActionCommand().equals(MenuOptions.deleteSemester)){
 			d.GUIRemoveSemester(this);
 		}
-		else if(e.getActionCommand().equals(MenuOptions.changeInstruct) || e.getActionCommand().equals(MenuOptions.addInstruct)){
-			d.addCourseDialogBox(e.getActionCommand(), this.sem);
-		}
-		else if(e.getActionCommand().equals(MenuOptions.supriseMe)){
-			d.GUISupriseWindow(this.sem);
-		}
 		else{
 			hide();
 		}
@@ -232,6 +233,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		defaultPanel.add(topPanel, BorderLayout.CENTER);
 		//Add all Schedule elements
+
+		JPanel menuPanel = new JPanel();
+		menuPanel.setOpaque(false);
+		menuPanel.setLayout(new BorderLayout());
+		
+		SemesterMenuBar menu = new SemesterMenuBar(this, defaultPanel);
+		menuPanel.add(menu, BorderLayout.NORTH);
+		defaultPanel.add(menuPanel);
+	
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
 			defaultPanel.add(element);
@@ -264,43 +274,13 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 
 		//Adds special buttons to MayX 
-	//	if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			deleteSemesterButton.setEnabled(true);
-			
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new GridLayout(2,1,5,5));
-			buttonPanel.setBackground(defaultPanel.getBackground());
-
-			if(sem.semesterDate.sNumber == SemesterDate.MAYX){
-				changeCourse = makeAddChangeButton(MenuOptions.changeInstruct);
-			}
-			
-			if(sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber == SemesterDate.SUMMERTWO || sem.semesterDate.sNumber == SemesterDate.FALL 
-					|| sem.semesterDate.sNumber == SemesterDate.SPRING){
-				changeCourse = makeAddChangeButton(MenuOptions.addInstruct);
-			}
-
-			JButton supriseMe = new JButton(MenuOptions.supriseMe);
-			if(CourseList.testList().getCoursesIn(sem).size()==0){
-				supriseMe.setEnabled(false);
-				changeCourse.setEnabled(false);
-			}
-			supriseMe.setActionCommand(MenuOptions.supriseMe);
-			supriseMe.addActionListener(this);
+		}
 
 			
-			
-		//	buttonPanel.add(supriseMe);
-		//buttonPanel.add(changeCourse);
-		defaultPanel.add(supriseMe);
-		defaultPanel.add(changeCourse);
 
-		//	defaultPanel.add(buttonPanel);
-
-	//	}
-
-
-
+		
 	}
 
 	public JLabel newDropLabel(){
