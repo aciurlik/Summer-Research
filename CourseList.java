@@ -292,7 +292,8 @@ public class CourseList  {
 	}
 	
 	public  ArrayList<Course> getCoursesIn(Semester s){
-		return onlyThoseIn(listOfCourses,s);
+		ArrayList<Course> result =  onlyThoseIn(listOfCourses,s);
+		return result;
 	}
 
 	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){

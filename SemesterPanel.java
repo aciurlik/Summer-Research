@@ -81,39 +81,33 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				);
 
 		hidePanel.add(showSemester);
-		
+
 
 		fallSpring = new JLabel("", JLabel.CENTER);
 		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
 		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
 		deleteSemesterButton.addActionListener(this);
 		deleteSemesterButton.setEnabled(false);
-		
-		
-		
-		
+
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
 		hideSem.setPreferredSize(new Dimension(15,15));
 		hideSem.addActionListener(this);
 		deleteSemesterButton.setPreferredSize(new Dimension(15, 15));
-		
 
-		
 		JPanel PanelforButtons = new JPanel();
 		PanelforButtons.setBackground(defaultPanel.getBackground());
 		PanelforButtons.setOpaque(false);
-		
+
 		PanelforButtons.add(deleteSemesterButton);
 		PanelforButtons.add(hideSem);
-		
-		
+
 		JLabel FallSpring = new JLabel();
 		FallSpring.setFont(FurmanOfficial.bigHeaderFont);
-		
+
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		topPanel.add(PanelforButtons, BorderLayout.WEST);
-		
+
 		topPanel.setBackground(defaultPanel.getBackground());
 		topPanel.add(fallSpring, BorderLayout.CENTER);
 
@@ -165,7 +159,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public int getRequirementNumber() {
 		return requirementNumber;
 	}
-	
+
 
 
 
@@ -228,7 +222,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 		season +=  " " + sem.semesterDate.year;
 		fallSpring.setText(season);
-		
+
 		topPanel.setBackground(defaultPanel.getBackground());
 
 		defaultPanel.add(topPanel, BorderLayout.CENTER);
@@ -255,7 +249,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			defaultPanel.add(dropLabel);
 		}
 		 */
-		
+
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
@@ -268,17 +262,19 @@ public class SemesterPanel extends JPanel implements ActionListener{
 				JLabel emptyLabel = new JLabel();
 				defaultPanel.add(emptyLabel);
 			}
-			
-			
+
+
 
 		}
 
 		//Adds special buttons to MayX 
+
 		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			deleteSemesterButton.setEnabled(true);
 		}
 
 			
+
 
 		
 	}
@@ -315,8 +311,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		d.GUIRemoveElement(e, this);
 		//this.updatePanel(true);
 	}
-	
-	
+
+
 	public void dragStarted(ScheduleElement e){
 		if(this.canTake(e)){
 			this.setHilighted(true);
@@ -325,7 +321,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public void dragEnded(){
 		this.setHilighted(false);
 	}
-	
+
 	public void setHilighted(boolean b){
 		if(b){
 			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
@@ -363,7 +359,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	public boolean canTake(Requirement r){
 		return !this.sem.getCoursesSatisfying(r).isEmpty();
 	}
-	
+
 	private class SemesterPanelDropHandler extends PanelDropHandler{
 
 		@Override
@@ -378,7 +374,7 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			}
 
 		}
-		
+
 
 		@Override
 		public boolean canImport(Component c) {
@@ -391,8 +387,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			return false;
 		}
 	}
-	
-	
+
+
 
 }
 

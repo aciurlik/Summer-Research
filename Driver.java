@@ -491,10 +491,9 @@ public class Driver{
 
 
 	public void updateAll(){
-
 		schP.update(sch);
 		reqs.update(sch);
-
+		
 	}
 
 	public void repaintAll(){
