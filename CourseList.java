@@ -89,7 +89,7 @@ public class CourseList  {
 			//try to parse this requirement from the raw data
 			try{
 				Requirement r = Requirement.readFromFurmanPrereqs(originalRequirementString);
-				ourVersion = r.toString();
+				ourVersion = r.saveString();
 				this.addPrereqMeaning(originalRequirementString, ourVersion);
 			}catch (Exception e){
 				//Handle special strings
@@ -107,7 +107,7 @@ public class CourseList  {
 				}
 				//If none of the special strings happened, we 
 				//should ask the user and save their choice.
-				return askUserToDefine(originalRequirementString);
+				return askUserToDefine(p, originalRequirementString);
 			}
 		}
 		return Requirement.readFrom(ourVersion);
@@ -150,7 +150,8 @@ public class CourseList  {
 	//////////////////////////////
 	//  This section handles saving and loading
 	//  the translation of weird prerequsites, like
-	//	"ACC 122, 133, MTH 150 or MTH 145"
+	//	"ACC 122, 133, MTH 150 or MTH 145" and
+	//  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
 	//  into valid, unambiguous requirement strings.
 	//
 	
@@ -161,8 +162,8 @@ public class CourseList  {
 
 	
 	
-	public Requirement askUserToDefine(String originalRequirementString){
-		System.out.print("\nI need help here, what does this mean?\n" + originalRequirementString + "\n>>>");
+	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
+		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What that requirement mean?\n>>>");
 		//TODO ask the user
 		Scanner scan = new Scanner(System.in);
 		String userInput = scan.nextLine();
@@ -175,7 +176,8 @@ public class CourseList  {
 				valid = true;
 			}catch (Exception e){
 				if(userInput.toUpperCase().equals("QUIT") || 
-						userInput.toUpperCase().equals("SKIP")){
+						userInput.toUpperCase().equals("SKIP") ||
+						userInput.toUpperCase().equals("S")){
 					System.out.println("Ok, I'll skip this one until next time");
 					return new Requirement();
 				}

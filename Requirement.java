@@ -580,8 +580,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	/**
 	 * Example inputs:
 	 * 
-	 *  ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340
-	 *  ACC-111, ECN-111 or 225, MTH-141 or 150
+	 *  "ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340"
+	 *  "ACC-111, ECN-111 or 225, MTH-141 or 150"
+	 *  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
 	 *  
 	 *  This method has to be very careful because syntax might be
 	 *  department dependent. The above examples show a clear syntax,
