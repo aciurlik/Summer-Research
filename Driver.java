@@ -81,7 +81,7 @@ public class Driver{
 
 
 		//Make data
-		sch = Schedule.testSchedule();		
+		sch = Schedule.testSchedule();
 		sch.setDriver(this);
 
 
@@ -121,8 +121,8 @@ public class Driver{
 		CourseList l = CourseList.testList();
 		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(sch.masterList, sch.semesters.get(0).semesterDate, null);
-		sch = current;
+		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
+		setSchedule(current);
 		this.update();
 
 	}
@@ -132,7 +132,6 @@ public class Driver{
 	private void setSchedule(Schedule current) {
 		sch=current;
 		this.sch.setDriver(this);
-
 	}
 
 

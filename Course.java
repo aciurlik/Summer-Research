@@ -59,7 +59,7 @@ public class Course implements ScheduleElement{
 		userSpecifiedReqs = new HashSet<Requirement>();
 		reqsSatisfied = new HashSet<Requirement>();
 	}
-	
+
 	public void setName(String name){
 		this.name = name;
 	}
@@ -183,7 +183,7 @@ public class Course implements ScheduleElement{
 		}
 		return new Interval<Time>(examTime[0], examTime[1]);
 	}
-	
+
 	/**
 	 * find a list of all the intervals
 	 *  representing all the meeting times for
@@ -210,8 +210,8 @@ public class Course implements ScheduleElement{
 			return null;
 		}
 	}
-	
-	
+
+
 	public boolean overlaps(ScheduleElement other){
 		if(other instanceof Course){
 			return this.allTakenTimes().overlaps(((Course)other).allTakenTimes());
@@ -433,6 +433,30 @@ public class Course implements ScheduleElement{
 		Time totalStartTime = Time.combine(times[0], times[1]);
 		Time totalEndTime = Time.combine(times[0], times[3]);
 		Time[] meetingTime = new Time[]{totalStartTime, totalEndTime};
+
+
+		if(semester.sNumber==(SemesterDate.SUMMERONE) || semester.sNumber==(SemesterDate.SUMMERTWO)){
+			Time SummerSessionOne = new Time(times[0].year, 6, 16, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+			Time SummerSessionTwo = new Time(times[0].year, 7, 25, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+			Interval<Time> sessionInterval = new  Interval<Time>(times[0], times[2]);
+
+
+			if(sessionInterval.contains(SummerSessionOne)){
+
+				semester = new SemesterDate(semester.year, SemesterDate.SUMMERONE);
+				Time midpoint = times[0].findMidPoint(times[2]);
+				SummerSessionOne = SummerSessionOne.findMidPoint(midpoint);
+
+
+			}
+			if(sessionInterval.contains(SummerSessionTwo)){
+				semester = new SemesterDate(semester.year,SemesterDate.SUMMERTWO);
+				Time midpoint = times[0].findMidPoint(times[2]);
+				SummerSessionTwo = SummerSessionTwo.findMidPoint(midpoint);
+			}
+
+
+		}
 
 
 		Course result =  new Course(p, sectionNumber, professor, Time.meetingDaysFrom(meetingDays), creditHours, semester);
