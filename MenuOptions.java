@@ -27,6 +27,7 @@ public class MenuOptions {
 	public static final  String addStudyAway = "Add Study Away";
 	public static final  String addNotes = "Add Note";
 	public static final  String removeStudyAway = "Remove Study Away";
+	public static final  String removeNotes = "Remove Note";
 	
 	public static final  String deleteSemester = "x";
 	public static final  String hideSemester = "-";

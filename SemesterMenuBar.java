@@ -25,8 +25,6 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener{
 		JMenuItem menuItem;
 
 
-
-
 		//Create the menu bar.
 
 
@@ -63,12 +61,21 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener{
 		menu.add(menuItem);
 
 
-		menuItem = new JMenuItem(MenuOptions.addNotes);
-		JPopupMenu addNotes = new JPopupMenu();
-		menuItem.addActionListener(this);
-		addNotes.add(menuItem);
-		menu.add(menuItem);
 
+		menuItem = new JMenuItem();
+		if(!semPanel.sem.hasNotes){
+			menuItem.setText(MenuOptions.addNotes);
+			menuItem.setActionCommand(MenuOptions.addNotes);
+		}
+		if(semPanel.sem.hasNotes){
+			
+			menuItem.setText(MenuOptions.removeNotes);
+			menuItem.setActionCommand(MenuOptions.removeNotes);
+		}
+		JPopupMenu notes = new JPopupMenu();
+		menuItem.addActionListener(this);
+		notes.add(menuItem);
+		menu.add(menuItem);
 
 		this.add(menu);
 	}
@@ -91,8 +98,11 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener{
 		}
 		if(e.getActionCommand().equals(MenuOptions.addNotes)){
 			semPanel.d.GUIaddNotes(semPanel.sem);
-			//JTextField notes = new JTextField();
-			//semPanel.defaultPanel.add(notes);		
+			semPanel.updatePanel();
+			
 			}
+		if(e.getActionCommand().equals(MenuOptions.removeNotes)){
+			semPanel.d.GUIremoveNotes(semPanel.sem);
+		}
 	}
 }

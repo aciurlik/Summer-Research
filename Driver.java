@@ -18,11 +18,14 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.BadLocationException;
 
 
 public class Driver{ 
 
 	Schedule sch;
+	static Schedule testSchedule;
 	SchedulePanel schP;
 	RequirementListPanel reqs;
 	int season;
@@ -38,8 +41,23 @@ public class Driver{
 	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
-	int Counter = 0;
 
+	
+	public static Driver testDriver(){
+		Driver results = new Driver();
+		testSchedule = Schedule.testSchedule();		
+		testSchedule.setDriver(results);
+		int wantedMajor=0;
+		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
+			if(ListOfMajors.testList().get(i).name.equals("Psychology")){
+				wantedMajor=i;
+			}
+		}
+		
+		results.GUIAddMajor(ListOfMajors.testList().get(wantedMajor));
+		testSchedule.setDriver(results);
+		return results;
+	}
 
 
 
@@ -464,6 +482,7 @@ public class Driver{
 
 	public void GUImakeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(true);
+		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will furfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
 		this.update();
 		
 	}
@@ -479,6 +498,24 @@ public class Driver{
 		this.update();
 		
 	}
+	
+	
+	public void GUITextBeingWritten(DocumentEvent e, Semester s) throws BadLocationException {
+		int length = e.getDocument().getLength();
+		String noteWritten = e.getDocument().getText(0, length);
+		s.setNotes(noteWritten);
+		
+		
+	}
+
+	public void GUIremoveNotes(Semester sem) {
+		sem.setHasNotes(false);
+		sem.setNotes("");
+		this.update();
+		
+	}
+	
+	
 
 	public boolean userRequestError(ScheduleError s){
 		String header=null;
@@ -511,14 +548,11 @@ public class Driver{
 
 
 	public void updateAll(){
-		if(Counter>0){
-		System.out.println("1" + schP.allSemesterPanels.get(0).defaultPanel.getBackground());	}
+	
+	
 		schP.update(sch);
 		reqs.update(sch);
-		if(Counter>0){
-		System.out.println("3" + schP.allSemesterPanels.get(0).defaultPanel.getBackground());	
-		}
-		Counter++;
+		
 	}
 
 	public void repaintAll(){
@@ -535,32 +569,19 @@ public class Driver{
 	public void update() {
 		updateAll();
 		repaintAll(); 
+		//System.out.println(this.sch.semesters.get(0).hasNotes);
 
 	}
 
 
 	public static void main(String[] args){
-		new Driver();
+		//new Driver();
+		testDriver();
 
 
 	}
 
-
-
 	
-	
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

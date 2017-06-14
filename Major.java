@@ -24,9 +24,7 @@ public class Major {
 	
 	String majorType;
 	
-	public static final int BA = 0;
-	public static final int BS = 1;
-	public static final int BM = 2;
+
 	int degreeType;
 
 	public static final int MajorDDNRange = 100;

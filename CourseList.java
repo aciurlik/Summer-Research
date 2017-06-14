@@ -30,7 +30,7 @@ public class CourseList  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
-	
+
 	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
 
 
@@ -45,32 +45,32 @@ public class CourseList  {
 		return readAll();
 	}
 
-	
+
 	public CourseList (){
 		this.listOfCourses = new ArrayList<Course>();
 		this.rawPrereqs = new Hashtable<Prefix, String>();
 		this.savedPrereqMeanings = new Hashtable<String, String>();
-			loadPrereqMeanings(this.prereqMeaningsFile);
+		loadPrereqMeanings(this.prereqMeaningsFile);
 		this.GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Prereq stuff
 	//////////////////////////////
 	//////////////////////////////
-	
-	
-	
+
+
+
 	/**
 	 * Make a requirement for all the prerequsites for this course.
 	 * @param p
@@ -94,11 +94,11 @@ public class CourseList  {
 			}catch (Exception e){
 				//Handle special strings
 				// These will not be saved in savedPrereqMeanings.
-				
+
 				//"any first year writing seminar" is common
-				
+
 				//"appropriate placement" is common
-				
+
 				//"audition required" is common
 				if(originalRequirementString.equals("audition required")){
 					Requirement result = new Requirement();
@@ -112,9 +112,9 @@ public class CourseList  {
 		}
 		return Requirement.readFrom(ourVersion);
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Figure out what prefixes to display as 'needed' to the user
 	 * if they try to put this course in a place where only
@@ -139,14 +139,14 @@ public class CourseList  {
 	public HashSet<Prefix> neededListDeep(Prefix p, HashSet<Prefix> taken){
 		return neededListShallow(p,taken);
 	}
-	
-	
 
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Prereq meanings
@@ -157,20 +157,20 @@ public class CourseList  {
 	//	"ACC 122, 133, MTH 150 or MTH 145" and
 	//  into valid, unambiguous requirement strings.
 	//
-	
+
 	public boolean addRawPrereq(Course c, String prereqString){
 		this.rawPrereqs.put(c.getPrefix(), prereqString);
 		return true;
 	}
 
-	
-	
+
+
 	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
 		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What that requirement mean?\n>>>");
 		//TODO ask the user
 		Scanner scan = new Scanner(System.in);
 		String userInput = scan.nextLine();
-		
+
 		Requirement result = null;
 		boolean valid = false;
 		while(!valid){
@@ -191,14 +191,14 @@ public class CourseList  {
 		}
 		addPrereqMeaning(originalRequirementString, userInput);
 		return result;
-		
+
 	}
-	
+
 	public void addPrereqMeaning(String originalString, String ourMeaning){
 		savedPrereqMeanings.put(originalString,ourMeaning);
 		savePrereqMeanings(this.prereqMeaningsFile);
 	}
-	
+
 	public void loadPrereqMeanings(String fileName){
 		File f = new File(fileName);
 		if(!f.exists()){
@@ -235,9 +235,9 @@ public class CourseList  {
 
 
 
-	
-	
-	
+
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  List methods
@@ -264,15 +264,15 @@ public class CourseList  {
 		Course c = listOfCourses.remove(i);
 		return c;
 	}
-	
-	
-	
+
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Filter methods
 	//////////////////////////////
 	//////////////////////////////
-	
+
 	/**
 	 * Return only those members of input which are in the given semester.
 	 * @param input
@@ -290,7 +290,7 @@ public class CourseList  {
 		}
 		return SemesterList;
 	}
-	
+
 	public  ArrayList<Course> getCoursesIn(Semester s){
 		ArrayList<Course> result =  onlyThoseIn(listOfCourses,s);
 		return result;
@@ -308,10 +308,10 @@ public class CourseList  {
 	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(this.listOfCourses,r);
 	}
-	
-	
-	
-	
+
+
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  GER stuff
@@ -331,9 +331,9 @@ public class CourseList  {
 		}
 		return "null";
 	}
-	
-	
-	
+
+
+
 	public static int getDegreeTypeNumber(String s){
 		if(s.equals("BM")){
 			return CourseList.BM;
@@ -361,71 +361,80 @@ public class CourseList  {
 	 * @param MajorType
 	 * @return
 	 */
-	public Major getGERMajor(int majorType){
+	public Major getGERMajor(Prefix forignLang,int majorType){
 		Major m = new Major("GER");
-		
-		
-		outerloop:
-		for(String key : GERRequirements.keySet()){
-			//Special cases first, then default behavior.
-			// default behavior is to add every prefix in the 
-			// list to each requirement, and to do nothing to 
-			// double dip numbers (if double dip numbers exist).
-			
-			Requirement r = new Requirement();
-			r.setName(key);
-			boolean includeDefaultPrefixes = true;
-			
-			
-			
-			switch(key){
-			case "MR":
-				// "Students with a BS must complete this requirement with a calculus course"
-				// "Students with a BM do not need to fulfill this requirement."
-				switch ( majorType){
-				case Major.BS:
-					//For BS, the MR requirement is predefined
-					r = (Requirement)Requirement.readFrom("1 of (MTH 150, MTH 145)");
-					includeDefaultPrefixes = false;
-					break;
-				case Major.BM:
-					// For BM, there is no MR requirement.
-					continue outerloop;
-				case Major.BA:
-				default:
-					//For BA and any unknown majorType, 
-					// you can take any of the MR courses.
-					includeDefaultPrefixes = true;
 
-				}
-				break;
-			case "NW":
-				/* From the Furman GER checklist, NW requires:
-				 * 		"Two courses, at least one with a 
-				 * 		separate labratory component."
-				 * 
-				 * To handle this, we make 2 requirements, one of which
-				 * 		is NW and the other is NWL. You need one course from
-				 * 		each requirement, and they aren't allowed to double dip.
-				 * 		Every prefix in the NWL requirement also satisfies 
-				 * 		the NW requirement.
-				 * 
-				 * In addition, "Students seeking the Bachelor of Music degree 
-				 * must complete only one course to meet this requirement, 
-				 * while Bachelor of Science degree candidates must complete 
-				 * this requirement in courses appropriate for majors in 
-				 * the natural science disciplines. "
-				 * 
-				 */
-				switch(majorType){
-				case Major.BS:
-					// only courses "appropriate for majors in the 
-					// natural science disciplines," which currently (6/11/2017) means
-					//
-					// "courses numbered 110 or greater in Biology, Chemistry, 
-					//  Earth and Environmental Science, Neuroscience, Physics, 
-					//  "Sustainability Science."
-             /*
+
+		outerloop:
+			for(String key : GERRequirements.keySet()){
+				//Special cases first, then default behavior.
+				// default behavior is to add every prefix in the 
+				// list to each requirement, and to do nothing to 
+				// double dip numbers (if double dip numbers exist).
+
+				Requirement r = new Requirement();
+				r.setName(key);
+				boolean includeDefaultPrefixes = true;
+
+
+
+				switch(key){
+				case "MR":
+					//System.out.println("Major Type" + majorType);
+					// "Students with a BS must complete this requirement with a calculus course"
+					// "Students with a BM do not need to fulfill this requirement."
+					switch ( majorType){
+					case CourseList.BS:
+
+						//For BS, the MR requirement is predefined
+						r = (Requirement)Requirement.readFrom("1 of (MTH 150, 2 of (MTH 120, MTH 145))");
+						r.setName("MR");
+						System.out.println(r.name);
+						includeDefaultPrefixes = false;
+						break;
+					case CourseList.BM:
+
+						// For BM, there is no MR requirement.
+						continue outerloop;
+					case CourseList.BA:
+
+
+					default:
+						//For BA and any unknown majorType, 
+						// you can take any of the MR courses.
+						includeDefaultPrefixes = true;
+
+
+					}
+
+					break;
+				case "NW":
+					/* From the Furman GER checklist, NW requires:
+					 * 		"Two courses, at least one with a 
+					 * 		separate labratory component."
+					 * 
+					 * To handle this, we make 2 requirements, one of which
+					 * 		is NW and the other is NWL. You need one course from
+					 * 		each requirement, and they aren't allowed to double dip.
+					 * 		Every prefix in the NWL requirement also satisfies 
+					 * 		the NW requirement.
+					 * 
+					 * In addition, "Students seeking the Bachelor of Music degree 
+					 * must complete only one course to meet this requirement, 
+					 * while Bachelor of Science degree candidates must complete 
+					 * this requirement in courses appropriate for majors in 
+					 * the natural science disciplines. "
+					 * 
+					 */
+					switch(majorType){
+					case CourseList.BS:
+						// only courses "appropriate for majors in the 
+						// natural science disciplines," which currently (6/11/2017) means
+						//
+						// "courses numbered 110 or greater in Biology, Chemistry, 
+						//  Earth and Environmental Science, Neuroscience, Physics, 
+						//  "Sustainability Science."
+						/*
             	r.choices.clear();
 				      r.choices.add(new Prefix("CHM", 110));
 				      r.choices.add(new Prefix("CHM", 115));
@@ -437,52 +446,60 @@ public class CourseList  {
 				      r.choices.add(new Prefix("PHY", 112));
 				      r.choices.add(new Prefix("PSY", 320));
 				      r.choices.add(new Prefix("SUS", 120));   
-            */
-					for(Prefix p : GERRequirements.get("NWL")){
-						if(p.getNumber().compareTo("110") >= 0){
-							r.choices.add(new TerminalRequirement(p));
-            }
-					}
-					for(Prefix p : GERRequirements.get("NW")){
-						if(p.getNumber().compareTo("110") >= 0){
+						 */
+						for(Prefix p : GERRequirements.get("NWL")){
+							if(p.getNumber().compareTo("110") >= 0){
+								r.choices.add(new TerminalRequirement(p));
+							}
+						}
+						for(Prefix p : GERRequirements.get("NW")){
+							if(p.getNumber().compareTo("110") >= 0){
+								r.choices.add(new TerminalRequirement(p));
+							}
+						}
+						includeDefaultPrefixes = false;
+						break;
+					case CourseList.BA:
+					case CourseList.BM:
+					default:
+						for(Prefix p : GERRequirements.get("NWL")){
 							r.choices.add(new TerminalRequirement(p));
 						}
 					}
-					includeDefaultPrefixes = false;
+					//TODO set the double dip number of NW and NWL to be different.
+					// r.setDoubleDipNumber
 					break;
-				case Major.BA:
-				case Major.BM:
-				default:
-					for(Prefix p : GERRequirements.get("NWL")){
+				case "NWL":
+					//Music majors don't need this requirement.
+					// they only need the NW requirement.
+					if(majorType== CourseList.BM){
+						continue outerloop;
+					}
+					break;
+				case "HB":
+					//every major type needs 2 hb.
+					r.numToChoose = 2;
+					break;
+				case "WC":
+				case "NE":
+					// TODO set doubleDipNumber differently from all the others
+
+				}
+				if(includeDefaultPrefixes){
+					for(Prefix p : GERRequirements.get(key)){
 						r.choices.add(new TerminalRequirement(p));
 					}
 				}
-				//TODO set the double dip number of NW and NWL to be different.
-				// r.setDoubleDipNumber
-				break;
-			case "NWL":
-				//Music majors don't need this requirement.
-				// they only need the NW requirement.
-				if(majorType== Major.BM){
-					continue outerloop;
+
+				if(!r.name.equals("FL")){
+					m.addRequirement(r);
 				}
-				break;
-			case "HB":
-				//every major type needs 2 hb.
-				r.numToChoose = 2;
-				break;
-			case "WC":
-			case "NE":
-				// TODO set doubleDipNumber differently from all the others
+
+
 
 			}
-			if(includeDefaultPrefixes){
-				for(Prefix p : GERRequirements.get(key)){
-					r.choices.add(new TerminalRequirement(p));
-				}
-			}
-			m.addRequirement(r);
-		}
+
+		m.addRequirement(FLRequirement(forignLang ,majorType));
 		return m;
 	}
 
@@ -509,15 +526,35 @@ public class CourseList  {
 
 
 
-	
-	
+
+	public Requirement FLRequirement(Prefix p, int degreeType){
+		Requirement	r= new Requirement();
+		r.setName("FL");
+		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
+			for(Prefix prefix : GERRequirements.get("FL")){
+				if(!prefix.getSubject().equals(p.getSubject())){
+					r.choices.add(new TerminalRequirement(prefix));
+				}
+
+			}
+		}
+		if(degreeType == CourseList.BS){
+			for(Prefix prefix : GERRequirements.get("FL")){
+				r.choices.add(new TerminalRequirement(prefix));
+			}
+		}
+
+		return r;
+	}
+
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Reading
 	//////////////////////////////
 	//////////////////////////////
 
-	
+
 	public static CourseList readAll(){
 		CourseList result = new CourseList();
 		File f = new File("CourseCatologs");
@@ -598,7 +635,7 @@ public class CourseList  {
 			return;
 		}
 	}
-	
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Testing
