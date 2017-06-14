@@ -512,9 +512,7 @@ public class CourseList  {
 	 */
 	public void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
-		//if(c.coursePrefix.getSubject().equals("SPN")){
-		//	System.out.println(c.getPrefix());
-		//	}
+
 		for(String s : allGERs){
 			HashSet<Prefix> old = this.GERRequirements.get(s);
 			if(old == null){
@@ -632,14 +630,13 @@ public class CourseList  {
 							Course newDuplicateCourse = Course.readFromFurmanData(data);
 							if( newDuplicateCourse != duplicateCourse){
 								if(duplicateCourse != null){
-									this.add(duplicateCourse);
 
+							
+
+									this.add(duplicateCourse);	
 								}
 								duplicateCourse=newDuplicateCourse;
-
-
 							}
-
 							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
 
 						}
