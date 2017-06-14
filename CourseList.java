@@ -513,7 +513,6 @@ public class CourseList  {
 	 */
 	public void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
-
 		for(String s : allGERs){
 			HashSet<Prefix> old = this.GERRequirements.get(s);
 			if(old == null){
@@ -604,16 +603,11 @@ public class CourseList  {
 							Course newDuplicateCourse = Course.readFromFurmanData(data);
 							if( newDuplicateCourse != duplicateCourse){
 								if(duplicateCourse != null){
-									this.add(duplicateCourse);
-									
+									this.add(duplicateCourse);	
 								}
 								duplicateCourse=newDuplicateCourse;
-
-
 							}
-
 							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
-							
 						}
 					}
 					//Also, see if this course satisfies any GERs.
@@ -646,7 +640,6 @@ public class CourseList  {
 			br.close();
 			if(lastCourse != null){
 				this.add(lastCourse);
-				
 			}
 			if(duplicateCourse != null){
 				this.add(duplicateCourse);

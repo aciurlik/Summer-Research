@@ -106,7 +106,19 @@ public class TerminalRequirement extends Requirement {
 	 */
 	public static TerminalRequirement readFrom(String s){
 		TerminalRequirement result;
-		//First look for either a '-', a '>', or a '<'.
+		//First look for either '-', '>', '<', or 'of'.
+		s = s.replaceAll("\\s+", "");
+		if(s.contains("of")){
+			int i = s.indexOf("of");
+			result = readFrom(s.substring(i + 2));
+			String numString = s.substring(0, i);
+			try{
+				result.numToChoose = Integer.parseInt(numString);
+			}catch(Exception e){
+				throw new RuntimeException("the 'of' in a Terminal Requirement must be preceeded by an integer.");
+			}
+			return result;
+		}
 		if(s.contains(">") || s.contains("<")){
 			result = readFromInequality(s);
 		}
@@ -186,12 +198,15 @@ public class TerminalRequirement extends Requirement {
 	}
 	
 	public String saveString(){
-		String result;
+		String result = "";
 		if((!usesMin) && (!usesMax)){
 			result =  p.toString();
 		}
 		else{
-			result = p.getSubject();
+			if(numToChoose != 1){
+				result += numToChoose + " of ";
+			}
+			result += p.getSubject();
 			if(usesMin){
 				result  +=  ">" + min;
 			}
@@ -217,25 +232,127 @@ public class TerminalRequirement extends Requirement {
 	@Override
 	public HashSet<Prefix> fastestCompletionSet(HashSet<Prefix> taken) {
 		HashSet<Prefix> result = new HashSet<Prefix>();
-		if(isSatisfiedBy(taken)){
-			return result;
+		if(isExact()){
+			if(isSatisfiedBy(taken)){
+				return result;
+			}
+			else{
+				result.add(p);
+				return result;
+			}
 		}
 		else{
-			result.add(p);
+			int numLeft = numLeftAfter(taken);
+			int seed = 0;
+			while(numLeft > 0){
+				Prefix possible = nextPrefixSatisfying(seed);
+				if(!taken.contains(possible)){
+					numLeft--;
+					result.add(possible);
+				}
+				seed ++;
+			}
 			return result;
 		}
 	}
-	@Override
-	public double percentComplete(HashSet<Prefix> taken) {
-		//either 1 or 0 by the definition of terminal requirement.
-		if(isSatisfiedBy(taken)){
+	
+	/**
+	 * test whether this requirement uses min or max, or instead
+	 * is an exact requirement (a requirement for exactly one prefix)
+	 * @return
+	 */
+	public boolean isExact(){
+		return (!usesMin) && (!usesMax);
+	}
+	
+	/**
+	 * Efficiently calculate how many courses are left after
+	 * taking this set of prefixes.
+	 * @param taken
+	 * @return
+	 */
+	private int numLeftAfter(HashSet<Prefix> taken){
+		if(isExact()){
+			if(taken.contains(p)){
+				return 0;
+			}
 			return 1;
 		}
-		return 0;
+		int result = numToChoose;
+		for(Prefix p : taken){
+			if(isSatisfiedBy(p)){
+				result --;
+				if(result <= 0){
+					return result;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Make a prefix that satisfies this terminal requirement
+	 * Should only be used for requirements that use > or <.
+	 * @param seed
+	 * @return
+	 */
+	private Prefix nextPrefixSatisfying(int seed){
+		if(this.usesMin){
+			int possible = this.min + seed + 1;
+			if(usesMax && possible >= max){
+				throw new RuntimeException("No more representative prefixes");
+			}
+			return new Prefix(this.p.getSubject(), possible);
+		}
+		if(this.usesMax){
+			int possible = this.max - seed - 1;
+			if(usesMin && possible <= min){
+				throw new RuntimeException("No more representative prefixes");
+			}
+			return new Prefix(this.p.getSubject(), possible);
+		}
+		else{
+			throw new RuntimeException("You shouldn't need a representative prefix for a terminal requirement that doesn't use max or min.");
+		}
 	}
 	
 	
+	@Override
+	public double percentComplete(HashSet<Prefix> taken) {
+		return 1.0 - (numLeftAfter(taken) * 1.0) / numToChoose;
+	}
 	
+	public boolean isSatisfiedBy(HashSet<Prefix> taken){
+		return numLeftAfter(taken) <= 0;
+	}
+	
+	/**
+	 * Efficiently calculate whether this prefix counts towards
+	 * this terminal requirement at all.
+	 */
+	@Override
+	public boolean isSatisfiedBy(Prefix p) {
+		if((!usesMax) && (!usesMin)){
+			if(p.compareTo(this.p) == 0){
+				return true;
+			}
+			return false;
+		}
+		if(p.getSubject().equals(this.p.getSubject())){
+			int takenNum;
+			try{
+				takenNum = Integer.parseInt(p.getNumber());
+			}catch (Exception e){
+				return false;
+			}
+			boolean maxGood = takenNum < this.max ;
+			boolean minGood = takenNum > this.min;
+			if((!usesMax || maxGood) && (!usesMin || minGood)){
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	
 	
@@ -269,47 +386,14 @@ public class TerminalRequirement extends Requirement {
 		return null;
 	}
 	
-	public boolean isSatisfiedBy(HashSet<Prefix> taken){
-		if(!usesMax && !usesMin){
-			if(taken.contains(p)){
-				return true;
-			}
-			return false;
-		}
-		for(Prefix p : taken){
-			if(isSatisfiedBy(p)){
-				return true;
-			}
-		}
-		return false;
-	}
-	@Override
-	public boolean isSatisfiedBy(Prefix p) {
-		if(!usesMax && !usesMin){
-			if(p.compareTo(this.p) == 0){
-				return true;
-			}
-		}
-		if(p.getSubject().equals(this.p.getSubject())){
-			int takenNum;
-			try{
-				takenNum = Integer.parseInt(p.getNumber());
-			}catch (Exception e){
-				return false;
-			}
-			boolean maxGood = takenNum < this.max ;
-			boolean minGood = takenNum > this.min;
-			if((!usesMax || maxGood) && (!usesMin || minGood)){
-				return true;
-			}
-		}
-		return false;
-	}
+
 	
 	
 	public static void testTerminalRequirements(){
 		String[] test = { 
-				"MTH - 150",
+				"MTH-150",
+				"MTH-001",
+				"MTH-500",
 				"MTH > 150",
 				"MTH < 150",
 				"MTH >= 150",
@@ -317,15 +401,19 @@ public class TerminalRequirement extends Requirement {
 				"MTH > 150 < 200",
 				"MTH < 200 > 150",
 				"MTH <= 200 >= 150",
-				"MTH >= 150 <= 200"
+				"MTH >= 150 <= 200",
+				"2 of MTH>100"
 		};
 		
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		taken.add(new Prefix("MTH", 150));
+		//taken.add(new Prefix("MTH", 120));
+		
 		
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
-			System.out.println(t.saveString()+ ", " + t.isSatisfiedBy(taken));
+			System.out.println(t.saveString()+ ",\t" + t.isSatisfiedBy(taken)
+					+ ",\t" +t.numLeftAfter(taken) +   ",\t" + t.numToChoose+ ",\t" + t.percentComplete(taken));
 		}
 	}
 	

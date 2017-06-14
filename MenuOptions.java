@@ -22,7 +22,7 @@ public class MenuOptions {
 
 	//Semester Panel
 	public static final  String addInstruct = "Add a Course";
-	public static final  String supriseMe = "Suprise Me!";
+	public static final  String supriseMe = "Surprise Me!";
 	public static final  String changeInstruct = "Change Course";
 	public static final  String addStudyAway = "Add Study Away";
 	public static final  String addNotes = "Add Note";
