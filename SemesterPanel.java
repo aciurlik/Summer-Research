@@ -22,8 +22,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
-public class SemesterPanel extends JPanel implements ActionListener{
+public class SemesterPanel extends JPanel implements ActionListener, DocumentListener{
 
 
 
@@ -42,6 +48,9 @@ public class SemesterPanel extends JPanel implements ActionListener{
 	Semester sem;
 	private JButton changeCourse;
 	final static int height=300;
+	JTextArea notes = new JTextArea();
+	
+
 
 	public int preferredHeight = 300;
 
@@ -59,8 +68,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		// semester is not hidden.
 		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
-		
-		
+
+
 
 		//Setup the hidePanel, the panel which is visbile if this semester is hidden.
 		// This panel includes a button to show the semester again.
@@ -109,7 +118,8 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		topPanel.add(PanelforButtons, BorderLayout.WEST);
 
 		topPanel.setBackground(defaultPanel.getBackground());
-		topPanel.add(fallSpring, BorderLayout.CENTER);
+	//	topPanel.add(fallSpring, BorderLayout.CENTER);
+		
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,height));
@@ -205,11 +215,15 @@ public class SemesterPanel extends JPanel implements ActionListener{
 
 
 	//Redraw this panel based on the semester sem.
+
 	public void updatePanel(Semester sem){
 		this.sem = sem;
+  JLabel dropLabel = newDropLabel();
 
+    
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
+
 
 		//Figure out the season and add it
 
@@ -225,48 +239,51 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		fallSpring.setText(season);
 
 		topPanel.setBackground(defaultPanel.getBackground());
+		
 
 		defaultPanel.add(topPanel, BorderLayout.CENTER);
 		//Add all Schedule elements
-
+		defaultPanel.add(fallSpring);
 		JPanel menuPanel = new JPanel();
 		menuPanel.setOpaque(false);
 		menuPanel.setLayout(new BorderLayout());
-		
+
 		SemesterMenuBar menu = new SemesterMenuBar(this, defaultPanel);
 		menuPanel.add(menu, BorderLayout.NORTH);
-		defaultPanel.add(menuPanel);
-	
+		topPanel.add(menuPanel);
+		
+
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
 			defaultPanel.add(element);
 			element.updatePanel();
 		}
-		//Adds Drop Spaces 
-		/**
-		 * 
-		 * if(sem.elements.size()==4){
-			JLabel dropLabel = newDropLabel();
-			defaultPanel.add(dropLabel);
-		}
-		 */
+		
+
+
+
 
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
+
 		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
-			JLabel dropLabel = newDropLabel();
+
 			defaultPanel.add(dropLabel);
 			for (int i= 0; i<DropsNeeded-1; i++){
 				JLabel emptyLabel = new JLabel();
 				defaultPanel.add(emptyLabel);
+				
 			}
 
 
 
+
+
 		}
+
 
 		//Adds special buttons to MayX 
 
@@ -274,11 +291,33 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			deleteSemesterButton.setEnabled(true);
 		}
 
-			
+
+		if(sem.studyAway){
 
 
+			dropLabel.setForeground(Color.white);
+			fallSpring.setForeground(Color.white);
+			fallSpring.setText("Study Away " + sem.semesterDate.getSeason(sem.semesterDate.sNumber)+ " "+ sem.semesterDate.year);
+
+
+
+		}
+		if(sem.hasNotes){
+			//defaultPanel.add(notes);
+			JScrollPane scrollPane = new JScrollPane(notes); 
+			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			defaultPanel.add(scrollPane);
+			notes.getDocument().addDocumentListener(this);
 		
+		}
+		topPanel.setBackground(this.correctBackgroundColor(sem));
+		defaultPanel.setBackground(this.correctBackgroundColor(this.sem));
+
 	}
+
+
+
 
 	public JLabel newDropLabel(){
 		JLabel dropLabel = new JLabel(addAClass);
@@ -328,7 +367,18 @@ public class SemesterPanel extends JPanel implements ActionListener{
 			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
 		else{
-			this.setBackground(semesterColor(this.sem));
+
+			correctBackgroundColor(this.sem);
+		}
+	}
+
+
+	public Color correctBackgroundColor(Semester s){
+		if(s.studyAway){
+			return FurmanOfficial.grey;
+		}
+		else{
+			return semesterColor(this.sem);
 		}
 	}
 	/**
@@ -389,9 +439,41 @@ public class SemesterPanel extends JPanel implements ActionListener{
 		}
 	}
 
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		try {
+			this.d.GUITextBeingWritten(e, sem);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		try {
+			this.d.GUITextBeingWritten(e, sem);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		try {
+			this.d.GUITextBeingWritten(e, sem);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 
+	}
 }
+
 
 
 

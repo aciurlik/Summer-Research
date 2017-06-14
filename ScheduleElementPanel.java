@@ -83,6 +83,11 @@ public class ScheduleElementPanel extends JPanel {
 		JPanel remove = new JPanel();
 		JButton toRemove = new JButton(removeButtonText);
 		toRemove.setForeground(FurmanOfficial.darkPurple);
+		if(s instanceof Course){
+			if (((Course) s).isTaken()){
+				toRemove.setEnabled(false);
+			}
+		}
 		toRemove.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				removeSelf();

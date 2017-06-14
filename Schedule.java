@@ -9,6 +9,11 @@ public class Schedule {
 	ArrayList<Semester> semesters;
 	Driver d; 
 	CourseList masterList;
+	int CLP; 
+	Prefix languagePrefix;
+
+
+
 
 
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
@@ -20,11 +25,43 @@ public class Schedule {
 		CourseList l = CourseList.testList();
 		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
 
-		result.addMajor(Major.testMajor());
-
-
+		//Class One 
+		int wantedMajor=0;
+		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
+			if(ListOfMajors.testList().get(i).name.equals("Psychology")){
+				wantedMajor=i;
+			}
+		}
+		
+	
+		
+		
+		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
+		a.setTaken(true);
+		result.addScheduleElement(a, result.semesters.get(0));
+		
+		
+		//Class Two
+		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
+		b.setTaken(true);
+		result.semesters.get(0).add(b);
+		
+		//Class Three 
+		Course c = new Course(new Prefix("FRN", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
+		c.setTaken(true);
+		result.semesters.get(0).add(c);
+		
+		
+		//Class Four
+		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
+		d.setTaken(true);
+		result.semesters.get(0).add(d);
 		//result.semesters.add(b);
 
+		
+		result.setCLP(10);
+		result.setLanguagePrefix(new Prefix("FRN", 120));
+		
 		return result;
 	}
 
@@ -48,7 +85,7 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
-		this.addMajor(masterList.getGERMajor(CourseList.BA));
+		this.addMajor(masterList.getGERMajor(this.languagePrefix, CourseList.BA));
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
@@ -186,7 +223,7 @@ public class Schedule {
 		addAtMajor(newMajor, majorsList.size());
 		if(!newMajor.name.equals("GER")){
 			majorsList.remove(0);
-			addAtMajor(masterList.getGERMajor(this.determineGER()), 0);
+			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
 		}
 		//Tell the courses which requirements they satisfy
 		reqsFulfilledValid = false;
@@ -209,7 +246,7 @@ public class Schedule {
 		reqsFulfilledValid = false;
 		if(!major.name.equals("GER")){
 			majorsList.remove(0);
-			addAtMajor(masterList.getGERMajor(this.determineGER()), 0);
+			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
 		}
 	}
 
@@ -362,9 +399,26 @@ public class Schedule {
 
 
 
+	public int getCLP() {
+		return CLP;
+	}
 
 
 
+	public void setCLP(int cLP) {
+		CLP = cLP;
+	}
+
+
+	public Prefix getLanguagePrefix() {
+		return languagePrefix;
+	}
+
+
+
+	public void setLanguagePrefix(Prefix languagePrefix) {
+		this.languagePrefix = languagePrefix;
+	}
 
 
 

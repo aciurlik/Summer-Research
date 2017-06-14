@@ -34,7 +34,7 @@ public class Prefix implements Comparable<Prefix>{
 		String[] pair = prefixString.split("-");
 		return new Prefix (pair[0], pair[1]);
 	}
-	
+
 	@Override
 	public boolean equals(Object o){
 		if(o==null){
@@ -48,12 +48,12 @@ public class Prefix implements Comparable<Prefix>{
 	public boolean equals(Prefix other){
 		return this.subject.equals(other.subject) && this.courseNumber.equals(other.courseNumber);
 	}
-	
+
 	@Override
 	public int hashCode(){
 		return subject.hashCode() + courseNumber.hashCode();
 	}
-	
+
 
 	@Override
 	public int compareTo(Prefix other) {
@@ -64,7 +64,7 @@ public class Prefix implements Comparable<Prefix>{
 		return this.courseNumber.compareTo(other.courseNumber);
 	}
 
-	
+
 	public static Prefix readFromJSON(String s) {
 		return readFrom(SaverLoader.peel(s));
 	}

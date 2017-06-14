@@ -9,6 +9,13 @@ public class Semester implements Comparable<Semester>{
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
 	private int OverloadLimit;
+	public boolean hasNotes = false;
+	public String notes = "";
+	
+	
+	
+	
+	
 
 
 	public Semester(SemesterDate sD, Schedule s){
@@ -207,6 +214,34 @@ public class Semester implements Comparable<Semester>{
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
 		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
 	}
+	
+	
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public boolean isHasNotes() {
+		return hasNotes;
+	}
+
+	public void setHasNotes(boolean hasNotes) {
+		this.hasNotes = hasNotes;
+	}
+
+	public boolean isStudyAway() {
+		return studyAway;
+	}
+
+	public void setStudyAway(boolean studyAway) {
+		this.studyAway = studyAway;
+	}
+
+	public boolean studyAway = false;
+
 
 	@Override
 	public boolean equals(Object other){

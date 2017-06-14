@@ -18,11 +18,14 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.BadLocationException;
 
 
 public class Driver{ 
 
 	Schedule sch;
+	static Schedule testSchedule;
 	SchedulePanel schP;
 	RequirementListPanel reqs;
 	int season;
@@ -39,6 +42,22 @@ public class Driver{
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
 
+	
+	public static Driver testDriver(){
+		Driver results = new Driver();
+		testSchedule = Schedule.testSchedule();		
+		testSchedule.setDriver(results);
+		int wantedMajor=0;
+		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
+			if(ListOfMajors.testList().get(i).name.equals("Psychology")){
+				wantedMajor=i;
+			}
+		}
+		
+		results.GUIAddMajor(ListOfMajors.testList().get(wantedMajor));
+		testSchedule.setDriver(results);
+		return results;
+	}
 
 
 
@@ -334,6 +353,7 @@ public class Driver{
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 	}
+	
 	public void dragEnded(){
 		this.schP.dragEnded();
 	}
@@ -346,11 +366,11 @@ public class Driver{
 		if((y != null) && (y !=0)){
 			Semester addedSemester = sch.addNewSemesterInsideSch(y,season);
 			this.update();
-			addCourseDialogBox(s, addedSemester);
+			addCourseDialogBox(addedSemester);
 		}
 	}
 
-	public void addCourseDialogBox(String season, Semester s){	
+	public void addCourseDialogBox(Semester s){	
 		ArrayList<Course> addCourses = new ArrayList<Course>();
 		addCourses = CourseList.testList().getCoursesIn(s);
 		if(addCourses.size()==0){
@@ -363,10 +383,10 @@ public class Driver{
 				toAdd[i]= addCourses.get(i);
 			}
 			if(addCourses.size()>0){
-				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + season,  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
+				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + s.semesterDate.getSeason(s.semesterDate.sNumber),  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
 				if((c != null) && (c instanceof Course)){
 					//Removes all courses that have already been added in case of MayX 
-					if(season.equals(MenuOptions.changeInstruct)){
+					if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
 						s.elements.clear();
 					}
 
@@ -457,8 +477,45 @@ public class Driver{
 
 		this.update();
 	}
+	
+	
 
+	public void GUImakeSemesterStudyAway(Semester sem) {
+		sem.setStudyAway(true);
+		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will furfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
+		this.update();
+		
+	}
+	
+	public void GUIremoveSemesterStudyAway(Semester sem) {
+		
+		sem.setStudyAway(false);
+		this.update();
+	}
 
+	public void GUIaddNotes(Semester sem) {
+		sem.setHasNotes(true);
+		this.update();
+		
+	}
+	
+	
+	public void GUITextBeingWritten(DocumentEvent e, Semester s) throws BadLocationException {
+		int length = e.getDocument().getLength();
+		String noteWritten = e.getDocument().getText(0, length);
+		s.setNotes(noteWritten);
+		
+		
+	}
+
+	public void GUIremoveNotes(Semester sem) {
+		sem.setHasNotes(false);
+		sem.setNotes("");
+		this.update();
+		
+	}
+	
+	
 
 	public boolean userRequestError(ScheduleError s){
 		String header=null;
@@ -503,6 +560,8 @@ public class Driver{
 
 
 	public void updateAll(){
+	
+	
 		schP.update(sch);
 		reqs.update(sch);
 		
@@ -522,26 +581,19 @@ public class Driver{
 	public void update() {
 		updateAll();
 		repaintAll(); 
+		//System.out.println(this.sch.semesters.get(0).hasNotes);
 
 	}
 
 
 	public static void main(String[] args){
-		new Driver();
+		//new Driver();
+		testDriver();
 
 
 	}
 
-
-
-
-
-
-
-
-
-
-
+	
 
 
 

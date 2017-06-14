@@ -659,7 +659,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				"3 of (MTH 110, MTH 120, MTH 130)",
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
 				"2 of (BIO 110, BIO 112, BIO 120)",
-				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)"
+				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))"
 		};
 		Prefix[] prefixes = new Prefix[]{
 				new Prefix("MTH", "110"),
@@ -722,7 +723,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				needsToBeShown = true;
 			}
 
-			needsToBeShown = true;
+			//needsToBeShown = true;
 
 
 			if(needsToBeShown){
