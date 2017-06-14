@@ -188,6 +188,10 @@ public class Time implements Comparable<Time>{
 			this.day = (this.day + 1)%7;
 			return;
 		}
+		if(this.day == UNUSED){
+			this.day = 1;
+			return;
+		}
 		if(this.day < daysIn(this.month)){
 			this.day += 1;
 			return;
@@ -528,6 +532,36 @@ public class Time implements Comparable<Time>{
 		return this.month + "/" + this.day + "/" + this.year + " " 
 				+ this.hours + ":" + this.minutes + ":" + this.seconds;
 	}
+	
+	
+	
+	public Time findMidPoint(Time other){
+ 		int avgSec = (int)((this.toSec() + other.toSec())/2);
+ 		return(timeFromSeconds(avgSec));
+ 	
+ 	}
+  
+ 	private Time timeFromSeconds(int seconds) {
+ 		int Secs = seconds%secsInMin;
+ 		int secondsLeft= seconds-Secs;
+ 		int Minute = (secondsLeft)%secsInHour;
+ 		secondsLeft=secondsLeft-(Minute*secsInMin);
+ 		int Hour = secondsLeft%secsInDay;
+ 		secondsLeft=secondsLeft-(Hour*secsInMin);
+ 		int Days = (int)secondsLeft/secsInDay;
+ 		Time  startTime = new Time(2000, 1, 1, Secs, Minute, Hour);
+ 		return(startTime.addDays(Days));
+ 		
+ 	}
+ 	
+ 	public boolean isAllUnused(){
+ 		if(this.day==Time.UNUSED && this.hours==Time.UNUSED && this.minutes==Time.UNUSED && this.month==Time.UNUSED && this.seconds==Time.UNUSED && this.year==Time.UNUSED){
+ 			return true;
+ 		}
+ 		return false;
+ 	}
+	
+	
 	
 	/**
 	 * Given two times, create a new time like this:

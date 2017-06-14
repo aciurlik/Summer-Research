@@ -131,6 +131,34 @@ public class Course implements ScheduleElement{
 	//////////////
 	public Intervals<Time> allTakenTimes(){
 		Intervals<Time> result = new Intervals<Time>();
+		Interval<Time> labTime = labTime();
+		if(labTime != null){
+			result.addInterval(labTime);
+		}
+		Interval<Time> examTime = examTime();
+		if(examTime != null){
+			result.addInterval(examTime);
+		}
+		//note - some courses may have meeting times with all values unused.
+		// For example, music courses often don't specify times.
+		Intervals<Time> meetingDays = meetingTimes();
+		for(Interval<Time> i : meetingDays.intervals){
+			result.addInterval(i);
+		}
+		return result;
+	}
+	/**
+	 * Return times with:
+	 * 		day set to the lab day,
+	 * 		hours and min set to the correct values, 
+	 * 		sec may or may not be unused,
+	 * 		and year/month unused.
+	 * 
+	 * May return null.
+	 * 
+	 * @return
+	 */
+	public Interval<Time> labTime(){
 		if(labTime != null){
 			labTime[0].day = labDay;
 			labTime[1].day = labDay;
@@ -138,27 +166,52 @@ public class Course implements ScheduleElement{
 			labTime[0].year = Time.UNUSED;
 			labTime[1].month = Time.UNUSED;
 			labTime[1].year = Time.UNUSED;
-			result.addInterval(new Interval<Time>(labTime[0], labTime[1]));
+			return new Interval<Time>(labTime[0], labTime[1]);
 		}
-		if(examTime != null){
-			result.addInterval(new Interval<Time>(examTime[0], examTime[1]));
-		}
-
-		//note - some courses may have meeting times with all values unused.
-		// For example, music courses often don't specify times.
-		if(meetingDays != null && meetingTime != null){
-			for (int day : meetingDays){
-				Time s = new Time(meetingTime[0]);
-				Time f = new Time(meetingTime[1]);
-				s.advanceToNext(day);
-				f.advanceToNext(day);
-				result.addInterval(new Interval<Time>(s,f));
-			}
-		}
-		return result;
-
-
+		return null;
 	}
+	/**
+	 * Return times with the exact 
+	 * year, month, day, hour, and min
+	 * 		(sec may be unused)
+	 * may return null
+	 * @return
+	 */
+	public Interval<Time> examTime(){
+		if(examTime == null){
+			return null;
+		}
+		return new Interval<Time>(examTime[0], examTime[1]);
+	}
+	
+	/**
+	 * find a list of all the intervals
+	 *  representing all the meeting times for
+	 *  this course.
+	 *  
+	 * Each interval in the list represents one day, so it will have times
+	 * of the form 
+	 * 		year:UNUSED month:UNUSED day:0-6 hour:given min:given sec:UNUSED or given.
+	 * @return
+	 */
+	public Intervals<Time> meetingTimes(){
+		if(meetingDays != null && meetingTime != null){
+			Intervals<Time> result = new Intervals<Time>();
+			for (int day : meetingDays){
+				Time start = new Time(meetingTime[0]);
+				Time finish = new Time(meetingTime[1]);
+				start.advanceToNext(day);
+				finish.advanceToNext(day);
+				result.addInterval(new Interval<Time>(start,finish));
+			}
+			return result;
+		}
+		else{
+			return null;
+		}
+	}
+	
+	
 	public boolean overlaps(ScheduleElement other){
 		if(other instanceof Course){
 			return this.allTakenTimes().overlaps(((Course)other).allTakenTimes());
