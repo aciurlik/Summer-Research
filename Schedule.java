@@ -24,18 +24,10 @@ public class Schedule {
 
 		CourseList l = CourseList.testList();
 		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
-
+		result.setLanguagePrefix(new Prefix("SPN", "201"));
+		
+		
 		//Class One 
-		int wantedMajor=0;
-		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
-			if(ListOfMajors.testList().get(i).name.equals("Psychology")){
-				wantedMajor=i;
-			}
-		}
-		
-	
-		
-		
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		a.setTaken(true);
 		result.addScheduleElement(a, result.semesters.get(0));
@@ -47,9 +39,9 @@ public class Schedule {
 		result.semesters.get(0).add(b);
 		
 		//Class Three 
-		Course c = new Course(new Prefix("FRN", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
+		Course c = new Course(new Prefix("FRN", 201), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
 		c.setTaken(true);
-		result.semesters.get(0).add(c);
+		//result.semesters.get(0).add(c);
 		
 		
 		//Class Four
@@ -60,7 +52,7 @@ public class Schedule {
 
 		
 		result.setCLP(10);
-		result.setLanguagePrefix(new Prefix("FRN", 120));
+		
 		
 		return result;
 	}
@@ -76,7 +68,7 @@ public class Schedule {
 	 * @param currentSemester
 	 */
 	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
-
+		
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
 		//add the GERs major
@@ -85,7 +77,7 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
-		this.addMajor(masterList.getGERMajor(this.languagePrefix, CourseList.BA));
+		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
@@ -418,6 +410,9 @@ public class Schedule {
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		this.languagePrefix = languagePrefix;
+		majorsList.remove(0);
+		addAtMajor(masterList.getGERMajor(languagePrefix, this.determineGER()), 0);
+		
 	}
 
 

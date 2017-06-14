@@ -45,7 +45,8 @@ public class Driver{
 	
 	public static Driver testDriver(){
 		Driver results = new Driver();
-		testSchedule = Schedule.testSchedule();		
+		testSchedule = Schedule.testSchedule();	
+		
 		testSchedule.setDriver(results);
 		int wantedMajor=0;
 		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){

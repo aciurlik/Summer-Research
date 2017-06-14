@@ -389,7 +389,6 @@ public class CourseList  {
 						//For BS, the MR requirement is predefined
 						r = (Requirement)Requirement.readFrom("1 of (MTH 150, 2 of (MTH 120, MTH 145))");
 						r.setName("MR");
-						System.out.println(r.name);
 						includeDefaultPrefixes = false;
 						break;
 					case CourseList.BM:
@@ -513,6 +512,7 @@ public class CourseList  {
 	 */
 	public void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
+
 		for(String s : allGERs){
 			HashSet<Prefix> old = this.GERRequirements.get(s);
 			if(old == null){
@@ -527,21 +527,48 @@ public class CourseList  {
 
 
 	public Requirement FLRequirement(Prefix p, int degreeType){
+		int standard=0;
 		Requirement	r= new Requirement();
 		r.setName("FL");
-		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
-			for(Prefix prefix : GERRequirements.get("FL")){
-				if(!prefix.getSubject().equals(p.getSubject())){
-					r.choices.add(new TerminalRequirement(prefix));
-				}
-
-			}
-		}
 		if(degreeType == CourseList.BS){
-			for(Prefix prefix : GERRequirements.get("FL")){
-				r.choices.add(new TerminalRequirement(prefix));
-			}
+			standard =120;
 		}
+		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
+			standard=201;
+		}
+		
+		
+		if (p != null){
+
+			r.choices.add(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
+
+		}
+		
+		if(p==null || !p.getSubject().equals("GRK") ) {
+
+			r.choices.add(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
+		}
+		if(p==null || !p.getSubject().equals("LTN")){
+
+			r.choices.add(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
+		}
+		if(p==null || !p.getSubject().equals("JPN")){
+
+			r.choices.add(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
+		}
+		if(p==null || !p.getSubject().equals("FRN")){
+
+			r.choices.add(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
+		}
+		if(p==null || !p.getSubject().equals("SPN")){
+
+			r.choices.add(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
+		}
+		if(p==null || !p.getSubject().equals("CHN")){
+
+			r.choices.add(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
+		}
+		
 
 		return r;
 	}
@@ -603,11 +630,15 @@ public class CourseList  {
 							Course newDuplicateCourse = Course.readFromFurmanData(data);
 							if( newDuplicateCourse != duplicateCourse){
 								if(duplicateCourse != null){
+
+							
+
 									this.add(duplicateCourse);	
 								}
 								duplicateCourse=newDuplicateCourse;
 							}
 							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+
 						}
 					}
 					//Also, see if this course satisfies any GERs.
@@ -640,6 +671,7 @@ public class CourseList  {
 			br.close();
 			if(lastCourse != null){
 				this.add(lastCourse);
+
 			}
 			if(duplicateCourse != null){
 				this.add(duplicateCourse);
@@ -648,7 +680,7 @@ public class CourseList  {
 			e.printStackTrace();
 			return;
 		}
-		
+
 	}
 
 	//////////////////////////////

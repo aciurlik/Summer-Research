@@ -401,6 +401,7 @@ public class TerminalRequirement extends Requirement {
 				"MTH > 150 < 200",
 				"MTH < 200 > 150",
 				"MTH <= 200 >= 150",
+
 				"MTH >= 150 <= 200",
 				"2 of MTH>100"
 		};
@@ -408,7 +409,7 @@ public class TerminalRequirement extends Requirement {
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		taken.add(new Prefix("MTH", 150));
 		//taken.add(new Prefix("MTH", 120));
-		
+
 		
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
