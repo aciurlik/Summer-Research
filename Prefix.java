@@ -14,6 +14,7 @@ public class Prefix implements Comparable<Prefix>{
 		this.subject = subject;
 		this.courseNumber = courseNumber;
 	}
+	
 	public Prefix(String subject, int courseNumber){
 		this.subject = subject;
 		this.courseNumber = "" + courseNumber;

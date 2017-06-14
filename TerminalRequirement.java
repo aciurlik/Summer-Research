@@ -318,10 +318,11 @@ public class TerminalRequirement extends Requirement {
 				"MTH < 200 > 150",
 				"MTH <= 200 >= 150",
 				"MTH >= 150 <= 200"
+				
 		};
 		
 		HashSet<Prefix> taken = new HashSet<Prefix>();
-		taken.add(new Prefix("MTH", 150));
+		taken.add(new Prefix("MTH", 300));
 		
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
