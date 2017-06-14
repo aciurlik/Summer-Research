@@ -577,6 +577,7 @@ public class CourseList  {
 	public void addCoursesIn(File furmanCoursesFile){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
+		Course duplicateCourse =null;
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(furmanCoursesFile));
@@ -598,14 +599,27 @@ public class CourseList  {
 						this.add(lastCourse);
 					}
 					lastCourse = Course.readFromFurmanData(data);
+					if(data.get(0).contains("Summer")){
+						if(lastCourse.meetingTime==null || lastCourse.meetingTime[0].isAllUnused()  ){
+							Course newDuplicateCourse = Course.readFromFurmanData(data);
+							if( newDuplicateCourse != duplicateCourse){
+								if(duplicateCourse != null){
+									this.add(duplicateCourse);
+									
+								}
+								duplicateCourse=newDuplicateCourse;
+
+
+							}
+
+							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+							
+						}
+					}
 					//Also, see if this course satisfies any GERs.
 					String GERs = data.get(14);
 					if(!GERs.equals("")){
 						setCourseSatisfiesGER(data.get(14), lastCourse);
-					}
-					String prerequsitesString = data.get(16);
-					if(!prerequsitesString.equals("")){
-						this.addRawPrereq(lastCourse, prerequsitesString.trim());
 					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
@@ -630,10 +644,18 @@ public class CourseList  {
 				line = br.readLine();
 			}
 			br.close();
+			if(lastCourse != null){
+				this.add(lastCourse);
+				
+			}
+			if(duplicateCourse != null){
+				this.add(duplicateCourse);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+		
 	}
 
 	//////////////////////////////

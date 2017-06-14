@@ -519,6 +519,7 @@ public class Driver{
 
 	public boolean userRequestError(ScheduleError s){
 		String header=null;
+		//instruct will be displayed as the main warning message
 		String instruct= null; 
 		if(s.error.equals(ScheduleError.overloadError)){
 			header = "Overload Error";
@@ -526,7 +527,18 @@ public class Driver{
 		}
 		if(s.error.equals(ScheduleError.overlapError)){
 			header = "Overlap Error";
-			instruct = (s.duplicateCourses[0].getDisplayString() + " overlaps " + s.duplicateCourses[1].getDisplayString());
+			instruct = (s.elementList[0].getDisplayString() + "\n    overlaps \n" + s.elementList[1].getDisplayString());
+			ArrayList<String> issueStrings = new ArrayList<String>();
+			if(s.meetingOverlap){
+				issueStrings.add("meeting times");
+			}
+			if(s.examOverlap){
+				issueStrings.add( "exams");
+			}
+			if(s.labOverlap){
+				issueStrings.add("labs");
+			}
+			instruct += "\nIsses in :" + issueStrings.toString();
 		}
 		if(s.error.equals(ScheduleError.preReqError)){
 			header = "Prerequisites Error";
@@ -538,7 +550,7 @@ public class Driver{
 		//}
 		if(s.error.equals(ScheduleError.duplicateError)){
 			header = "Duplicate Error";
-			instruct = s.duplicateCourses[0].getDisplayString() + " duplicates " +s.duplicateCourses[1].getDisplayString();
+			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);

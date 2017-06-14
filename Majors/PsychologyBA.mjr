@@ -1,0 +1,11 @@
+Psychology-BA
+REQ:{Number to Choose: {1} Choices: {{PSY-111}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{PSY-201}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{PSY-202}} DDN: {0} Requirement Name:{null}}
+REQ:{Number to Choose: {1} Choices: {{PSY-215}{PSY-218}{PSY-314}{PSY-318}} DDN: {1} Requirement Name:{Applied}}
+REQ:{Number to Choose: {1} Choices: {{PSY-320}{PSY-321}{PSY-323}} DDN: {1} Requirement Name:{Biopsychology}}
+REQ:{Number to Choose: {1} Choices: {{PSY-211}{PSY-213}} DDN: {1} Requirement Name:{Development}}
+REQ:{Number to Choose: {1} Choices: {{PSY-322}{PSY-324}} DDN: {1} Requirement Name:{Learning and Cognition}}
+REQ:{Number to Choose: {1} Choices: {{PSY-212}{PSY-214}{PSY-216}} DDN: {1} Requirement Name:{Social or Health}}
+REQ:{Number to Choose: {1} Choices: {{PSY-403}{PSY-404}{PSY-413}{PSY-414}{PSY-415}{PSY-418}} DDN: {1} Requirement Name:{Capstone}}
+REQ:{Number to Choose: {2} Choices: {{PSY-215}{PSY-218}{PSY-314}{PSY-318}{PSY-320}{PSY-321}{PSY-323}{PSY-211}{PSY-213}{PSY-322}{PSY-324}{PSY-212}{PSY-214}{PSY-216}{PSY-403}{PSY-404}{PSY-413}{PSY-414}{PSY-415}{PSY-418}} DDN: {1} Requirement Name:{Elective}}

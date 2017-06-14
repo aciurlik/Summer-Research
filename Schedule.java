@@ -692,7 +692,7 @@ public class Schedule {
 						ScheduleElement[] results = {e, e1};
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
-						duplicate.setDuplicateCourses(results);
+						duplicate.setElementList(results);
 						return(!this.userOverride(duplicate));
 					}
 				}
@@ -701,7 +701,7 @@ public class Schedule {
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 				ScheduleElement[] result = {e, e1};
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
-				duplicate.setDuplicateCourses(result);
+				duplicate.setElementList(result);
 				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
 				return (!this.userOverride(duplicate));
 			}
@@ -721,15 +721,14 @@ public class Schedule {
 	/**
 	 * Check all semesters to see if any elements in them
 	 * have overlapping times (are taken at the same time)
+	 * This method will not cause any errors to be displayed to the user.
 	 */
-	public boolean checkOverlap(){
+	public ArrayList<ScheduleError> checkOverlap(){
+		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
 		for(Semester s : semesters){
-			if(s.checkOverlap(null)){
-				return s.checkOverlap(null);
-			}
-
+			result.addAll(s.checkAllOverlap());
 		}
-		return false;
+		return result;
 	}
 
 

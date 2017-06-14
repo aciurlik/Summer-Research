@@ -126,7 +126,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			SemesterPanel foundp = this.findPanelFor(s);
 			
 			if(foundp != null){
-				foundp.updatePanel();
+				foundp.updatePanel(s);
 				scrollPanel.add(foundp, gbc);
 				gbc.gridx++;
 			}
