@@ -18,6 +18,7 @@ public class Course implements ScheduleElement{
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
 	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
+	public boolean taken;
 
 	String professor;
 
@@ -279,8 +280,20 @@ public class Course implements ScheduleElement{
 		if(this.meetingTime != null){
 			result.append( this.meetingTime[0].clockTime() + " ");
 		}
-		result.append(this.professor);
+		if(professor != null){
+			result.append(this.professor);
+		}
 		return result.toString();
+	}
+
+
+
+	public boolean isTaken() {
+		return taken;
+	}
+
+	public void setTaken(boolean taken) {
+		this.taken = taken;
 	}
 
 	@Override
