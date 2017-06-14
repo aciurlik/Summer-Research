@@ -1,12 +1,11 @@
 import java.util.HashSet;
 
 public class ScheduleError {
-	String error = null; 
-	ScheduleElement[] duplicateCourses = null;
-	Prefix offendingPCourse = null;
-//	Prefix missingCourse = null; 
-	ScheduleElement offendingCourse = null;
-	HashSet<Prefix> neededCourses = null;
+	String error; 
+	ScheduleElement[] elementList;
+	Prefix offendingPrefix;
+	ScheduleElement offendingCourse;
+	HashSet<Prefix> neededCourses;
 	int overloadLimit = 0;
 	String instructions;
 	public static final String duplicateError = "Duplicate Error";
@@ -14,14 +13,15 @@ public class ScheduleError {
 	public static final String overlapError = "Overlap Error";
 	public static final String overloadError = "Overload Error";
 	public static final String preReqErrorPrefix = "Prerequisite Error";
+	
+	boolean meetingOverlap = false;
+	boolean examOverlap = false;
+	boolean labOverlap = false;
 
 	 
 	public ScheduleError(String s){
 		this.error = s;
 	}
-	
-	
-
 
 	public String getError() {
 		return error;
@@ -33,23 +33,23 @@ public class ScheduleError {
 	}
 
 
-	public ScheduleElement[] getDuplicateCourses() {
-		return duplicateCourses;
+	public ScheduleElement[] getElementList() {
+		return elementList;
 	}
 
 
-	public void setDuplicateCourses(ScheduleElement[] duplicateCourses) {
-		this.duplicateCourses = duplicateCourses;
+	public void setElementList(ScheduleElement[] newList) {
+		this.elementList = newList;
 	}
 
 
-	public Prefix getCourse() {
-		return offendingPCourse;
+	public Prefix getPrefix() {
+		return offendingPrefix;
 	}
 
 
-	public void setCourse(Prefix course) {
-		this.offendingPCourse = course;
+	public void setPrefix(Prefix p) {
+		this.offendingPrefix = p;
 	}
 
 

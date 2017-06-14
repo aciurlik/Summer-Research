@@ -84,7 +84,7 @@ public class RequirementPanel extends JPanel {
 		String fullText = "";
 		
 		
-		this.percentComplete =(int) Math.round(req.storedPercentComplete * 100); 
+		this.percentComplete =(int) Math.round(req.storedPercentComplete * 100);
 		if(percentComplete > 0 && percentComplete < 100){
 			fullText = "(" + percentComplete + "%)" ;
 			fullText += req.storedCoursesLeft + "left\n";

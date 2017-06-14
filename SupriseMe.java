@@ -6,9 +6,11 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class SupriseMe extends JPanel implements ActionListener {
@@ -35,47 +37,54 @@ public class SupriseMe extends JPanel implements ActionListener {
 		
 
 		ArrayList<Course> getReady = sch.masterList.getCoursesIn(s);
-		Random rand = new Random();
-		c = getReady.get(rand.nextInt(getReady.size()));
-		String string = c.toString();
-		tokens = string.split(delims);
+		if(getReady.size()==0){
+			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+			JOptionPane.showMessageDialog(frame, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+
+		}
+		else{	
+			Random rand = new Random();
+			c = getReady.get(rand.nextInt(getReady.size()));
+			String string = c.toString();
+			tokens = string.split(delims);
 
 
-		this.setLayout(new BorderLayout());
-		//this.setPreferredSize(new Dimension(500, 500));
-		this.setBackground(FurmanOfficial.darkPurple);
-		JLabel suprise = new JLabel("FEELING LUCKY?", JLabel.CENTER);
+			this.setLayout(new BorderLayout());
+			//this.setPreferredSize(new Dimension(500, 500));
+			this.setBackground(FurmanOfficial.darkPurple);
+			JLabel suprise = new JLabel("FEELING LUCKY?", JLabel.CENTER);
 
-		suprise.setFont(FurmanOfficial.bigHeaderFont);
-		suprise.setForeground(Color.white);
-		this.add(suprise, BorderLayout.NORTH);
+			suprise.setFont(FurmanOfficial.bigHeaderFont);
+			suprise.setForeground(Color.white);
+			this.add(suprise, BorderLayout.NORTH);
 
-		newCourse = new JPanel();
-		newCourse.setBackground(FurmanOfficial.grey);
-		//	newCourse.setPreferredSize(new Dimension(300, 300));
-		this.add(newCourse, BorderLayout.CENTER);
-
-
-
-		takeIt = new JPanel();
-		takeIt.setBackground(this.getBackground());
-		doIt = new JButton("Take the Challenge!");
-		doIt.setActionCommand(MenuOptions.Challenge);
-		doIt.addActionListener(this);
-		takeIt.add(doIt);
-		this.add(takeIt, BorderLayout.SOUTH);
-		//sup = new JLabel(c.toString());
+			newCourse = new JPanel();
+			newCourse.setBackground(FurmanOfficial.grey);
+			//	newCourse.setPreferredSize(new Dimension(300, 300));
+			this.add(newCourse, BorderLayout.CENTER);
 
 
 
-		frame.add(this);
-		frame.pack();
-		this.revalidate();
-		this.repaint();
-		frame.revalidate();
-		frame.repaint();
-		frame.setVisible(true);
+			takeIt = new JPanel();
+			takeIt.setBackground(this.getBackground());
+			doIt = new JButton("Take the Challenge!");
+			doIt.setActionCommand(MenuOptions.Challenge);
+			doIt.addActionListener(this);
+			takeIt.add(doIt);
+			this.add(takeIt, BorderLayout.SOUTH);
+			//sup = new JLabel(c.toString());
 
+
+
+			frame.add(this);
+			frame.pack();
+			this.revalidate();
+			this.repaint();
+			frame.revalidate();
+			frame.repaint();
+			frame.setVisible(true);
+
+		}
 
 	}
 
@@ -98,37 +107,15 @@ public class SupriseMe extends JPanel implements ActionListener {
 				newCourse.add(sup);
 				try{
 					Thread.sleep(300);
-					newCourse.revalidate();
-					newCourse.repaint();
-					this.revalidate();
-					this.repaint();
-					frame.revalidate();
-					frame.repaint();
 				}
 				catch(InterruptedException p){
 					p.printStackTrace();
 				}
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
+				
 				frame.add(this);
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
+				
 				frame.pack();
 
-				newCourse.revalidate();
-				newCourse.repaint();
-				this.revalidate();
-				this.repaint();
-				frame.revalidate();
-				frame.repaint();
 				frame.setVisible(true);
 
 			}

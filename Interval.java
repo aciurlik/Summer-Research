@@ -80,6 +80,13 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 			return first;
 		}
 	}
+	
+	public boolean contains(T other){
+		if(this.start.compareTo(other)==-1 && this.end.compareTo(other)==1){
+			return true;
+		}
+		return false;
+	}
 
 	public static void main(String[] args){
 		Time t1 = new Time(2000, 1, 1, 0,0);

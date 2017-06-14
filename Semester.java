@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 
 
 public class Semester implements Comparable<Semester>{
@@ -34,58 +35,83 @@ public class Semester implements Comparable<Semester>{
 	}
 
 	/**
-	 * Check for any overlap among the Courses in this semester.
-	 * If addition is not equal to null, check if there would be
-	 *   overlap were addition to be added.
+	 * Check for any overlap in this semester with the new element.
+	 * 
+	 * true if overlap is found.
 	 * 
 	 * @param addition
 	 */
+	
 	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
-
+		
+		if(addition == null || ( ! (addition instanceof Course))){
+			return false;
+		}
+		ArrayList<Course> courses = allCourses();
+		for(int i= 0; i<courses.size(); i++){
+			if(courses.get(i).overlaps(addition)){
+				ScheduleError overlaped = makeOverlapError(courses.get(i), (Course) addition);
+				if(!this.schedule.userOverride(overlaped)){
+					return true; //we found an overlap, and the user didn't override
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check all courses in this semester for overlap issues.
+	 * 
+	 * Return a list of all errors found, size 0 if none found.
+	 * @return
+	 */
+	public ArrayList<ScheduleError> checkAllOverlap(){
+		ArrayList<ScheduleError> overlaps = new ArrayList<ScheduleError>();
+		ArrayList<Course> courses = allCourses();
+		for (int i = 0; i < courses.size() ; i ++){
+			for(int j = i+1; j < courses.size() ; j ++){
+				if(courses.get(i).overlaps(courses.get(j))){
+						ScheduleError overlapped = makeOverlapError(courses.get(i), courses.get(j));
+						overlaps.add(overlapped);
+				}
+			}
+		}
+		return overlaps;
+	}
+	
+	private ArrayList<Course> allCourses(){
 		ArrayList<Course> courses = new ArrayList<Course>();
 		for (ScheduleElement e : this.elements){
 			if(e instanceof Course){
 				courses.add((Course)e);
 			}
 		}
-		//	if(addition != null && (addition instanceof Course)){
-		//		courses.add((Course) addition);
-		//}
-		int overlapCounter = 0;
-		if(addition == null){
-			for (int i = 0; i < courses.size() ; i ++){
-				for(int j = i+1; j < courses.size() ; j ++){
-					if(courses.get(i).overlaps(courses.get(j))){
-						overlapCounter++;
-						if(overlapCounter > 0){
-							Course[] overlap ={courses.get(i), courses.get(j) };
-							ScheduleError overlaped = new ScheduleError(ScheduleError.overlapError);
-							overlaped.setDuplicateCourses(overlap);
-							//overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
-							return(!this.schedule.userOverride(overlaped));
-						}
+		return courses;
+	}
 
-					}
-				}
-			}
+	/**
+	 * Given courses where c1.overlaps(c2) is true.
+	 * @param c1
+	 * @param c2
+	 * @return
+	 */
+	private ScheduleError makeOverlapError(Course c1, Course c2){
+		ScheduleError result = new ScheduleError(ScheduleError.overlapError);
+		Course[] overlap = new Course[]{c1, c2};
+		result.setElementList(overlap);
+		
+		//Figure out whether it's lab, meeting, or exam that overlaps.
+		if(c1.examTime().overlaps(c2.examTime())){
+			result.examOverlap = true;
 		}
-		if(addition != null && addition instanceof Course){
-			for(int i= 0; i<courses.size(); i++){
-				if(courses.get(i).overlaps(addition)){
-					overlapCounter++;
-					if(overlapCounter > 0){
-						Course[] overlap ={courses.get(i), (Course) addition };
-						ScheduleError overlaped = new ScheduleError(ScheduleError.overlapError);
-						overlaped.setDuplicateCourses(overlap);
-						//overlaped.setInstructions(overlap[0].getDisplayString() + " overlaps " + overlap[1].getDisplayString());
-						return(!this.schedule.userOverride(overlaped));
-					}
-				}
-			}
-
+		if(c1.labTime().overlaps(c2.labTime())){
+			result.labOverlap = true;
 		}
-		return false;
+		if(c1.meetingTimes().overlaps(c2.meetingTimes())){
+			result.meetingOverlap = true;
+		}
+		return result;
 	}
 
 
