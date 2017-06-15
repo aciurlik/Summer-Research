@@ -138,8 +138,10 @@ public class Course implements ScheduleElement{
 		//note - some courses may have meeting times with all values unused.
 		// For example, music courses often don't specify times.
 		Intervals<Time> meetingDays = meetingTimes();
-		for(Interval<Time> i : meetingDays.intervals){
-			result.addInterval(i);
+		if(meetingDays != null){
+			for(Interval<Time> i : meetingDays.intervals){
+				result.addInterval(i);
+			}
 		}
 		return result;
 	}

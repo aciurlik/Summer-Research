@@ -61,7 +61,9 @@ public class Major {
 	}
 
 	public static Major testMajor(){
-		Major result = new Major("Math-BS");
+		Major result = new Major("Math");
+		result.degreeTypes.add(CourseList.BA);
+		result.degreeTypes.add(CourseList.BS);
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 250)}, 1));
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 260)}, 1));
 		result.addRequirement(new Requirement(new Prefix[]{
@@ -119,12 +121,25 @@ public class Major {
 	}
 
 	
-	
-
+  
+  
+  
+  
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
 		result.append(typeString + this.majorType + "\n");
+		result.append(degreeTypeString);
+		String degree="";
+		for(int i: degreeTypes){
+			
+			degree = degree + (CourseList.getDegreeTypeString(i) + ", ");
+			
+		}
+		String toAppend = degree.substring(0, degree.length()-2);
+		result.append(toAppend);
+		result.append("\n");
+		
 		for (int i = 0; i  <this.reqList.size() ; i ++){
 			Requirement r = this.reqList.get(i);
 			result.append("R" + i);

@@ -54,15 +54,12 @@ public class MenuOptions {
 	public static final  String removeMinor = "Remove Minor";
 	public static final  String exploreMayX = "Explore MayX Opportunities";
 	public static final  String help ="Help";
+	public static String checkAllErrors = "Check all Errors";
 
-	//Duplicate Errors
+
 
 	
-	//CourseList
-	//GER
-	public static final String humanBehavior = "HB";
-	public static final String nautralWorld = "NW";
-	public static final String	nautralWorldLab = "NWL";
+	
 	
 	
 }

@@ -49,7 +49,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	private JButton changeCourse;
 	final static int height=300;
 	JTextArea notes = new JTextArea();
-	
+	JPanel menuPanel;
+
 
 
 	public int preferredHeight = 300;
@@ -118,9 +119,13 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		topPanel.add(PanelforButtons, BorderLayout.WEST);
 
 		topPanel.setBackground(defaultPanel.getBackground());
-	//	topPanel.add(fallSpring, BorderLayout.CENTER);
-		
+		//	topPanel.add(fallSpring, BorderLayout.CENTER);
 
+		menuPanel = new JPanel();
+		menuPanel.setOpaque(false);
+		menuPanel.setLayout(new BorderLayout());
+		topPanel.add(menuPanel);
+		
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,height));
 		this.add(defaultPanel);
@@ -217,12 +222,15 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	//Redraw this panel based on the semester sem.
 
 	public void updatePanel(Semester sem){
+		
 		this.sem = sem;
-  JLabel dropLabel = newDropLabel();
+		JLabel dropLabel = newDropLabel();
+		menuPanel.removeAll();
 
-    
+
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
+		
 
 
 		//Figure out the season and add it
@@ -239,26 +247,24 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		fallSpring.setText(season);
 
 		topPanel.setBackground(defaultPanel.getBackground());
-		
+
 
 		defaultPanel.add(topPanel, BorderLayout.CENTER);
 		//Add all Schedule elements
 		defaultPanel.add(fallSpring);
-		JPanel menuPanel = new JPanel();
-		menuPanel.setOpaque(false);
-		menuPanel.setLayout(new BorderLayout());
-
-		SemesterMenuBar menu = new SemesterMenuBar(this, defaultPanel);
-		menuPanel.add(menu, BorderLayout.NORTH);
-		topPanel.add(menuPanel);
 		
+
+		SemesterMenuBar menu = new SemesterMenuBar(this);
+		menuPanel.add(menu, BorderLayout.NORTH);
+		
+
 
 		for (ScheduleElement e : this.sem.elements){
 			ScheduleElementPanel element = new ScheduleElementPanel(e, this);
 			defaultPanel.add(element);
 			element.updatePanel();
 		}
-		
+
 
 
 
@@ -275,7 +281,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			for (int i= 0; i<DropsNeeded-1; i++){
 				JLabel emptyLabel = new JLabel();
 				defaultPanel.add(emptyLabel);
-				
+
 			}
 
 
@@ -309,7 +315,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			defaultPanel.add(scrollPane);
 			notes.getDocument().addDocumentListener(this);
-		
+
 		}
 		topPanel.setBackground(this.correctBackgroundColor(sem));
 		defaultPanel.setBackground(this.correctBackgroundColor(this.sem));
@@ -447,7 +453,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
@@ -458,7 +464,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
