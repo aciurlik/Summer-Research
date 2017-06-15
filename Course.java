@@ -22,7 +22,7 @@ public class Course implements ScheduleElement{
 
 	String professor;
 
-	HashSet<Requirement> reqsSatisfied;
+	HashSet<Requirement> oldEnemyList;
 	HashSet<Requirement> userSpecifiedReqs;
 
 
@@ -42,7 +42,7 @@ public class Course implements ScheduleElement{
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
 		userSpecifiedReqs = new HashSet<Requirement>();
-		reqsSatisfied = new HashSet<Requirement>();
+		oldEnemyList = new HashSet<Requirement>();
 	}
 
 	/**
@@ -51,22 +51,15 @@ public class Course implements ScheduleElement{
 	 * @param sectionNumber
 	 */
 	public Course(Prefix prefix, String sectionNumber, String professor, int[] meetingDays, int creditHours, SemesterDate semester ){
-		this.creditHours=creditHours;
-		this.coursePrefix=prefix;
-		this.semester = semester;
-		this.professor = professor;
-		this.meetingDays = meetingDays;
-		this.sectionNumber = sectionNumber;
-		userSpecifiedReqs = new HashSet<Requirement>();
-		reqsSatisfied = new HashSet<Requirement>();
+		this(prefix, semester, professor, meetingDays, creditHours, sectionNumber);
 	}
 
+	
 	public void setName(String name){
 		this.name = name;
 	}
 
 	public Prefix getPrefix(){
-
 		return coursePrefix;
 	}
 
@@ -88,6 +81,8 @@ public class Course implements ScheduleElement{
 		}
 		return result;
 	}
+	
+	
 
 	///////////////////
 	///////////////////
@@ -221,21 +216,6 @@ public class Course implements ScheduleElement{
 			return false;
 		}
 	}
-	/**
-	 * Clear the list of requirements that this course satisfies.
-	 * Will not touch user specified requirements.
-	 */
-	public void clearReqsSatisfied(){
-		this.reqsSatisfied = new HashSet<Requirement>();
-	}
-	/**
-	 * Adds this requirement to the list of requirements satisfied by this course.
-	 * Automatically ignores duplicates.
-	 * @param req
-	 */
-	public void satisfies(Requirement req){
-		this.reqsSatisfied.add(req);
-	}
 
 	/**
 	 * If the user declares that this course will satisfy this requirement, 
@@ -252,13 +232,30 @@ public class Course implements ScheduleElement{
 	 * @return
 	 */
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(){
-		ArrayList<Requirement> result = new ArrayList<Requirement>(reqsSatisfied);
+	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded){
+		HashSet<Requirement> result = new HashSet<Requirement>();
+		for(Requirement r : loaded){
+			if(r.isSatisfiedBy(this.coursePrefix)){
+				result.add(r);
+			}
+		}
+		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
+		if(! /*sets equal*/ ((enemies.containsAll(oldEnemyList)) && oldEnemyList.containsAll(enemies)) ){
+			//the enemies changed. TODO
+			//ask the user which requirements should now be satisfied by this course.
+			System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
+					+ enemies.toString() + "\n"
+					+ " Which one should get the credit hours?");
+			userSpecifiedReqs = new HashSet<Requirement>();
+			this.oldEnemyList = enemies;
+		}
+		result.removeAll(oldEnemyList);
 		for(Requirement specified : userSpecifiedReqs){
 			result.add(specified);
 		}
-		return result;
+		return new ArrayList<Requirement>(result);
 	}
+	
 
 
 	@Override

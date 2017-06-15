@@ -121,9 +121,6 @@ public class Major {
 	
 	
 
-	static final String typeString = "Type: ";
-	static final String degreeTypeString = "Possible Degree(s):";
-	static final String reqGraphString = "Collection of Requirement Enemies:";
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
@@ -152,7 +149,7 @@ public class Major {
 			else{
 				ArrayList<Integer> enemies = new ArrayList<Integer>();
 				for(int j = i+1 ; j < reqList.size(); j ++){
-					if(!RequirementGraph.doesPlaysNice(reqList.get(i), reqList.get(j))){
+					if(!RequirementGraph.doesPlayNice(reqList.get(i), reqList.get(j))){
 						enemies.add(j);
 					}
 				}
@@ -168,9 +165,97 @@ public class Major {
 		}
 		return result.toString();
 	}
-
+	static final String typeString = "Type: ";
+	static final String degreeTypeString = "Possible Degree(s):";
+	static final String reqGraphString = "Collection of Requirement Enemies:";
 
 	/**
+	 * 
+	 * SYNTAX AND FORMAT OF MAJOR FILES.
+	 * 
+	 * Example file:
+	 * 
+	 * Math-BS
+	 * Type: Major
+	 * Possible Degree(s): BA, BS
+	 * R0:(MTH-250)
+	 * R1:(MTH-260)
+	 * R2:(MTH-350, MTH-450)
+	 * R3:(MTH-360, MTH-460)
+	 * R4 MTH Electives:7 of (MTH-151, MTH-160, MTH-250, MTH-320, MTH-335, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, or MTH-504)
+	 * R5 MR: 1 of (MTH-150, 2 of (MTH 145, MTH 120) )
+	 * Collection of Requirement Enemies:
+	 * R1:R2
+	 * R3:4
+	 * R4:4
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * Example file with explanations:
+	 * 
+	 * Math-BS   ---> This is the name of the major.
+	 * 
+	 * Type: Major ---> This optional line can specify Major, Minor, or Track. 
+	 * 			------>  The string 'Type: ' must be exact.
+	 * 
+	 * Possible Degree(s): BA, BS ---> This optional line can specify which GER 
+	 * 						--------->   types may be associated with this major. 
+	 * 						--------->  Values should be separated by commas, but it ignores spacing.
+	 * 						---------> The string "Possible Degree(s):" should be exact.
+	 * 
+	 * R0:(MTH-250)  --> This is one of the requirements for this major. See the Requirement class saving and reading tutorial
+	 *  		   ---->  for an explanation of valid requirements.
+	 *  
+	 * R1:(MTH-260)
+	 * R2:(MTH-350, MTH-450)
+	 * R3:(MTH-360, MTH-460)
+	 * R4 MTH Electives:7 of (MTH-151, MTH-160, MTH-250, MTH-320, MTH-335, MTH-337, MTH-340, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, MTH-450, MTH-451, MTH-460, MTH-461, or MTH-504)
+	 *     				------>This requirement has a name associated with it.
+	 *     				------> The name is defined to be all characters before the colon, but after the first space.
+	 *     				------>  So, "R5  MYNAME: VALIDREQUIREMENTSTRING"
+	 *     				------>  would make a requirement with a name ' MYNAME', not 'MYNAME'. 
+	 *     
+	 * R5 MR: 1 of (MTH-150, 2 of (MTH 145, MTH 120) )
+	 * 					------> This requirement has a name of MR and has an unnamed sub-requirement.
+	 * 
+	 * Collection of Requirement Enemies: --> this string must be exact, and it marks the beginning of the 
+	 * 								-----> portion of the Requirement Graph stored by this major.
+	 * 								-----> The requirement graph specifies which requirements are enemies,
+	 * 								-----> meaning that a course satisfying one cannot also satisfy the other
+	 * 								-----> at the same time. For example, if r1 is "1 of (MTH-360, MTH 460)" and
+	 * 								-----> r2 is the MTH elective requirement, the course MTH 360 might satisfy both
+	 * 								-----> r1 and r2, but it is not allowed to do so. This means that r1 and r2 are 
+	 * 								-----> enemies.
+	 * 
+	 * R1:R2
+	 * R3:4 -----> Enemies may also be specified by friend groups. A requirement with a friend group
+	 * 		-----> is automatically enemies with any other requirement that has a friend group, unless 
+	 * 		-----> they are in the same friend group. In this example, the friend groups mean that
+	 * 		-----> R3 and R5 are enemies, R4 and R5 are enemies, but R3 and R4 are friends.
+	 * R4:4
+	 * R5:3
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 * @param saveString
 	 * @return
@@ -193,11 +278,12 @@ public class Major {
 			startIndex++;
 		}
 		int i = startIndex;
-		while(lines[i].indexOf("R") == 0){
+		while(i < lines.length && lines[i].indexOf("R") == 0){
 			Requirement newRequirement = readRequirementLine(lines[i]);
 			result.addRequirement(newRequirement);
 			i++;
 		}
+		//Check if there are any reqGraph edges listed after.
 		if(i == lines.length){
 			return result;
 		}
@@ -309,6 +395,8 @@ public class Major {
 		
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
+		
+		System.out.println(RequirementGraph.doesPlayNice(x.reqList.get(1), x.reqList.get(2)));
 		
 		//ListOfMajors m = ListOfMajors.testList();
 		//System.out.println(m.getCompleteMajorsList().get(1).saveString());

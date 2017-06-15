@@ -47,7 +47,8 @@ public class RequirementGraph {
 	/**
 	 * Check if r1 and r2 can share a course or not
 	 */
-	public static boolean doesPlaysNice(Requirement r1, Requirement r2){
+	public static boolean doesPlayNice(Requirement r1, Requirement r2){
+		
 		HashSet<Requirement> outEdges = edges.get(r1);
 		if(outEdges == null){
 			return true;
@@ -56,5 +57,25 @@ public class RequirementGraph {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Looks for enemy requirements in this set.
+	 * If found, it returns the first pair of enemies found.
+	 * Otherwise returns an empty list.
+	 * @param reqs
+	 * @return
+	 */
+	public static HashSet<Requirement> enemiesIn(HashSet<Requirement> reqs){
+		HashSet<Requirement> result = new HashSet<Requirement>();
+		for(Requirement r : reqs){
+			for(Requirement r2 : reqs){
+				if(!doesPlayNice(r, r2)){
+					result.add(r);
+					result.add(r2);
+				}
+			}
+		}
+		return result;
 	}
 }
