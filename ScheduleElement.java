@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * 
@@ -35,9 +36,8 @@ public interface ScheduleElement {
 	/**
 	 * 
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
-	 * if element has no requirements it fulfills (if course), an empty ArrayList is returned
+	 * if element has no requirements it fulfills, an empty ArrayList is returned.
 	 */
-	public ArrayList<Requirement> getRequirementsFulfilled();
-
-
+	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded);
+	
 }

@@ -352,10 +352,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled() {
+	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> r) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>(1);
 		result.add(this);
 		return result;
+	}
+	
+	@Override
+	public String toString(){
+		return this.getDisplayString();
 	}
 
 
@@ -439,6 +444,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
 	 * 
 	 */
+
 
 
 
