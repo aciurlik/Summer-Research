@@ -127,12 +127,10 @@ public class TerminalRequirement extends Requirement {
 				s = s.replaceAll("(?<=[a-zA-Z])(?=\\d)", "-");
 			}
 			if(!s.contains("-")){
-				System.out.println(s);
 				parseException(s, "A terminal requirement has to include a '-', or else both letters and numbers");
 			}
 			String[] split = s.split("-");
 			if(split.length > 2){
-				System.out.println(s);
 				parseException(s,"You need a comma between terminal requirements");
 			}
 			Prefix p = new Prefix(split[0], split[1]); //in case of BLK
@@ -225,66 +223,30 @@ public class TerminalRequirement extends Requirement {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/////////////////////
 	/////////////////////
-	///// Methods overwritten to prevent infinte loops in requirement
+	///// Methods overwritten to prevent infinite loops in requirement
 	/////////////////////
 	/////////////////////
-	
-	
-	
-	@Override
-	public HashSet<Prefix> fastestCompletionSet(HashSet<Prefix> taken) {
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		if(isExact()){
-			if(isSatisfiedBy(taken)){
-				return result;
-			}
-			else{
-				result.add(p);
-				return result;
-			}
-		}
-		else{
-			int numLeft = numLeftAfter(taken);
-			int seed = 0;
-			while(numLeft > 0){
-				Prefix possible = nextPrefixSatisfying(seed);
-				if(!taken.contains(possible)){
-					numLeft--;
-					result.add(possible);
-				}
-				seed ++;
-			}
-			return result;
-		}
-	}
-	
-	/**
-	 * test whether this requirement uses min or max, or instead
-	 * is an exact requirement (a requirement for exactly one prefix)
-	 * @return
-	 */
-	public boolean isExact(){
-		return (!usesMin) && (!usesMax);
-	}
-	
-	/**
-	 * Efficiently calculate how many courses are left after
-	 * taking this set of prefixes.
-	 * @param taken
-	 * @return
-	 */
-	private int numLeftAfter(HashSet<Prefix> taken){
-		if(isExact()){
-			if(taken.contains(p)){
-				return 0;
-			}
-			return 1;
-		}
+	//See Requirement class for explanation of which methods need to
+	// be overwritten
+
+	@Override 
+	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
+		//TODO what if this usesCreditHours? Is that even possible? (I don't think so).
 		int result = numToChoose;
-		for(Prefix p : taken){
-			if(isSatisfiedBy(p)){
+		for(ScheduleElement e : taken){
+			if(isSatisfiedBy(e.getPrefix())){
 				result --;
 				if(result <= 0){
 					return result;
@@ -294,41 +256,7 @@ public class TerminalRequirement extends Requirement {
 		return result;
 	}
 	
-	/**
-	 * Make a prefix that satisfies this terminal requirement
-	 * Should only be used for requirements that use > or <.
-	 * @param seed
-	 * @return
-	 */
-	private Prefix nextPrefixSatisfying(int seed){
-		if(this.usesMin){
-			int possible = this.min + seed + 1;
-			if(usesMax && possible >= max){
-				throw new RuntimeException("No more representative prefixes");
-			}
-			return new Prefix(this.p.getSubject(), possible);
-		}
-		if(this.usesMax){
-			int possible = this.max - seed - 1;
-			if(usesMin && possible <= min){
-				throw new RuntimeException("No more representative prefixes");
-			}
-			return new Prefix(this.p.getSubject(), possible);
-		}
-		else{
-			throw new RuntimeException("You shouldn't need a representative prefix for a terminal requirement that doesn't use max or min.");
-		}
-	}
 	
-	
-	@Override
-	public double percentComplete(HashSet<Prefix> taken) {
-		return 1.0 - (numLeftAfter(taken) * 1.0) / numToChoose;
-	}
-	
-	public boolean isSatisfiedBy(HashSet<Prefix> taken){
-		return numLeftAfter(taken) <= 0;
-	}
 	
 	/**
 	 * Efficiently calculate whether this prefix counts towards
@@ -336,7 +264,10 @@ public class TerminalRequirement extends Requirement {
 	 */
 	@Override
 	public boolean isSatisfiedBy(Prefix p) {
-		if((!usesMax) && (!usesMin)){
+		if(p == null){
+			return false;
+		}
+		if(isExact()){
 			if(p.compareTo(this.p) == 0){
 				return true;
 			}
@@ -358,22 +289,31 @@ public class TerminalRequirement extends Requirement {
 		return false;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	@Override
-	public int compareTo(Requirement o) {
-		if(!(o instanceof TerminalRequirement)){
-			//Terminal requirements are less than other types of requirements.
-			return -1;
-		}
-		TerminalRequirement other = (TerminalRequirement)o;
-		return this.saveString().compareTo(other.saveString());
+
+	/**
+	 * test whether this requirement uses min or max, or instead
+	 * is an exact requirement (a requirement for exactly one prefix)
+	 * @return
+	 */
+	public boolean isExact(){
+		return ((!usesMin) && (!usesMax));
 	}
+	
+	public boolean isSatisfiedBy(ArrayList<ScheduleElement> taken){
+		return minMoreNeeded(taken) <= 0;
+	}
+
+	
+	
+	
+	
+	
+	
+	/////////////////////
+	/////////////////////
+	///// Methods from ScheduleElement
+	/////////////////////
+	/////////////////////
 	
 	@Override
 	public Prefix getPrefix() {
@@ -392,7 +332,24 @@ public class TerminalRequirement extends Requirement {
 		return result;
 	}
 	
+	
+	
+	@Override
+	public int compareTo(Requirement o) {
+		if(!(o instanceof TerminalRequirement)){
+			//Terminal requirements are less than other types of requirements.
+			return -1;
+		}
+		TerminalRequirement other = (TerminalRequirement)o;
+		return this.saveString().compareTo(other.saveString());
+	}
+	
 
+	
+	
+	
+	
+	
 	
 	
 	public static void testTerminalRequirements(){
@@ -412,17 +369,45 @@ public class TerminalRequirement extends Requirement {
 				"2 of MTH>100"
 		};
 		
-		HashSet<Prefix> taken = new HashSet<Prefix>();
-		taken.add(new Prefix("MTH", 150));
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
+		taken.add(new PrefixHours(new Prefix("MTH", 150), 4));
 		//taken.add(new Prefix("MTH", 120));
 
+
+		double tol = Double.MIN_VALUE * 10000;
 		
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
-			System.out.println(t.saveString()+ ",\t" + t.isSatisfiedBy(taken)
-					+ ",\t" +t.numLeftAfter(taken) +   ",\t" + t.numToChoose+ ",\t" + t.percentComplete(taken));
+			boolean sat =  t.isSatisfiedBy(taken);
+			int minMore =  t.minMoreNeeded(taken);
+			double percent = t.percentComplete(taken, false);
+			boolean show = false;
+			if(sat && (percent < 1.0 - tol || minMore > 0)){
+				show = true;
+			}
+			if((!sat) && (percent > 1.0-tol || minMore <= 0)){
+				show = true;
+			}
+			if(percent > 1.0-tol && minMore >0){
+				show = true;
+			}
+			if(percent < 1.0-tol && minMore <= 0){
+				show = true;
+			}
+			if(show){
+			System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
+					+ ",\t" +minMore + ",\t" + percent);
+			}
 		}
+		System.out.println("Finished testing");
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	public static void main(String[] args){
 		testTerminalRequirements();

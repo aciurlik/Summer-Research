@@ -124,24 +124,13 @@ public class CourseList  {
 	 * the courses in taken might act as prerequisites for it.
 	 * @return
 	 */
-	public HashSet<Prefix> neededListShallow(Prefix p, HashSet<Prefix> taken){
+	public Requirement prereqs(Prefix p, HashSet<Prefix> taken){
 		Requirement r = getPrereqsShallow(p);
 		if(r == null){
 		
 			return null;
 		}
-		return r.fastestCompletionSet(taken);
-	}
-	/**
-	 * Figure out what prefixes to display as 'needed' to the user
-	 * if they try to put this prefix in a place where only the courses
-	 * in taken might act as prerequisites for it.
-	 * @param p
-	 * @param taken
-	 * @return
-	 */
-	public HashSet<Prefix> neededListDeep(Prefix p, HashSet<Prefix> taken){
-		return neededListShallow(p,taken);
+		return r;
 	}
 
 

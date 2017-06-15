@@ -5,7 +5,7 @@ public class ScheduleError {
 	ScheduleElement[] elementList;
 	Prefix offendingPrefix;
 	ScheduleElement offendingCourse;
-	HashSet<Prefix> neededCourses;
+	Requirement neededCourses;
 	int overloadLimit = 0;
 	String instructions;
 	Semester offendingSemester;
@@ -77,12 +77,12 @@ public class ScheduleError {
 	}
 
 
-	public HashSet<Prefix> getNeededCourses() {
+	public Requirement getNeededCourses() {
 		return neededCourses;
 	}
 
 
-	public void setNeededCourses(HashSet<Prefix> neededCourses) {
+	public void setNeededCourses(Requirement neededCourses) {
 		this.neededCourses = neededCourses;
 	}
 
