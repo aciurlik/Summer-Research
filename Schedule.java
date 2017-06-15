@@ -24,35 +24,35 @@ public class Schedule {
 		CourseList l = CourseList.testList();
 		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
 		result.setLanguagePrefix(new Prefix("SPN", "201"));
-		
-		
+
+
 		//Class One 
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		a.setTaken(true);
 		result.addScheduleElement(a, result.semesters.get(0));
-		
-		
+
+
 		//Class Two
 		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
 		b.setTaken(true);
 		result.semesters.get(0).add(b);
-		
+
 		//Class Three 
 		Course c = new Course(new Prefix("FRN", 201), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
 		c.setTaken(true);
 		//result.semesters.get(0).add(c);
-		
-		
+
+
 		//Class Four
 		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		d.setTaken(true);
 		result.semesters.get(0).add(d);
 		//result.semesters.add(b);
 
-		
+
 		result.setCLP(10);
-		
-		
+
+
 		return result;
 	}
 
@@ -67,7 +67,7 @@ public class Schedule {
 	 * @param currentSemester
 	 */
 	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
-		
+
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
 		//add the GERs major
@@ -168,7 +168,7 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-		
+
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
 		}
@@ -285,12 +285,12 @@ public class Schedule {
 
 
 		if(newElement == oldElement){
-			if (checkDuplicates(newElement, true)){
+			if (checkDuplicates(newElement, true, false)){
 				return true;
 			}
 		}
 		else{
-			if (checkDuplicates(newElement, false)){
+			if (checkDuplicates(newElement, false, false)){
 				return true;
 			}
 		}
@@ -311,7 +311,7 @@ public class Schedule {
 		if(s.checkOverlap(e)){
 			return true;
 		}
-		if(checkDuplicates(e,false)){
+		if(checkDuplicates(e,false, false)){
 			return true;
 		}
 		return false;
@@ -399,7 +399,7 @@ public class Schedule {
 		this.languagePrefix = languagePrefix;
 		majorsList.remove(0);
 		addAtMajor(masterList.getGERMajor(languagePrefix, this.determineGER()), 0);
-		
+
 	}
 
 
@@ -447,6 +447,7 @@ public class Schedule {
 					ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
 					prereq.setOffendingCourse(e);
 					prereq.setNeededCourses(needed);
+					prereq.setOffendingSemester(s);
 					result.add(prereq);
 				}
 			}
@@ -460,12 +461,12 @@ public class Schedule {
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
-		
+
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
 			preReq.setNeededCourses(needed);
 			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
-		
+
 			return(!this.userOverride(preReq));
 
 			//throw new PrerequsiteException(needed, e);
@@ -474,7 +475,7 @@ public class Schedule {
 	}
 	public HashSet<Prefix> prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
-			
+
 			return new HashSet<Prefix>();
 		}
 		else{
@@ -482,7 +483,7 @@ public class Schedule {
 			taken.addAll(prefixesTakenIn(sD));
 			HashSet<Prefix> needed = masterList.neededListDeep(p, taken);
 			if(needed == null){
-				
+
 				needed= new HashSet<Prefix>();
 			}
 			return needed;
@@ -510,20 +511,20 @@ public class Schedule {
 
 	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
 			ScheduleElement oldE, ScheduleElement newE){
-	
+
 		//If one of the prefixes is null or 
 		// if the prefixes are different, 
 		// we're really just doing an
 		// add and a remove.
 		Prefix newP = newE.getPrefix();
 		if(newP == null){
-	
+
 			return(checkPrerequsitesRemoving(oldE, oldSem));
 			//	checkPrerequsitesFor(newE, newSem.semesterDate);
 		}
 		Prefix oldP = oldE.getPrefix();
 		if(oldP == null){
-			
+
 			return checkPrerequsitesAdding(newE, newSem.semesterDate);
 		}
 		//If they're equal, we're really moving the time we take this class.
@@ -540,7 +541,7 @@ public class Schedule {
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(missing);
 					//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
-				
+
 					return((!this.userOverride(preReq)));
 				}
 			}
@@ -571,7 +572,7 @@ public class Schedule {
 			if(!needed.isEmpty()){
 				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 				preReq.setNeededCourses(needed);
-				
+
 				return(!this.userOverride(preReq));
 			}
 			return false;
@@ -662,16 +663,30 @@ public class Schedule {
 	 * If one is found, throw an exception.
 	 */
 	public boolean  checkDuplicates(){
-		for( ScheduleElement element : getAllElements()){
-			if(checkDuplicates(element, true)){
-				return checkDuplicates(element, true);
+		ArrayList<ScheduleError> result = checkAllDuplicates();
+		for(ScheduleError s: result){
+			if(checkDuplicates(s.getOffendingCourse(), true, false) == false){
+				return true;
 			}
 		}
 		return false;
 	}
 
+	public ArrayList<ScheduleError> checkAllDuplicates(){
+		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
+		for(ScheduleElement element : getAllElements()){
+			if(checkDuplicates(element, true, true)){
+				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+				duplicate.setOffendingCourse(element);
+				result.add(duplicate);
 
-	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded){
+
+			}
+		}
+		return(result);
+	}
+
+	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded, boolean isAll){
 		int exactDuplicateCount = 1;
 		if(alreadyAdded){
 			exactDuplicateCount = 0;
@@ -687,7 +702,12 @@ public class Schedule {
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setElementList(results);
-						return(!this.userOverride(duplicate));
+						if(isAll == false){
+							return(!this.userOverride(duplicate));
+						}
+						else{
+							return(true);
+						}
 					}
 				}
 				continue;
@@ -697,7 +717,12 @@ public class Schedule {
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 				duplicate.setElementList(result);
 				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
-				return (!this.userOverride(duplicate));
+				if(isAll == false){
+					return (!this.userOverride(duplicate));
+				}
+				else{
+					return true;
+				}
 			}
 		}
 		return false;
@@ -789,13 +814,13 @@ public class Schedule {
 	 * Get the number of requirements still left to put in the schedule.
 	 * @return
 	 */
-	
+
 	public int estimatedCoursesLeft(){
 		int counter = 0;
 		ArrayList<ScheduleElement> courseEst = this.getAllElements();
 		for(Requirement n: this.getAllRequirements()){
 			counter += n.minCoursesNeeded(courseEst, true);
-			
+
 		}
 		return counter;
 	}

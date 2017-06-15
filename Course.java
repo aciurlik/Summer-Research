@@ -285,7 +285,16 @@ public class Course implements ScheduleElement{
 		return result.toString();
 	}
 
-
+	
+	public String shortString(){
+		String result = new String();
+		result = result + this.semester.getSeason(this.semester.sNumber)+ " "+ this.semester.year + " ";
+		result = result + this.coursePrefix.toString() + " "; 
+		result = result + this.sectionNumber+ " ";
+		
+		return result;
+		
+	}
 
 	public boolean isTaken() {
 		return taken;

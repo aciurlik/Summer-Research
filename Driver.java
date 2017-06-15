@@ -229,7 +229,7 @@ public class Driver{
 
 				}
 				if(m.degreeTypes.size()>1){
-					instructions = "What type of degree would you like";
+					instructions = "What type of degree would you like for " + m.name ;
 					header = "Degree Type";
 				}
 
@@ -568,21 +568,29 @@ public class Driver{
 			if(s.checkOverload(true, null)==true){
 				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
 				overload.setOffendingSemester(s);
-				allErrors.add(overload);
-				
-				
+				allErrors.add(overload);	
 			}
+
 		}
+		allErrors.addAll(sch.checkAllPrerequsites());
+		allErrors.addAll(sch.checkAllDuplicates());
 		String result = new String();
 		for(ScheduleError s : allErrors){
 			if(s.error.equals(ScheduleError.overlapError)){
-				result = result + s.elementList[0].getDisplayString() + "\n    overlaps \n" + s.elementList[1].getDisplayString() + "\n";
+				result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
 			}
 			if(s.error.equals(ScheduleError.overloadError)){
-				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit();
+				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
 			}
+			if(s.error.equals(ScheduleError.preReqError)){
+				result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+			}
+			if(s.error.equals(ScheduleError.duplicateError)){
+				result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
+			}
+
 		}
-		JOptionPane.showMessageDialog(popUP,  result );
+		JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 	}
 
 

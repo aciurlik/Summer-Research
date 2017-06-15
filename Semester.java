@@ -112,7 +112,7 @@ public class Semester implements Comparable<Semester>{
 		if(c1.examTime().overlaps(c2.examTime())){
 			result.examOverlap = true;
 		}
-		if(c1.labTime() != null || c2.labTime() != null){
+		if(c1.labTime() != null && c2.labTime() != null){
 			if(c1.labTime().overlaps(c2.labTime())){
 				result.labOverlap = true;
 			}

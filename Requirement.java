@@ -340,14 +340,40 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 	@Override
 	public String getDisplayString() {
+		int counter = 0;
+		String finalResult = new String();
 		if(this.name != null){
 			return this.name;
 		}
 		String result = this.saveString();
 		if(this.numToChoose == 1){
 			result = result.substring(1, result.length() - 1);
+			
 		}
 		return result;
+			/**
+			 * if(result.length()>1000000000){
+				String[] newResult = result.split(",");
+				for(String s: newResult){
+					if(counter%4==0){
+						finalResult=finalResult+s+"\n";
+					}
+					else{
+						finalResult=finalResult + s;
+					}
+					counter++;
+					
+				}
+				
+				}
+			else{
+				return result;
+			}
+		}
+		return finalResult;
+			 * 
+			 */
+			
 	}
 
 
@@ -751,9 +777,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 	}
 
+	@Override
+	public String shortString() {
+
+		return this.getDisplayString();
+	}
+	
 	public static void main(String[] args){
 		testReading();
 	}
+
+
+	
 
 
 }
