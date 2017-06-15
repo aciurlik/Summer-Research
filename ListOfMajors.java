@@ -37,7 +37,14 @@ public class ListOfMajors {
 
 				}
 				)){
-			result.add(Major.readFrom(f));
+			try{
+				result.add(Major.readFrom(f));
+			}
+			catch(Exception e){
+				e.printStackTrace();
+				System.out.println("I'm skipping this major.");
+			}
+			
 		}
 		return result;
 	}

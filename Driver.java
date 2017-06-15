@@ -235,8 +235,7 @@ public class Driver{
 
 				String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 				int MajorType = 0;
-				if(GERNeeded.equals("BM") ||GERNeeded.equals("BA")||GERNeeded.equals("BS")){
-
+				if(GERNeeded!= null){
 					MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
 				}
 				//this.sch.removeMajor(sch.masterList.getGERMajor(0));

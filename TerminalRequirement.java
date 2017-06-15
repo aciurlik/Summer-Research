@@ -115,7 +115,7 @@ public class TerminalRequirement extends Requirement {
 			try{
 				result.numToChoose = Integer.parseInt(numString);
 			}catch(Exception e){
-				throw new RuntimeException("the 'of' in a Terminal Requirement must be preceeded by an integer.");
+				parseException(s, "the 'of' in a Terminal Requirement must be preceeded by an integer.");
 			}
 			return result;
 		}
@@ -128,17 +128,21 @@ public class TerminalRequirement extends Requirement {
 			}
 			if(!s.contains("-")){
 				System.out.println(s);
-				throw new RuntimeException("A terminal requirement has to include a '-', or else both letters and numbers");
+				parseException(s, "A terminal requirement has to include a '-', or else both letters and numbers");
 			}
 			String[] split = s.split("-");
 			if(split.length > 2){
 				System.out.println(s);
-				throw new RuntimeException("You need a comma between terminal requirements");
+				parseException(s,"You need a comma between terminal requirements");
 			}
 			Prefix p = new Prefix(split[0], split[1]); //in case of BLK
 			result = new TerminalRequirement(p);
 		}
 		return result;
+	}
+	
+	private static void parseException(String s, String message){
+		throw new RuntimeException("Issue parsing \"" + s + "\" :\n" + message);
 	}
 	
 	private static TerminalRequirement readFromInequality(String s){
@@ -381,9 +385,11 @@ public class TerminalRequirement extends Requirement {
 		return this.saveString();
 	}
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled() {
+	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> r) {
 		//TODO think through the implications of this
-		return null;
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		result.add(this);
+		return result;
 	}
 	
 

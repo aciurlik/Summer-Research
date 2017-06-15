@@ -17,8 +17,7 @@ public class Schedule {
 
 
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
-	boolean reqsFulfilledValid; // the return value of getRequirementsFulfilled 
-	// is valid for all schedule elements
+
 
 	public static Schedule testSchedule(){
 
@@ -73,7 +72,6 @@ public class Schedule {
 		this.majorsList= new ArrayList<Major>();
 		//add the GERs major
 		reqsValid = false;
-		reqsFulfilledValid = false;
 
 		//Course list
 		this.masterList = masterList;
@@ -165,15 +163,7 @@ public class Schedule {
 			return false;
 		}
 		s.remove(e);
-		if(reqsFulfilledValid){
-			//could make this more efficient by only updating 
-			// requirements that return true for
-			// isSatisfiedBy(e);
-			this.reqsValid = false;
-		}
-		else{
-			reqsValid = false;
-		}
+		reqsValid = false;
 		return true;
 	}
 
@@ -218,7 +208,6 @@ public class Schedule {
 			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
 		}
 		//Tell the courses which requirements they satisfy
-		reqsFulfilledValid = false;
 		//Tell the new requirements if some taken course satisfies them.
 		reqsValid = false;
 	}
@@ -226,7 +215,6 @@ public class Schedule {
 	public void addAtMajor(Major newMajor, int index){
 		majorsList.add(index, newMajor);
 		//Tell the courses which requirements they satisfy
-		reqsFulfilledValid = false;
 		//Tell the new requirements if some taken course satisfies them.
 		reqsValid = false;
 	}
@@ -235,7 +223,6 @@ public class Schedule {
 	public void removeMajor(Major major) {
 		majorsList.remove(major);
 		reqsValid = false;
-		reqsFulfilledValid = false;
 		if(!major.name.equals("GER")){
 			majorsList.remove(0);
 			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
@@ -381,8 +368,8 @@ public class Schedule {
 	 * May include duplicate requirements if two majors share a requirement.
 	 * @return
 	 */
-	public ArrayList<Requirement> getAllRequirements(){
-		ArrayList<Requirement> result = new ArrayList<Requirement>();
+	public HashSet<Requirement> getAllRequirements(){
+		HashSet<Requirement> result = new HashSet<Requirement>();
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
@@ -789,16 +776,23 @@ public class Schedule {
 	 *  
 	 */
 	public void updateReqs(){
-		if(! reqsFulfilledValid){
-			updateAllReqsFulfilled();
-		}
-		//This cannot be a set because we need duplicate requirements
+		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-		for(Requirement r : this.getAllRequirements()){
-			r.isComplete(allTakenElements, true);
-			r.percentComplete(allTakenElements, true);
-			r.minCoursesNeeded(allTakenElements,  true);
+		
+		//For each requirement, find all the schedule elements that satisfy it
+		// (this prevents enemy requirements from both seeing the same course)
+		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
+		for(Requirement r : reqList){
+			ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
+			for(ScheduleElement e : allTakenElements){
+				if(e.getRequirementsFulfilled(reqList).contains(r)){
+					satisficers.add(e);
+				}
+			}
+			r.isComplete(satisficers, true);
+			r.percentComplete(satisficers, true);
+			r.minCoursesNeeded(satisficers, true);
 		}
 		reqsValid = true;
 	}
@@ -809,9 +803,6 @@ public class Schedule {
 	 * @param r
 	 */
 	public int updateRequirement(Requirement r){
-		if(! reqsFulfilledValid){
-			updateAllReqsFulfilled();
-		}
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 		r.isComplete(allTakenElements, true);
 		r.percentComplete(allTakenElements, true);
@@ -841,10 +832,7 @@ public class Schedule {
 	 * @return
 	 */
 	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
-		if(!reqsFulfilledValid){
-			this.updateRequirementsSatisfied(e);
-		}
-		return e.getRequirementsFulfilled();
+		return e.getRequirementsFulfilled(getAllRequirements());
 	}
 
 
@@ -872,7 +860,6 @@ public class Schedule {
 	}
 
 	private void updateRequirementsSatisfied(Course c){
-		c.clearReqsSatisfied();
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
 			for(Requirement r : m.reqList){
@@ -902,16 +889,6 @@ public class Schedule {
 	}
 
 
-	/**
-	 * Go through the list of courses and tell each one
-	 * which current requirements it can satisfy.
-	 */
-	public void updateAllReqsFulfilled(){
-		for (ScheduleElement e : getAllElements()){
-			updateRequirementsSatisfied(e);
-		}
-		reqsFulfilledValid = true;
-	}
 
 
 
