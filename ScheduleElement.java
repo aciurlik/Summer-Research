@@ -31,7 +31,15 @@ public interface ScheduleElement {
 	 * that should be displayed in GUI
 	 */
 	public String getDisplayString();
-
+	
+	
+	/**
+	 * If course return Semester Date, Prefix and Section number, requirement returns and empty String
+	 * @return String that has less information than display string
+	 */
+	public String shortString();
+	
+	
 	/**
 	 * 
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
@@ -39,5 +47,5 @@ public interface ScheduleElement {
 	 */
 	public ArrayList<Requirement> getRequirementsFulfilled();
 
-
+	
 }

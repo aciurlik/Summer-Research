@@ -128,7 +128,7 @@ public class CourseList  {
 		Requirement r = getPrereqsShallow(p);
 		if(r == null){
 		
-			return null;
+			return new HashSet<Prefix>();
 		}
 		return r.fastestCompletionSet(taken);
 	}

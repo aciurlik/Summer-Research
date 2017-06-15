@@ -17,20 +17,20 @@ public class Time implements Comparable<Time>{
 	public static final int THURSDAY = 4;
 	public static final int FRIDAY = 5;
 	public static final int SATURDAY = 6;
-	
-	
-	
+
+
+
 	public static final int secsInMin = 60;
 	public static final int secsInHour = 60 * secsInMin;
 	public static final int secsInDay = 24 * secsInHour;
 	public static final int secsInNormalYear = 365 * secsInDay;
 
 	public static final String[] daysConversion = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-	
+
 	public static final int UNUSED = -1;
 	public static final int AM = 0;
 	public static final int PM = 1;
-	
+
 
 	public static final char[] dayCodes = {'U', 'M', 'T', 'W', 'R', 'F', 'S'};
 	public static HashMap<Character, Integer> reverseDayCodes;
@@ -40,16 +40,16 @@ public class Time implements Comparable<Time>{
 			reverseDayCodes.put(dayCodes[i], i);
 		}
 	}
-	
+
 	//If a field is unused, it will have this value.
 	// However, some methods have undefined behavior if particular fields are unused.
 	// For example, if t doesn't use days, and you say t.addMinutes(5000), t may have a day.
 	//When necessary (for example, calculating total seconds) unused values are taken from the time
 	// Jan 1 2000 12:00:00 AM 
-	
+
 	//However, if the month is unused, treat the day as a day of week.
-	
-	
+
+
 	int day; //(1) thru (numDays)
 	int month; // 1 thru 12
 	int year; // regular year, as in 2017 right now.
@@ -148,7 +148,7 @@ public class Time implements Comparable<Time>{
 			return new int[]{UNUSED,AM};
 		}
 	}
-	
+
 	public final static int[] daysInMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
 	public static int daysIn(int month){
 		return daysInMonth[month - 1];
@@ -168,7 +168,7 @@ public class Time implements Comparable<Time>{
 		next.minutes = totalMinutes % 60;
 		int totalHours = this.hours + totalMinutes / 60;
 		next.hours = totalHours % 24;
-		
+
 		if(! (this.day  == UNUSED)){
 			return next.addDays(totalHours / 24);
 		}
@@ -228,9 +228,9 @@ public class Time implements Comparable<Time>{
 	public int dayOfWeek(){
 		if(this.month == UNUSED || this.year == UNUSED || this.day == UNUSED){
 			this.day=0;
-			
+
 			//throw new RuntimeException( "Tried to find the day of week for an unspecified date: " + this.toString());
-			
+
 		}
 		if(this.month==UNUSED && this.year==UNUSED){
 			return this.day;
@@ -350,7 +350,7 @@ public class Time implements Comparable<Time>{
 		return totalSec;
 
 	}
-	
+
 
 	public String clockTime(){
 		int[] americanHours = fromMilitary(hours);
@@ -359,10 +359,10 @@ public class Time implements Comparable<Time>{
 			result += "00";
 		}
 		else{
-			result += this.minutes;
+			result += String.format("%02d" , this.minutes);
 		}
 		if(this.seconds != UNUSED){
-			result += ":" + this.seconds;
+			result += ":" + String.format("%02d", this.seconds);
 		}
 		if(americanHours[1] == AM){
 			result += "AM";
@@ -386,6 +386,7 @@ public class Time implements Comparable<Time>{
 	public int minutesUntil(Time other){
 		return (int)((other.toSec() - this.toSec()) / 60); 
 	}
+	
 	@Override
 	public int compareTo(Time that) {
 
@@ -397,7 +398,7 @@ public class Time implements Comparable<Time>{
 		}
 		return 0;
 	}
-	
+
 
 	/**
 	 * Given a code of the form "MWF" make the correct
@@ -432,13 +433,13 @@ public class Time implements Comparable<Time>{
 		try{
 			return Time.readFrom(s);
 		}catch(Exception e){
-			
+
 		}
 		boolean dateSuccessful = false;
 		int newYear = UNUSED;
 		int newMonth = UNUSED;
 		int newDay = UNUSED;
-		
+
 		//Find any strings of the form 55/23/1332, 4/2/12, or other similar constructs.
 		String possibleDividers = "[ /\\-]";
 		Pattern pattern = Pattern.compile("\\d{1,2}?" + possibleDividers + "\\d{1,2}?" + possibleDividers + "\\d{2,4}");
@@ -474,9 +475,9 @@ public class Time implements Comparable<Time>{
 				dateSuccessful = true;
 			} while (matcher.find(matcher.start(0) + 1) && !dateSuccessful);
 		}
-		
+
 		//Find any strings of the form dd:ddAM or dd:ddPM, or 
-		
+
 		boolean timeSuccessful = false;
 		int newHour = UNUSED;
 		int newMinute = UNUSED;
@@ -519,50 +520,63 @@ public class Time implements Comparable<Time>{
 				timeSuccessful = true;
 			} while (matcher.find(matcher.start(0) + 1) && !timeSuccessful);
 		}
-		
+
 		if(!dateSuccessful && !timeSuccessful){
 			//System.out.println(s);
 		}
-		
-		
+
+
 		return new Time(newYear, newMonth, newDay, newHour, newMinute, UNUSED);
 	}
-	
+
 	public String simpleString(){
 		return this.month + "/" + this.day + "/" + this.year + " " 
 				+ this.hours + ":" + this.minutes + ":" + this.seconds;
 	}
-	
-	
-	
+
+
+
 	public Time findMidPoint(Time other){
- 		int avgSec = (int)((this.toSec() + other.toSec())/2);
- 		return(timeFromSeconds(avgSec));
- 	
- 	}
-  
- 	private Time timeFromSeconds(int seconds) {
- 		int Secs = seconds%secsInMin;
- 		int secondsLeft= seconds-Secs;
- 		int Minute = (secondsLeft)%secsInHour;
- 		secondsLeft=secondsLeft-(Minute*secsInMin);
- 		int Hour = secondsLeft%secsInDay;
- 		secondsLeft=secondsLeft-(Hour*secsInMin);
- 		int Days = (int)secondsLeft/secsInDay;
- 		Time  startTime = new Time(2000, 1, 1, Secs, Minute, Hour);
- 		return(startTime.addDays(Days));
- 		
- 	}
- 	
- 	public boolean isAllUnused(){
- 		if(this.day==Time.UNUSED && this.hours==Time.UNUSED && this.minutes==Time.UNUSED && this.month==Time.UNUSED && this.seconds==Time.UNUSED && this.year==Time.UNUSED){
- 			return true;
- 		}
- 		return false;
- 	}
-	
-	
-	
+		
+		int avgSec = (int)((this.toSec() + other.toSec()))/2;
+		return(timeFromSeconds(avgSec));
+
+	}
+
+	public static Time timeFromSeconds(long seconds) {
+		int	resultSecs = (int) (seconds%secsInMin);
+		int totalMinutes = (int) (seconds/secsInMin);
+		int resultMinutes = totalMinutes%60;
+		int totalHours = totalMinutes/60;
+		int resultHours = totalHours%24;
+		int totalDays = totalHours/24;
+
+		Time  startTime = new Time(2000, 1, 1, resultHours, resultMinutes, resultSecs);
+		return(startTime.addDays(totalDays));
+
+	}
+
+	public boolean isAllUnused(){
+		if(this.day==Time.UNUSED && this.hours==Time.UNUSED && this.minutes==Time.UNUSED && this.month==Time.UNUSED && this.seconds==Time.UNUSED && this.year==Time.UNUSED){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean equals(Object Time){
+		if(Time instanceof Time){
+			Time other = (Time)Time;
+			if(other.year==this.year && other.month == this.month && other.day==this.day && other.hours==this.hours
+					&& other.minutes==this.minutes && other.seconds == this.seconds){
+				return true;
+			}
+			
+				
+		}
+		return false;
+	}
+
 	/**
 	 * Given two times, create a new time like this:
 	 * If both times say Unused for a field, the new time has Unused for that field.
@@ -582,7 +596,7 @@ public class Time implements Comparable<Time>{
 				combine(date.seconds, time.seconds)
 				);
 	}
-	
+
 	private static int combine(int v1, int v2){
 		if(v1 == UNUSED){
 			return v2;
@@ -604,12 +618,29 @@ public class Time implements Comparable<Time>{
 	}
 
 
+
+	public static void testReading(){
+		String[] tests = new String[]{
+				"10:0AM", 
+				"10:00AM",
+		};
+		for(String s: tests){
+			Time t = Time.tryRead(s);
+			System.out.println("TEN TEST");
+			System.out.println(t.clockTime());
+
+		}
+
+	}
 	public static void main(String[] args){
 		Time t = Time.tryRead("11:00AM");
 		Time s = Time.tryRead("04/28/18");
+		Time p = Time.tryRead("10:00AM");
 
-		System.out.println(t);
-		System.out.println(s);
+		testReading();
+		//	System.out.println(p.clockTime());
+		//	System.out.println(t);
+		//	System.out.println(s);
 
 
 		//		double year = 31536000;
