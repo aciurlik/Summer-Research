@@ -11,11 +11,11 @@ public class Semester implements Comparable<Semester>{
 	private int OverloadLimit;
 	public boolean hasNotes = false;
 	public String notes = "";
-	
-	
-	
-	
-	
+
+
+
+
+
 
 
 	public Semester(SemesterDate sD, Schedule s){
@@ -48,10 +48,10 @@ public class Semester implements Comparable<Semester>{
 	 * 
 	 * @param addition
 	 */
-	
+
 	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
-		
+
 		if(addition == null || ( ! (addition instanceof Course))){
 			return false;
 		}
@@ -66,7 +66,7 @@ public class Semester implements Comparable<Semester>{
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check all courses in this semester for overlap issues.
 	 * 
@@ -79,14 +79,14 @@ public class Semester implements Comparable<Semester>{
 		for (int i = 0; i < courses.size() ; i ++){
 			for(int j = i+1; j < courses.size() ; j ++){
 				if(courses.get(i).overlaps(courses.get(j))){
-						ScheduleError overlapped = makeOverlapError(courses.get(i), courses.get(j));
-						overlaps.add(overlapped);
+					ScheduleError overlapped = makeOverlapError(courses.get(i), courses.get(j));
+					overlaps.add(overlapped);
 				}
 			}
 		}
 		return overlaps;
 	}
-	
+
 	private ArrayList<Course> allCourses(){
 		ArrayList<Course> courses = new ArrayList<Course>();
 		for (ScheduleElement e : this.elements){
@@ -107,13 +107,15 @@ public class Semester implements Comparable<Semester>{
 		ScheduleError result = new ScheduleError(ScheduleError.overlapError);
 		Course[] overlap = new Course[]{c1, c2};
 		result.setElementList(overlap);
-		
+
 		//Figure out whether it's lab, meeting, or exam that overlaps.
 		if(c1.examTime().overlaps(c2.examTime())){
 			result.examOverlap = true;
 		}
-		if(c1.labTime().overlaps(c2.labTime())){
-			result.labOverlap = true;
+		if(c1.labTime() != null || c2.labTime() != null){
+			if(c1.labTime().overlaps(c2.labTime())){
+				result.labOverlap = true;
+			}
 		}
 		if(c1.meetingTimes().overlaps(c2.meetingTimes())){
 			result.meetingOverlap = true;
@@ -123,8 +125,13 @@ public class Semester implements Comparable<Semester>{
 
 
 
-
-	public boolean checkOverload(ScheduleElement addition){
+/**
+ * This is able to take a null input. 
+ * @param forAll true if checking all errors, false otherwise
+ * @param addition the schedule Element you are adding to your semester
+ * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
+ */
+	public boolean checkOverload(boolean forAll,ScheduleElement addition){
 
 		int totalHours = 0;
 
@@ -148,17 +155,22 @@ public class Semester implements Comparable<Semester>{
 			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
 			overload.setOverloadLimit(this.OverloadLimit);
 			overload.setOffendingCourse(addition);
-		//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
-			return (!this.schedule.userOverride(overload));
+			//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
+			if(forAll == false){
+				return (!this.schedule.userOverride(overload));
+			}
+			if(forAll == true){
+				return true;
+			}
 		}
-		else{
-			return false;
-		}
+
+		return false;
+
 	}
 
-	
-	
-	
+
+
+
 
 
 	public int compareTo(Semester other){
@@ -173,7 +185,7 @@ public class Semester implements Comparable<Semester>{
 	 * @return
 	 */
 	public boolean add(ScheduleElement e){
-		if(!this.checkOverload(e)){
+		if(!this.checkOverload(false, e)){
 			this.elements.add(e);
 			return true;
 		}
@@ -197,7 +209,7 @@ public class Semester implements Comparable<Semester>{
 
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
-		if(!this.checkOverload(newElement)){
+		if(!this.checkOverload(false, newElement)){
 			int i = this.elements.indexOf(oldElement);
 			this.elements.set(i, newElement);
 			return true;
@@ -216,8 +228,8 @@ public class Semester implements Comparable<Semester>{
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
 		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
 	}
-	
-	
+
+
 	public String getNotes() {
 		return notes;
 	}
@@ -243,8 +255,8 @@ public class Semester implements Comparable<Semester>{
 	}
 
 	public boolean studyAway = false;
-	
-	
+
+
 	public int getOverloadLimit() {
 		return OverloadLimit;
 	}

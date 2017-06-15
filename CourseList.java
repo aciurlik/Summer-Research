@@ -77,11 +77,14 @@ public class CourseList  {
 	 * @return
 	 */
 	public Requirement getPrereqsShallow(Prefix p){
+		
 		if(p == null){
+			
 			return null;
 		}
 		String originalRequirementString = this.rawPrereqs.get(p);
 		if(originalRequirementString == null){
+			
 			return null;
 		}
 		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
@@ -124,6 +127,7 @@ public class CourseList  {
 	public HashSet<Prefix> neededListShallow(Prefix p, HashSet<Prefix> taken){
 		Requirement r = getPrereqsShallow(p);
 		if(r == null){
+		
 			return null;
 		}
 		return r.fastestCompletionSet(taken);
@@ -645,6 +649,10 @@ public class CourseList  {
 					String GERs = data.get(14);
 					if(!GERs.equals("")){
 						setCourseSatisfiesGER(data.get(14), lastCourse);
+					}
+					String prerequsitesString = data.get(16);
+					if(!prerequsitesString.equals("")){
+						this.addRawPrereq(lastCourse, prerequsitesString.trim());
 					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
