@@ -1,0 +1,20 @@
+Spanish 
+Possible Degree(s):BA
+
+R0: 1 of (SPN-215) 
+
+R1: 1 of (SPN-270)
+
+R2 Civilization: 2 of (SPN-220, SPN-240, SPN-320, SPN-350)
+
+R3 Linguistics: 2 of (SPN-300, SPN-301, SPN-304, SPN-305, SPN-306)
+
+R4 Literature Survey: 1 of (SPN-310, SPN-331, SPN-332, SPN-340, SPN-361)
+
+R5 410-475: 1 of (SPN >410 <475)
+
+R6 400+: 1 of (SPN >400)
+
+Collection of Requirement Enemies:
+R5:R6
+
