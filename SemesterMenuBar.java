@@ -17,12 +17,15 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener{
 	SemesterPanel semPanel;
 
 
-	public SemesterMenuBar(SemesterPanel semesterPanel, JPanel j) {
+	public SemesterMenuBar(SemesterPanel semesterPanel) {
+		
 		super();
+		this.removeAll();
+		
 		this.semPanel=semesterPanel;
 
-		JMenu menu, submenu;
-		JMenuItem menuItem;
+		JMenu menu;
+		JMenuItem menuItem; 
 
 
 		//Create the menu bar.
@@ -46,38 +49,43 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener{
 		menu.add(menuItem);
 
 		
-		menuItem = new JMenuItem();
-		if(!semPanel.sem.studyAway){
-			menuItem.setText(MenuOptions.addStudyAway);
-			menuItem.setActionCommand(MenuOptions.addStudyAway);
-		}
+		JMenuItem studyAway = new JMenuItem();
 		if(semPanel.sem.studyAway){
-			menuItem.setText(MenuOptions.removeStudyAway);
-			menuItem.setActionCommand(MenuOptions.removeStudyAway);
+		//System.out.println("REMOVE");
+			studyAway.setText(MenuOptions.removeStudyAway);
+			studyAway.setActionCommand(MenuOptions.removeStudyAway);
 		}
+		else{
+		//	System.out.println("ADD");
+			studyAway.setText(MenuOptions.addStudyAway);
+			studyAway.setActionCommand(MenuOptions.addStudyAway);
+		}
+		
 		JPopupMenu addStudyAway = new JPopupMenu();
-		menuItem.addActionListener(this);
-		addStudyAway.add(menuItem);
-		menu.add(menuItem);
+		studyAway.addActionListener(this);
+		addStudyAway.add(studyAway);
+		menu.add(studyAway);
 
 
 
 		menuItem = new JMenuItem();
+		if(semPanel.sem.hasNotes){
+			menuItem.setText(MenuOptions.removeNotes);
+			menuItem.setActionCommand(MenuOptions.removeNotes);
+		}
 		if(!semPanel.sem.hasNotes){
 			menuItem.setText(MenuOptions.addNotes);
 			menuItem.setActionCommand(MenuOptions.addNotes);
 		}
-		if(semPanel.sem.hasNotes){
-			
-			menuItem.setText(MenuOptions.removeNotes);
-			menuItem.setActionCommand(MenuOptions.removeNotes);
-		}
+		
 		JPopupMenu notes = new JPopupMenu();
 		menuItem.addActionListener(this);
 		notes.add(menuItem);
 		menu.add(menuItem);
 
+		
 		this.add(menu);
+		
 	}
 
 

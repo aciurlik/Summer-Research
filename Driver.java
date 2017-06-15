@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.swing.ImageIcon;
@@ -42,11 +43,11 @@ public class Driver{
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
 
-	
+
 	public static Driver testDriver(){
 		Driver results = new Driver();
 		testSchedule = Schedule.testSchedule();	
-		
+
 		testSchedule.setDriver(results);
 		int wantedMajor=0;
 		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
@@ -54,7 +55,7 @@ public class Driver{
 				wantedMajor=i;
 			}
 		}
-		
+
 		results.GUIAddMajor(ListOfMajors.testList().get(wantedMajor));
 		testSchedule.setDriver(results);
 		return results;
@@ -315,7 +316,7 @@ public class Driver{
 			season= SemesterDate.MAYX;
 			seasonName = MenuOptions.mayX;
 		}
-		
+
 
 
 
@@ -327,15 +328,15 @@ public class Driver{
 		int end = sch.semesters.get(last).semesterDate.year;
 
 		for(int i=  sch.semesters.get(1).semesterDate.year; i<= end; i++){
-			
-				if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
 
-					availableYears.add(i);
-				}
-			
+			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
+
+				availableYears.add(i);
 			}
 
-		
+		}
+
+
 		yearsDialog = new Integer[availableYears.size()];
 		for(int i=0; i<availableYears.size(); i++){
 			yearsDialog[i]= availableYears.get(i);
@@ -353,7 +354,7 @@ public class Driver{
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 	}
-	
+
 	public void dragEnded(){
 		this.schP.dragEnded();
 	}
@@ -477,18 +478,18 @@ public class Driver{
 
 		this.update();
 	}
-	
-	
+
+
 
 	public void GUImakeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(true);
-		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will furfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
 		this.update();
-		
+		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will furfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
+
 	}
-	
+
 	public void GUIremoveSemesterStudyAway(Semester sem) {
-		
+
 		sem.setStudyAway(false);
 		this.update();
 	}
@@ -496,26 +497,26 @@ public class Driver{
 	public void GUIaddNotes(Semester sem) {
 		sem.setHasNotes(true);
 		this.update();
-		
+
 	}
-	
-	
+
+
 	public void GUITextBeingWritten(DocumentEvent e, Semester s) throws BadLocationException {
 		int length = e.getDocument().getLength();
 		String noteWritten = e.getDocument().getText(0, length);
 		s.setNotes(noteWritten);
-		
-		
+
+
 	}
 
 	public void GUIremoveNotes(Semester sem) {
 		sem.setHasNotes(false);
 		sem.setNotes("");
 		this.update();
-		
+
 	}
-	
-	
+
+
 
 	public boolean userRequestError(ScheduleError s){
 		String header=null;
@@ -559,12 +560,30 @@ public class Driver{
 	}
 
 
+	public void GUICheckAllErrors() {
+		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
+		for(Semester s: sch.semesters){
+			if(s.checkAllOverlap()!=null){
+				allErrors.addAll(s.checkAllOverlap());
+				}
+			}
+		}
+
+
+
+	
+
+
+
+
+
+
 	public void updateAll(){
-	
-	
+
+
 		schP.update(sch);
 		reqs.update(sch);
-		
+
 	}
 
 	public void repaintAll(){
@@ -593,7 +612,12 @@ public class Driver{
 
 	}
 
-	
+
+
+
+
+
+
 
 
 

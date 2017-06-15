@@ -786,17 +786,16 @@ public class Schedule {
 	 * Get the number of requirements still left to put in the schedule.
 	 * @return
 	 */
-	public int totalRequirementsLeft(){
-		if(!reqsValid){
-			updateReqs();
+	
+	public int estimatedCoursesLeft(){
+		int counter = 0;
+		ArrayList<ScheduleElement> courseEst = this.getAllElements();
+		for(Requirement n: this.getAllRequirements()){
+			counter += n.minCoursesNeeded(courseEst, true);
+			
 		}
-		int result = 0;
-		for(Requirement r : this.getUniqueRequirementsList()){
-			result += r.storedCoursesLeft;
-		}
-		return result;
+		return counter;
 	}
-
 
 
 	/**
