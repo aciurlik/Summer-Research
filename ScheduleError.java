@@ -8,6 +8,10 @@ public class ScheduleError {
 	HashSet<Prefix> neededCourses;
 	int overloadLimit = 0;
 	String instructions;
+	Semester offendingSemester;
+
+
+
 	public static final String duplicateError = "Duplicate Error";
 	public static final String preReqError = "Prerequisite Error";
 	public static final String overlapError = "Overlap Error";
@@ -92,7 +96,13 @@ public class ScheduleError {
 		this.overloadLimit = overloadLimit;
 	}
 
+	public Semester getOffendingSemester() {
+		return offendingSemester;
+	}
 
+	public void setOffendingSemester(Semester offendingSemester) {
+		this.offendingSemester = offendingSemester;
+	}
 
 	
 }

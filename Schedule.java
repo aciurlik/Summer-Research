@@ -449,31 +449,36 @@ public class Schedule {
 	 * [ [e1, needed1] , [e2, needed2], [e3, ...]
 	 * or null if no prerequsite issues were found.
 	 */
-	public Object[] checkAllPrerequsites(){
-		ArrayList<Object> result = new ArrayList<Object>();
+	public ArrayList<ScheduleError> checkAllPrerequsites(){
+		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
 		HashSet<Prefix> taken = new HashSet<Prefix>();
 		Collections.sort(semesters);
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
 				HashSet<Prefix> needed = masterList.neededListShallow(e.getPrefix(), taken);
 				if(!needed.isEmpty()){
-					result.add(new Object[]{e, needed});
+					ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
+					prereq.setOffendingCourse(e);
+					prereq.setNeededCourses(needed);
+					result.add(prereq);
 				}
 			}
 		}
 		if(result.isEmpty()){
 			return null;
 		}
-		return result.toArray();
+		return result;
 	}
 
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
 		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
 		if(!needed.isEmpty()){
+		
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
 			preReq.setNeededCourses(needed);
 			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
+		
 			return(!this.userOverride(preReq));
 
 			//throw new PrerequsiteException(needed, e);
@@ -482,6 +487,7 @@ public class Schedule {
 	}
 	public HashSet<Prefix> prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
+			
 			return new HashSet<Prefix>();
 		}
 		else{
@@ -489,6 +495,7 @@ public class Schedule {
 			taken.addAll(prefixesTakenIn(sD));
 			HashSet<Prefix> needed = masterList.neededListDeep(p, taken);
 			if(needed == null){
+				
 				needed= new HashSet<Prefix>();
 			}
 			return needed;
@@ -516,17 +523,20 @@ public class Schedule {
 
 	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
 			ScheduleElement oldE, ScheduleElement newE){
+	
 		//If one of the prefixes is null or 
 		// if the prefixes are different, 
 		// we're really just doing an
 		// add and a remove.
 		Prefix newP = newE.getPrefix();
 		if(newP == null){
+	
 			return(checkPrerequsitesRemoving(oldE, oldSem));
 			//	checkPrerequsitesFor(newE, newSem.semesterDate);
 		}
 		Prefix oldP = oldE.getPrefix();
 		if(oldP == null){
+			
 			return checkPrerequsitesAdding(newE, newSem.semesterDate);
 		}
 		//If they're equal, we're really moving the time we take this class.
@@ -543,6 +553,7 @@ public class Schedule {
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(missing);
 					//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
+				
 					return((!this.userOverride(preReq)));
 				}
 			}
@@ -573,6 +584,7 @@ public class Schedule {
 			if(!needed.isEmpty()){
 				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 				preReq.setNeededCourses(needed);
+				
 				return(!this.userOverride(preReq));
 			}
 			return false;

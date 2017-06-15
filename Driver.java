@@ -565,13 +565,30 @@ public class Driver{
 		for(Semester s: sch.semesters){
 			if(s.checkAllOverlap()!=null){
 				allErrors.addAll(s.checkAllOverlap());
-				}
+			}
+			if(s.checkOverload(true, null)==true){
+				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
+				overload.setOffendingSemester(s);
+				allErrors.add(overload);
+				
+				
 			}
 		}
+		String result = new String();
+		for(ScheduleError s : allErrors){
+			if(s.error.equals(ScheduleError.overlapError)){
+				result = result + s.elementList[0].getDisplayString() + "\n    overlaps \n" + s.elementList[1].getDisplayString() + "\n";
+			}
+			if(s.error.equals(ScheduleError.overloadError)){
+				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit();
+			}
+		}
+		JOptionPane.showMessageDialog(popUP,  result );
+	}
 
 
 
-	
+
 
 
 
