@@ -156,7 +156,9 @@ public class Semester implements Comparable<Semester>{
 		}
 	}
 
-
+	
+	
+	
 
 
 	public int compareTo(Semester other){
@@ -241,7 +243,15 @@ public class Semester implements Comparable<Semester>{
 	}
 
 	public boolean studyAway = false;
+	
+	
+	public int getOverloadLimit() {
+		return OverloadLimit;
+	}
 
+	public void setOverloadLimit(int overloadLimit) {
+		OverloadLimit = overloadLimit;
+	}
 
 	@Override
 	public boolean equals(Object other){

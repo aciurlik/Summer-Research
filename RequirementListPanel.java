@@ -43,7 +43,7 @@ public class RequirementListPanel extends JPanel{
 	public JLabel creditHoursLabel;
 	public String cHText = "     Credit Hours Left: ";
 	public JLabel reqsLeftLabel;
-	public String reqsText = "Requirements Left: ";
+	public String reqsText = "Estimated Courses Left: ";
 	public JLabel clpLeftLabel;
 	public String clpText =  "     CLPs Left:   ";
 	//public Schedule schedule;
@@ -135,7 +135,7 @@ public class RequirementListPanel extends JPanel{
 			this.inner.add(majorPanel, gbc);
 			
 			this.creditHoursLabel.setText(this.cHText + (128 - schedule.getCreditHoursComplete()));
-			this.reqsLeftLabel.setText(this.reqsText + schedule.totalRequirementsLeft());
+			this.reqsLeftLabel.setText(this.reqsText + schedule.estimatedCoursesLeft());
 			this.clpLeftLabel.setText(this.clpText + schedule.CLP);
 		}
 	}

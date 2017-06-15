@@ -130,7 +130,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		saveSched.add(menuItem);
 		menu.add(menuItem);
 		
-
+		menuItem = new JMenuItem("Check all Errors");
+		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
+		menuItem.addActionListener(this);
+		allErrors.add(menuItem);
+		menu.add(menuItem);
 
 
 
@@ -233,6 +237,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		}
 		if(e.getActionCommand().equals(MenuOptions.help)){
 			System.out.println("HElp yourself");
+		}
+		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
+			d.GUICheckAllErrors();
 		}
 	}
 
