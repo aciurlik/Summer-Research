@@ -390,7 +390,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		if(e instanceof Requirement){
 			r = (Requirement) e;
 		}
-		else if (e instanceof Course){
+		else if (e instanceof  ScheduleCourse){
 			r = new TerminalRequirement(e.getPrefix());
 		}
 		else{

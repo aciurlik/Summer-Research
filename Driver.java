@@ -46,6 +46,7 @@ public class Driver{
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
 	ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
+	bellTower b;
 
 	public static Driver testDriver(){
 		Driver results = new Driver();
@@ -62,45 +63,11 @@ public class Driver{
 
 
 	public Driver() {
-	
-		int givenHeight = 300;
-		int givenWidth =100;
-		//Belltower icon and scaling
-		ImageIcon icon = new ImageIcon("src/bellTower.jpg");
-		Image image = icon.getImage();
-		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
-
-		icon = new ImageIcon(newImage);
-
-
-		int percentDone=Schedule.getPercentDone(icon.getIconHeight());
-
-		JLabel belltowerLabel = new JLabel(icon);
-		belltowerLabel.setOpaque(true);
-
-
-
-		JPanel overlap = new JPanel();
-
-
-		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
-
-
-
-
-		overlap.setSize(icon.getIconWidth(), percentDone);
-		overlap.setLocation(0, icon.getIconHeight()-percentDone);
-		overlap.setOpaque(true);
-
-		belltowerLabel.add(overlap);
-
-
-
-
 
 		//Make data
 		sch = Schedule.testSchedule();
 		sch.setDriver(this);
+
 
 
 		JFrame frame = new JFrame();
@@ -116,6 +83,8 @@ public class Driver{
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
 		left.setBackground(FurmanOfficial.bouzarthGrey);
+		bellTower belltowerLabel = new bellTower(sch);
+		this.b=belltowerLabel;
 		left.add(belltowerLabel);
 		left.add(extras);
 		frame.add(left, BorderLayout.WEST);
@@ -147,12 +116,13 @@ public class Driver{
 		setSchedule(current);
 		this.update();
 	}
+
 	private void setSchedule(Schedule current) {
 		sch=current;
 		this.sch.setDriver(this);
 	}
 
-	
+
 	/**
 	 * Ask the user to pick out some of the enemies that will be allowed to
 	 * be satisfied by that course.
@@ -163,33 +133,33 @@ public class Driver{
 	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
 		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>();
 		HashSet<Requirement> result = new HashSet<Requirement>();
-		
+
 		JPanel problems = new JPanel();
 		problems.setLayout(new BorderLayout());
-	
+
 		JLabel instruct = new JLabel("The course "+ c.getPrefix() + " satisfies some requirements that don't want to share.\n"
 				+ "Which requirements should it satisfy?");
-	
+
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
-	
+
 		for(int i = 0; i<enemies.size(); i++){
 			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).getDisplayString() + " (" +  majors.get(i).name + ")" );
 			stack.add(combattingReqs);
 			userOptions.add(combattingReqs);
 		}
-		
-	
+
+
 		problems.add(stack);
 		JOptionPane.showMessageDialog(popUP,  problems, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
-		
+
 		for(int i=0; i<userOptions.size(); i++){
 			if(userOptions.get(i).isSelected()){
 				result.add(enemies.get(i));
 			}
-			
+
 		}
-	
+
 		return result;
 	}
 
@@ -206,15 +176,28 @@ public class Driver{
 	}
 
 
+
 	/**
 	 * When a schedule element panel is dropped into a semester panel
 	 * @param p
 	 * @param semesterPanel
 	 */
-	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel semesterPanel) {
+	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel newSemesterPanel) {
+
 		Semester old = p.container.sem;
-		sch.moveElement(p.getElement(), old, semesterPanel.sem);
-		this.update();
+		if(p.getElement() instanceof ScheduleCourse){
+
+			Requirement r=	new Requirement(new Prefix[]{p.getElement().getPrefix()}, 1);
+			sch.replaceElement(old, p.getElement(), r);
+			sch.moveElement(r, old, newSemesterPanel.sem);
+			//This requirement is not removing itself
+			old.remove(r);
+			this.update();
+		}
+		else{
+			sch.moveElement(p.getElement(), old, newSemesterPanel.sem);
+			this.update();
+		}
 	}
 
 
@@ -275,17 +258,19 @@ public class Driver{
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
 			JOptionPane.showMessageDialog(popUP, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
-			
+
 		}
 		this.sch.addMajor(m);
 		this.update();
 	}
+
 	
 	/**
 	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
 	 * this lets the user choose a type.
 	 * @param m
 	 */
+
 	public void GUIChooseMajorDegreeType(Major m){
 		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
 			ArrayList<String> toAdd= new ArrayList<String>();
@@ -320,7 +305,7 @@ public class Driver{
 			}
 
 			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
-			
+
 			int MajorType = 0;
 			if(GERNeeded == null){
 				return;
@@ -673,6 +658,48 @@ public class Driver{
 
 	}
 
+
+
+	public void GUICheckAllErrors() {
+		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
+		String result = new String();
+		if(!allErrors.isEmpty()){
+			for(ScheduleError s : allErrors){
+				if(s.error.equals(ScheduleError.overlapError)){
+					result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
+				}
+				if(s.error.equals(ScheduleError.overloadError)){
+					result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
+				}
+				if(s.error.equals(ScheduleError.preReqError)){
+					result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+				}
+				if(s.error.equals(ScheduleError.duplicateError)){
+					result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
+				}
+			}
+			if(result.length() < 2){
+				result = "Your Schedule had no errors! You're a pretty savy scheduler";
+			}
+			JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+		}
+		else{
+			JOptionPane.showMessageDialog(popUP, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+		}
+		String majorNotes = "";
+		boolean hasNotes = false;
+		for(Major m : sch.majorsList){
+			if(m.notes != null){
+				majorNotes += "Notes for " + m.name + "\n";
+				majorNotes += m.notes + "\n\n";
+				hasNotes = true;
+			}
+		}
+
+		if(hasNotes){
+			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
+		}
+
 	
 	
 	
@@ -682,6 +709,7 @@ public class Driver{
 	
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
+
 	}
 
 	public void dragEnded(){
@@ -690,6 +718,7 @@ public class Driver{
 
 	public void updateAll(){
 
+		b.update();
 		schP.update(sch);
 		reqs.update(sch);
 
@@ -701,6 +730,9 @@ public class Driver{
 
 		reqs.revalidate();
 		reqs.repaint();
+
+		b.revalidate();
+		b.repaint();
 
 	}
 

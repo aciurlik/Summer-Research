@@ -210,8 +210,13 @@ public class Semester implements Comparable<Semester>{
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
 		if(!this.checkOverload(false, newElement)){
+		//	System.out.println(oldElement);
+		
 			int i = this.elements.indexOf(oldElement);
+		//	System.out.println(i);
+		//	System.out.println(this.elements.size());
 			this.elements.set(i, newElement);
+			
 			return true;
 		}
 		else{
