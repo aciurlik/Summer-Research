@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -141,6 +142,21 @@ public class Driver{
 		setSchedule(current);
 		this.update();
 
+	}
+	
+	/**
+	 * Ask the user to pick out some of the enemies that will be allowed to
+	 * be satisfied by that course.
+	 * @param enemies
+	 * @param c
+	 * @return
+	 */
+	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
+		HashSet<Requirement> result = new HashSet<Requirement>();
+		String message = "The course "+ c.getPrefix() + " satisfies some requirements that don't want to share.\n"
+				+ "Which requirements should it satisfy?";
+		//Ask the user which ones.
+		return result;
 	}
 
 

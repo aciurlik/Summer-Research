@@ -64,7 +64,8 @@ public class ScheduleCourse implements ScheduleElement{
 			System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
 					+ enemies.toString() + "\n"
 					+ " Which one should get the credit hours?");
-			this.c.userSpecifiedReqs = new HashSet<Requirement>();
+			HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
+			this.c.userSpecifiedReqs = kept;
 			this.c.oldEnemyList = enemies;
 		}
 		result.removeAll(this.c.oldEnemyList);
