@@ -14,8 +14,9 @@ public class Major {
 	ArrayList<Requirement> reqList;
 	ArrayList<Integer> reqFriendGroups;
 	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
-
 	public int chosenDegree;
+	
+	public String notes;
 
 
 
@@ -35,29 +36,6 @@ public class Major {
 		this.majorType = NORMAL_MAJOR;
 		this.reqList = new ArrayList<Requirement>();
 		this.reqFriendGroups = new ArrayList<Integer>();
-	}
-
-	public void addDegreeType(String degreeType){
-		if(degreeType.equals("BM")){
-			this.degreeTypes.add(CourseList.BM);
-		}
-		if(degreeType.equals("BS")){
-			this.degreeTypes.add(CourseList.BS);
-		}
-		if(degreeType.equals("BA")){
-			this.degreeTypes.add(CourseList.BA);
-		}
-
-	}
-
-
-
-	public int getChosenDegree() {
-		return chosenDegree;
-	}
-
-	public void setChosenDegree(int chosenDegree) {
-		this.chosenDegree = chosenDegree;
 	}
 
 	public static Major testMajor(){
@@ -101,6 +79,28 @@ public class Major {
 		RequirementGraph.putEdge(result.reqList.get(1), result.reqList.get(2));
 		return result;
 	}
+	
+	public void addDegreeType(String degreeType){
+		if(degreeType.equals("BM")){
+			this.degreeTypes.add(CourseList.BM);
+		}
+		if(degreeType.equals("BS")){
+			this.degreeTypes.add(CourseList.BS);
+		}
+		if(degreeType.equals("BA")){
+			this.degreeTypes.add(CourseList.BA);
+		}
+	}
+
+
+
+	public int getChosenDegree() {
+		return chosenDegree;
+	}
+
+	public void setChosenDegree(int chosenDegree) {
+		this.chosenDegree = chosenDegree;
+	}
 
 	/**
 	 * Sets the type of this major.
@@ -118,6 +118,13 @@ public class Major {
 	public void addRequirement(Requirement r){
 		this.reqList.add(r);
 		reqFriendGroups.add(0);
+	}
+	
+	public void addToNotes(String line){
+		notes += line + "\n";
+	}
+	public String getNodes(){
+		return this.notes;
 	}
 
 
@@ -284,6 +291,7 @@ public class Major {
 	 * @return
 	 */
 	public static Major readFrom(String saveString){
+		saveString = saveString.trim();
 		String[] lines = saveString.split("[\n]+");
 		Major result = new Major(lines[0]);
 		int startIndex = 1;
@@ -320,7 +328,16 @@ public class Major {
 			i++;
 		}
 		result.addEnemyEdgesFromFriendGroups();
-
+		if(i < lines.length){
+			result.notes = "";
+			//Skip the line saying "Notes:"
+			if(lines[i].toUpperCase().contains("NOTES:")){
+				i++;
+			}
+		}
+		for(; i <lines.length ; i ++){
+			result.addToNotes(lines[i]);
+		}
 		return result;
 	}
 
