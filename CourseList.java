@@ -84,8 +84,9 @@ public class CourseList  {
 		}
 		String originalRequirementString = this.rawPrereqs.get(p);
 		if(originalRequirementString == null){
-			
-			return null;
+			Requirement result = new Requirement();
+			result.numToChoose = 0;
+			return result;
 		}
 		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){
@@ -118,31 +119,7 @@ public class CourseList  {
 
 
 
-	/**
-	 * Figure out what prefixes to display as 'needed' to the user
-	 * if they try to put this course in a place where only
-	 * the courses in taken might act as prerequisites for it.
-	 * @return
-	 */
-	public HashSet<Prefix> neededListShallow(Prefix p, HashSet<Prefix> taken){
-		Requirement r = getPrereqsShallow(p);
-		if(r == null){
-		
-			return new HashSet<Prefix>();
-		}
-		return r.fastestCompletionSet(taken);
-	}
-	/**
-	 * Figure out what prefixes to display as 'needed' to the user
-	 * if they try to put this prefix in a place where only the courses
-	 * in taken might act as prerequisites for it.
-	 * @param p
-	 * @param taken
-	 * @return
-	 */
-	public HashSet<Prefix> neededListDeep(Prefix p, HashSet<Prefix> taken){
-		return neededListShallow(p,taken);
-	}
+
 
 
 

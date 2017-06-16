@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Course implements ScheduleElement{
+public class Course implements ScheduleElement, HasCreditHours{
 
 
 	protected int creditHours;
@@ -19,6 +19,8 @@ public class Course implements ScheduleElement{
 	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
 	public boolean taken;
+	
+	public static final int defaultCreditHours = 4;
 
 	String professor;
 
