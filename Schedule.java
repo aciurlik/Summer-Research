@@ -36,9 +36,11 @@ public class Schedule {
 
 		//Class Two
 		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
+
 		ScheduleCourse bb = new ScheduleCourse(b, result);
 		bb.setTaken(true);
 		result.addScheduleElement(bb , result.semesters.get(0));
+
 
 
 		//Class Three
@@ -438,12 +440,13 @@ public class Schedule {
 	 */
 	public ArrayList<ScheduleError> checkAllPrerequsites(){
 		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
-		HashSet<Prefix> taken = new HashSet<Prefix>();
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		Collections.sort(semesters);
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
-				HashSet<Prefix> needed = masterList.neededListShallow(e.getPrefix(), taken);
-				if(!needed.isEmpty()){
+				Requirement needed = masterList.getPrereqsShallow(e.getPrefix());
+				boolean complete = needed.isComplete(taken, true);
+				if(!complete){
 					ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
 					prereq.setOffendingCourse(e);
 					prereq.setNeededCourses(needed);
@@ -459,8 +462,11 @@ public class Schedule {
 	}
 
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
-		HashSet<Prefix> needed = prereqsNeededFor(e.getPrefix(), sD);
-		if(!needed.isEmpty()){
+		Requirement needed = prereqsNeededFor(e.getPrefix(), sD);
+		if(needed == null){
+			return false; //no errors found
+		}
+		if(!needed.storedIsComplete){
 
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
@@ -468,23 +474,22 @@ public class Schedule {
 			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
 
 			return(!this.userOverride(preReq));
-
 			//throw new PrerequsiteException(needed, e);
 		}
 		return false;
 	}
-	public HashSet<Prefix> prereqsNeededFor(Prefix p, SemesterDate sD){
+	public Requirement prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
-
-			return new HashSet<Prefix>();
+			return null;
 		}
 		else{
-			HashSet<Prefix> taken = prefixesTakenBefore(sD);
-			taken.addAll(prefixesTakenIn(sD));
-			HashSet<Prefix> needed = masterList.neededListDeep(p, taken);
-			if(needed == null){
+			ArrayList<ScheduleElement> taken = elementsTakenBefore(sD);
+			taken.addAll(elementsTakenIn(sD));
+			Requirement needed = masterList.getPrereqsShallow(p);
+			if(needed != null){
+				needed.isComplete(taken, true);
+				needed.minMoreNeeded(taken, true);
 
-				needed= new HashSet<Prefix>();
 			}
 			return needed;
 		}
@@ -495,8 +500,8 @@ public class Schedule {
 		for(Semester other : this.semesters){
 			if(other.getDate().compareTo(s.getDate()) >= 0 ){
 				for(ScheduleElement oElement : s.getElements()){
-					HashSet<Prefix> needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
-					if(needed.contains(currentP)){
+					Requirement needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
+					if(needed.isSatisfiedBy(currentP)){
 						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 						preReq.setOffendingCourse(e);
 						preReq.setNeededCourses(needed);
@@ -533,10 +538,10 @@ public class Schedule {
 		if(newP.equals(oldP)){
 			//If we're moving the course backward in time 
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
-				HashSet<Prefix> taken  = this.prefixesTakenBefore(newSem.semesterDate);
-				taken.addAll(this.prefixesTakenIn(newSem.semesterDate));
-				HashSet<Prefix> missing =masterList.neededListShallow(oldE.getPrefix(), taken);
-				if(!missing.isEmpty()){
+				ArrayList<ScheduleElement> taken  = this.elementsTakenBefore(newSem.semesterDate);
+				taken.addAll(this.elementsTakenIn(newSem.semesterDate));
+				Requirement missing =masterList.getPrereqsShallow(oldE.getPrefix());
+				if(missing != null && !missing.isComplete(taken, true)){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(missing);
@@ -549,29 +554,22 @@ public class Schedule {
 			//the old position of the moving course, this is because any other course has already had an error thrown, and therefore has been checked by the user. 
 
 			//prefixes between oldSem and newSem inclusive.
-			HashSet<Prefix> beforeNew = this.prefixesTakenBefore(newSem.semesterDate);
-			HashSet<Prefix> afterOld = this.prefixesTakenAfter(oldSem.semesterDate);
-			HashSet<Prefix> old = this.prefixesTakenIn(oldSem);
+			ArrayList<ScheduleElement> beforeNew = this.elementsTakenBefore(newSem.semesterDate);
+			ArrayList<ScheduleElement> afterOld = this.elementsTakenAfter(oldSem.semesterDate);
+			ArrayList<ScheduleElement> old = this.elementsTakenIn(oldSem);
 			afterOld.addAll(old);
 			afterOld.retainAll(beforeNew);
-			HashSet<Prefix>needed = new HashSet();
-
-
-			for(Prefix p : afterOld){
-
-				if(Arrays.asList(masterList.getPrereqsShallow(p)).contains(newP)){
+			HashSet<Prefix> needed = new HashSet<Prefix>();
+			
+			for(ScheduleElement p : afterOld){
+				if(masterList.getPrereqsShallow(p.getPrefix()).isSatisfiedBy(newP)){
 					//throw new PrerequsiteException(new Prefix[]{newP}, p);
-					needed.add(p);
-
-
-					//	preReq.setInstructions(p.toString() + " had prerequisite " + newP.toString() );
-
+					needed.add(p.getPrefix());
 				}
-
 			}
 			if(!needed.isEmpty()){
 				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
-				preReq.setNeededCourses(needed);
+				preReq.setNeededCourses(new Requirement(needed.toArray(new Prefix[needed.size()]),1));
 
 				return(!this.userOverride(preReq));
 			}
@@ -589,12 +587,12 @@ public class Schedule {
 	 * @param sd
 	 * @return
 	 */
-	public HashSet<Prefix> prefixesTakenBefore(SemesterDate sd){
-		HashSet<Prefix> taken = new HashSet<Prefix>();
+	public ArrayList<ScheduleElement> elementsTakenBefore(SemesterDate sd){
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		for(Semester s : semesters){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sd) < 0){
-				taken.addAll(prefixesTakenIn(s));
+				taken.addAll(elementsTakenIn(s));
 			}
 		}
 		return taken;
@@ -604,31 +602,29 @@ public class Schedule {
 	 * @param sd
 	 * @return
 	 */
-	public HashSet<Prefix> prefixesTakenAfter(SemesterDate sd){
-		HashSet<Prefix> taken = new HashSet<Prefix>();
+	public ArrayList<ScheduleElement> elementsTakenAfter(SemesterDate sd){
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		for(Semester s : semesters){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sd) > 0){
-				taken.addAll(prefixesTakenIn(s));
+				taken.addAll(elementsTakenIn(s));
 			}
 		}
 		return taken;
 	}
-	public HashSet<Prefix> prefixesTakenIn(SemesterDate sD){
-		HashSet<Prefix> taken = new HashSet<Prefix>();
+	public ArrayList<ScheduleElement> elementsTakenIn(SemesterDate sD){
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		for(Semester s : semesters){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sD) == 0){
-				taken.addAll(prefixesTakenIn(s));
+				taken.addAll(elementsTakenIn(s));
 			}
 		}
 		return taken;
 	}
-	public HashSet<Prefix> prefixesTakenIn(Semester s){
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		for(ScheduleElement e : s.getElements()){
-			result.add(e.getPrefix());
-		}
+	public ArrayList<ScheduleElement> elementsTakenIn(Semester s){
+		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
+		result.addAll(s.getElements());
 		return result;
 	}
 
@@ -784,8 +780,7 @@ public class Schedule {
 		
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		for(Requirement r : reqList){
-			updateRequirement(r);
-			
+      updateRequirement(r);
 		}
 		reqsValid = true;
 	}
@@ -800,6 +795,7 @@ public class Schedule {
 				// (this prevents enemy requirements from both seeing the same course)s
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
+
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 		for(ScheduleElement e : allTakenElements){
@@ -811,6 +807,7 @@ public class Schedule {
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
 		return r.minCoursesNeeded(satisficers,  true);
+
 	}
 
 
@@ -823,8 +820,7 @@ public class Schedule {
 		int counter = 0;
 		ArrayList<ScheduleElement> courseEst = this.getAllElements();
 		for(Requirement n: this.getAllRequirements()){
-			counter += n.minCoursesNeeded(courseEst, true);
-
+			counter += n.minMoreNeeded(courseEst, true);
 		}
 		return counter;
 	}

@@ -3,7 +3,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Course {
+
+public class Course implements HasCreditHours{
+
 
 
 	protected int creditHours;
@@ -18,7 +20,11 @@ public class Course {
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
 	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
+
+
 	
+	public static final int defaultCreditHours = 4;
+
 
 	String professor;
 

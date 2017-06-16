@@ -12,6 +12,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
+	// if this requirement usesCreditHours, then numToChoose is the number
+	// of credit hours, and storedCoursesLeft stores the number of credit hours left.
+	boolean usesCreditHours;
 	String name;
 	boolean storedIsComplete;
 	int storedCoursesLeft;
@@ -24,6 +27,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public Requirement(){
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
+		usesCreditHours = false;
 	}
 
 
@@ -48,6 +52,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
 	}
+	
+	public void setHoursNeeded(int hours){
+		this.numToChoose = hours;
+		this.usesCreditHours = true;
+	}
 
 
 	public void setName(String name){
@@ -56,28 +65,86 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public String getName() {
 		return this.name;
 	}
-
-
-
-	private Object[] separate(Iterable<ScheduleElement> taken){
-		HashSet<Prefix> takenPrefixes = new HashSet<Prefix>();
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/////////////////////
+	/////////////////////
+	///// Recursive methods
+	/////////////////////
+	/////////////////////
+	//
+	//  The call chain here looks something like:
+	//
+	//
+	//
+	//									percentComplete(taken, bool)
+	//											|
+	//											V
+	//  isComplete(taken, bool)				MMN(taken, bool)
+	//			|								|
+	//			V								V
+	//  isComplete(taken, int, bool) ---> MMN(taken, int, bool)
+	//			^								|
+	// 			|								|
+	//			|								V
+	// 			-----recurse on choices----- MMN(taken)
+	//											|
+	//											|
+	//											|
+	// isSatisfied(p) <----recurse on choices---
+	// |		  ^		
+	// | 		  |	
+	// |			--------
+	// |					|
+	// -recurse on choices--
+	//
+	// Terminal requirment only needs to overwrite methods that have
+	// an outedge that recurses, so MMN(taken, int, bool) and
+	// isSatisfied.
+	//
+	
+	
+	private int numPlannedLater(ArrayList<ScheduleElement> taken){
 		int numPlanned = 0;
 		for(ScheduleElement s : taken){
-			Prefix p = s.getPrefix();
-			if(p!= null){
-				takenPrefixes.add(p);
-			}
-			else{
-				if(s == this){
-					//TODO figure out about subset requirements.
-					numPlanned ++;
-				}
+			if(s == this){
+				numPlanned ++;
 			}
 		}
-		return new Object[]{takenPrefixes, numPlanned};
+		return numPlanned;
 	}
-
-	//INFINITELOOPHAZARD
+	/**
+	 * Find the subset of schedule elements that have prefixes
+	 * @param taken
+	 * @return
+	 */
+	private HashSet<ScheduleElement> takenPrefixes(ArrayList<ScheduleElement> taken){
+		HashSet<ScheduleElement> takenElements = new HashSet<ScheduleElement>();
+		for(ScheduleElement s : taken){
+			if(s.getPrefix()!= null){
+				takenElements.add(s);
+			}
+		}
+		return takenElements;
+	}
+	
 	/**
 	 * Check whether this set of schedule elements completes this requirements.
 	 * If storeValue is true, this requirement will store the value it calculates
@@ -86,85 +153,103 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @param storeValue
 	 * @return
 	 */
-	public boolean isComplete(Iterable<ScheduleElement> taken, boolean storeValue){
-
-		//Find all the prefixes,
-		// and count how many things will magically satisfy this requirement
-		Object[] separated = separate(taken);
-		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>)separated[0];
-		int numPlanned = (int) separated[1];
-		return isComplete(takenPrefixes, numPlanned, storeValue);
+	public boolean isComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
+		int numPlanned = numPlannedLater(taken);
+		return isComplete(taken, numPlanned, storeValue);
 	}
 
-	//INFINITELOOPHAZARD
 	/** 
 	 * Check if these prefixes satisfy this requirement.
 	 * Requirements are optimists - if this set of taken things
 	 *  has any shot of satisfying this requirement, then the requirement.
 	 *  will say that it does. 
+	 *  For credit hours, all future requirements are assumed to satisfy 4 credits.
 	 * @param taken
 	 * @return
 	 */
-	private boolean isComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
-		boolean result = minCoursesNeeded(taken, numPlannedLater, storeValue) <= 0;
+	private boolean isComplete(ArrayList<ScheduleElement> taken, int numPlannedLater, boolean storeValue){
+		boolean result = minMoreNeeded(taken, numPlannedLater, storeValue) <= 0;
 		if(storeValue){
 			this.storedIsComplete = result;
 		}
 		return result;
 	}
 
-	//INFINITELOOPHAZARD
 	/**
-	 * Find the minimum number of courses you would need to completely
+	 * Find the minimum number of courses or credits you would need to completely
 	 * satisfy this requirement, given this set of things you've already taken.
 	 * @param taken
 	 * @param storeValue
 	 * @return
 	 */
-	public int minCoursesNeeded(Iterable<ScheduleElement> taken, boolean storeValue){
-		Object[] separated = separate(taken);
-		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>)separated[0];
-		int numPlanned = (int)separated[1];
-		return minCoursesNeeded(takenPrefixes, numPlanned, storeValue);
+	public int minMoreNeeded(ArrayList<ScheduleElement> taken, boolean storeValue){
+		int numPlanned = numPlannedLater(taken);
+		return minMoreNeeded(taken, numPlanned, storeValue);
 	}
-
-	//INFINITELOOPHAZARD
 	/**
-	 * Find the minimum number of courses you would need to completely
+	 * Find the minimum number of courses or credits you would need to completely
 	 * satisfy this requirement, given this set of things you've already taken.
 	 */
-	private int minCoursesNeeded(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
-		int result = fastestCompletionSet(taken).size() - numPlannedLater;
+	private int minMoreNeeded(ArrayList<ScheduleElement> taken, int numPlannedLater, boolean storeValue){
+		int result = minMoreNeeded(taken);
+		result = result - numPlannedLater;
 		if(storeValue){
 			this.storedCoursesLeft = result;
 		}
 		return result;
 	}
-
+	
+	
 	//INFINITELOOPHAZARD
-	/** 
-	 * Find the set of prefixes that would most quickly complete this requirement
+	/**
+	 * 
+	 * @param taken
 	 * @return
 	 */
-	public HashSet<Prefix> fastestCompletionSet(HashSet<Prefix> taken){
-		//If you have n to choose of k choices, then you need the 
-		// n fastest completion sets from all your choices.
-		ArrayList<HashSet<Prefix>> subSets = new ArrayList<HashSet<Prefix>>();
-		for(Requirement r : choices){
-			subSets.add(r.fastestCompletionSet(taken));
-		}
-		Collections.sort(subSets,new Comparator<HashSet>(){
-			@Override
-			public int compare(HashSet o1, HashSet o2) {
-				return o1.size() - o2.size();
+	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
+		if(this.usesCreditHours){
+			int result = 0;
+			ArrayList<Requirement> completed = new ArrayList<Requirement>();
+			for(Requirement r : choices){
+				if(r.isComplete(taken, false)){
+					//you get to add the credits from it
+					completed.add(r);
+				}
 			}
-		});
-		HashSet<Prefix> result = new HashSet<Prefix>();
-		for(int i = 0; i < this.numToChoose ; i ++){
-			result.addAll(subSets.get(i));
+			for(ScheduleElement e : taken){
+				//if any of your completed subrequirements uses it, you can add its credits.
+				if(e instanceof HasCreditHours){
+					int credits = ((HasCreditHours)e).getCreditHours();
+					boolean found = false;
+					for(Requirement r : completed){
+						if(r.isSatisfiedBy(e.getPrefix())){
+							found = true;
+							break;
+						}
+					}
+					if(found){
+						result += credits;
+					}
+				}
+			}
+			return result;
 		}
-		return result;
+		else{
+			ArrayList<Integer> otherNums = new ArrayList<Integer>();
+			for(Requirement r : choices){
+				otherNums.add(r.minMoreNeeded(taken));
+			}
+			Collections.sort(otherNums);
+			int result = 0;
+			for(int i = 0; i < numToChoose ; i ++){
+				result += otherNums.get(i);
+			}
+			return result;
+		}
 	}
+	
+
+
 
 
 	/**
@@ -174,77 +259,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @param storeValue
 	 * @return
 	 */
-	public double percentComplete(Iterable<ScheduleElement> taken, boolean storeValue){
-		Object[] separated = separate(taken);
-		HashSet<Prefix> takenPrefixes = (HashSet<Prefix>) separated[0];
-		int numPlanned = (int)separated[1];
-		return percentComplete(takenPrefixes, numPlanned, storeValue);
-	}
-
-
-	//INFINITELOOPHAZARD
-	/** 
-	 * Find what % this requirement is complete if you get the best-case scenario for
-	 * each of the numPlannedLater courses.
-	 * @param taken
-	 * @param numPlannedLater
-	 * @param storeValue
-	 * @return
-	 */
-	public double percentComplete(HashSet<Prefix> taken, int numPlannedLater, boolean storeValue){
-		//While this requirement isn't 100% complete, add numPlannedLater
-		// imaginary courses to the working set.
-		HashSet<Prefix> workingSet = new HashSet<Prefix>(taken);
-		for(int i = 0; i < numPlannedLater ; i ++){
-			if(Math.abs(percentComplete(workingSet) - 1.0) < tolerance ){
-				return 1.0;
-			}
-			Prefix next = findBestToTake(workingSet);
-			workingSet.add(next);
-		}
-		double result = percentComplete(workingSet);
+	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
+		double minNeeded = minMoreNeeded(taken, storeValue);
+		double originalNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		double result = (1.0 - minNeeded/originalNeeded);
 		if(storeValue){
-			storedPercentComplete = result;
+			this.storedPercentComplete = result;
 		}
 		return result;
 	}
-
-	//INFINITELOOPHAZARD
-	/**
-	 * Figure out what % complete this requirement is.
-	 */
-	public double percentComplete(HashSet<Prefix> taken){
-		//We need the top numToChoose percents.
-		// Once we find these n values, say a, b, and c, we want
-		// 1/3 a + 1/3 b + 1/3 c, or in general,
-		// sum( largest n subPercents) / numToChoose.
-		ArrayList<Double> subPercents = new ArrayList<Double>();
-		for(Requirement r : this.choices){
-			subPercents.add(r.percentComplete(taken));
-		}
-		Collections.sort(subPercents);
-		double miniPercent = 0;
-		for(int i = 0 ; i < subPercents.size() && i < numToChoose ; i ++){
-			int index = subPercents.size() - (i + 1);
-			miniPercent += subPercents.get(index);
-		}
-		return ((double)miniPercent)  / numToChoose;
-	}
-
-	//INFINITELOOPHAZARD
-	/** TODO needs to be tested
-	 * Find the prefix that would bring this requirement closest to completion.
-	 * Return the prefix and the % it would add in an Object[]
-	 * @param taken
-	 * @return
-	 */
-	public Prefix findBestToTake(HashSet<Prefix> taken){
-		for(Prefix p : fastestCompletionSet(taken)){
-			return p;
-		}
-		return null;
-	}
-
+	
+	
+	
 
 	//INFINITELOOPHAZARD
 	public boolean isSatisfiedBy(Prefix p) {
@@ -255,6 +281,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		return false;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 
@@ -702,12 +740,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				new Prefix("MTH", "150"),
 				new Prefix("MTH", "160")
 		};
-		HashSet<Prefix> takens = new HashSet<Prefix>();
-		takens.add(prefixes[0]);//MTH 110
-		takens.add(prefixes[1]);//MTH 120
+		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
+		takens.add(new PrefixHours(prefixes[0], 4));//MTH 110
+		takens.add(new PrefixHours(prefixes[1], 4));//MTH 120
 
 		System.out.print("Taken prefixes: ");
-		for(Prefix p : takens){
+		for(ScheduleElement p : takens){
 			System.out.print(p + " ");
 		}
 		System.out.println();
@@ -715,66 +753,32 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 		for(String toRead : tests){
 			boolean needsToBeShown = false;
-			System.out.println("ReadingFrom \"" +toRead + "\"");
 			Requirement r = Requirement.readFrom(toRead);
 			boolean complete = r.isComplete(takens, 0, true);
-			double percentComplete = r.percentComplete(takens, 0, true);
-			HashSet<Prefix> completionSet = r.fastestCompletionSet(takens);
-
-			boolean completeAfter = r.isComplete(takens, completionSet.size(), false);
-			double percentAfter = r.percentComplete(takens, completionSet.size(), false);
-
-
+			double percentComplete = r.percentComplete(takens, true);
+			int minLeft = r.minMoreNeeded(takens, true);
+			
 			double tol = Double.MIN_VALUE * 10000;
-			if(complete && ( percentComplete < 1.0 - tol || completionSet.size() != 0)){
-				needsToBeShown = true;
-			}
-			if(!complete && percentComplete > 1.0 + tol && completionSet.size() <= 0 ){
-				needsToBeShown = true;
-			}
-			if(percentComplete < 1.0 - tol && completionSet.size() == 0 ){
-				needsToBeShown = true;
-			}
-			if(percentComplete > 1.0 - tol && completionSet.size() != 0){
-				needsToBeShown = true;
-			}
-			if(completeAfter != true){
-				needsToBeShown = true;
-			}
-			if(percentAfter < 1.0 - tol){
-				needsToBeShown = true;
-			}
-
 			if(r.storedIsComplete != complete){
-				needsToBeShown = true;
-			}
-			if(r.storedCoursesLeft != completionSet.size()){
 				needsToBeShown = true;
 			}
 			if(r.storedPercentComplete != percentComplete){
 				needsToBeShown = true;
 			}
 
-			//needsToBeShown = true;
+			needsToBeShown = true;
 
 
 			if(needsToBeShown){
-				System.out.println("Complete?" + complete);
-				System.out.println("Percent Complete:" + percentComplete);
-				System.out.println("Fastest completion set:");
-				for(Prefix p : completionSet){
-					System.out.println("  " + p);
-				}
-				System.out.println("Complete with scheduled requirements?" + completeAfter);
-				System.out.println("Percent complete with scheduled requirements:" + percentAfter);
-				System.out.println("Stored courses left:" + r.storedCoursesLeft);
-
+				System.out.println("ReadingFrom \"" +toRead + "\"");
+				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
+				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
+				System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
+				System.out.println();
 			}
-			else{
-				System.out.println("No obvious errors found");
-			}
-			System.out.println();
+			
 		}
+		System.out.println("Finished testing");
 	}
 
 	@Override
