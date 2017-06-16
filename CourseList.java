@@ -147,7 +147,7 @@ public class CourseList  {
 
 
 	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
-		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What that requirement mean?\n>>>");
+		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What does that requirement mean?\n>>>");
 		//TODO ask the user
 		Scanner scan = new Scanner(System.in);
 		String userInput = scan.nextLine();
@@ -163,7 +163,9 @@ public class CourseList  {
 						userInput.toUpperCase().equals("SKIP") ||
 						userInput.toUpperCase().equals("S")){
 					System.out.println("Ok, I'll skip this one until next time");
-					return new Requirement();
+					result = new Requirement();
+					result.numToChoose = 0;
+					return result;
 				}
 				System.out.print(e.getMessage() + "\n" + originalRequirementString + "\n>>>");
 				userInput = scan.nextLine();

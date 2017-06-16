@@ -806,7 +806,7 @@ public class Schedule {
 		
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
-		return r.minCoursesNeeded(satisficers,  true);
+		return r.minMoreNeeded(satisficers,  true);
 
 	}
 
