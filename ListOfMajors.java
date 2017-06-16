@@ -44,7 +44,7 @@ public class ListOfMajors {
 				e.printStackTrace();
 				System.out.println("I'm skipping this major.");
 			}
-			
+
 		}
 		return result;
 	}
@@ -120,11 +120,11 @@ public class ListOfMajors {
 		ArrayList<Major> majorGUI = new ArrayList<Major>();
 		for(Major m: completeMajorsList){
 			if (m.isType(Major.NORMAL_MAJOR)){
-			majorGUI.add(m);
+				majorGUI.add(m);
 			}
 
 		}
-		
+
 		return majorGUI;
 
 	}
@@ -152,11 +152,20 @@ public class ListOfMajors {
 		}
 		return trackGUI;
 	}
-	
-	
 
-	
-	
+
+	public  Major getMajor(String s){
+		int wantedMajor =0;
+		for(int i = 0; i<completeMajorsList.size(); i++){
+			if(completeMajorsList.get(i).name.equals(s)){
+				wantedMajor=i;
+			}
+		}
+		return completeMajorsList.get(wantedMajor);
+
+	}
+
+
 	/*
 	 * 
 Math-BS

@@ -3,7 +3,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Course implements ScheduleElement, HasCreditHours{
+
+public class Course implements HasCreditHours{
+
 
 
 	protected int creditHours;
@@ -18,9 +20,11 @@ public class Course implements ScheduleElement, HasCreditHours{
 	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
 	int labDay;
 	Time[] examTime; // month, day, year, and so on are all used.
-	public boolean taken;
+
+
 	
 	public static final int defaultCreditHours = 4;
+
 
 	String professor;
 
@@ -124,29 +128,8 @@ public class Course implements ScheduleElement, HasCreditHours{
 		this.labDay = labDay;
 	}
 
-	//////////////
-	/// Overlaps method and helper
-	//////////////
-	public Intervals<Time> allTakenTimes(){
-		Intervals<Time> result = new Intervals<Time>();
-		Interval<Time> labTime = labTime();
-		if(labTime != null){
-			result.addInterval(labTime);
-		}
-		Interval<Time> examTime = examTime();
-		if(examTime != null){
-			result.addInterval(examTime);
-		}
-		//note - some courses may have meeting times with all values unused.
-		// For example, music courses often don't specify times.
-		Intervals<Time> meetingDays = meetingTimes();
-		if(meetingDays != null){
-			for(Interval<Time> i : meetingDays.intervals){
-				result.addInterval(i);
-			}
-		}
-		return result;
-	}
+
+	
 	/**
 	 * Return times with:
 	 * 		day set to the lab day,
@@ -212,57 +195,12 @@ public class Course implements ScheduleElement, HasCreditHours{
 	}
 
 
-	public boolean overlaps(ScheduleElement other){
-		if(other instanceof Course){
-			return this.allTakenTimes().overlaps(((Course)other).allTakenTimes());
-		}
-		else{
-			return false;
-		}
-	}
-
-	/**
-	 * If the user declares that this course will satisfy this requirement, 
-	 * then this will save it forever (even if the requirement is no longer on
-	 * the requirements list visible to the user).
-	 * @param req
-	 */
-	public void userSpecifiedSatisfies(Requirement req){
-		userSpecifiedReqs.add(req);
-	}
-
-	/**
-	 * Return an unsorted list of the requirements satisfied by this course.
-	 * @return
-	 */
-	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded){
-		HashSet<Requirement> result = new HashSet<Requirement>();
-		for(Requirement r : loaded){
-			if(r.isSatisfiedBy(this.coursePrefix)){
-				result.add(r);
-			}
-		}
-		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
-		if(! /*sets equal*/ ((enemies.containsAll(oldEnemyList)) && oldEnemyList.containsAll(enemies)) ){
-			//the enemies changed. TODO
-			//ask the user which requirements should now be satisfied by this course.
-			System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
-					+ enemies.toString() + "\n"
-					+ " Which one should get the credit hours?");
-			userSpecifiedReqs = new HashSet<Requirement>();
-			this.oldEnemyList = enemies;
-		}
-		result.removeAll(oldEnemyList);
-		for(Requirement specified : userSpecifiedReqs){
-			result.add(specified);
-		}
-		return new ArrayList<Requirement>(result);
-	}
 	
 
 
-	@Override
+	
+
+
 	public boolean isDuplicate(ScheduleElement other) {
 		if(! ( other instanceof Course )){
 			return false;
@@ -288,28 +226,11 @@ public class Course implements ScheduleElement, HasCreditHours{
 	}
 
 	
-	public String shortString(){
-		String result = new String();
-		result = result + this.semester.getSeason(this.semester.sNumber)+ " "+ this.semester.year + " ";
-		result = result + this.coursePrefix.toString() + " "; 
-		result = result + this.sectionNumber+ " ";
-		
-		return result;
-		
-	}
+	
 
-	public boolean isTaken() {
-		return taken;
-	}
 
-	public void setTaken(boolean taken) {
-		this.taken = taken;
-	}
 
-	@Override
-	public String getDisplayString() {
-		return this.toString();
-	}
+
 
 	public String saveString(){
 		/*  TODO add name

@@ -11,6 +11,7 @@ public class Schedule {
 	CourseList masterList;
 	int CLP; 
 	Prefix languagePrefix;
+	
 
 
 
@@ -28,26 +29,25 @@ public class Schedule {
 
 		//Class One 
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
-		a.setTaken(true);
-		result.addScheduleElement(a, result.semesters.get(0));
+		ScheduleCourse aa = new ScheduleCourse(a, result);
+		aa.setTaken(true);
+		result.addScheduleElement(aa, result.semesters.get(0));
 
 
 		//Class Two
 		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
-		b.setTaken(true);
-		result.addScheduleElement(b, result.semesters.get(0));
-		
 
-		//Class Three 
-		Course c = new Course(new Prefix("FRN", 201), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
-		c.setTaken(true);
-		//result.semesters.get(0).add(c);
+		ScheduleCourse bb = new ScheduleCourse(b, result);
+		bb.setTaken(true);
+		result.addScheduleElement(bb , result.semesters.get(0));
 
 
-		//Class Four
-		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
-		d.setTaken(true);
-		result.addScheduleElement(d, result.semesters.get(0));
+
+		//Class Three
+		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null,  4, "03");
+		ScheduleCourse dd = new ScheduleCourse(d, result);
+		dd.setTaken(true);
+		result.addScheduleElement(dd, result.semesters.get(0));
 		//result.semesters.add(b);
 
 
@@ -203,6 +203,7 @@ public class Schedule {
 
 
 	public void addMajor(Major newMajor){
+
 		addAtMajor(newMajor, majorsList.size());
 		if(!newMajor.name.equals("GER")){
 			majorsList.remove(0);
@@ -771,23 +772,15 @@ public class Schedule {
 	 *  
 	 */
 	public void updateReqs(){
+		
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 		
-		//For each requirement, find all the schedule elements that satisfy it
-		// (this prevents enemy requirements from both seeing the same course)
+		
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		for(Requirement r : reqList){
-			ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
-			for(ScheduleElement e : allTakenElements){
-				if(e.getRequirementsFulfilled(reqList).contains(r)){
-					satisficers.add(e);
-				}
-			}
-			r.isComplete(satisficers, true);
-			r.percentComplete(satisficers, true);
-			r.minMoreNeeded(satisficers, true);
+      updateRequirement(r);
 		}
 		reqsValid = true;
 	}
@@ -798,10 +791,23 @@ public class Schedule {
 	 * @param r
 	 */
 	public int updateRequirement(Requirement r){
+		//For each requirement, find all the schedule elements that satisfy it
+				// (this prevents enemy requirements from both seeing the same course)s
+		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-		r.isComplete(allTakenElements, true);
-		r.percentComplete(allTakenElements, true);
-		return r.minMoreNeeded(allTakenElements,  true);
+
+		//Courses that don't have enemies, and exclude courses that do have enemies
+		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
+		for(ScheduleElement e : allTakenElements){
+			if(e.getRequirementsFulfilled(reqList).contains(r)){
+				satisficers.add(e);
+			}
+		}
+		
+		r.isComplete(satisficers, true);
+		r.percentComplete(satisficers, true);
+		return r.minCoursesNeeded(satisficers,  true);
+
 	}
 
 

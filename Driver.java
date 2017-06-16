@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -42,21 +43,14 @@ public class Driver{
 	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
-
+	ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
 
 	public static Driver testDriver(){
 		Driver results = new Driver();
 		testSchedule = Schedule.testSchedule();	
 
 		testSchedule.setDriver(results);
-		int wantedMajor=0;
-		for(int i = 0; i<ListOfMajors.testList().getSize(); i++){
-			if(ListOfMajors.testList().get(i).name.equals("Psychology")){
-				wantedMajor=i;
-			}
-		}
-
-		results.GUIAddMajor(ListOfMajors.testList().get(wantedMajor));
+		results.GUIAddMajor(results.l.getMajor("Psychology"));
 		testSchedule.setDriver(results);
 		return results;
 	}
@@ -66,6 +60,7 @@ public class Driver{
 
 
 	public Driver() {
+	
 		int givenHeight = 300;
 		int givenWidth =100;
 		//Belltower icon and scaling
@@ -235,9 +230,10 @@ public class Driver{
 
 				String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 				int MajorType = 0;
-				if(GERNeeded!= null){
-					MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
+				if(GERNeeded == null){
+					return;
 				}
+				MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
 				//this.sch.removeMajor(sch.masterList.getGERMajor(0));
 				//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
 				m.setChosenDegree(MajorType);
@@ -248,7 +244,7 @@ public class Driver{
 	}
 
 	public void GUIPopUP(String s){
-		new ExtrasAddList(s, this, sch);
+		new PopUpChooser(s, this, sch);
 	}
 
 	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
@@ -390,7 +386,7 @@ public class Driver{
 						s.elements.clear();
 					}
 
-					sch.addScheduleElement(c, s);
+					sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
 					this.update();
 
 				}	
@@ -465,13 +461,13 @@ public class Driver{
 	public void GUIChallengeExcepted(Semester s, Course c){
 		if(s.semesterDate.sNumber==SemesterDate.MAYX){
 			//s.elements.clear();
-			sch.addScheduleElement(c, s);
+			sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
 
 
 		}
 		else{
 
-			sch.addScheduleElement(c, s);
+			sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
 
 		}	
 
