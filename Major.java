@@ -378,7 +378,9 @@ public class Major {
 				RequirementGraph.makeLoner(this.reqList.get(firstReqNum));
 			}
 			else{
+
 			reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
+
 			}
 		}
 	}
