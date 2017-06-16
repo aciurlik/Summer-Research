@@ -730,7 +730,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
 				"2 of (BIO 110, BIO 112, BIO 120)",
 				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
-				"1 of (MTH 150, 2 of (MTH 145, MTH 120))"
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+				"{Number to Choose: {1} Choices: {{ART-401}} DDN: {1} Requirement Name:{null}}",
+				"{Number to Choose: {1} Choices: {{ART-111}{ART-112}{ART-113}{ART-124}{ART-130}{ART-131}{ART-205}{ART-330}{ART-401}{THA-115}{THA-116}{THA-315}{THA-316}{THA-317}} DDN: {1} Requirement Name:{12 hours of studio art}}"
 		};
 		Prefix[] prefixes = new Prefix[]{
 				new Prefix("MTH", "110"),
@@ -743,6 +745,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
 		takens.add(new PrefixHours(prefixes[0], 4));//MTH 110
 		takens.add(new PrefixHours(prefixes[1], 4));//MTH 120
+		takens.add(new PrefixHours(new Prefix("Art", "401"), 4));//MTH 120
 
 		System.out.print("Taken prefixes: ");
 		for(ScheduleElement p : takens){
@@ -770,6 +773,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 			if(needsToBeShown){
+				System.out.println(r.numToChoose + "," + r.choices + "," + r.name);
 				System.out.println("ReadingFrom \"" +toRead + "\"");
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
 				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);

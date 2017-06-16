@@ -14,17 +14,17 @@ public class Major {
 	ArrayList<Requirement> reqList;
 	ArrayList<Integer> reqFriendGroups;
 	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
-	
+
 	public int chosenDegree;
-	
+
 
 
 	public static final String NORMAL_MAJOR = "Major";
 	public static final String MINOR = "Minor";
 	public static final String TRACK = "Track";
-	
+
 	String majorType;
-	
+
 
 	int degreeType;
 
@@ -50,8 +50,8 @@ public class Major {
 
 	}
 
-	
-	
+
+
 	public int getChosenDegree() {
 		return chosenDegree;
 	}
@@ -93,7 +93,7 @@ public class Major {
 				7);
 		electives.setName("MTH Electives");
 		result.addRequirement(electives);
-		
+
 		//result.reqFriendGroups.set(4, 2);
 		//result.reqFriendGroups.set(3,1);
 		//result.reqFriendGroups.set(2,1);
@@ -101,7 +101,7 @@ public class Major {
 		RequirementGraph.putEdge(result.reqList.get(1), result.reqList.get(2));
 		return result;
 	}
-	
+
 	/**
 	 * Sets the type of this major.
 	 * Should be one of NORMAL_MAJOR, MINOR, or TRACK. 
@@ -110,7 +110,7 @@ public class Major {
 	public void setType(String majorType){
 		this.majorType = majorType;
 	}
-	
+
 	public boolean isType(String majorType){
 		return this.majorType.equals(majorType);
 	}
@@ -120,26 +120,30 @@ public class Major {
 		reqFriendGroups.add(0);
 	}
 
-	
-  
-  
-  
-  
+
+
+
+
+
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
 		result.append(typeString + this.majorType + "\n");
 		result.append(degreeTypeString);
 		String degree="";
-		for(int i: degreeTypes){
-			
-			degree = degree + (CourseList.getDegreeTypeString(i) + ", ");
+		if(degreeTypes.size()>0){
+			for(int i: degreeTypes){
+
+				degree = degree + (CourseList.getDegreeTypeString(i) + ", ");
+
+			}
+
+
+			String toAppend = degree.substring(0, degree.length()-2);
+			result.append(toAppend);
 			
 		}
-		String toAppend = degree.substring(0, degree.length()-2);
-		result.append(toAppend);
 		result.append("\n");
-		
 		for (int i = 0; i  <this.reqList.size() ; i ++){
 			Requirement r = this.reqList.get(i);
 			result.append("R" + i);
@@ -312,10 +316,10 @@ public class Major {
 			i++;
 		}
 		result.addEnemyEdgesFromFriendGroups();
-		
+
 		return result;
 	}
-	
+
 	private static Requirement readRequirementLine(String s){
 		int colonIndex = s.indexOf(":");
 		int firstSpace = s.indexOf(" ");
@@ -327,7 +331,7 @@ public class Major {
 		}
 		return newRequirement;
 	}
-	
+
 	/**
 	 * Given a line of the form "R3: R1, R2, R7 "
 	 *  or  "R3: 5"
@@ -366,7 +370,7 @@ public class Major {
 			}
 		}
 	}
-	
+
 
 
 	public static Major readFrom(File f){
@@ -407,12 +411,12 @@ public class Major {
 	public static void main(String[] args){
 		Major t = Major.testMajor();
 		System.out.println(t.saveString());
-		
+
 		Major x = Major.readFrom(t.saveString());
 		System.out.println(x.saveString());
-		
+
 		System.out.println(RequirementGraph.doesPlayNice(x.reqList.get(1), x.reqList.get(2)));
-		
+
 		//ListOfMajors m = ListOfMajors.testList();
 		//System.out.println(m.getCompleteMajorsList().get(1).saveString());
 

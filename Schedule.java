@@ -501,6 +501,9 @@ public class Schedule {
 			if(other.getDate().compareTo(s.getDate()) >= 0 ){
 				for(ScheduleElement oElement : s.getElements()){
 					Requirement needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
+					if(needed == null){
+						return false;
+					}
 					if(needed.isSatisfiedBy(currentP)){
 						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 						preReq.setOffendingCourse(e);
@@ -806,7 +809,7 @@ public class Schedule {
 		
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
-		return r.minCoursesNeeded(satisficers,  true);
+		return r.minMoreNeeded(satisficers,  true);
 
 	}
 

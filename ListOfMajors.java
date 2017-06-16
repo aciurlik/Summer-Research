@@ -1,7 +1,11 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,10 +26,15 @@ public class ListOfMajors {
 
 	public static ListOfMajors readFrom(File folder){
 		ListOfMajors result = new ListOfMajors();
+		System.out.println(folder);
 		for (File f: folder.listFiles(
+				
 				new FileFilter(){
+					
 					@Override
+					
 					public boolean accept(File pathname) {
+					
 						String fullName = pathname.getAbsolutePath();
 						int i = fullName.lastIndexOf('.');
 						if(i <= 0){
@@ -37,8 +46,11 @@ public class ListOfMajors {
 
 				}
 				)){
+		
 			try{
 				result.add(Major.readFrom(f));
+			
+				
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -50,7 +62,19 @@ public class ListOfMajors {
 	}
 
 
-
+	public void saveMe(Major m, File f){
+		try {
+			BufferedWriter bf = new BufferedWriter(new FileWriter(f));
+			bf.write(m.saveString());
+			bf.close();
+			System.out.println(f.getAbsolutePath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
 	public ArrayList<Major> getCompleteMajorsList() {
 		return completeMajorsList;
 	}
@@ -165,7 +189,15 @@ public class ListOfMajors {
 
 	}
 
-
+	public static void main(String[] args){
+		ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
+		for(Major m : l.completeMajorsList){
+			System.out.println("Start of Major:");
+			System.out.println(m.saveString());
+			System.out.println("\n");
+		}
+		
+	}
 	/*
 	 * 
 Math-BS

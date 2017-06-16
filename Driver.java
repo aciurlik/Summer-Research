@@ -186,7 +186,8 @@ public class Driver{
 	}
 
 	public void GUIAddMajor(Major m) {
-		if(m.majorType.equals(m.MINOR)){
+		System.out.println(m.degreeTypes);
+		if(m.majorType.equals(m.MINOR) || (m.majorType.equals(m.TRACK) && m.degreeTypes.isEmpty())){
 			this.sch.addMajor(m);
 			this.update();
 		}
@@ -213,7 +214,7 @@ public class Driver{
 					toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
 					toAdd.add(CourseList.getDegreeTypeString(CourseList.BA));
 					toAdd.add(CourseList.getDegreeTypeString(CourseList.BM));
-					instructions = "Your major was not given a degree type. Please look-up your major and choose the appropriate option.";
+					instructions = "Your major was not given a degree type. Please look up your major and choose the appropriate option.";
 					header = "WARNING";
 				}
 
@@ -229,6 +230,7 @@ public class Driver{
 				}
 
 				String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+				
 				int MajorType = 0;
 				if(GERNeeded == null){
 					return;
