@@ -135,6 +135,10 @@ public class Driver{
 
 	}
 
+	
+	/**
+	 * Create a new, blank schedule to work from.
+	 */
 	public void GUINewSchedule() {
 		CourseList l = CourseList.testList();
 		Collections.sort(sch.semesters);
@@ -142,8 +146,12 @@ public class Driver{
 		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
 		setSchedule(current);
 		this.update();
-
 	}
+	private void setSchedule(Schedule current) {
+		sch=current;
+		this.sch.setDriver(this);
+	}
+
 	
 	/**
 	 * Ask the user to pick out some of the enemies that will be allowed to
@@ -186,13 +194,11 @@ public class Driver{
 	}
 
 
-
-	private void setSchedule(Schedule current) {
-		sch=current;
-		this.sch.setDriver(this);
-	}
-
-
+	/**
+	 * When a requirement panel is dropped into a semester panel
+	 * @param r
+	 * @param semesterP
+	 */
 	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
 		this.update();
@@ -200,6 +206,11 @@ public class Driver{
 	}
 
 
+	/**
+	 * When a schedule element panel is dropped into a semester panel
+	 * @param p
+	 * @param semesterPanel
+	 */
 	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel semesterPanel) {
 		Semester old = p.container.sem;
 		sch.moveElement(p.getElement(), old, semesterPanel.sem);
@@ -207,12 +218,20 @@ public class Driver{
 	}
 
 
+	/**
+	 * When the user clicks the  + button to add a new semester to the schedule
+	 */
 	public void GUISemesterPanelAdded(){
 		sch.addNewSemester();
 		this.update();
-
 	}
 
+	/**
+	 * When a schedule element is removed from a semester panel 
+	 * (not replaced or moved)
+	 * @param e
+	 * @param semesterPanel
+	 */
 	public void GUIRemoveElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
 		sch.removeElement(e.getElement(), semesterPanel.sem);
 		this.update();
@@ -220,6 +239,13 @@ public class Driver{
 	}
 
 
+	/**
+	 * When an element is changed from one value to another, for example, 
+	 * a requirement becoming a course.
+	 * @param container
+	 * @param toChange
+	 * @param newValue
+	 */
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
 		ScheduleElement old = toChange.getElement();
@@ -227,6 +253,7 @@ public class Driver{
 		update();
 	}
 
+	
 	public void GUIAddMajor(Major m) {
 		boolean typeNeedsToBeChosen = true;
 		if (m.majorType.equals(Major.MINOR)){
@@ -254,6 +281,11 @@ public class Driver{
 		this.update();
 	}
 	
+	/**
+	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
+	 * this lets the user choose a type.
+	 * @param m
+	 */
 	public void GUIChooseMajorDegreeType(Major m){
 		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
 			ArrayList<String> toAdd= new ArrayList<String>();
@@ -300,15 +332,18 @@ public class Driver{
 		}
 	}
 
+	/**
+	 * A general method for some types of popups
+	 * @param s
+	 */
 	public void GUIPopUP(String s){
 		new PopUpChooser(s, this, sch);
 	}
-
-	public ArrayList<Major> GUIRemoveDuplicates(ArrayList<Major> collectionOfMajors) {
-		return sch.filterAlreadyChosenMajors(collectionOfMajors);
-
-
-	}
+	
+	/**
+	 * Show the user a webpage
+	 * @param actionCommand
+	 */
 	public void GUIOutsideLink(String actionCommand) {
 		try{
 			if(actionCommand.equals(MenuOptions.addInternship)){
@@ -334,6 +369,10 @@ public class Driver{
 
 	}
 
+	/**
+	 * If the user clicks an x button on a semester.
+	 * @param semesterPanel
+	 */
 	public void GUIRemoveSemester(SemesterPanel semesterPanel) {
 		sch.removeSemester(semesterPanel.sem);
 		this.update();
@@ -348,6 +387,7 @@ public class Driver{
 
 
 
+	
 	public void GUIChooseSummerSession() {
 		String[] summerChoice = {MenuOptions.summerSessionOne, MenuOptions.summerSessionTwo};
 		String c = (String)JOptionPane.showInputDialog(popUP, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
@@ -403,17 +443,13 @@ public class Driver{
 
 	}
 
-	public void dragStarted(ScheduleElement e){
-		this.schP.dragStarted(e);
-	}
 
-	public void dragEnded(){
-		this.schP.dragEnded();
-	}
-
-
-
-
+	/**
+	 * When adding a summer session, after choosing session 1 or 2, 
+	 * this method lets the use choose which year they want to add it in
+	 * 
+	 * @param s
+	 */
 	public void createYearDialogBox(String s){
 		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
 		if((y != null) && (y !=0)){
@@ -423,96 +459,75 @@ public class Driver{
 		}
 	}
 
+	/**
+	 * Ask the user which course in this semester they want to add.
+	 * Used by MayX or Summer semesters, or the addCourse button of
+	 * a semester.
+	 * @param s
+	 */
 	public void addCourseDialogBox(Semester s){	
 		ArrayList<Course> addCourses = new ArrayList<Course>();
-		addCourses = CourseList.testList().getCoursesIn(s);
-		if(addCourses.size()==0){
+		addCourses = sch.masterList.getCoursesIn(s);
+		Course[] finalCourseList = new Course[addCourses.size()];
+		for(int i = 0; i<addCourses.size(); i++){
+			finalCourseList[i] = addCourses.get(i);
+		}
+		
+		Course c = GUIChooseCourse(finalCourseList, "Choose a course" );
+		if(c != null){
+			//Removes all courses that have already been added in case of MayX 
+			if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
+				s.elements.clear();
+			}
+			sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
+			this.update();
+		}
+	}
+
+
+
+	public Course GUIChooseCourse(Course[] finalListOfCourses, String message) {
+		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
-			JOptionPane.showMessageDialog(popUP, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+			JOptionPane.showMessageDialog(popUP, "There were no courses to choose from :( ", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
+			return null;
 		}
-		if(addCourses.size()>0){
-			Course[] toAdd = new Course[addCourses.size()];
-			for(int i = 0; i<addCourses.size(); i++){
-				toAdd[i]= addCourses.get(i);
-			}
-			if(addCourses.size()>0){
-				Course c = (Course)JOptionPane.showInputDialog(popUP, instructCourse + s.semesterDate.getSeason(s.semesterDate.sNumber),  headInstructCourse, JOptionPane.PLAIN_MESSAGE, icon, toAdd, "cat" );
-				if((c != null) && (c instanceof Course)){
-					//Removes all courses that have already been added in case of MayX 
-					if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
-						s.elements.clear();
-					}
-
-					sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
-					this.update();
-
-				}	
-			}
-		}
-	}
-
-
-
-	public Course GUIChooseCourse(Course[] finallistOfCourses, String action) {
-		Course[] toAdd = finallistOfCourses;
-
-		if(toAdd.length>0){
-			Course c = (Course)JOptionPane.showInputDialog(popUP, action , action , JOptionPane.PLAIN_MESSAGE, icon, toAdd, "Dr. Fray");
-
-			if(c!=null && c instanceof Course){
-				return c;
-
-			}
-		}
-		return null;
-
-	}
-
-
-
-
-
-	public void GUIRemoveMajorDialogBox(String actionCommand) {
-		ArrayList<Major> removeMajor = new ArrayList<Major>();
-		removeMajor = sch.majorsList;
-
-		//Make Note to test This
-		if(actionCommand.equals(MenuOptions.removeMinor)){
-			for(Major m : removeMajor){
-				if(!m.isType(Major.MINOR)){
-					removeMajor.remove(m);
-
+		String[] displayed = new String[finalListOfCourses.length];
+		HashSet<Requirement> allReqs = sch.getAllRequirements();
+		for(int i = 0; i < finalListOfCourses.length ; i ++){
+			Course c = finalListOfCourses[i];
+			ScheduleCourse sc = new ScheduleCourse(c, this.sch);
+			int reqsFulfilled = 0;
+			for(Requirement r : allReqs){
+				if(r.isSatisfiedBy(c.getPrefix())){
+					reqsFulfilled ++;
 				}
 			}
+			String displayedString = String.format(
+					"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
+					reqsFulfilled,
+					c.meetingTime[0].clockTime(),
+					sc.getPrefix().toString() + " " +c.professor);
+			displayed[i] = displayedString;
 		}
-		if(actionCommand.equals(MenuOptions.removeTrack)){
-			for(Major m : removeMajor){
-				if(!m.isType(Major.TRACK)){
-					removeMajor.remove(m);
+		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
+		int chosenIndex = 0;
+		for(; chosenIndex < displayed.length ; chosenIndex ++){
+			if(displayed[chosenIndex] == chosenString){
+				break;
+			}
+		}
+		if(chosenIndex == displayed.length){
+			return null;
+		}
+		return finalListOfCourses[chosenIndex];
 
-				}
-			}
-		}
-		Major[] toRemove = new Major[removeMajor.size()];
-		if(removeMajor.size() != 0){
-			for(int i = 0; i<removeMajor.size(); i++){
-				toRemove[i] = removeMajor.get(i);
-			}
-
-			Major m = (Major) JOptionPane.showInputDialog(popUP, actionCommand, actionCommand, JOptionPane.PLAIN_MESSAGE,icon, toRemove, "Cat" );
-			if((m != null) && (m instanceof Major)){
-				sch.removeMajor(m);
-				this.update();
-			}
-		}
 	}
+	
+	
 
 	public void GUISupriseWindow(Semester s) {
-
 		new SupriseMe(sch, s, this);
-
-
-
 	}
 
 	public void GUIChallengeExcepted(Semester s, Course c){
@@ -567,10 +582,57 @@ public class Driver{
 		this.update();
 
 	}
+	
+
+	public void GUICheckAllErrors() {
+		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
+		String result = new String();
+		for(ScheduleError s : allErrors){
+			if(s.error.equals(ScheduleError.overlapError)){
+				result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
+			}
+			if(s.error.equals(ScheduleError.overloadError)){
+				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
+			}
+			if(s.error.equals(ScheduleError.preReqError)){
+				result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+			}
+			if(s.error.equals(ScheduleError.duplicateError)){
+				result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
+			}
+		}
+		if(result.length() < 2){
+			result = "Your Schedule had no errors! You're a pretty savy scheduler";
+		}
+		JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+		String majorNotes = "";
+		boolean hasNotes = false;
+		for(Major m : sch.majorsList){
+			if(m.notes != null){
+				majorNotes += "Notes for " + m.name + "\n";
+				majorNotes += m.notes + "\n\n";
+				hasNotes = true;
+			}
+		}
+		if(hasNotes){
+			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
 
 
 
-	public boolean userRequestError(ScheduleError s){
+
+	
+	/**
+	 * A highly used method.
+	 * Whenever there is a scheudling error, like classes overlapping,
+	 * this method is called. The user is asked whether we should ignore
+	 * the error. If the user overrides the error,
+	 *  this method returns true, otherwise false.
+	 * @param s
+	 * @return
+	 */
+	public boolean userOverrideError(ScheduleError s){
 		String header=null;
 		//instruct will be displayed as the main warning message
 		String instruct= null; 
@@ -611,53 +673,22 @@ public class Driver{
 
 	}
 
-
-	public void GUICheckAllErrors() {
-		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
-		String result = new String();
-		for(ScheduleError s : allErrors){
-			if(s.error.equals(ScheduleError.overlapError)){
-				result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.overloadError)){
-				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
-			}
-			if(s.error.equals(ScheduleError.preReqError)){
-				result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.duplicateError)){
-				result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
-			}
-		}
-		if(result.length() < 2){
-			result = "Your Schedule had no errors! You're a pretty savy scheduler";
-		}
-		JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
-		String majorNotes = "";
-		boolean hasNotes = false;
-		for(Major m : sch.majorsList){
-			if(m.notes != null){
-				majorNotes += "Notes for " + m.name + "\n";
-				majorNotes += m.notes + "\n\n";
-				hasNotes = true;
-			}
-		}
-		if(hasNotes){
-			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
-		}
+	
+	
+	
+	
+	
+	
+	
+	public void dragStarted(ScheduleElement e){
+		this.schP.dragStarted(e);
 	}
 
-
-
-
-
-
-
-
-
+	public void dragEnded(){
+		this.schP.dragEnded();
+	}
 
 	public void updateAll(){
-
 
 		schP.update(sch);
 		reqs.update(sch);
@@ -673,15 +704,12 @@ public class Driver{
 
 	}
 
-
-
 	public void update() {
 		updateAll();
 		repaintAll(); 
 		//System.out.println(this.sch.semesters.get(0).hasNotes);
 
 	}
-
 
 	public static void main(String[] args){
 		//new Driver();
@@ -690,32 +718,7 @@ public class Driver{
 
 	}
 
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
