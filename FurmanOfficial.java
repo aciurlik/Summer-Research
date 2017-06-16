@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 
 public class FurmanOfficial {
@@ -23,6 +24,14 @@ public class FurmanOfficial {
 	public static final Font bigHeaderFont = getFont(18);
 	public static final Font smallHeaderFont = getFont(14);
 	public static final Font normalFont = getFont(12);
+	
+	
+	static{
+		UIManager.put("OptionPane.messageFont", getFont(12));
+		UIManager.put("OptionPane.font", getFont(12));
+		UIManager.put("OptionPane.buttonFont", getFont(12));
+		UIManager.put("List.font", new Font("MONOSPACED", Font.PLAIN, 12));
+	}
 	
 	/**
 	 * Rescale this RGB value according to the given alpha
