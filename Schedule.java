@@ -281,7 +281,7 @@ public class Schedule {
 	///////////////////////////////
 	public boolean userOverride(ScheduleError s){
 		if(this.d != null){
-			return(d.userRequestError(s));
+			return(d.userOverrideError(s));
 		}
 		else{
 			return true;
