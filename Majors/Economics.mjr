@@ -1,12 +1,13 @@
 Economics
+Type: Major
 Possible Degree(s):BA
-R0: (ACC-111)
-R1: (ECN-111)
-R2: (ECN-225)
-R3: (ECN-331)
-R4: (ECN-345)
-R5: (ECN-346)
-R6: (ECN-475)
-R7: (MTH-150)
-R8 Electives: (3 of ECN>=201)
-
+R0:(ACC-111)
+R1:(ECN-111)
+R2:(ECN-225)
+R3:(ECN-331)
+R4:(ECN-345)
+R5:(ECN-346)
+R6:(ECN-475)
+R7:(MTH-150)
+R8 Electives:(3 of ECN>200)
+Collection of Requirement Enemies:

@@ -501,6 +501,9 @@ public class Schedule {
 			if(other.getDate().compareTo(s.getDate()) >= 0 ){
 				for(ScheduleElement oElement : s.getElements()){
 					Requirement needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
+					if(needed == null){
+						return false;
+					}
 					if(needed.isSatisfiedBy(currentP)){
 						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 						preReq.setOffendingCourse(e);

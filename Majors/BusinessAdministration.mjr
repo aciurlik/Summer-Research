@@ -1,12 +1,14 @@
 Business Administration
+Type: Major
 Possible Degree(s):BA
-REQ:{Number to Choose: {1} Choices: {{ACC-111}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ECN-111}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ECN-225}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-145}{MTH-150}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ACC-301}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{BUS-321}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{BUS-331}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{BUS-341}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{BUS-450}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {4} Choices: {{ACC-300}{ACC-301}{ACC-360}{ACC-450}{ACC-501}{ACC-503}{BUS-230}{BUS-300}{BUS-305}{BUS-310}{BUS-312}{BUS-315}{BUS-320}{BUS-321}{BUS-325}{BUS-330}{BUS-331}{BUS-335}{BUS-337}{BUS-341}{BUS-350}{BUS-360}{BUS-411}{BUS-420}{BUS-421}{BUS-422}{BUS-450}{BUS-501}{BUS-505}{ECN-233}{ECN-234}{ECN-235}{ECN-236}{ECN-237}{ECN-238}{ECN-241}{ECN-242}{ECN-243}{ECN-247}{ECN-248}{ECN-249}{ECN-250}{ECN-251}{ECN-252}{ECN-253}{ECN-256}{ECN-263}{ECN-331}{ECN-345}{ECN-346}{ECN-356}{ECN-357}{ECN-371}{ECN-475}{ECN-501}} DDN: {0} Requirement Name:{ACC BUS ECN Elective}}
+R0:(ACC-111)
+R1:(ECN-111)
+R2:(ECN-225)
+R3:(MTH-145, MTH-150)
+R4:(ACC-301)
+R5:(BUS-321)
+R6:(BUS-331)
+R7:(BUS-341)
+R8:(BUS-450)
+R9 ACC BUS ECN Elective:4 of (ACC-300, ACC-301, ACC-360, ACC-450, ACC-501, ACC-503, BUS-230, BUS-300, BUS-305, BUS-310, BUS-312, BUS-315, BUS-320, BUS-321, BUS-325, BUS-330, BUS-331, BUS-335, BUS-337, BUS-341, BUS-350, BUS-360, BUS-411, BUS-420, BUS-421, BUS-422, BUS-450, BUS-501, BUS-505, ECN-233, ECN-234, ECN-235, ECN-236, ECN-237, ECN-238, ECN-241, ECN-242, ECN-243, ECN-247, ECN-248, ECN-249, ECN-250, ECN-251, ECN-252, ECN-253, ECN-256, ECN-263, ECN-331, ECN-345, ECN-346, ECN-356, ECN-357, ECN-371, ECN-475, or ECN-501)
+Collection of Requirement Enemies:

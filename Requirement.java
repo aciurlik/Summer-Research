@@ -745,15 +745,19 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				"2 of (BIO 110, BIO 112, BIO 120)",
 				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
 				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+
 				"2 ch of (MTH-110, MTH-120, MTH-130)",
 				"2 chof (MTH-110, MTH-120, MTH-130)",
 				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
 				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)"
+
 		};
 		
 		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
+
 		takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
 		takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
+
 
 		System.out.print("Taken prefixes: ");
 		for(ScheduleElement p : takens){
@@ -781,6 +785,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 			if(needsToBeShown){
+				System.out.println(r.numToChoose + "," + r.choices + "," + r.name);
 				System.out.println("ReadingFrom \"" +toRead + "\"");
 				System.out.println("Uses CH? " + r.usesCreditHours);
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);

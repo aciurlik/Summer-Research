@@ -61,6 +61,7 @@ public class ScheduleCourse implements ScheduleElement{
 		if(! /*sets equal*/ ((enemies.containsAll(this.c.oldEnemyList)) && this.c.oldEnemyList.containsAll(enemies)) ){
 			//the enemies changed. TODO
 			//ask the user which requirements should now be satisfied by this course.
+			//sch.conflictingRequirements(this
 			System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
 					+ enemies.toString() + "\n"
 					+ " Which one should get the credit hours?");

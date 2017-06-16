@@ -1,12 +1,14 @@
 Psychology
-Possible Degree(s):BS,BA
-REQ:{Number to Choose: {1} Choices: {{PSY-111}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PSY-201}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PSY-202}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PSY-215}{PSY-218}{PSY-314}{PSY-318}} DDN: {1} Requirement Name:{Applied}}
-REQ:{Number to Choose: {1} Choices: {{PSY-320}{PSY-321}{PSY-323}} DDN: {1} Requirement Name:{Biopsychology}}
-REQ:{Number to Choose: {1} Choices: {{PSY-211}{PSY-213}} DDN: {1} Requirement Name:{Development}}
-REQ:{Number to Choose: {1} Choices: {{PSY-322}{PSY-324}} DDN: {1} Requirement Name:{Learning and Cognition}}
-REQ:{Number to Choose: {1} Choices: {{PSY-212}{PSY-214}{PSY-216}} DDN: {1} Requirement Name:{Social or Health}}
-REQ:{Number to Choose: {1} Choices: {{PSY-403}{PSY-404}{PSY-413}{PSY-414}{PSY-415}{PSY-418}} DDN: {1} Requirement Name:{Capstone}}
-REQ:{Number to Choose: {2} Choices: {{PSY-215}{PSY-218}{PSY-314}{PSY-318}{PSY-320}{PSY-321}{PSY-323}{PSY-211}{PSY-213}{PSY-322}{PSY-324}{PSY-212}{PSY-214}{PSY-216}{PSY-403}{PSY-404}{PSY-413}{PSY-414}{PSY-415}{PSY-418}} DDN: {1} Requirement Name:{Elective}}
+Type: Major
+Possible Degree(s):BS, BA
+R0:(PSY-111)
+R1:(PSY-201)
+R2:(PSY-202)
+R3 Applied:(PSY-215, PSY-218, PSY-314, or PSY-318)
+R4 Biopsychology:(PSY-320, PSY-321, or PSY-323)
+R5 Development:(PSY-211, PSY-213)
+R6 Learning and Cognition:(PSY-322, PSY-324)
+R7 Social or Health:(PSY-212, PSY-214, or PSY-216)
+R8 Capstone:(PSY-403, PSY-404, PSY-413, PSY-414, PSY-415, or PSY-418)
+R9 Elective:2 of (PSY-211, PSY-212, PSY-213, PSY-214, PSY-215, PSY-216, PSY-218, PSY-314, PSY-318, PSY-320, PSY-321, PSY-322, PSY-323, PSY-324, PSY-403, PSY-404, PSY-413, PSY-414, PSY-415, or PSY-418)
+Collection of Requirement Enemies:

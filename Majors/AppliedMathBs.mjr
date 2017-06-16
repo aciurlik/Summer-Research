@@ -1,10 +1,12 @@
 Applied Math
+Type: Major
 Possible Degree(s):BS
-REQ:{Number to Choose: {1} Choices: {{CSC-121}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{CSC-122}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-160}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-250}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-260}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ MTH-360}{ MTH-450}{ MTH-460}{MTH-350}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {4} Choices: {{ BIO-340}{ BIO-440}{ BIO-445}{ CHM-310}{ CHM-330}{ CHM-340}{ CSC-343}{ CSC-461}{ ECN-331}{ ECN-345}{ ECN-346}{ ECN-475}{ MTH-320}{ MTH-330}{ MTH-335}{ MTH-337}{ MTH-340}{ MTH-341}{ MTH-435}{ PHY-311}{ PHY-312}{ PHY-312}{ PHY-321}{ PHY-322}{ PHY-421}{ PHY-421}{ PHY-441}{ PHY-442}{ PHY-451}{MTH-255}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {2} Choices: {{ CHM-110}{ CHM-115}{ CHM-120}{ EES-112}{ EES-113}{ EES-115}{ PHY-111}{ PHY-112}{ PSY-320}{ SUS-120}{BIO-111}} DDN: {0} Requirement Name:{null}}
+R0:(CSC-121)
+R1:(CSC-122)
+R2:(MTH-160)
+R3:(MTH-250)
+R4:(MTH-260)
+R5:(MTH-350, MTH-360, MTH-450, or MTH-460)
+R6:4 of (BIO-340, BIO-440, BIO-445, CHM-310, CHM-330, CHM-340, CSC-343, CSC-461, ECN-331, ECN-345, ECN-346, ECN-475, MTH-255, MTH-320, MTH-330, MTH-335, MTH-337, MTH-340, MTH-341, MTH-435, PHY-311, PHY-312, PHY-321, PHY-322, PHY-421, PHY-441, PHY-442, or PHY-451)
+R7:2 of (BIO-111, CHM-110, CHM-115, CHM-120, EES-112, EES-113, EES-115, PHY-111, PHY-112, PSY-320, or SUS-120)
+Collection of Requirement Enemies:

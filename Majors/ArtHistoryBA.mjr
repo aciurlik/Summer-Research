@@ -1,7 +1,9 @@
 Art History
+Type: Major
 Possible Degree(s):BA
-REQ:{Number to Choose: {1} Choices: {{ART-130}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-131}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-330}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {6} Choices: {{ART-230}{ART-231}{ART-234}{ART-235}{ART-236}{ART-237}{ART-245}{ART-250}{ART-251}{ART-254}{ART-260}{ART-261}{ART-263}{ART-270}{ART-271}} DDN: {0} Requirement Name:{Art History 200-299}}
-REQ:{Number to Choose: {1} Choices: {{ART-111}{ART-112}{ART-113}{ART-124}{ART-130}{ART-131}{ART-205}{ART-330}{ART-401}} DDN: {0} Requirement Name:{Art Studio Course}}
+R0:(ART-130)
+R1:(ART-131)
+R2:(ART-330)
+R3 Art History 200-299:6 of (ART-230, ART-231, ART-234, ART-235, ART-236, ART-237, ART-245, ART-250, ART-251, ART-254, ART-260, ART-261, ART-263, ART-270, or ART-271)
+R4 Art Studio Course:(ART-111, ART-112, ART-113, ART-124, ART-130, ART-131, ART-205, ART-330, or ART-401)
+Collection of Requirement Enemies:

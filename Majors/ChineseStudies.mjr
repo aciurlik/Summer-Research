@@ -1,5 +1,7 @@
 Chinese Studies
+Type: Major
 Possible Degree(s):BA
-REQ:{Number to Choose: {3} Choices: {{CHN-202}{CHN-301}{CHN-302}{CHN-401}{CHN-402}{CHN-403}{CHN-404}} DDN: {1} Requirement Name:{Chinese Language}}
-REQ:{Number to Choose: {1} Choices: {{CHN-470}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {4} Choices: {{ANT-201}{AST-470}{CHN-220}{CHN-225}{CHN-230}{CHN-235}{CHN-245}{CHN-246}{CHN-320}{CHN-403}{CHN-404}{ECN-251}{HST-165}{HST-166}{HST-268}{HST-350}{PHL-240}{PHL-325}{POL-226}{POL-443}} DDN: {1} Requirement Name:{Courses focusing on China}}
+R0 Chinese Language:3 of (CHN-202, CHN-301, CHN-302, CHN-401, CHN-402, CHN-403, or CHN-404)
+R1:(CHN-470)
+R2 Courses focusing on China:4 of (ANT-201, AST-470, CHN-220, CHN-225, CHN-230, CHN-235, CHN-245, CHN-246, CHN-320, CHN-403, CHN-404, ECN-251, HST-165, HST-166, HST-268, HST-350, PHL-240, PHL-325, POL-226, or POL-443)
+Collection of Requirement Enemies:
