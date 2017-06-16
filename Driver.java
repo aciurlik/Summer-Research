@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -152,10 +153,35 @@ public class Driver{
 	 * @return
 	 */
 	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
+		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>();
 		HashSet<Requirement> result = new HashSet<Requirement>();
-		String message = "The course "+ c.getPrefix() + " satisfies some requirements that don't want to share.\n"
-				+ "Which requirements should it satisfy?";
-		//Ask the user which ones.
+		
+		JPanel problems = new JPanel();
+		problems.setLayout(new BorderLayout());
+	
+		JLabel instruct = new JLabel("The course "+ c.getPrefix() + " satisfies some requirements that don't want to share.\n"
+				+ "Which requirements should it satisfy?");
+	
+		problems.add(instruct, BorderLayout.NORTH);
+		JPanel stack = new JPanel();
+	
+		for(int i = 0; i<enemies.size(); i++){
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).getDisplayString() + " (" +  majors.get(i).name + ")" );
+			stack.add(combattingReqs);
+			userOptions.add(combattingReqs);
+		}
+		
+	
+		problems.add(stack);
+		JOptionPane.showMessageDialog(popUP,  problems, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
+		
+		for(int i=0; i<userOptions.size(); i++){
+			if(userOptions.get(i).isSelected()){
+				result.add(enemies.get(i));
+			}
+			
+		}
+	
 		return result;
 	}
 
@@ -587,20 +613,7 @@ public class Driver{
 
 
 	public void GUICheckAllErrors() {
-		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
-		for(Semester s: sch.semesters){
-			if(s.checkAllOverlap()!=null){
-				allErrors.addAll(s.checkAllOverlap());
-			}
-			if(s.checkOverload(true, null)==true){
-				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
-				overload.setOffendingSemester(s);
-				allErrors.add(overload);	
-			}
-
-		}
-		allErrors.addAll(sch.checkAllPrerequsites());
-		allErrors.addAll(sch.checkAllDuplicates());
+		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
 		String result = new String();
 		for(ScheduleError s : allErrors){
 			if(s.error.equals(ScheduleError.overlapError)){
