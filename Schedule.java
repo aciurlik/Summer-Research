@@ -11,7 +11,7 @@ public class Schedule {
 	CourseList masterList;
 	int CLP; 
 	Prefix languagePrefix;
-	
+	int totalCoursesNeeded=0;
 
 
 
@@ -76,14 +76,17 @@ public class Schedule {
 
 		//Course list
 		this.masterList = masterList;
-		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
+
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
 		for(int i = 0;i < 8 ; i ++){
 			this.semesters.add(new Semester(firstSemester, this));
 			firstSemester = firstSemester.next();
+
+
 		}
+		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
 
 
 	}
@@ -147,11 +150,17 @@ public class Schedule {
 	 */
 	public boolean replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
 		if	(checkErrorsWhenReplacing(s, s, oldElement, newElement)){
+
 			return false;
 		}
+		//System.out.println("reqs valid");
 		if(s.replace(oldElement, newElement)){
+
 			this.reqsValid = false;
+
 		}
+
+
 		return true;
 	}
 	/**
@@ -208,6 +217,9 @@ public class Schedule {
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
 		}
+		for(Requirement r: newMajor.reqList){
+			totalCoursesNeeded += r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		}
 	}
 
 
@@ -216,6 +228,9 @@ public class Schedule {
 		reqsValid = false;
 		if(!major.name.equals("GER")){
 			recalcGERMajor();
+		}
+		for(Requirement r: major.reqList){
+			totalCoursesNeeded -= r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
 		}
 	}
 
@@ -232,10 +247,17 @@ public class Schedule {
 		return highestDegree;
 	}
 
-	public static int getPercentDone(int iconHeight) {
+	public int getPercentDone(int iconHeight) {
+		System.out.println("I DID THIS");
+		int haveDone = this.estimatedCoursesLeft();
+		int toPercent = totalCoursesNeeded-haveDone;
+		float percent = (toPercent*100)/totalCoursesNeeded;
+		int newHeight = (int)(percent*iconHeight)/100;
 
-		return (iconHeight-1);
+		return newHeight-1;
 	}
+
+
 
 
 	/*				^		^		^
@@ -389,7 +411,7 @@ public class Schedule {
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
 	}
-	
+
 	private void recalcGERMajor(){
 		majorsList.set(0,masterList.getGERMajor(languagePrefix, this.determineGER()));
 	}
@@ -435,13 +457,15 @@ public class Schedule {
 		for(Semester s : semesters){
 			for (ScheduleElement e : s.getElements()){
 				Requirement needed = masterList.getPrereqsShallow(e.getPrefix());
-				boolean complete = needed.isComplete(taken, true);
-				if(!complete){
-					ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
-					prereq.setOffendingCourse(e);
-					prereq.setNeededCourses(needed);
-					prereq.setOffendingSemester(s);
-					result.add(prereq);
+				if(needed != null){
+					boolean complete = needed.isComplete(taken, true);
+					if(!complete){
+						ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
+						prereq.setOffendingCourse(e);
+						prereq.setNeededCourses(needed);
+						prereq.setOffendingSemester(s);
+						result.add(prereq);
+					}
 				}
 			}
 		}
@@ -550,7 +574,7 @@ public class Schedule {
 			afterOld.addAll(old);
 			afterOld.retainAll(beforeNew);
 			HashSet<Prefix> needed = new HashSet<Prefix>();
-			
+
 			for(ScheduleElement p : afterOld){
 				if(masterList.getPrereqsShallow(p.getPrefix()).isSatisfiedBy(newP)){
 					//throw new PrerequsiteException(new Prefix[]{newP}, p);
@@ -762,15 +786,15 @@ public class Schedule {
 	 *  
 	 */
 	public void updateReqs(){
-		
+
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-		
-		
+
+
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		for(Requirement r : reqList){
-      updateRequirement(r);
+			updateRequirement(r);
 		}
 		reqsValid = true;
 	}
@@ -782,7 +806,7 @@ public class Schedule {
 	 */
 	public int updateRequirement(Requirement r){
 		//For each requirement, find all the schedule elements that satisfy it
-				// (this prevents enemy requirements from both seeing the same course)s
+		// (this prevents enemy requirements from both seeing the same course)s
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 
@@ -793,7 +817,7 @@ public class Schedule {
 				satisficers.add(e);
 			}
 		}
-		
+
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
 		return r.minMoreNeeded(satisficers,  true);
@@ -810,7 +834,13 @@ public class Schedule {
 		int counter = 0;
 		ArrayList<ScheduleElement> courseEst = this.getAllElements();
 		for(Requirement n: this.getAllRequirements()){
-			counter += n.minMoreNeeded(courseEst, true);
+			if(n.usesCreditHours){
+				counter += n.minMoreNeeded(courseEst, true)/4;
+			}
+
+			else{
+				counter += n.minMoreNeeded(courseEst, true);
+			}
 		}
 		return counter;
 	}
@@ -948,8 +978,8 @@ public class Schedule {
 		}
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Find the set of requirements that this course should satisfy, given the
 	 * list of requirement enemies that are trying to be fulfilled by this course.
