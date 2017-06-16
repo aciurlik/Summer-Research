@@ -33,12 +33,18 @@ public class PrefixHours implements ScheduleElement, HasCreditHours{
 	}
 	@Override
 	public String getDisplayString() {
-		return null;
+		return toString();
 	}
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(
 			HashSet<Requirement> loaded) {
 		return null;
+	}
+
+
+	@Override
+	public String shortString() {
+		return getDisplayString();
 	}
 
 }

@@ -119,20 +119,7 @@ public class CourseList  {
 
 
 
-	/**
-	 * Figure out what prefixes to display as 'needed' to the user
-	 * if they try to put this course in a place where only
-	 * the courses in taken might act as prerequisites for it.
-	 * @return
-	 */
-	public Requirement prereqs(Prefix p, HashSet<Prefix> taken){
-		Requirement r = getPrereqsShallow(p);
-		if(r == null){
-		
-			return new HashSet<Prefix>();
-		}
-		return r;
-	}
+
 
 
 
