@@ -1,9 +1,11 @@
 Earth and Enviromental Science-BS
+Type: Major
 Possible Degree(s):BS
-REQ:{Number to Choose: {1} Choices: {{EES-111}{EES-112}{EES-113}{EES-115}} DDN: {0} Requirement Name:{Entry EES}}
-REQ:{Number to Choose: {1} Choices: {{EES-220}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{EES-472}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{CHM-110}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{CHM-115}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {7} Choices: {{EES-200}{EES-201}{EES-210}{EES-218}{EES-221}{EES-230}{EES-301}{EES-310}{EES-325}{EES-330}{EES-343}{EES-350}{EES-351}{EES-352}{EES-353}{EES-354}{EES-355}{EES-356}{EES-357}{EES-358}{EES-360}{EES-402}{EES-410}{EES-421}{EES-425}{EES-430}{EES-472}{EES-475}{EES-502}{EES-504}} DDN: {0} Requirement Name:{EES Elective}}
-REQ:{Number to Choose: {1} Choices: {{MTH-120}{MTH-145}{MTH-150}} DDN: {0} Requirement Name:{MTH Requirement}}
+R0 Entry EES:(EES-111, EES-112, EES-113, or EES-115)
+R1:(EES-220)
+R2:(EES-472)
+R3:(CHM-110)
+R4:(CHM-115)
+R5 EES Elective:7 of (EES-200, EES-201, EES-210, EES-218, EES-221, EES-230, EES-301, EES-310, EES-325, EES-330, EES-343, EES-350, EES-351, EES-352, EES-353, EES-354, EES-355, EES-356, EES-357, EES-358, EES-360, EES-402, EES-410, EES-421, EES-425, EES-430, EES-472, EES-475, EES-502, or EES-504)
+R6 MTH Requirement:(MTH-120, MTH-145, or MTH-150)
+Collection of Requirement Enemies:

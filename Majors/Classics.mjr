@@ -1,4 +1,6 @@
 Classics
+Type: Major
 Possible Degree(s):BA
 R0 4 CLS courses:(4 of CLS>0)
-R1 Greek and Latin: ( 2 of (4 of GRK>0, 2 of LTN>0), 2 of (2 of GRK>0, 4 of LTN>0) )
+R1 Greek and Latin:(2 of (2 of GRK>0, 4 of LTN>0), 2 of (2 of LTN>0, 4 of GRK>0))
+Collection of Requirement Enemies:

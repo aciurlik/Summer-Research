@@ -1,14 +1,16 @@
 Physics
+Type: Major
 Possible Degree(s):BA
-REQ:{Number to Choose: {1} Choices: {{MTH-151}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-160}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-111}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-112}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-241}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-331}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-311}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-312}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-321}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-322}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-441}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{PHY-421}{PHY-432}{PHY-442}{PHY-451}{PHY-452}} DDN: {0} Requirement Name:{null}}
+R0:(MTH-151)
+R1:(MTH-160)
+R2:(PHY-111)
+R3:(PHY-112)
+R4:(PHY-241)
+R5:(PHY-331)
+R6:(PHY-311)
+R7:(PHY-312)
+R8:(PHY-321)
+R9:(PHY-322)
+R10:(PHY-441)
+R11:(PHY-421, PHY-432, PHY-442, PHY-451, or PHY-452)
+Collection of Requirement Enemies:

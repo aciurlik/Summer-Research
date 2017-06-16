@@ -1,12 +1,14 @@
 Studio Art
+Type: Major
 Possible Degree(s):BA
-REQ:{Number to Choose: {1} Choices: {{ART-111}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-112}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-113}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-124}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-130}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-131}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-205}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-330}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-401}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{ART-111}{ART-112}{ART-113}{ART-124}{ART-130}{ART-131}{ART-205}{ART-330}{ART-401}{THA-115}{THA-116}{THA-315}{THA-316}{THA-317}} DDN: {1} Requirement Name:{12 hours of studio art}}
+R0:(ART-111)
+R1:(ART-112)
+R2:(ART-113)
+R3:(ART-124)
+R4:(ART-130)
+R5:(ART-131)
+R6:(ART-205)
+R7:(ART-330)
+R8:(ART-401)
+R9 12 hours of studio art:(ART-111, ART-112, ART-113, ART-124, ART-130, ART-131, ART-205, ART-330, ART-401, THA-115, THA-116, THA-315, THA-316, or THA-317)
+Collection of Requirement Enemies:
