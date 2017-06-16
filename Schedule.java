@@ -958,6 +958,44 @@ public class Schedule {
 		}
 		return false;
 	}
+	
+	
+	/**
+	 * Find the set of requirements that this course should satisfy, given the
+	 * list of requirement enemies that are trying to be fulfilled by this course.
+	 * @param enemies
+	 * @param c
+	 * @return
+	 */
+	public HashSet<Requirement> resolveConflictingRequirements(HashSet<Requirement> enemies, Course c){
+		HashSet<Requirement> result = new HashSet<Requirement>();
+		ArrayList<Requirement> reqs = new ArrayList<Requirement>();
+		ArrayList<Major> majors = new ArrayList<Major>();
+		//associate each requirement with its major.
+		for(Requirement r : enemies){
+			boolean found = false;
+			for(Major m : majors){
+				if(found != true){
+					if(m.reqList.contains(r)){
+						found = true;
+						reqs.add(r);
+						majors.add(m);
+					}
+				}
+			}
+			if(found == false){
+				throw new RuntimeException("I couldn't find the major for this requirement" + r);
+			}
+		}
+		if(this.d != null){
+			//Ask the user to pick for us.
+			return d.GUIResolveConflictingRequirements(reqs, majors, c);
+		}
+		else{
+			//If we try to resolve conflicts on our own, this is where we would do it.
+			return new HashSet<Requirement>();
+		}
+	}
 
 
 
