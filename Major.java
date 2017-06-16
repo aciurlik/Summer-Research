@@ -377,7 +377,9 @@ public class Major {
 			if(split[1].toUpperCase().equals("ALL")){
 				RequirementGraph.makeLoner(this.reqList.get(firstReqNum));
 			}
-			reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
+			else{
+				reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
+			}
 		}
 	}
 	private int parseReqNumber(String s){

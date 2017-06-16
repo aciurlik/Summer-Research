@@ -388,7 +388,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		String finalResult = new String();
 		String result = this.saveString();
 		if(this.numToChoose == 1){
-			result = result.substring(1, result.length() - 1);
+			result = result.substring(6, result.length() - 1);
 		}
 		return result;
 	}
@@ -785,8 +785,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 			if(needsToBeShown){
-				System.out.println(r.numToChoose + "," + r.choices + "," + r.name);
 				System.out.println("ReadingFrom \"" +toRead + "\"");
+				System.out.println("    got \"" + r.getDisplayString() + "\"");
 				System.out.println("Uses CH? " + r.usesCreditHours);
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
 				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
