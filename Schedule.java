@@ -977,7 +977,7 @@ public class Schedule {
 		//associate each requirement with its major.
 		for(Requirement r : enemies){
 			boolean found = false;
-			for(Major m : majors){
+			for(Major m : this.majorsList){
 				if(found != true){
 					if(m.reqList.contains(r)){
 						found = true;
@@ -1001,7 +1001,23 @@ public class Schedule {
 	}
 
 
+	public  ArrayList<ScheduleError> checkAllErrors(){
+		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
+		for(Semester s: this.semesters){
+			if(s.checkAllOverlap()!=null){
+				allErrors.addAll(s.checkAllOverlap());
+			}
+			if(s.checkOverload(true, null)==true){
+				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
+				overload.setOffendingSemester(s);
+				allErrors.add(overload);	
+			}
 
+		}
+		allErrors.addAll(this.checkAllPrerequsites());
+		allErrors.addAll(this.checkAllDuplicates());
+		return allErrors;
+	}
 
 
 
