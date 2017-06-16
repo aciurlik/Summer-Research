@@ -84,8 +84,9 @@ public class CourseList  {
 		}
 		String originalRequirementString = this.rawPrereqs.get(p);
 		if(originalRequirementString == null){
-			
-			return null;
+			Requirement result = new Requirement();
+			result.numToChoose = 0;
+			return result;
 		}
 		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){

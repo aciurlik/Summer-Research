@@ -35,7 +35,7 @@ public class Schedule {
 		//Class Two
 		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
 		b.setTaken(true);
-		result.semesters.get(0).add(b);
+		result.addScheduleElement(b, result.semesters.get(0));
 		
 		//Class Three 
 		Course c = new Course(new Prefix("FRN", 201), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
@@ -46,7 +46,7 @@ public class Schedule {
 		//Class Four
 		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		d.setTaken(true);
-		result.semesters.get(0).add(d);
+		result.addScheduleElement(d, result.semesters.get(0));
 		//result.semesters.add(b);
 
 		
@@ -460,6 +460,9 @@ public class Schedule {
 
 	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
 		Requirement needed = prereqsNeededFor(e.getPrefix(), sD);
+		if(needed == null){
+			return false; //no errors found
+		}
 		if(!needed.storedIsComplete){
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);

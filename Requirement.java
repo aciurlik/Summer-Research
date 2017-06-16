@@ -94,7 +94,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	//
 	//
 	//
-	//									percentComplete(
+	//									percentComplete(taken, bool)
 	//											|
 	//											V
 	//  isComplete(taken, bool)				MMN(taken, bool)
@@ -261,7 +261,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 */
 	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
 		double minNeeded = minMoreNeeded(taken, storeValue);
-		double result = (1.0 - minNeeded/numToChoose);
+		double originalNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		double result = (1.0 - minNeeded/originalNeeded);
 		if(storeValue){
 			this.storedPercentComplete = result;
 		}
@@ -739,7 +740,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				needsToBeShown = true;
 			}
 
-			//needsToBeShown = true;
+			needsToBeShown = true;
 
 
 			if(needsToBeShown){
@@ -747,6 +748,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
 				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
 				System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
+				System.out.println();
 			}
 			
 		}

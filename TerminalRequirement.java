@@ -394,6 +394,8 @@ public class TerminalRequirement extends Requirement {
 			if(percent < 1.0-tol && minMore <= 0){
 				show = true;
 			}
+			
+			//show = true;
 			if(show){
 			System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
 					+ ",\t" +minMore + ",\t" + percent);

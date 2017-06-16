@@ -190,6 +190,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	}
 
 	public Color semesterColor(Semester s){
+		if(s.studyAway){
+			return FurmanOfficial.grey;
+		}
 		int ColorNum = 0;
 		if(s.getDate().sNumber<SemesterDate.FALL){
 			ColorNum = s.getDate().year;
@@ -317,9 +320,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			notes.getDocument().addDocumentListener(this);
 
 		}
-		topPanel.setBackground(this.correctBackgroundColor(sem));
-		defaultPanel.setBackground(this.correctBackgroundColor(this.sem));
-
+		topPanel.setBackground(this.semesterColor(this.sem));
+		defaultPanel.setBackground(this.semesterColor(this.sem));
 	}
 
 
@@ -373,18 +375,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
 		else{
-
-			correctBackgroundColor(this.sem);
-		}
-	}
-
-
-	public Color correctBackgroundColor(Semester s){
-		if(s.studyAway){
-			return FurmanOfficial.grey;
-		}
-		else{
-			return semesterColor(this.sem);
+			this.setBackground(semesterColor(this.sem));
 		}
 	}
 	/**

@@ -139,7 +139,6 @@ public class RequirementPanel extends JPanel {
 			//	source.repaint();
 			d.dragEnded();
 
-
 		}
 
 
