@@ -203,22 +203,11 @@ public class Schedule {
 
 
 	public void addMajor(Major newMajor){
-
-		addAtMajor(newMajor, majorsList.size());
+		majorsList.add(newMajor);
+		reqsValid = false;
 		if(!newMajor.name.equals("GER")){
-			majorsList.remove(0);
-			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
+			recalcGERMajor();
 		}
-		//Tell the courses which requirements they satisfy
-		//Tell the new requirements if some taken course satisfies them.
-		reqsValid = false;
-	}
-
-	public void addAtMajor(Major newMajor, int index){
-		majorsList.add(index, newMajor);
-		//Tell the courses which requirements they satisfy
-		//Tell the new requirements if some taken course satisfies them.
-		reqsValid = false;
 	}
 
 
@@ -226,8 +215,7 @@ public class Schedule {
 		majorsList.remove(major);
 		reqsValid = false;
 		if(!major.name.equals("GER")){
-			majorsList.remove(0);
-			addAtMajor(masterList.getGERMajor(this.languagePrefix, this.determineGER()), 0);
+			recalcGERMajor();
 		}
 	}
 
@@ -399,9 +387,11 @@ public class Schedule {
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		this.languagePrefix = languagePrefix;
-		majorsList.remove(0);
-		addAtMajor(masterList.getGERMajor(languagePrefix, this.determineGER()), 0);
-
+		recalcGERMajor();
+	}
+	
+	private void recalcGERMajor(){
+		majorsList.set(0,masterList.getGERMajor(languagePrefix, this.determineGER()));
 	}
 
 
@@ -454,9 +444,6 @@ public class Schedule {
 					result.add(prereq);
 				}
 			}
-		}
-		if(result.isEmpty()){
-			return null;
 		}
 		return result;
 	}
