@@ -83,8 +83,8 @@ public class ScheduleElementPanel extends JPanel {
 		JPanel remove = new JPanel();
 		JButton toRemove = new JButton(removeButtonText);
 		toRemove.setForeground(FurmanOfficial.darkPurple);
-		if(s instanceof Course){
-			if (((Course) s).isTaken()){
+		if(s instanceof ScheduleCourse){
+			if (((ScheduleCourse) s).isTaken()){
 				toRemove.setEnabled(false);
 			}
 		}
@@ -115,7 +115,7 @@ public class ScheduleElementPanel extends JPanel {
 				public void actionPerformed(ActionEvent e){
 					Course c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
 					if(c != null){
-						container.d.GUIElementChanged(container, reference , c);
+						container.d.GUIElementChanged(container, reference ,  new ScheduleCourse (c, container.d.sch));
 					}
 				}
 			});

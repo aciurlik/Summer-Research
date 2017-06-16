@@ -55,10 +55,10 @@ public class Semester implements Comparable<Semester>{
 		if(addition == null || ( ! (addition instanceof Course))){
 			return false;
 		}
-		ArrayList<Course> courses = allCourses();
+		ArrayList<ScheduleCourse> courses = allCourses();
 		for(int i= 0; i<courses.size(); i++){
 			if(courses.get(i).overlaps(addition)){
-				ScheduleError overlaped = makeOverlapError(courses.get(i), (Course) addition);
+				ScheduleError overlaped = makeOverlapError(courses.get(i), (ScheduleCourse) addition);
 				if(!this.schedule.userOverride(overlaped)){
 					return true; //we found an overlap, and the user didn't override
 				}
@@ -75,7 +75,7 @@ public class Semester implements Comparable<Semester>{
 	 */
 	public ArrayList<ScheduleError> checkAllOverlap(){
 		ArrayList<ScheduleError> overlaps = new ArrayList<ScheduleError>();
-		ArrayList<Course> courses = allCourses();
+		ArrayList<ScheduleCourse> courses = allCourses();
 		for (int i = 0; i < courses.size() ; i ++){
 			for(int j = i+1; j < courses.size() ; j ++){
 				if(courses.get(i).overlaps(courses.get(j))){
@@ -87,11 +87,11 @@ public class Semester implements Comparable<Semester>{
 		return overlaps;
 	}
 
-	private ArrayList<Course> allCourses(){
-		ArrayList<Course> courses = new ArrayList<Course>();
+	private ArrayList<ScheduleCourse> allCourses(){
+		ArrayList<ScheduleCourse> courses = new ArrayList<ScheduleCourse>();
 		for (ScheduleElement e : this.elements){
-			if(e instanceof Course){
-				courses.add((Course)e);
+			if(e instanceof ScheduleCourse){
+				courses.add((ScheduleCourse)e);
 			}
 		}
 		return courses;
@@ -103,9 +103,9 @@ public class Semester implements Comparable<Semester>{
 	 * @param c2
 	 * @return
 	 */
-	private ScheduleError makeOverlapError(Course c1, Course c2){
+	private ScheduleError makeOverlapError(ScheduleCourse c1, ScheduleCourse c2){
 		ScheduleError result = new ScheduleError(ScheduleError.overlapError);
-		Course[] overlap = new Course[]{c1, c2};
+		ScheduleCourse[] overlap = new ScheduleCourse[]{c1, c2};
 		result.setElementList(overlap);
 
 		//Figure out whether it's lab, meeting, or exam that overlaps.
