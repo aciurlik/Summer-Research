@@ -125,7 +125,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		menuPanel.setOpaque(false);
 		menuPanel.setLayout(new BorderLayout());
 		topPanel.add(menuPanel);
-		
+
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,height));
 		this.add(defaultPanel);
@@ -225,7 +225,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	//Redraw this panel based on the semester sem.
 
 	public void updatePanel(Semester sem){
-		
+
 		this.sem = sem;
 		JLabel dropLabel = newDropLabel();
 		menuPanel.removeAll();
@@ -233,7 +233,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		defaultPanel.removeAll();
 		defaultPanel.setBackground(this.semesterColor(this.sem));
-		
+
 
 
 		//Figure out the season and add it
@@ -255,11 +255,11 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		defaultPanel.add(topPanel, BorderLayout.CENTER);
 		//Add all Schedule elements
 		defaultPanel.add(fallSpring);
-		
+
 
 		SemesterMenuBar menu = new SemesterMenuBar(this);
 		menuPanel.add(menu, BorderLayout.NORTH);
-		
+
 
 
 		for (ScheduleElement e : this.sem.elements){
@@ -405,7 +405,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 	}
 	public boolean canTake(Requirement r){
-		return !this.sem.getCoursesSatisfying(r).isEmpty();
+		ArrayList<Course> coursesSatisfying = this.sem.getCoursesSatisfying(r);
+		coursesSatisfying.removeAll(sem.elements);
+		return !coursesSatisfying.isEmpty();
 	}
 
 	private class SemesterPanelDropHandler extends PanelDropHandler{
