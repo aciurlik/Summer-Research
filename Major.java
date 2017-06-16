@@ -254,6 +254,10 @@ public class Major {
 	 * 		-----> R3 and R5 are enemies, R4 and R5 are enemies, but R3 and R4 are friends.
 	 * R4:4
 	 * R5:3
+	 * R1:ALL----> If the string "ALL" is found, this requirement will be made a loner.
+	 * 		-----> Loners are enemies with all other requirements (including from other majors)
+	 * 		-----> except for those specified here.
+	 * R1:R2 ----> In this example, R1 is enemies with every requirement other than R2.
 	 * 
 	 * 
 	 * 
@@ -331,8 +335,10 @@ public class Major {
 	/**
 	 * Given a line of the form "R3: R1, R2, R7 "
 	 *  or  "R3: 5"
-	 *  the former means to make r1, r2, and r7 enemies of r3.
-	 *   the latter means to put r3 in friend group 5
+	 *  or "R3: ALL"
+	 *  the first means to make r1, r2, and r7 enemies of r3.
+	 *   the middle means to put r3 in friend group 5
+	 *   the third means to make r3 a loner, so it is enemies with all requirements
 	 *   
 	 * @param s
 	 */
@@ -347,6 +353,9 @@ public class Major {
 			}
 		}
 		else{
+			if(split[1].toUpperCase().equals("ALL")){
+				RequirementGraph.makeLoner(this.reqList.get(firstReqNum));
+			}
 			reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
 		}
 	}

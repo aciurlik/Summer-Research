@@ -21,6 +21,7 @@ public class RequirementGraph {
 	//We will use the edge list format for storing this graph, because
 	// it will probably be sparse.
 	static Hashtable<Requirement, HashSet<Requirement>> edges = new Hashtable<Requirement, HashSet<Requirement>>();
+	static HashSet<Requirement> loners = new HashSet<Requirement>();
 	
 	/**
 	 * Declares that r1 can't play nice with r2.
@@ -45,18 +46,34 @@ public class RequirementGraph {
 	}
 	
 	/**
+	 * Set it so that this requirement is enemies with all other requirements,
+	 * except 
+	 * @param r
+	 */
+	public static void makeLoner(Requirement r){
+		loners.add(r);
+	}
+	
+	public static boolean isLoner(Requirement r){
+		return loners.contains(r);
+	}
+	
+	/**
 	 * Check if r1 and r2 can share a course or not
 	 */
 	public static boolean doesPlayNice(Requirement r1, Requirement r2){
-		
+		boolean result = true;
+		if(isLoner(r1) || isLoner(r2)){
+			result = !result;
+		}
 		HashSet<Requirement> outEdges = edges.get(r1);
 		if(outEdges == null){
-			return true;
+			return result;
 		}
 		if(outEdges.contains(r2)){
-			return false;
+			return !result;
 		}
-		return true;
+		return result;
 	}
 	
 	/**
