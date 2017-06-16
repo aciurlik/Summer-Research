@@ -208,12 +208,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 */
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
 		if(this.usesCreditHours){
-			int result = 0;
-			ArrayList<Requirement> completed = new ArrayList<Requirement>();
+			int result = numToChoose;
+			ArrayList<Requirement> completedSubreqs = new ArrayList<Requirement>();
 			for(Requirement r : choices){
 				if(r.isComplete(taken, false)){
 					//you get to add the credits from it
-					completed.add(r);
+					completedSubreqs.add(r);
 				}
 			}
 			for(ScheduleElement e : taken){
@@ -221,14 +221,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				if(e instanceof HasCreditHours){
 					int credits = ((HasCreditHours)e).getCreditHours();
 					boolean found = false;
-					for(Requirement r : completed){
+					for(Requirement r : completedSubreqs){
 						if(r.isSatisfiedBy(e.getPrefix())){
 							found = true;
 							break;
 						}
 					}
 					if(found){
-						result += credits;
+						result -= credits;
+						if(result <= 0){
+							return 0;
+						}
 					}
 				}
 			}
@@ -415,6 +418,24 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	}
 
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 	/////////////////////////////////
@@ -497,18 +518,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	/**
 	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
 	 * Make a save string for this requirement.
+	 * It should be unambiguous for any reader to see what this requirement is.
 	 * @return
 	 */
 	public String saveString(){
 
 		//Add the prefix
 		StringBuilder result = new StringBuilder();
-		if(this.numToChoose == 1){
-			result.append("(");
+		result.append(numToChoose);
+		if(this.usesCreditHours){
+			result.append(" ch");
 		}
-		else{
-			result.append(numToChoose + " of (");
-		}
+		result.append(" of (");
 		//Add the guts of this requirement - each sub-requirement
 
 
@@ -581,9 +602,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		s = s.replaceAll(",[or]*", " , ");
 		// If you see the string "6of", replace it with "6of ".
 		// Hopefully all other replaces will handle the space before the
-		// first digit of the number (a parenthesis should preceed that digit).
+		// first digit of the number (a parenthesis or comma should precede that digit).
 		s = s.replaceAll("(?<=[0-9])of", "of ");
-
+		s = s.replaceAll("(?<=[0-9])chof", "chof ");
 		s = s.trim();
 
 		Stack<String> reversed = new Stack<String>();
@@ -628,6 +649,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			}
 			Requirement result = (Requirement)temp;
 			result.numToChoose = numToChoose;
+			return result;
+		}
+		else if(next.matches("[0-9]+chof")){
+			int numToChoose = Integer.parseInt(
+					next.substring(0, next.length() - 4));
+			Requirement temp = parse(tokens);
+			if(! (temp instanceof Requirement)){
+				throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
+			}
+			Requirement result = (Requirement)temp;
+			result.numToChoose = numToChoose;
+			result.usesCreditHours = true;
 			return result;
 		}
 		else{
@@ -711,19 +744,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
 				"2 of (BIO 110, BIO 112, BIO 120)",
 				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
-				"1 of (MTH 150, 2 of (MTH 145, MTH 120))"
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+				"2 ch of (MTH-110, MTH-120, MTH-130)",
+				"2 chof (MTH-110, MTH-120, MTH-130)",
+				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
+				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)"
 		};
-		Prefix[] prefixes = new Prefix[]{
-				new Prefix("MTH", "110"),
-				new Prefix("MTH", "120"),
-				new Prefix("MTH", "130"),
-				new Prefix("MTH", "140"),
-				new Prefix("MTH", "150"),
-				new Prefix("MTH", "160")
-		};
+		
 		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
-		takens.add(new PrefixHours(prefixes[0], 4));//MTH 110
-		takens.add(new PrefixHours(prefixes[1], 4));//MTH 120
+		takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
+		takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
 
 		System.out.print("Taken prefixes: ");
 		for(ScheduleElement p : takens){
@@ -752,6 +782,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 			if(needsToBeShown){
 				System.out.println("ReadingFrom \"" +toRead + "\"");
+				System.out.println("Uses CH? " + r.usesCreditHours);
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
 				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
 				System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
