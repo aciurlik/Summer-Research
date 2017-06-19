@@ -22,6 +22,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
@@ -46,7 +48,7 @@ public class Driver{
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
 	ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
-	bellTower b;
+	BellTower b;
 
 	public static Driver testDriver(){
 		Driver results = new Driver();
@@ -83,7 +85,7 @@ public class Driver{
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
 		left.setBackground(FurmanOfficial.bouzarthGrey);
-		bellTower belltowerLabel = new bellTower(sch);
+		BellTower belltowerLabel = new BellTower(sch);
 		this.b=belltowerLabel;
 		left.add(belltowerLabel);
 		left.add(extras);
@@ -104,7 +106,7 @@ public class Driver{
 
 	}
 
-	
+
 	/**
 	 * Create a new, blank schedule to work from.
 	 */
@@ -113,6 +115,7 @@ public class Driver{
 		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
 		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
+		this.b.setSchedule(current);
 		setSchedule(current);
 		this.update();
 	}
@@ -236,7 +239,7 @@ public class Driver{
 		update();
 	}
 
-	
+
 	public void GUIAddMajor(Major m) {
 		boolean typeNeedsToBeChosen = true;
 		if (m.majorType.equals(Major.MINOR)){
@@ -264,7 +267,7 @@ public class Driver{
 		this.update();
 	}
 
-	
+
 	/**
 	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
 	 * this lets the user choose a type.
@@ -324,7 +327,7 @@ public class Driver{
 	public void GUIPopUP(String s){
 		new PopUpChooser(s, this, sch);
 	}
-	
+
 	/**
 	 * Show the user a webpage
 	 * @param actionCommand
@@ -372,7 +375,7 @@ public class Driver{
 
 
 
-	
+
 	public void GUIChooseSummerSession() {
 		String[] summerChoice = {MenuOptions.summerSessionOne, MenuOptions.summerSessionTwo};
 		String c = (String)JOptionPane.showInputDialog(popUP, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
@@ -457,7 +460,7 @@ public class Driver{
 		for(int i = 0; i<addCourses.size(); i++){
 			finalCourseList[i] = addCourses.get(i);
 		}
-		
+
 		Course c = GUIChooseCourse(finalCourseList, "Choose a course" );
 		if(c != null){
 			//Removes all courses that have already been added in case of MayX 
@@ -488,13 +491,26 @@ public class Driver{
 					reqsFulfilled ++;
 				}
 			}
-			String displayedString = String.format(
-					"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
-					reqsFulfilled,
-					c.meetingTime[0].clockTime(),
-					sc.getPrefix().toString() + " " +c.professor);
+			String displayedString = "";
+			if(c.meetingTime != null && c.meetingTime[0]!= null){
+				displayedString = String.format(
+						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
+						reqsFulfilled,
+						c.meetingTime[0].clockTime(),
+						sc.getPrefix().toString() + " " +c.professor);
+
+			}
+			else{
+				displayedString = String.format(
+						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
+						reqsFulfilled,
+						"",
+						sc.getPrefix().toString() + " " +c.professor);
+
+			}
 			displayed[i] = displayedString;
 		}
+
 		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
 		int chosenIndex = 0;
 		for(; chosenIndex < displayed.length ; chosenIndex ++){
@@ -508,8 +524,8 @@ public class Driver{
 		return finalListOfCourses[chosenIndex];
 
 	}
-	
-	
+
+
 
 	public void GUISupriseWindow(Semester s) {
 		new SupriseMe(sch, s, this);
@@ -567,47 +583,14 @@ public class Driver{
 		this.update();
 
 	}
-	
-
-	public void GUICheckAllErrors() {
-		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
-		String result = new String();
-		for(ScheduleError s : allErrors){
-			if(s.error.equals(ScheduleError.overlapError)){
-				result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.overloadError)){
-				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
-			}
-			if(s.error.equals(ScheduleError.preReqError)){
-				result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.duplicateError)){
-				result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
-			}
-		}
-		if(result.length() < 2){
-			result = "Your Schedule had no errors! You're a pretty savy scheduler";
-		}
-		JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
-		String majorNotes = "";
-		boolean hasNotes = false;
-		for(Major m : sch.majorsList){
-			if(m.notes != null){
-				majorNotes += "Notes for " + m.name + "\n";
-				majorNotes += m.notes + "\n\n";
-				hasNotes = true;
-			}
-		}
-		if(hasNotes){
-			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
 
 
 
 
-	
+
+
+
+
 	/**
 	 * A highly used method.
 	 * Whenever there is a scheudling error, like classes overlapping,
@@ -700,13 +683,13 @@ public class Driver{
 			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
 
-	
-	
-	
-	
-	
-	
-	
+
+
+	}
+
+
+
+
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 
@@ -744,6 +727,19 @@ public class Driver{
 	}
 
 	public static void main(String[] args){
+		try {
+			// Set cross-platform Java L&F (also called "Metal")
+			UIManager.setLookAndFeel(
+					"javax.swing.plaf.nimbus.NimbusLookAndFeel"	);
+			MenuOptions.setUIType(true);
+		} 
+		catch (Exception e) {
+			System.out.println("I AM HERE");
+			UIManager.getCrossPlatformLookAndFeelClassName();
+			MenuOptions.setUIType(false);
+		}
+
+
 		//new Driver();
 		testDriver();
 

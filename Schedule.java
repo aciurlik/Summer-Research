@@ -248,7 +248,6 @@ public class Schedule {
 	}
 
 	public int getPercentDone(int iconHeight) {
-		System.out.println("I DID THIS");
 		int haveDone = this.estimatedCoursesLeft();
 		int toPercent = totalCoursesNeeded-haveDone;
 		float percent = (toPercent*100)/totalCoursesNeeded;
