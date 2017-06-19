@@ -11,6 +11,7 @@ public class Semester implements Comparable<Semester>{
 	private int OverloadLimit;
 	public boolean hasNotes = false;
 	public String notes = "";
+	boolean isAP = false;
 
 
 

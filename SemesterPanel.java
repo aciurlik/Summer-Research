@@ -265,6 +265,10 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		season +=  " " + sem.semesterDate.year;
 		fallSpring.setText(season);
+		if(this.sem.isAP){
+			fallSpring.setText("Prior Course");
+			
+		}
 
 		topPanel.setBackground(defaultPanel.getBackground());
 

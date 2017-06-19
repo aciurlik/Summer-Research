@@ -6,12 +6,14 @@ import java.util.HashSet;
 
 public class Schedule {
 	ArrayList<Major> majorsList;
-	ArrayList<Semester> semesters;
+	private ArrayList<Semester> semesters;
 	Driver d; 
 	CourseList masterList;
 	int CLP; 
 	Prefix languagePrefix;
 	int totalCoursesNeeded=0;
+	Semester priorSemester;
+
 
 
 
@@ -31,7 +33,7 @@ public class Schedule {
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		ScheduleCourse aa = new ScheduleCourse(a, result);
 		aa.setTaken(true);
-		result.addScheduleElement(aa, result.semesters.get(0));
+		result.addScheduleElement(aa, result.semesters.get(1));
 
 
 		//Class Two
@@ -39,7 +41,7 @@ public class Schedule {
 
 		ScheduleCourse bb = new ScheduleCourse(b, result);
 		bb.setTaken(true);
-		result.addScheduleElement(bb , result.semesters.get(0));
+		result.addScheduleElement(bb , result.semesters.get(1));
 
 
 
@@ -47,7 +49,7 @@ public class Schedule {
 		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null,  4, "03");
 		ScheduleCourse dd = new ScheduleCourse(d, result);
 		dd.setTaken(true);
-		result.addScheduleElement(dd, result.semesters.get(0));
+		result.addScheduleElement(dd, result.semesters.get(1));
 		//result.semesters.add(b);
 
 
@@ -80,8 +82,16 @@ public class Schedule {
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
-		for(int i = 0;i < 8 ; i ++){
-			this.semesters.add(new Semester(firstSemester, this));
+		for(int i = 0;i < 9 ; i ++){
+			Semester s = new Semester(firstSemester, this);
+			if(i==0){
+				s.isAP=true;
+				priorSemester =s;
+			}
+			else{
+			this.semesters.add(s);
+			}
+			
 			firstSemester = firstSemester.next();
 
 
@@ -404,12 +414,34 @@ public class Schedule {
 		return languagePrefix;
 	}
 
-
+	
+	public ArrayList<Semester> getAllSemesters(){
+		ArrayList<Semester> allSemesters = new ArrayList<Semester>();
+		allSemesters.add(priorSemester);
+		allSemesters.addAll(this.semesters);
+		return allSemesters;
+		
+	}
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
+		Requirement r = this.masterList.getPrereqsShallow(languagePrefix);
+		for(Requirement req: r.choices){
+			if(!req.getPrefix().getNumber().equals("115")){
+				System.out.println(req.getPrefix());
+
+				Course c = new Course(req.getPrefix(), new SemesterDate(priorSemester.semesterDate.year,priorSemester.semesterDate.sNumber), null, null, 4, null );
+				ScheduleCourse cc = new ScheduleCourse(c, this);
+				cc.setTaken(true);
+				priorSemester.add(cc);
+			}
+		}
 	}
+
+
+
+
 
 	private void recalcGERMajor(){
 		majorsList.set(0,masterList.getGERMajor(languagePrefix, this.determineGER()));
