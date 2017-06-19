@@ -42,7 +42,6 @@ public class bellTower extends JPanel{
 
 
 		int percentDone= sch.getPercentDone(icon.getIconHeight());
-		System.out.println(percentDone);
 		overlap.setSize(icon.getIconWidth(), percentDone);
 		overlap.setLocation(0, icon.getIconHeight()-percentDone);
 		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
