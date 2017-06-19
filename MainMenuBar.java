@@ -106,16 +106,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		newSched.add(menuItem);
 		menu.add(menuItem);
 		
-		
-		menuItem = new JMenuItem(MenuOptions.openSchedule);
+		/**
+		 * menuItem = new JMenuItem(MenuOptions.openSchedule);
 		JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
 		openSched.add(menuItem);
 		menu.add(menuItem);
-		
-		
-		
-		menuItem = new JMenuItem("Save Schedule");
+		 * 
+		 * 
+		 * 
+		 * 	menuItem = new JMenuItem("Save Schedule");
 		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
 		menuItem.addActionListener(this);
 		saveSched.add(menuItem);
@@ -129,6 +129,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		menuItem.addActionListener(this);
 		saveSched.add(menuItem);
 		menu.add(menuItem);
+		 */
+		
+		
+		
+		
+	
 		
 		menuItem = new JMenuItem("Check all Errors");
 		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
@@ -183,14 +189,19 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		menu.add(submenu);
 
-
-		//Add Help
+/**
+ * //Add Help
 		menu = new JMenu("Help");
 		JPopupMenu helpMePopup = new JPopupMenu(MenuOptions.help);
 		menu.addActionListener(this);
 		helpMePopup.add(menu);
 		this.add(menu);
 
+ * 
+ * 
+ * 
+ */
+		
 
 
 

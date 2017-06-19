@@ -52,7 +52,12 @@ public class ScheduleElementPanel extends JPanel {
 
 
 
+		if(s instanceof ScheduleCourse){
+			if(((ScheduleCourse) s).isTaken()){
+				return;
+			}
 
+		}
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
 
@@ -164,6 +169,7 @@ public class ScheduleElementPanel extends JPanel {
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
+			
 			//alert the driver of the change
 			//container.d.dragStarted(toBeDragged);
 			container.d.dragStarted(s);
