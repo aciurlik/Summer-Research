@@ -237,8 +237,32 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			}
 			return result;
 		}
-		else{
+		else{ //this doesn't use credit hours.
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
+			// if there is a requirement in taken, we need to see
+			// first whether it satisfies a choice, and if not, if it
+			// satisfies this requirement. If it satisfies a choice,
+			// then we should let that choice use it. If it satisfies
+			// no subchoice but does satisfy this requirement, then
+			// we should subtract 1 from minMoreNeeded.
+			ArrayList<Requirement> takenRequirements = new ArrayList<Requirement>();
+			for(ScheduleElement e : taken){
+				if(e instanceof Requirement){
+					takenRequirements.add((Requirement)e);
+				}
+			}
+			for(Requirement t : takenRequirements){
+				if(t.isSubset(this)){
+					boolean canUse = true;
+					for(Requirement choice : choices){
+						if(t.isSubset(choice)){
+							canUse = false;
+						}
+					}
+					
+				}
+			}
+			
 			for(Requirement r : choices){
 				otherNums.add(r.minMoreNeeded(taken));
 			}
@@ -282,6 +306,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				return true;
 			}
 		}
+		return false;
+	}
+	
+	public boolean isSubset(Requirement r){
+		//TODO
 		return false;
 	}
 	

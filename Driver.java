@@ -110,9 +110,8 @@ public class Driver{
 	 */
 	public void GUINewSchedule() {
 		CourseList l = CourseList.testList();
-		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
+		Schedule current = new Schedule(l, sch.getStartDate(), null);
 		setSchedule(current);
 		this.update();
 	}
@@ -399,12 +398,11 @@ public class Driver{
 
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
-		Collections.sort(sch.semesters);
+		ArrayList<Semester> semesters = sch.getSemesters();
+		int last = (semesters.size()-1);
+		int end = semesters.get(last).semesterDate.year;
 
-		int last = (sch.semesters.size()-1);
-		int end = sch.semesters.get(last).semesterDate.year;
-
-		for(int i=  sch.semesters.get(1).semesterDate.year; i<= end; i++){
+		for(int i=  semesters.get(1).semesterDate.year; i<= end; i++){
 
 			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
 
@@ -569,40 +567,6 @@ public class Driver{
 	}
 	
 
-	public void GUICheckAllErrors() {
-		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
-		String result = new String();
-		for(ScheduleError s : allErrors){
-			if(s.error.equals(ScheduleError.overlapError)){
-				result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.overloadError)){
-				result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
-			}
-			if(s.error.equals(ScheduleError.preReqError)){
-				result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
-			}
-			if(s.error.equals(ScheduleError.duplicateError)){
-				result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
-			}
-		}
-		if(result.length() < 2){
-			result = "Your Schedule had no errors! You're a pretty savy scheduler";
-		}
-		JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
-		String majorNotes = "";
-		boolean hasNotes = false;
-		for(Major m : sch.majorsList){
-			if(m.notes != null){
-				majorNotes += "Notes for " + m.name + "\n";
-				majorNotes += m.notes + "\n\n";
-				hasNotes = true;
-			}
-		}
-		if(hasNotes){
-			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
 
 
 
@@ -688,7 +652,7 @@ public class Driver{
 		}
 		String majorNotes = "";
 		boolean hasNotes = false;
-		for(Major m : sch.majorsList){
+		for(Major m : sch.getMajors()){
 			if(m.notes != null){
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
@@ -699,6 +663,7 @@ public class Driver{
 		if(hasNotes){
 			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
 
 	
 	
