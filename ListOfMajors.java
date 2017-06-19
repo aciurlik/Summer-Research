@@ -26,7 +26,6 @@ public class ListOfMajors {
 
 	public static ListOfMajors readFrom(File folder){
 		ListOfMajors result = new ListOfMajors();
-		System.out.println(folder);
 		for (File f: folder.listFiles(
 				
 				new FileFilter(){
