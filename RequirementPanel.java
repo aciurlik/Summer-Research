@@ -105,7 +105,7 @@ public class RequirementPanel extends JPanel {
 		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
-		shown.setToolTipText(fullText);
+		shown.setToolTipText(req.choices.toString());
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 

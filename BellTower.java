@@ -37,17 +37,19 @@ public class BellTower extends JPanel{
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 	}
 
+	
 	public void setSchedule(Schedule s){
 		this.sch=s;
 	}
+
 	public void update(){
 
 
 		int percentDone= sch.getPercentDone(icon.getIconHeight());
 		overlap.setSize(icon.getIconWidth(), percentDone);
 		overlap.setLocation(0, icon.getIconHeight()-percentDone);
-		overlap.setBackground(FurmanOfficial.nimbusAlpha);
-		if(sch.estimatedCoursesLeft()==0){
+		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
+		if(percentDone==icon.getIconHeight()-1){
 			if(sch.checkAllErrors().isEmpty()){
 				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
 			}

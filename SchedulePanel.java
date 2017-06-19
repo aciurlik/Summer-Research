@@ -123,7 +123,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
 
 
-		for(Semester s: sch.semesters){
+		for(Semester s: sch.getAllSemesters()){
 			SemesterPanel foundp = this.findPanelFor(s);
 			
 			if(foundp != null){

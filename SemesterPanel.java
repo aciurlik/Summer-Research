@@ -51,7 +51,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	final static int height=300;
 	JTextArea notes = new JTextArea();
 	JPanel menuPanel;
-	int NimbusWidth = 35;
+	int NimbusWidth = 40;
 	int NimbusHeight = 20;
 
 
@@ -105,7 +105,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
 		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
 		deleteSemesterButton.addActionListener(this);
-		deleteSemesterButton.setEnabled(false);
+		if(!this.sem.extraSemester){
+			deleteSemesterButton.setEnabled(false);
+		}
 
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
 
@@ -265,10 +267,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		season +=  " " + sem.semesterDate.year;
 		fallSpring.setText(season);
-		if(this.sem.isAP){
-			fallSpring.setText("Prior Course");
-			
-		}
+		fallSpring.setForeground(Color.black);
+
 
 		topPanel.setBackground(defaultPanel.getBackground());
 
@@ -343,6 +343,13 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 		topPanel.setBackground(this.semesterColor(this.sem));
 		defaultPanel.setBackground(this.semesterColor(this.sem));
+
+
+		if(this.sem.isAP){
+			fallSpring.setText("Prior Courses");
+			defaultPanel.remove(topPanel);
+
+		}
 	}
 
 

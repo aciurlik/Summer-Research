@@ -112,9 +112,8 @@ public class Driver{
 	 */
 	public void GUINewSchedule() {
 		CourseList l = CourseList.testList();
-		Collections.sort(sch.semesters);
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.semesters.get(0).semesterDate, null);
+		Schedule current = new Schedule(l, sch.getStartSemester().semesterDate, null);
 		this.b.setSchedule(current);
 		setSchedule(current);
 		this.update();
@@ -208,7 +207,8 @@ public class Driver{
 	 * When the user clicks the  + button to add a new semester to the schedule
 	 */
 	public void GUISemesterPanelAdded(){
-		sch.addNewSemester();
+		Semester s = sch.addNewSemester();
+		s.setExtraSemester(true);
 		this.update();
 	}
 
@@ -409,12 +409,11 @@ public class Driver{
 
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
-		Collections.sort(sch.semesters);
-
-		int last = (sch.semesters.size()-1);
-		int end = sch.semesters.get(last).semesterDate.year;
-
-		for(int i=  sch.semesters.get(1).semesterDate.year; i<= end; i++){
+		ArrayList<Semester> allSemesters = sch.getAllSemesters();
+		int last = (allSemesters.size()-1);
+		int end = allSemesters.get(last).semesterDate.year;
+		//Two first is Prior, second is odd one out
+		for(int i=  allSemesters.get(2).semesterDate.year; i<= end; i++){
 
 			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
 

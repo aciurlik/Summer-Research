@@ -134,9 +134,10 @@ public class RequirementListPanel extends JPanel{
 			heightCounter++;
 			this.inner.add(majorPanel, gbc);
 			
-			this.creditHoursLabel.setText(this.cHText + (128 - schedule.getCreditHoursComplete()));
-			this.reqsLeftLabel.setText(this.reqsText + schedule.estimatedCoursesLeft());
-			this.clpLeftLabel.setText(this.clpText + schedule.CLP);
+			this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
+			this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
+			this.clpLeftLabel.setText(this.clpText + Math.max(0, schedule.CLP));
+			
 		}
 	}
 
