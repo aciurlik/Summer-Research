@@ -12,7 +12,8 @@ public class Semester implements Comparable<Semester>{
 	public boolean hasNotes = false;
 	public String notes = "";
 	boolean isAP = false;
-
+	public boolean studyAway = false;
+	protected boolean extraSemester = false;
 
 
 
@@ -126,12 +127,12 @@ public class Semester implements Comparable<Semester>{
 
 
 
-/**
- * This is able to take a null input. 
- * @param forAll true if checking all errors, false otherwise
- * @param addition the schedule Element you are adding to your semester
- * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
- */
+	/**
+	 * This is able to take a null input. 
+	 * @param forAll true if checking all errors, false otherwise
+	 * @param addition the schedule Element you are adding to your semester
+	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
+	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
 
 		int totalHours = 0;
@@ -144,14 +145,7 @@ public class Semester implements Comparable<Semester>{
 			Requirement toAdd = (Requirement) addition;
 			totalHours = totalHours + toAdd.getCreditHours();
 		}
-		for(ScheduleElement e : this.elements){
-			if(e instanceof Course){
-				totalHours = totalHours + ((Course) e).getCreditHours();
-			}
-			if(e instanceof Requirement){
-				totalHours = totalHours + ((Requirement) e).getCreditHours();
-			}
-		}
+		totalHours = totalHours + getCreditHours();
 		if(totalHours > OverloadLimit){
 			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
 			overload.setOverloadLimit(this.OverloadLimit);
@@ -170,7 +164,24 @@ public class Semester implements Comparable<Semester>{
 	}
 
 
-
+	public int getCreditHours(){
+		int totalHours = 0;
+		for(ScheduleElement e : this.elements){
+			
+			if(e instanceof ScheduleCourse){
+				totalHours = totalHours + ((ScheduleCourse) e).getCreditHours();
+			
+				
+			}
+			
+			if(e instanceof Requirement){
+				totalHours = totalHours + ((Requirement) e).getCreditHours();
+				
+			}
+		}
+		return totalHours;
+		
+	}
 
 
 
@@ -211,13 +222,13 @@ public class Semester implements Comparable<Semester>{
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
 		if(!this.checkOverload(false, newElement)){
-		//	System.out.println(oldElement);
-		
+			//	System.out.println(oldElement);
+
 			int i = this.elements.indexOf(oldElement);
-		//	System.out.println(i);
-		//	System.out.println(this.elements.size());
+			//	System.out.println(i);
+			//	System.out.println(this.elements.size());
 			this.elements.set(i, newElement);
-			
+
 			return true;
 		}
 		else{
@@ -260,7 +271,7 @@ public class Semester implements Comparable<Semester>{
 		this.studyAway = studyAway;
 	}
 
-	public boolean studyAway = false;
+	
 
 
 	public int getOverloadLimit() {
@@ -283,6 +294,11 @@ public class Semester implements Comparable<Semester>{
 		else{
 			return false;
 		}
+	}
+
+	public void setExtraSemester(boolean b) {
+		this.extraSemester =b;
+		
 	}
 
 

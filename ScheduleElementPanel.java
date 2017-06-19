@@ -29,7 +29,7 @@ public class ScheduleElementPanel extends JPanel {
 	private Dimension buttonSize = new Dimension(20, 20);
 	private String removeButtonText = "x";
 	public ScheduleElementPanel reference = this;
-	int nimbusWidth = 35;
+	int nimbusWidth = 40;
 	int nimbusHeight = 20;
 
 
