@@ -90,7 +90,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		button.setFont(FurmanOfficial.normalFont);
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
-		button.setBackground(FurmanOfficial.bouzarthDarkPurple);
+		button.setBackground(FurmanOfficial.darkPurple);
 		button.setBorderPainted(false);
 		button.setPreferredSize(new Dimension(153, 20));
 		button.setOpaque(true);
