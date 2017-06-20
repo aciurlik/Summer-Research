@@ -46,7 +46,7 @@ public class Driver{
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
 	ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
-	bellTower b;
+	BellTower b;
 
 	public static Driver testDriver(){
 		Driver results = new Driver();
@@ -83,7 +83,7 @@ public class Driver{
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
 		left.setBackground(FurmanOfficial.bouzarthGrey);
-		bellTower belltowerLabel = new bellTower(sch);
+		BellTower belltowerLabel = new BellTower(sch);
 		this.b=belltowerLabel;
 		left.add(belltowerLabel);
 		left.add(extras);

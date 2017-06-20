@@ -14,6 +14,7 @@ public class Schedule {
 	private int CLP; 
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
+	private Semester priorSemester;
 
 
 
