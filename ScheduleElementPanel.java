@@ -1,18 +1,15 @@
 
 
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,6 +26,7 @@ public class ScheduleElementPanel extends JPanel {
 	private Dimension buttonSize = new Dimension(20, 20);
 	private String removeButtonText = "x";
 	public ScheduleElementPanel reference = this;
+
 	int nimbusWidth = 40;
 	int nimbusHeight = 20;
 
@@ -47,8 +45,6 @@ public class ScheduleElementPanel extends JPanel {
 		this.reference=this;
 		this.container = container;
 		this.setBackground(FurmanOfficial.grey(30));
-		this.setLayout(new BorderLayout());
-		
 
 
 
@@ -85,7 +81,7 @@ public class ScheduleElementPanel extends JPanel {
 	public void updatePanel(){ //This can be taken out later
 		JLabel elementLabel = new JLabel(s.getDisplayString());
 		elementLabel.setFont(FurmanOfficial.normalFont);
-		this.add(elementLabel, BorderLayout.WEST);
+		this.add(elementLabel);
 		if(s instanceof Requirement) {
 			updateDropDown();
 		}
@@ -93,19 +89,8 @@ public class ScheduleElementPanel extends JPanel {
 
 		//Adds remove Button
 		JPanel remove = new JPanel();
-		remove.setOpaque(false);
 		JButton toRemove = new JButton(removeButtonText);
-		if(MenuOptions.UIType){
-			toRemove.setPreferredSize(new Dimension(nimbusWidth, nimbusHeight));
-			toRemove.setMargin(new Insets(1,1,1,1));
-			toRemove.setBackground(FurmanOfficial.nimbus);
-	
-		}
-		else{
-			toRemove.setForeground(FurmanOfficial.bouzarthDarkPurple);
-			toRemove.setPreferredSize(buttonSize);
-		}
-		
+		toRemove.setForeground(FurmanOfficial.darkPurple);
 		if(s instanceof ScheduleCourse){
 			if (((ScheduleCourse) s).isTaken()){
 				toRemove.setEnabled(false);
@@ -116,9 +101,9 @@ public class ScheduleElementPanel extends JPanel {
 				removeSelf();
 			}
 		});
-		
+		toRemove.setPreferredSize(buttonSize);
 		remove.add(toRemove);
-		this.add(remove, BorderLayout.EAST);
+		this.add(remove);
 	}
 
 
@@ -142,21 +127,15 @@ public class ScheduleElementPanel extends JPanel {
 					}
 				}
 			});
-			this.add(addCourse, BorderLayout.CENTER);
+			this.add(addCourse);
 		}	
 		else{
 			JLabel noCourse = new JLabel("No courses avaliable");
 			noCourse.setFont(FurmanOfficial.normalFont);
-			if(MenuOptions.UIType){
-				noCourse.setBackground(FurmanOfficial.nimbus);
-			}
-			else{
 			noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
-			}
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
-			this.add(noCourse, BorderLayout.CENTER);
-	
+			this.add(noCourse);
 		}
 	}
 

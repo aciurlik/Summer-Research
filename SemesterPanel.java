@@ -5,7 +5,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
@@ -81,12 +80,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		this.hidePanel.setBackground(FurmanOfficial.grey(50));
 		JButton showSemester = new JButton(MenuOptions.showSemester);
 		showSemester.setActionCommand(MenuOptions.showSemester);
-
-		if(MenuOptions.UIType){
-			showSemester.setPreferredSize(new Dimension(NimbusWidth+2, NimbusHeight));
-			showSemester.setMargin(new Insets(1,1,1,1));
-		}
-
+		showSemester.setPreferredSize(new Dimension(15, 15));
 		showSemester.setFont(FurmanOfficial.normalFont);
 		showSemester.addActionListener(new ActionListener(){
 			@Override
@@ -97,7 +91,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			}
 		}
 				);
-		hidePanel.setOpaque(false);
+
 		hidePanel.add(showSemester);
 
 
@@ -109,17 +103,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	
 
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
-
+		hideSem.setPreferredSize(new Dimension(15,15));
 		hideSem.addActionListener(this);
-
-		if(MenuOptions.UIType){
-			deleteSemesterButton.setPreferredSize(new Dimension(NimbusWidth, NimbusHeight));
-			deleteSemesterButton.setMargin(new Insets(1,1,1,1));
-			hideSem.setPreferredSize(new Dimension(NimbusWidth, NimbusHeight));
-			hideSem.setMargin(new Insets(1,1,1,1));
-		}
-
-
+		deleteSemesterButton.setPreferredSize(new Dimension(15, 15));
 
 		JPanel PanelforButtons = new JPanel();
 		PanelforButtons.setBackground(defaultPanel.getBackground());
@@ -132,7 +118,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		FallSpring.setFont(FurmanOfficial.bigHeaderFont);
 
 		topPanel = new JPanel();
-		topPanel.setOpaque(false);
 		topPanel.setLayout(new BorderLayout());
 		topPanel.add(PanelforButtons, BorderLayout.WEST);
 
@@ -400,12 +385,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	public void setHilighted(boolean b){
 		if(b){
-			if(MenuOptions.UIType){
-				this.setBackground(FurmanOfficial.nimbus);
-			}
-			else{
-				this.setBackground(FurmanOfficial.bouzarthDarkPurple);
-			}
+			this.setBackground(FurmanOfficial.bouzarthDarkPurple);
 		}
 		else{
 			this.setBackground(semesterColor(this.sem));
