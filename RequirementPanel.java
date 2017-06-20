@@ -30,7 +30,7 @@ public class RequirementPanel extends JPanel {
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
-	public RequirementPanel(Requirement req, Driver d){
+	public RequirementPanel(Requirement req, Driver d, MajorPanel m){
 		super();
 		this.req = req;
 		this.d = d;

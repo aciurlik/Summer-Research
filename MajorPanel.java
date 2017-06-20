@@ -108,7 +108,7 @@ public class MajorPanel extends JPanel {
 		JPanel heightFlex = new JPanel();
 		//heightFlex.setLayout(new WrapLayout());
 		for(Requirement r : reqList){
-			heightFlex.add(new RequirementPanel(r,d));
+			heightFlex.add(new RequirementPanel(r,d, this));
 		}
 		bottom.add(heightFlex, BorderLayout.WEST);
 		this.add(bottom, BorderLayout.CENTER);
