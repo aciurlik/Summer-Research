@@ -141,8 +141,8 @@ public class Semester implements Comparable<Semester>{
 
 		int totalHours = 0;
 
-		if(addition instanceof Course){
-			Course toAdd = (Course) addition;
+		if(addition instanceof ScheduleCourse){
+			ScheduleCourse toAdd = (ScheduleCourse) addition;
 			totalHours= totalHours + toAdd.getCreditHours();
 		}
 		if(addition instanceof Requirement){
@@ -162,9 +162,7 @@ public class Semester implements Comparable<Semester>{
 				return true;
 			}
 		}
-
 		return false;
-
 	}
 
 

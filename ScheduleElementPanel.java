@@ -81,7 +81,11 @@ public class ScheduleElementPanel extends JPanel {
 
 
 	public void updatePanel(){ //This can be taken out later
-		JLabel elementLabel = new JLabel(s.getDisplayString());
+		String display = s.getDisplayString();
+		if(display.length() > 100){
+			display = s.shortString();
+		}
+		JLabel elementLabel = new JLabel(display);
 		elementLabel.setFont(FurmanOfficial.normalFont);
 		this.add(elementLabel, BorderLayout.WEST);
 		if(s instanceof Requirement) {
