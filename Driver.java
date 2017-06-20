@@ -34,11 +34,11 @@ public class Driver{
 	SchedulePanel schP;
 	RequirementListPanel reqs;
 	int season;
-	JFrame popUP = new JFrame();
+	JFrame popUP;
 	JList<Integer> pickYears;
 	String seasonName;
 	Integer[] yearsDialog;
-	ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+	ImageIcon icon;
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
 	String instructCourse = "Please pick the course you would like to add to your ";
@@ -46,7 +46,7 @@ public class Driver{
 	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
 	ScheduleElement beingDragged;
-	ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
+	ListOfMajors l;
 	BellTower b;
 
 	public static Driver testDriver(){
@@ -62,10 +62,15 @@ public class Driver{
 
 
 	public Driver() {
+		
+		popUP = new JFrame();
+		icon = new ImageIcon("src/BellTower(T).png");
+		l = ListOfMajors.readFrom(new File("Majors"));
 
 		//Make data
 		sch = Schedule.testSchedule();
 		sch.setDriver(this);
+		
 
 
 
@@ -726,13 +731,16 @@ public class Driver{
 	}
 
 	public static void main(String[] args){
-	
+
+		//This just loads FurmanOfficial into memory so that the UIManager
+		// will be set before other static code gets run.
+		Color c = FurmanOfficial.grey;
+		
 		//new Driver();
 		testDriver();
 
 
 	}
-
 }
 
 
