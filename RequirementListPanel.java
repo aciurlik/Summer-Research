@@ -139,7 +139,7 @@ public class RequirementListPanel extends JPanel{
 
 			this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
 			this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
-			this.clpLeftLabel.setText(this.clpText + Math.max(0, schedule.CLP));
+			this.clpLeftLabel.setText(this.clpText + Math.max(0, schedule.getCLP()));
 		}
 	}
 

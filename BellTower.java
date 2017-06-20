@@ -45,9 +45,10 @@ public class BellTower extends JPanel{
 	public void update(){
 
 
-		int percentDone= sch.getPercentDone(icon.getIconHeight());
-		overlap.setSize(icon.getIconWidth(), percentDone);
-		overlap.setLocation(0, icon.getIconHeight()-percentDone);
+		double percentDone= sch.getPercentDone();
+		int newHeight = ((int)percentDone * icon.getIconHeight()) - 1;
+		overlap.setSize(icon.getIconWidth(), newHeight);
+		overlap.setLocation(0, icon.getIconHeight()-newHeight);
 		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
 		if(percentDone==icon.getIconHeight()-1){
 			if(sch.checkAllErrors().isEmpty()){
