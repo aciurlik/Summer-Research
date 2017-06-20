@@ -268,6 +268,14 @@ public class Schedule {
 		return result;
 	}
 	
+	public boolean isComplete(){
+		if(getPercentDone() > 1.0 - 0.000000000001){
+			if(majorsList.size() >= 1){
+				return true;
+			}
+		}
+		return false;
+	}
 	
 
 
@@ -1067,9 +1075,7 @@ public class Schedule {
 	}
 
 	public ArrayList<ScheduleCourse> filterAlreadyChosenCourses(ArrayList<ScheduleCourse> collectionOfCourses){
-		System.out.println(collectionOfCourses.toString());
 		collectionOfCourses.removeAll(this.getAllElements());
-		System.out.println(this.getAllElements().toString());
 		return collectionOfCourses;
 	}
 

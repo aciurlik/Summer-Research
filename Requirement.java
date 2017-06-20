@@ -598,10 +598,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		if(this.name != null){
 			return this.name;
 		}
-		int counter = 0;
-		String finalResult = new String();
 		String result = this.saveString();
-		if(this.numToChoose == 1){
+		if(this.numToChoose == 1 && this.choices.size() == 1){
 			result = result.substring(6, result.length() - 1);
 		}
 		return result;
@@ -609,7 +607,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	
 	@Override
 	public String shortString() {
-		return this.getDisplayString();
+		String result = this.getDisplayString();
+		if(result.length () > 20 && this.name == null){
+			result = result.replaceAll(" ", "");
+		}
+		return result;
 	}
 
 

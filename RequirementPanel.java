@@ -90,12 +90,15 @@ public class RequirementPanel extends JPanel {
 
 
 		this.percentComplete =(int) Math.round(req.storedPercentComplete * 100);
+		
+		/*
+		 * This section would add (25%) to the requirement's text
 		if(percentComplete > 0 && percentComplete < 100){
 			fullText = "(" + percentComplete + "%)" ;
 			fullText += req.storedCoursesLeft + "left\n";
 		}
-		fullText += req.getDisplayString();
-
+		*/
+		fullText += req.shortString();
 
 
 		int numChars = 20;
@@ -106,7 +109,8 @@ public class RequirementPanel extends JPanel {
 		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
-		shown.setToolTipText(req.choices.toString());
+		String toolTipText = req.getDisplayString();
+		shown.setToolTipText(toolTipText);
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 
