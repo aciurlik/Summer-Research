@@ -45,7 +45,26 @@ public class ScheduleCourse implements ScheduleElement{
 
 	}
 
+	public String supriseString(){
+		String result = "";
+		result = result + c.getPrefix().getSubject() + "-,";
+		result = result + c.getPrefix().getNumber() + "-,";
+		result = result + c.sectionNumber + ",";
+		if(c.name!=null){
+			result = result + c.name+ ",";
+		}
+		if(c.meetingDaysCode()!=null){
+			result = result + c.meetingDaysCode() + ",";
+		}
+		if(c.meetingTime != null){
+			result= result +( c.meetingTime[0].clockTime() + ",");
+		}
+		if(c.professor!=null){
+			result = result + c.professor + " ";
+		}
+		return result;
 
+	}
 
 
 	/**

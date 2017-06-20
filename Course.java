@@ -217,6 +217,7 @@ public class Course implements HasCreditHours{
 		if(name != null){
 			result.append(name + " ");
 		}
+		if(this.meetingDaysCode()!=null);
 		result.append(this.meetingDaysCode() + " ");
 		if(this.meetingTime != null){
 			result.append( this.meetingTime[0].clockTime() + " ");

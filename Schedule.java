@@ -94,7 +94,9 @@ public class Schedule {
 				this.semesters.add(s);
 				firstSemester = firstSemester.next();
 			}
-
+			if(i==8){
+				s.setLastSemester(true);
+			}
 		}
 		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
 
@@ -124,9 +126,12 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 	public Semester addNewSemester(){
+		Semester lastSemester = semesters.get(semesters.size()-1);
+		lastSemester.setLastSemester(false);
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
 		this.semesters.add(next);
+		next.setLastSemester(true);
 		return next;
 	}
 

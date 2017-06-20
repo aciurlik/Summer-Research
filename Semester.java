@@ -14,11 +14,14 @@ public class Semester implements Comparable<Semester>{
 	boolean isAP = false;
 	public boolean studyAway = false;
 	protected boolean extraSemester = false;
+	protected boolean lastSemester = false;
 
 
 
 
 
+
+	
 
 	public Semester(SemesterDate sD, Schedule s){
 		elements = new ArrayList<ScheduleElement>();
@@ -299,6 +302,11 @@ public class Semester implements Comparable<Semester>{
 	public void setExtraSemester(boolean b) {
 		this.extraSemester =b;
 		
+	}
+	
+
+	public void setLastSemester(boolean lastSemester) {
+		this.lastSemester = lastSemester;
 	}
 
 
