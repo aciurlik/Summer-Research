@@ -610,6 +610,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		String result = this.getDisplayString();
 		if(result.length () > 20 && this.name == null){
 			result = result.replaceAll(" ", "");
+			if(result.length() > 40){
+				System.out.println("long");
+				result = result.substring(0, 40);
+			}
 		}
 		return result;
 	}
