@@ -43,6 +43,7 @@ public class MenuOptions {
 	//Suprise Me 
 	public static final  String Want = "I want it";
 	public static final  String Challenge = "Take the Challenge";
+	public static final  String tryAgain = "Try Again";
 
 	//Only Menu Bar 
 	public static final  String openSchedule = "Open Schedule";

@@ -49,7 +49,7 @@ public class BellTower extends JPanel{
 		int newHeight = ((int)percentDone * icon.getIconHeight()) - 1;
 		overlap.setSize(icon.getIconWidth(), newHeight);
 		overlap.setLocation(0, icon.getIconHeight()-newHeight);
-		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
+		overlap.setBackground(FurmanOfficial.officialAlpha);
 		if(percentDone==icon.getIconHeight()-1){
 			if(sch.checkAllErrors().isEmpty()){
 				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);

@@ -22,19 +22,20 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 	JPanel newCourse;
 	JPanel takeIt;
 	JButton doIt;
-
+	JButton want = new JButton("I Want it!");
 	String delims = "[,]";
 	String[] tokens;
 	Thread runner;
 	String whole = "";
 	ArrayList<JLabel> questions = new ArrayList<JLabel>();
-
-
+	JButton tryAgain = new JButton("Try Again");
+	Schedule sch;
 
 	public SupriseMe(Schedule sch, Semester s, Driver d){
 		super();
 		this.d=d;
 		this.s=s;
+		this.sch=sch;
 
 		frame = new JFrame();
 
@@ -77,6 +78,12 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 			doIt.setActionCommand(MenuOptions.Challenge);
 			doIt.addActionListener(this);
 			takeIt.add(doIt);
+
+
+			tryAgain.setActionCommand(MenuOptions.tryAgain);
+			tryAgain.addActionListener(this);
+
+
 			this.add(takeIt, BorderLayout.SOUTH);
 			//sup = new JLabel(c.toString());
 
@@ -103,9 +110,13 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+
+
 		if(e.getActionCommand().equals(MenuOptions.Challenge)){
+			newCourse.removeAll();
 
-
+			takeIt.remove(tryAgain);
+			takeIt.remove(want);
 			for(int i=0; i<tokens.length; i++){
 				JPanel stack = new JPanel();
 				JLabel question = new JLabel("????? ");
@@ -125,35 +136,33 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 			frame.setVisible(true);
 
 			start();
-
-
-
-
-
-
-
-
 			//this.add(newCourse);
 			takeIt.remove(doIt);
-			JButton want = new JButton("I Want it!");
+
 			want.setActionCommand(MenuOptions.Want);
 			want.addActionListener(this);
 			takeIt.add(want);
+			frame.pack();
+
+			frame.setVisible(true);
+
+
+		
 		}
-		frame.pack();
-
-		frame.setVisible(true);
-
-
 		if(e.getActionCommand().equals(MenuOptions.Want)){
 			d.GUIChallengeExcepted(s, c);
 			frame.dispose();
 		}
+		if(e.getActionCommand().equals(MenuOptions.tryAgain)){
+			SupriseMe s = new SupriseMe(this.sch, this.s, this.d);
+			frame.dispose();
 
-
-
+		}
 
 	}
+
+
+
 
 
 
@@ -187,18 +196,21 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 			}
 			questions.get(i).setText(part);
 
-
+		
 			frame.repaint();
 			frame.revalidate();
 			frame.pack();
 			frame.setVisible(true);
 
-			try { Thread.sleep(1000); }
+			try { Thread.sleep(500); }
+			
 			catch (InterruptedException e) { }
 		}
-
-
-
+		takeIt.add(tryAgain);
+		frame.repaint();
+		frame.revalidate();
+		frame.pack();
+		frame.setVisible(true);
 		this.stop();
 
 

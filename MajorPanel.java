@@ -71,17 +71,17 @@ public class MajorPanel extends JPanel {
 
 		}
 		if(MenuOptions.UIType){
-			remove.setBackground(FurmanOfficial.nimbus);
+			
 			remove.setMargin(new Insets(1,1,1,1));
 			remove.setPreferredSize(new Dimension(nimbusWidth, nibusHeight));
 		}
 		else{
-			remove.setBackground(FurmanOfficial.darkPurple);
+		
 			remove.setPreferredSize(new Dimension (20, 20));
 		}
-
+		
 		remove.setForeground(Color.WHITE);
-
+		remove.setBackground(FurmanOfficial.official);
 		remove.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				removeSelf();

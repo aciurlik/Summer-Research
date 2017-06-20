@@ -54,8 +54,6 @@ public class Driver{
 		testSchedule = Schedule.testSchedule();	
 
 		testSchedule.setDriver(results);
-		results.GUIAddMajor(results.l.getMajor("Psychology"));
-		testSchedule.setDriver(results);
 		return results;
 	}
 
@@ -732,18 +730,7 @@ public class Driver{
 	}
 
 	public static void main(String[] args){
-		try {
-			// Set cross-platform Java L&F (also called "Metal")
-			UIManager.setLookAndFeel(
-					"javax.swing.plaf.nimbus.NimbusLookAndFeel"	);
-			MenuOptions.setUIType(true);
-		} 
-		catch (Exception e) {
-			System.out.println("I AM HERE");
-			UIManager.getCrossPlatformLookAndFeelClassName();
-			MenuOptions.setUIType(false);
-		}
-
+	
 		//new Driver();
 		testDriver();
 
