@@ -27,6 +27,9 @@ public class ScheduleElementPanel extends JPanel {
 	private String removeButtonText = "x";
 	public ScheduleElementPanel reference = this;
 
+	int nimbusWidth = 40;
+	int nimbusHeight = 20;
+
 
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox<ScheduleElement>  requirementDropDown;
@@ -45,7 +48,12 @@ public class ScheduleElementPanel extends JPanel {
 
 
 
+		if(s instanceof ScheduleCourse){
+			if(((ScheduleCourse) s).isTaken()){
+				return;
+			}
 
+		}
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
 
@@ -140,6 +148,7 @@ public class ScheduleElementPanel extends JPanel {
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
+			
 			//alert the driver of the change
 			//container.d.dragStarted(toBeDragged);
 			container.d.dragStarted(s);

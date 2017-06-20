@@ -111,7 +111,9 @@ public class Driver{
 	public void GUINewSchedule() {
 		CourseList l = CourseList.testList();
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.getStartDate(), null);
+
+		Schedule current = new Schedule(l, sch.getStartSemester().semesterDate, null);
+		this.b.setSchedule(current);
 		setSchedule(current);
 		this.update();
 	}
@@ -248,7 +250,9 @@ public class Driver{
 			typeNeedsToBeChosen = false;
 		}
 		if(typeNeedsToBeChosen){
-			GUIChooseMajorDegreeType(m);
+			if(!GUIChooseMajorDegreeType(m)){
+				return;
+			}
 		}
 		if(m.notes != null){
 			//show the user the notes, and let them know that this is the last time they'll see 
@@ -258,8 +262,10 @@ public class Driver{
 			JOptionPane.showMessageDialog(popUP, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
-		this.sch.addMajor(m);
-		this.update();
+			this.sch.addMajor(m);
+			this.update();
+		
+		
 	}
 
 	
@@ -269,7 +275,7 @@ public class Driver{
 	 * @param m
 	 */
 
-	public void GUIChooseMajorDegreeType(Major m){
+	public boolean GUIChooseMajorDegreeType(Major m){
 		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
 			ArrayList<String> toAdd= new ArrayList<String>();
 			String instructions = null;
@@ -304,15 +310,18 @@ public class Driver{
 
 			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 
-			int MajorType = 0;
+			int MajorType = CourseList.BA;
 			if(GERNeeded == null){
-				return;
+				return false;
 			}
+			
 			MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
 			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
 			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
 			m.setChosenDegree(MajorType);
+		
 		}
+		return true;
 	}
 
 	/**
@@ -397,17 +406,15 @@ public class Driver{
 
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
-		ArrayList<Semester> semesters = sch.getSemesters();
-		int last = (semesters.size()-1);
-		int end = semesters.get(last).semesterDate.year;
 
-		for(int i=  semesters.get(1).semesterDate.year; i<= end; i++){
-
+		ArrayList<Semester> allSemesters = sch.getAllSemesters();
+		int last = (allSemesters.size()-1);
+		int end = allSemesters.get(last).semesterDate.year;
+		//Two first is Prior, second is odd one out
+		for(int i=  allSemesters.get(2).semesterDate.year; i<= end; i++){
 			if ((!sch.SemesterAlreadyExists(new SemesterDate(i, season)))){
-
 				availableYears.add(i);
 			}
-
 		}
 
 
@@ -533,7 +540,7 @@ public class Driver{
 	public void GUImakeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(true);
 		this.update();
-		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will furfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
+		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will fulfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
 
 	}
 

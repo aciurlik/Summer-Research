@@ -22,7 +22,7 @@ public class Course implements HasCreditHours{
 	Time[] examTime; // month, day, year, and so on are all used.
 
 
-	
+
 	public static final int defaultCreditHours = 4;
 
 
@@ -60,7 +60,7 @@ public class Course implements HasCreditHours{
 		this(prefix, semester, professor, meetingDays, creditHours, sectionNumber);
 	}
 
-	
+
 	public void setName(String name){
 		this.name = name;
 	}
@@ -87,8 +87,8 @@ public class Course implements HasCreditHours{
 		}
 		return result;
 	}
-	
-	
+
+
 
 	///////////////////
 	///////////////////
@@ -129,7 +129,7 @@ public class Course implements HasCreditHours{
 	}
 
 
-	
+
 	/**
 	 * Return times with:
 	 * 		day set to the lab day,
@@ -195,10 +195,10 @@ public class Course implements HasCreditHours{
 	}
 
 
-	
 
 
-	
+
+
 
 
 	public boolean isDuplicate(ScheduleElement other) {
@@ -211,10 +211,13 @@ public class Course implements HasCreditHours{
 	public String toString(){
 		StringBuilder result = new StringBuilder();
 		result.append(coursePrefix.toString());
-		result.append(String.format("-" + this.sectionNumber + " "));
+		if(this.sectionNumber != null){
+			result.append(String.format("-" + this.sectionNumber + " "));
+		}
 		if(name != null){
 			result.append(name + " ");
 		}
+		if(this.meetingDaysCode()!=null);
 		result.append(this.meetingDaysCode() + " ");
 		if(this.meetingTime != null){
 			result.append( this.meetingTime[0].clockTime() + " ");
@@ -225,8 +228,8 @@ public class Course implements HasCreditHours{
 		return result.toString();
 	}
 
-	
-	
+
+
 
 
 

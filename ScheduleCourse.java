@@ -14,8 +14,8 @@ public class ScheduleCourse implements ScheduleElement{
 
 	@Override
 	public Prefix getPrefix() {
-			return c.coursePrefix;
-		}
+		return c.coursePrefix;
+	}
 
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
@@ -35,14 +35,36 @@ public class ScheduleCourse implements ScheduleElement{
 	public String shortString(){
 		String result = new String();
 		result = result + this.c.semester.getSeason(this.c.semester.sNumber)+ " "+ this.c.semester.year + " ";
+
 		result = result + this.c.coursePrefix.toString() + " "; 
-		result = result + this.c.sectionNumber+ " ";
+		if(!this.c.sectionNumber.equals(null)){
+			result = result + this.c.sectionNumber+ " ";
+		}
 
 		return result;
 
 	}
 
+	public String supriseString(){
+		String result = "";
+		result = result + c.getPrefix().getSubject() + "-,";
+		result = result + c.getPrefix().getNumber() + "-,";
+		result = result + c.sectionNumber + ",";
+		if(c.name!=null){
+			result = result + c.name+ ",";
+		}
+		if(c.meetingDaysCode()!=null){
+			result = result + c.meetingDaysCode() + ",";
+		}
+		if(c.meetingTime != null){
+			result= result +( c.meetingTime[0].clockTime() + ",");
+		}
+		if(c.professor!=null){
+			result = result + c.professor + " ";
+		}
+		return result;
 
+	}
 
 
 	/**
@@ -59,7 +81,7 @@ public class ScheduleCourse implements ScheduleElement{
 		}
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
 		if(! /*sets equal*/ ((enemies.containsAll(this.c.oldEnemyList)) && this.c.oldEnemyList.containsAll(enemies)) ){
-			
+
 			//the enemies changed. TODO
 			//ask the user which requirements should now be satisfied by this course.
 			//sch.conflictingRequirements(this
@@ -69,7 +91,7 @@ public class ScheduleCourse implements ScheduleElement{
 					+ " Which one should get the credit hours?");
 			 * 
 			 */
-			
+
 			HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
 			this.c.userSpecifiedReqs = kept;
 			this.c.oldEnemyList = enemies;
@@ -92,8 +114,8 @@ public class ScheduleCourse implements ScheduleElement{
 	public Intervals<Time> meetingTimes() {
 		return c.meetingTimes();
 	}
-	
-	
+
+
 	//////////////
 	/// Overlaps method and helper
 	//////////////
@@ -126,8 +148,8 @@ public class ScheduleCourse implements ScheduleElement{
 		}
 		return result;
 	}
-	
-	
+
+
 	public boolean isTaken() {
 		return taken;
 	}
@@ -135,7 +157,7 @@ public class ScheduleCourse implements ScheduleElement{
 	public void setTaken(boolean taken) {
 		this.taken = taken;
 	}
-	
+
 
 	/**
 	 * If the user declares that this course will satisfy this requirement, 
@@ -145,6 +167,10 @@ public class ScheduleCourse implements ScheduleElement{
 	 */
 	public void userSpecifiedSatisfies(Requirement req){
 		userSpecifiedReqs.add(req);
+	}
+
+	public int getCreditHours() {
+		return c.getCreditHours();
 	}
 
 }

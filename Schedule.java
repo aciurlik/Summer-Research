@@ -19,6 +19,7 @@ public class Schedule {
 
 
 
+
 	boolean reqsValid; // The set of requirements entailed by all majors is up to date
 
 
@@ -81,11 +82,21 @@ public class Schedule {
 
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
-		for(int i = 0;i < 8 ; i ++){
-			this.semesters.add(new Semester(firstSemester, this));
-			firstSemester = firstSemester.next();
-
-
+		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
+		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
+		for(int i = 0;i < 9 ; i ++){
+			if(i==0){
+				s.isAP=true;
+				priorSemester =s;
+			}
+			else{
+				s = new Semester(firstSemester, this);
+				this.semesters.add(s);
+				firstSemester = firstSemester.next();
+			}
+			if(i==8){
+				s.setLastSemester(true);
+			}
 		}
 		this.recalcGERMajor();
 
@@ -114,9 +125,12 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 	public Semester addNewSemester(){
+		Semester lastSemester = semesters.get(semesters.size()-1);
+		lastSemester.setLastSemester(false);
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
 		this.semesters.add(next);
+		next.setLastSemester(true);
 		return next;
 	}
 
@@ -361,7 +375,10 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 
-
+	public Semester getStartSemester(){
+		Collections.sort(this.semesters);
+		return this.semesters.get(0);
+	}
 
 
 
@@ -410,11 +427,31 @@ public class Schedule {
 	}
 
 
+	public ArrayList<Semester> getAllSemesters(){
+		ArrayList<Semester> allSemesters = new ArrayList<Semester>();
+		allSemesters.add(priorSemester);
+		allSemesters.addAll(this.semesters);
+		return allSemesters;
+
+	}
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
+		Requirement r = this.masterList.getPrereqsShallow(languagePrefix);
+		for(Requirement req: r.choices){
+			if(!req.getPrefix().getNumber().equals("115")){
+				Course c = new Course(req.getPrefix(), new SemesterDate(priorSemester.semesterDate.year,priorSemester.semesterDate.sNumber), null, null, 4, null );
+				ScheduleCourse cc = new ScheduleCourse(c, this);
+				cc.setTaken(true);
+				priorSemester.add(cc);
+			}
+		}
 	}
+
+
+
+
 
 	private void recalcGERMajor(){
 		int type = this.determineGER();
@@ -862,13 +899,20 @@ public class Schedule {
 		int counter = 0;
 		ArrayList<ScheduleElement> courseEst = this.getAllElements();
 		for(Requirement n: this.getAllRequirements()){
-			if(n.usesCreditHours){
+			
+			if((n.usesCreditHours)){
+				
 				counter += n.minMoreNeeded(courseEst, true)/4;
+			
 			}
 
+
 			else{
+				
 				counter += n.minMoreNeeded(courseEst, true);
+				
 			}
+
 		}
 		return counter;
 	}
@@ -992,10 +1036,8 @@ public class Schedule {
 	public int getCreditHoursComplete(){
 		//TODO replace with each semester's getCreditHours method
 		int result = 0;
-		for (ScheduleElement e : getAllElements()){
-			if(e instanceof Course){
-				result += ((Course)e).creditHours;
-			}
+		for (Semester s : this.getAllSemesters()){
+			result = result + s.getCreditHours();
 		}
 		return result;
 	}

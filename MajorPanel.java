@@ -20,7 +20,8 @@ public class MajorPanel extends JPanel {
 	
 	JPanel top;
 	JPanel bottom;
-
+	int nimbusWidth = 40;
+	int nibusHeight = 20;
 
 	public MajorPanel(Major m, Driver d){
 		super();
@@ -55,8 +56,7 @@ public class MajorPanel extends JPanel {
 		//Holds the things at the top left (currently major name and # unscheduled)
 		JPanel topLeftPanel = new JPanel(); 
 		topLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		
-		JLabel topLeftLabel =new JLabel(m.name + "         " + reqsLeft + " Unscheduled"); 
+		JLabel topLeftLabel =new JLabel(m.name + "         " + Math.max(0, reqsLeft)  + " Unscheduled"); 
 		topLeftLabel.setFont(FurmanOfficial.smallHeaderFont);
 		topLeftPanel.add(topLeftLabel);
 
