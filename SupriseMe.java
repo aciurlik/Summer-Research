@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class SupriseMe extends JPanel implements ActionListener {
+public class SupriseMe extends JPanel implements ActionListener, Runnable {
 	Driver d;
 	Course c;
 	Semester s;
@@ -23,10 +23,13 @@ public class SupriseMe extends JPanel implements ActionListener {
 	JPanel takeIt;
 	JButton doIt;
 
-	String delims = "[ ]+";
+	String delims = "[,]";
 	String[] tokens;
-
+	Thread runner;
 	String whole = "";
+	ArrayList<JLabel> questions = new ArrayList<JLabel>();
+
+
 
 	public SupriseMe(Schedule sch, Semester s, Driver d){
 		super();
@@ -34,7 +37,7 @@ public class SupriseMe extends JPanel implements ActionListener {
 		this.s=s;
 
 		frame = new JFrame();
-		
+
 
 		ArrayList<Course> getReady = sch.masterList.getCoursesIn(s);
 		if(getReady.size()==0){
@@ -44,8 +47,11 @@ public class SupriseMe extends JPanel implements ActionListener {
 		}
 		else{	
 			Random rand = new Random();
+
 			c = getReady.get(rand.nextInt(getReady.size()));
-			String string = c.toString();
+			ScheduleCourse cc = new ScheduleCourse(c, sch);
+			String string = cc.supriseString();
+			System.out.println(string);
 			tokens = string.split(delims);
 
 
@@ -98,40 +104,112 @@ public class SupriseMe extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.Challenge)){
-			for(int i=0; i<tokens.length; i++){
-				String part= new String (tokens[i]);
-				whole= whole + "  " + part;
-				sup.setText(whole);
-				sup.setFont(FurmanOfficial.getFont(45));
-				sup.setForeground(Color.white);
-				newCourse.add(sup);
-				try{
-					Thread.sleep(300);
-				}
-				catch(InterruptedException p){
-					p.printStackTrace();
-				}
-				
-				frame.add(this);
-				
-				frame.pack();
 
-				frame.setVisible(true);
+
+			for(int i=0; i<tokens.length; i++){
+				JPanel stack = new JPanel();
+				JLabel question = new JLabel("????? ");
+				question.setFont(FurmanOfficial.getFont(45));
+				question.setForeground(Color.white);
+				questions.add(question);
+
 
 			}
+			for(int p =0; p<questions.size(); p++){
+				newCourse.add(questions.get(p));
+			}
+			frame.add(this);
+
+			frame.pack();
+
+			frame.setVisible(true);
+
+			start();
+
+
+
+
+
+
+
+
+			//this.add(newCourse);
 			takeIt.remove(doIt);
-			this.add(newCourse);
 			JButton want = new JButton("I Want it!");
 			want.setActionCommand(MenuOptions.Want);
 			want.addActionListener(this);
 			takeIt.add(want);
 		}
+		frame.pack();
+
+		frame.setVisible(true);
+
+
 		if(e.getActionCommand().equals(MenuOptions.Want)){
 			d.GUIChallengeExcepted(s, c);
 			frame.dispose();
 		}
 
+
+
+
 	}
+
+
+
+	public void start() {
+		if (runner == null) {
+			runner = new Thread(this);
+			runner.start();
+		}
+	}
+
+
+	@SuppressWarnings("deprecation")
+	public void stop() {
+		if (runner != null) {
+			runner.stop();
+			runner = null;
+		}
+	}
+
+
+
+	@Override
+	public void run() {
+		for(int i=0; i<questions.size(); i++){
+			String part;
+			if(i>1){
+				part= new String (tokens[i] + "   ");
+			}
+			else{
+				part= new String (tokens[i]);
+			}
+			questions.get(i).setText(part);
+
+
+			frame.repaint();
+			frame.revalidate();
+			frame.pack();
+			frame.setVisible(true);
+
+			try { Thread.sleep(1000); }
+			catch (InterruptedException e) { }
+		}
+
+
+
+		this.stop();
+
+
+	}
+
+
 }
+
+
+
+
+
 
 

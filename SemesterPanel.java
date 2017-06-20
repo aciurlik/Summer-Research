@@ -105,9 +105,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
 		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
 		deleteSemesterButton.addActionListener(this);
-		if(!this.sem.extraSemester){
 			deleteSemesterButton.setEnabled(false);
-		}
+	
 
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
 
@@ -317,10 +316,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		//Adds special buttons to MayX 
 
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
-			deleteSemesterButton.setEnabled(true);
-		}
-
+		
+		
 
 		if(sem.studyAway){
 
@@ -349,6 +346,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			fallSpring.setText("Prior Courses");
 			defaultPanel.remove(topPanel);
 
+		}
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO ||sem.extraSemester || sem.lastSemester){
+			deleteSemesterButton.setEnabled(true);
 		}
 	}
 

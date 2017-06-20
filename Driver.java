@@ -207,8 +207,7 @@ public class Driver{
 	 * When the user clicks the  + button to add a new semester to the schedule
 	 */
 	public void GUISemesterPanelAdded(){
-		Semester s = sch.addNewSemester();
-		s.setExtraSemester(true);
+		sch.addNewSemester();
 		this.update();
 	}
 
