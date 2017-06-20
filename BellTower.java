@@ -8,18 +8,27 @@ import javax.swing.JPanel;
 
 public class BellTower extends JPanel{
 	Schedule sch;
-	JPanel overlap = new JPanel();
-	ImageIcon icon = new ImageIcon("src/bellTower.jpg");
-	ImageIcon firework = new ImageIcon("src/fireworks.jpg");
+	JPanel overlap ;
+	ImageIcon icon ;
+	ImageIcon firework;
 	JLabel belltowerLabel;
-	JPanel fire = new JPanel();
-	Image fireWork = firework.getImage();
-	ImageIcon fires = new ImageIcon(fireWork);
-	JLabel almost = new JLabel(fires);
+	JPanel fire;
+	Image fireWork;
+	ImageIcon fires;
+	JLabel almost;
 
 
 	public BellTower(Schedule sch) {
 		super();
+		
+		 overlap = new JPanel();
+		 icon = new ImageIcon("src/bellTower.jpg");
+		 firework = new ImageIcon("src/fireworks.jpg");
+		 fire  = new JPanel();
+		 fireWork = firework.getImage();
+		 fires = new ImageIcon(fireWork);
+		 almost = new JLabel(fires);
+		
 		fire.add(almost);
 		this.sch= sch;
 		int givenHeight = 300;

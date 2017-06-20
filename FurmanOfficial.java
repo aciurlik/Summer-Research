@@ -49,7 +49,12 @@ public class FurmanOfficial {
 			MenuOptions.setUIType(true);
 		} 
 		catch (Exception e) {
-			UIManager.getCrossPlatformLookAndFeelClassName();
+			try{UIManager.setLookAndFeel(
+					UIManager.getCrossPlatformLookAndFeelClassName()
+					);
+			}catch(Exception e2){
+				e2.printStackTrace();
+			}
 			MenuOptions.setUIType(false);
 		}
 		if(MenuOptions.UIType){
