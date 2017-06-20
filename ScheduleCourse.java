@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -171,6 +172,23 @@ public class ScheduleCourse implements ScheduleElement{
 
 	public int getCreditHours() {
 		return c.getCreditHours();
+	}
+
+	public SemesterDate getSemester() {
+		// TODO Auto-generated method stub
+		return c.getSemester();
+	}
+
+	@Override
+	public boolean equals(Object other){
+		if(other instanceof ScheduleCourse){
+			ScheduleCourse compare =(ScheduleCourse)other;
+			if(compare.c.equals(this.c)){
+				return true;
+			}
+
+		}
+		return false;	
 	}
 
 }

@@ -1,6 +1,3 @@
-
-
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -37,7 +34,7 @@ public class ScheduleElementPanel extends JPanel {
 	JComboBox<ScheduleElement>  requirementDropDown;
 	JButton addCourse = new JButton (MenuOptions.addCourseWithRequirement);
 
-	
+
 
 
 	public ScheduleElementPanel(ScheduleElement s, SemesterPanel container) {
@@ -48,7 +45,7 @@ public class ScheduleElementPanel extends JPanel {
 		this.container = container;
 		this.setBackground(FurmanOfficial.grey(30));
 		this.setLayout(new BorderLayout());
-		
+
 
 
 
@@ -99,13 +96,13 @@ public class ScheduleElementPanel extends JPanel {
 			toRemove.setPreferredSize(new Dimension(nimbusWidth, nimbusHeight));
 			toRemove.setMargin(new Insets(1,1,1,1));
 			toRemove.setBackground(FurmanOfficial.nimbus);
-	
+
 		}
 		else{
 			toRemove.setForeground(FurmanOfficial.bouzarthDarkPurple);
 			toRemove.setPreferredSize(buttonSize);
 		}
-		
+
 		if(s instanceof ScheduleCourse){
 			if (((ScheduleCourse) s).isTaken()){
 				toRemove.setEnabled(false);
@@ -116,7 +113,7 @@ public class ScheduleElementPanel extends JPanel {
 				removeSelf();
 			}
 		});
-		
+
 		remove.add(toRemove);
 		this.add(remove, BorderLayout.EAST);
 	}
@@ -129,16 +126,16 @@ public class ScheduleElementPanel extends JPanel {
 	 * This should only be called if the schedule element is a requirement.
 	 */
 	public void updateDropDown(){
-		ArrayList<Course> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
-		ArrayList<Course> finallistOfCourses = container.sem.schedule.filterAlreadyChosenCourses(listOfCourses);
-		final Course[] allPossibleCourses = finallistOfCourses.toArray(new Course[finallistOfCourses.size()]);
+		ArrayList<ScheduleCourse> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
+		ArrayList<ScheduleCourse> finallistOfCourses = container.sem.schedule.filterAlreadyChosenCourses(listOfCourses);
+		final ScheduleCourse[] allPossibleCourses = finallistOfCourses.toArray(new ScheduleCourse[finallistOfCourses.size()]);
 		if(finallistOfCourses.size()>0){
 			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					Course c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
+					ScheduleCourse c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
 					if(c != null){
-						container.d.GUIElementChanged(container, reference ,  new ScheduleCourse (c, container.d.sch));
+						container.d.GUIElementChanged(container, reference , c);
 					}
 				}
 			});
@@ -151,12 +148,12 @@ public class ScheduleElementPanel extends JPanel {
 				noCourse.setBackground(FurmanOfficial.nimbus);
 			}
 			else{
-			noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
+				noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
 			}
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
 			this.add(noCourse, BorderLayout.CENTER);
-	
+
 		}
 	}
 
@@ -169,7 +166,7 @@ public class ScheduleElementPanel extends JPanel {
 
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
-			
+
 			//alert the driver of the change
 			//container.d.dragStarted(toBeDragged);
 			container.d.dragStarted(s);
@@ -184,16 +181,22 @@ public class ScheduleElementPanel extends JPanel {
 		}
 
 	}
-	
-	
+
+
 	/*void dndDone(){
 		System.out.println("hi");
 	}
-	*/
+	 */
 
 
 
 }
+
+
+
+
+
+
 
 
 
