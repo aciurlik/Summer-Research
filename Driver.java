@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
@@ -104,7 +105,7 @@ public class Driver{
 
 	}
 
-	
+
 	/**
 	 * Create a new, blank schedule to work from.
 	 */
@@ -236,7 +237,7 @@ public class Driver{
 		update();
 	}
 
-	
+
 	public void GUIAddMajor(Major m) {
 		boolean typeNeedsToBeChosen = true;
 		if (m.majorType.equals(Major.MINOR)){
@@ -268,7 +269,7 @@ public class Driver{
 
 	}
 
-	
+
 	/**
 	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
 	 * this lets the user choose a type.
@@ -331,7 +332,7 @@ public class Driver{
 	public void GUIPopUP(String s){
 		new PopUpChooser(s, this, sch);
 	}
-	
+
 	/**
 	 * Show the user a webpage
 	 * @param actionCommand
@@ -379,7 +380,7 @@ public class Driver{
 
 
 
-	
+
 	public void GUIChooseSummerSession() {
 		String[] summerChoice = {MenuOptions.summerSessionOne, MenuOptions.summerSessionTwo};
 		String c = (String)JOptionPane.showInputDialog(popUP, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
@@ -528,8 +529,8 @@ public class Driver{
 		return finalListOfCourses[chosenIndex];
 
 	}
-	
-	
+
+
 
 	public void GUISupriseWindow(Semester s) {
 		new SupriseMe(sch, s, this);
@@ -587,13 +588,13 @@ public class Driver{
 		this.update();
 
 	}
-	
 
 
 
 
 
-	
+
+
 	/**
 	 * A highly used method.
 	 * Whenever there is a scheudling error, like classes overlapping,
@@ -687,13 +688,13 @@ public class Driver{
 		}
 	}
 
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	public void dragStarted(ScheduleElement e){
 		this.schP.dragStarted(e);
 
@@ -731,6 +732,18 @@ public class Driver{
 	}
 
 	public static void main(String[] args){
+		try {
+			// Set cross-platform Java L&F (also called "Metal")
+			UIManager.setLookAndFeel(
+					"javax.swing.plaf.nimbus.NimbusLookAndFeel"	);
+			MenuOptions.setUIType(true);
+		} 
+		catch (Exception e) {
+			System.out.println("I AM HERE");
+			UIManager.getCrossPlatformLookAndFeelClassName();
+			MenuOptions.setUIType(false);
+		}
+
 		//new Driver();
 		testDriver();
 
