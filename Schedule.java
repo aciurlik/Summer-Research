@@ -95,9 +95,8 @@ public class Schedule {
 				this.semesters.add(s);
 				firstSemester = firstSemester.next();
 			}
-			if(i==8){
-				s.setLastSemester(true);
-			}
+
+
 		}
 		this.recalcGERMajor();
 
@@ -126,12 +125,9 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 	public Semester addNewSemester(){
-		Semester lastSemester = semesters.get(semesters.size()-1);
-		lastSemester.setLastSemester(false);
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
 		this.semesters.add(next);
-		next.setLastSemester(true);
 		return next;
 	}
 
@@ -375,7 +371,10 @@ public class Schedule {
 	//	Nice getters
 	///////////////////////////////
 	///////////////////////////////
-
+	/**
+	 * This does not include prior Semester, because that is not apart of this.semesters
+	 * @return The first real (not prior Semester)
+	 */
 	public Semester getStartSemester(){
 		Collections.sort(this.semesters);
 		return this.semesters.get(0);
@@ -427,6 +426,11 @@ public class Schedule {
 		return languagePrefix;
 	}
 
+	/**
+	 * This has the prior semester first, and then the "regular" scheduled Semesters second, 
+	 * prior should always be in the first place/ 
+	 * 
+	 */
 
 	public ArrayList<Semester> getAllSemesters(){
 		ArrayList<Semester> allSemesters = new ArrayList<Semester>();
@@ -900,18 +904,18 @@ public class Schedule {
 		int counter = 0;
 		ArrayList<ScheduleElement> courseEst = this.getAllElements();
 		for(Requirement n: this.getAllRequirements()){
-			
+
 			if((n.usesCreditHours)){
-				
+
 				counter += n.minMoreNeeded(courseEst, true)/4;
-			
+
 			}
 
 
 			else{
-				
+
 				counter += n.minMoreNeeded(courseEst, true);
-				
+
 			}
 
 		}
@@ -1062,10 +1066,13 @@ public class Schedule {
 
 	}
 
-	public ArrayList<Course> filterAlreadyChosenCourses(ArrayList<Course> collectionOfCourses){
+	public ArrayList<ScheduleCourse> filterAlreadyChosenCourses(ArrayList<ScheduleCourse> collectionOfCourses){
+		System.out.println(collectionOfCourses.toString());
 		collectionOfCourses.removeAll(this.getAllElements());
+		System.out.println(this.getAllElements().toString());
 		return collectionOfCourses;
 	}
+
 
 	public boolean SemesterAlreadyExists(SemesterDate semesterDate) {
 		for(Semester s: this.semesters){
@@ -1131,6 +1138,18 @@ public class Schedule {
 		allErrors.addAll(this.checkAllPrerequsites());
 		allErrors.addAll(this.checkAllDuplicates());
 		return allErrors;
+	}
+
+
+
+	public ArrayList<ScheduleCourse> getCoursesInSemester(Semester s) {
+		ArrayList<Course> toFinal = this.masterList.getCoursesIn(s);
+		ArrayList<ScheduleCourse> scheduleCoursesInSemester = new ArrayList<ScheduleCourse>();
+		for(Course c: toFinal){
+			ScheduleCourse sc = new ScheduleCourse(c, this);
+			scheduleCoursesInSemester.add(sc);
+		}
+		return scheduleCoursesInSemester;
 	}
 
 

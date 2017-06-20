@@ -110,7 +110,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 
 
-
+	int counter = 0;
 	public void update(Schedule sch) {
 
 		long startTime = System.currentTimeMillis();
@@ -125,7 +125,10 @@ public class SchedulePanel extends JPanel implements ActionListener{
 
 		for(Semester s: sch.getAllSemesters()){
 			SemesterPanel foundp = this.findPanelFor(s);
-			
+			s.setLastSemester(false);
+			if(s.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
+				s.setLastSemester(true);
+			}
 			if(foundp != null){
 				foundp.updatePanel(s);
 				scrollPanel.add(foundp, gbc);
@@ -133,11 +136,20 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			}
 			else{
 				SemesterPanel semester = new SemesterPanel(s, this.d);
+				if(semester.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
+					s.setLastSemester(true);
+				}
+				else{
+					s.setLastSemester(false);
+					
+				}
 				allSemesterPanels.add(semester);
 				scrollPanel.add(semester, gbc);
 				gbc.gridx ++;
 			}
 			
+			
+	
 		}
 		
 

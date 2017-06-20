@@ -99,8 +99,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
 		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
 		deleteSemesterButton.addActionListener(this);
-			deleteSemesterButton.setEnabled(false);
-	
+		deleteSemesterButton.setEnabled(false);
+
 
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
 		hideSem.setPreferredSize(new Dimension(15,15));
@@ -301,8 +301,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		//Adds special buttons to MayX 
 
-		
-		
+
+
 
 		if(sem.studyAway){
 
@@ -332,8 +332,11 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			defaultPanel.remove(topPanel);
 
 		}
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO ||sem.extraSemester || sem.lastSemester){
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO  || sem.lastSemester){
 			deleteSemesterButton.setEnabled(true);
+		}
+		else{
+			deleteSemesterButton.setEnabled(false);
 		}
 	}
 
@@ -418,7 +421,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 	}
 	public boolean canTake(Requirement r){
-		ArrayList<Course> coursesSatisfying = this.sem.getCoursesSatisfying(r);
+		ArrayList<ScheduleCourse> coursesSatisfying = this.sem.getCoursesSatisfying(r);
 		coursesSatisfying.removeAll(sem.elements);
 		return !coursesSatisfying.isEmpty();
 	}

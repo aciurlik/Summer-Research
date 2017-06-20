@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -244,9 +245,15 @@ public class Semester implements Comparable<Semester>{
 	}
 
 
-	public ArrayList<Course> getCoursesSatisfying(Requirement r){
+	public ArrayList<ScheduleCourse> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
-		return this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
+		ArrayList<Course> finalCourse = this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
+		ArrayList<ScheduleCourse> coursesSatisfying = new ArrayList<ScheduleCourse>();
+		for(Course c : finalCourse){
+			ScheduleCourse s = new ScheduleCourse(c, this.schedule);
+			coursesSatisfying.add(s);
+		}
+		return coursesSatisfying;
 	}
 
 

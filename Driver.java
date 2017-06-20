@@ -262,10 +262,10 @@ public class Driver{
 			JOptionPane.showMessageDialog(popUP, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
-			this.sch.addMajor(m);
-			this.update();
-		
-		
+		this.sch.addMajor(m);
+		this.update();
+
+
 	}
 
 	
@@ -314,12 +314,12 @@ public class Driver{
 			if(GERNeeded == null){
 				return false;
 			}
-			
+
 			MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
 			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
 			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
 			m.setChosenDegree(MajorType);
-		
+
 		}
 		return true;
 	}
@@ -455,27 +455,30 @@ public class Driver{
 	 * @param s
 	 */
 	public void addCourseDialogBox(Semester s){	
-		ArrayList<Course> addCourses = new ArrayList<Course>();
-		addCourses = sch.masterList.getCoursesIn(s);
-		Course[] finalCourseList = new Course[addCourses.size()];
-		for(int i = 0; i<addCourses.size(); i++){
-			finalCourseList[i] = addCourses.get(i);
+		ArrayList<ScheduleCourse> addCourses = new ArrayList<ScheduleCourse>();
+		addCourses = sch.getCoursesInSemester(s);
+		ArrayList<ScheduleCourse> toFinal =sch.filterAlreadyChosenCourses(addCourses);
+		ScheduleCourse[] finalCourseList = new ScheduleCourse[toFinal.size()];
+		for(int i = 0; i<toFinal.size(); i++){
+			finalCourseList[i] = toFinal.get(i);
 		}
-		
-		Course c = GUIChooseCourse(finalCourseList, "Choose a course" );
+
+
+		ScheduleCourse c = GUIChooseCourse(finalCourseList, "Choose a course" );
+
 		if(c != null){
 			//Removes all courses that have already been added in case of MayX 
 			if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
 				s.elements.clear();
 			}
-			sch.addScheduleElement(new ScheduleCourse(c, this.sch), s);
+			sch.addScheduleElement(c, s);
 			this.update();
 		}
 	}
 
 
 
-	public Course GUIChooseCourse(Course[] finalListOfCourses, String message) {
+	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
 		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
 			JOptionPane.showMessageDialog(popUP, "There were no courses to choose from :( ", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
@@ -484,19 +487,32 @@ public class Driver{
 		String[] displayed = new String[finalListOfCourses.length];
 		HashSet<Requirement> allReqs = sch.getAllRequirements();
 		for(int i = 0; i < finalListOfCourses.length ; i ++){
-			Course c = finalListOfCourses[i];
-			ScheduleCourse sc = new ScheduleCourse(c, this.sch);
+			ScheduleCourse c = finalListOfCourses[i];
 			int reqsFulfilled = 0;
 			for(Requirement r : allReqs){
 				if(r.isSatisfiedBy(c.getPrefix())){
 					reqsFulfilled ++;
 				}
 			}
-			String displayedString = String.format(
-					"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
-					reqsFulfilled,
-					c.meetingTime[0].clockTime(),
-					sc.getPrefix().toString() + " " +c.professor);
+
+			String displayedString = "";
+			if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
+				displayedString = String.format(
+						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
+						reqsFulfilled,
+						c.c.meetingTime[0].clockTime(),
+						c.getPrefix().toString() + " " +c.c.professor);
+
+			}
+			else{
+				displayedString = String.format(
+						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
+						reqsFulfilled,
+						"",
+						c.getPrefix().toString() + " " +c.c.professor);
+
+			}
+
 			displayed[i] = displayedString;
 		}
 		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
