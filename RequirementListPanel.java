@@ -122,7 +122,9 @@ public class RequirementListPanel extends JPanel{
 		gbc.insets = new Insets(3,3,3,3);
 		gbc.anchor = GridBagConstraints.LINE_START;
 
+		schedule.checkUpdateReqs();
 		ArrayList<Major> majors = schedule.getMajors();
+		//System.out.println(majors.size());
 		int heightCounter = 1;
 
 
@@ -134,10 +136,10 @@ public class RequirementListPanel extends JPanel{
 			heightCounter++;
 			this.inner.add(majorPanel, gbc);
 			
+
 			this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
 			this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
-			this.clpLeftLabel.setText(this.clpText + Math.max(0, schedule.CLP));
-			
+			this.clpLeftLabel.setText(this.clpText + Math.max(0, schedule.getCLP()));
 		}
 	}
 

@@ -74,6 +74,8 @@ public class CourseList  {
 
 	/**
 	 * Make a requirement for all the prerequsites for this course.
+	 * if p is null or the prefix has no requirement, 
+	 * 		return null.
 	 * @param p
 	 * @return
 	 */
@@ -85,9 +87,7 @@ public class CourseList  {
 		}
 		String originalRequirementString = this.rawPrereqs.get(p);
 		if(originalRequirementString == null){
-			Requirement result = new Requirement();
-			result.numToChoose = 0;
-			return result;
+			return null;
 		}
 		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){
@@ -117,7 +117,6 @@ public class CourseList  {
 		}
 		return Requirement.readFrom(ourVersion);
 	}
-
 
 
 

@@ -14,8 +14,6 @@ public class FurmanOfficial {
 	public static final int[] darkPurpleRGB = {62, 24, 94};
 	public static final Color grey = new Color(91,91,91);
 	public static final int[] greyRGB = {91, 91, 91};
-	public static final Color nimbus = new Color(93,45, 133);
-	public static final Color nimbusAlpha = new Color(93, 45, 133, 200);
 	
 	
 	

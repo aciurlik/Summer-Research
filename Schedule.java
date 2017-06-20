@@ -5,14 +5,16 @@ import java.util.HashSet;
 
 
 public class Schedule {
-	ArrayList<Major> majorsList;
+	private ArrayList<Major> majorsList;
 	private ArrayList<Semester> semesters;
+	private ArrayList<Requirement> prereqs;
+	private Major GER;
 	Driver d; 
 	CourseList masterList;
-	int CLP; 
-	Prefix languagePrefix;
-	int totalCoursesNeeded=0;
-	Semester priorSemester;
+	private int CLP; 
+	private Prefix languagePrefix;
+	private int totalCoursesNeeded;
+	private Semester priorSemester;
 
 
 
@@ -73,11 +75,10 @@ public class Schedule {
 
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
-		//add the GERs major
+		this.prereqs = new ArrayList<Requirement>();
 		reqsValid = false;
-
-		//Course list
 		this.masterList = masterList;
+		
 
 
 		//Semesters
@@ -97,8 +98,7 @@ public class Schedule {
 
 
 		}
-		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
-
+		this.recalcGERMajor();
 
 	}
 
@@ -161,18 +161,15 @@ public class Schedule {
 	 */
 	public boolean replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
 		if	(checkErrorsWhenReplacing(s, s, oldElement, newElement)){
-
 			return false;
 		}
-		//System.out.println("reqs valid");
 		if(s.replace(oldElement, newElement)){
-
 			this.reqsValid = false;
-
+			updatePrereqs();
+			return true;
 		}
-
-
-		return true;
+		System.out.println("repace didn't work");
+		return false;
 	}
 	/**
 	 * In semester S, remove ScheduleElement e.
@@ -183,9 +180,13 @@ public class Schedule {
 		if(this.checkErrorsWhenRemoving(e, s)){
 			return false;
 		}
-		s.remove(e);
-		reqsValid = false;
-		return true;
+		if(s.remove(e)){
+			reqsValid = false;
+			updatePrereqs();
+			return true;
+		}
+		System.out.println("Remove didn't work");
+		return false;
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
@@ -193,16 +194,14 @@ public class Schedule {
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
 		}
-		sem.add(element);
-		updateRequirementsSatisfied(element);
-		if(reqsValid){
-			//could make this more efficient by only updating 
-			// requirements that return true for
-			// isSatisfiedBy(e);
+		if(sem.add(element)){
+			updateRequirementsSatisfied(element);
+			updatePrereqs();
 			reqsValid = false;
+			return true;
 		}
-		reqsValid = false;
-		return true;
+		System.out.println("add didn't work");
+		return false;
 	}
 
 
@@ -210,8 +209,11 @@ public class Schedule {
 		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
 			return false;
 		}
-		newSem.add(element);
-		return true;
+		if(newSem.add(element)){
+			return true;
+		}
+		System.out.println("move didn't work");
+		return false;
 
 	}
 
@@ -228,9 +230,7 @@ public class Schedule {
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
 		}
-		for(Requirement r: newMajor.reqList){
-			totalCoursesNeeded += r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		}
+		updateTotalCoursesNeeded();
 	}
 
 
@@ -240,9 +240,7 @@ public class Schedule {
 		if(!major.name.equals("GER")){
 			recalcGERMajor();
 		}
-		for(Requirement r: major.reqList){
-			totalCoursesNeeded -= r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		}
+		updateTotalCoursesNeeded();
 	}
 
 	public int determineGER(){
@@ -258,14 +256,19 @@ public class Schedule {
 		return highestDegree;
 	}
 
-	public int getPercentDone(int iconHeight) {
-		int haveDone = this.estimatedCoursesLeft();
-		int toPercent = totalCoursesNeeded-haveDone;
-		float percent = (toPercent*100)/totalCoursesNeeded;
-		int newHeight = (int)(percent*iconHeight)/100;
-
-		return newHeight-1;
+	/**
+	 * Return a number between 0 and 1 representing the completion level.
+	 * @param iconHeight
+	 * @return
+	 */
+	public double getPercentDone() {
+		int leftToDo = this.estimatedCoursesLeft();
+		int done = totalCoursesNeeded-leftToDo;
+		double result = (done)/totalCoursesNeeded;
+		return result;
 	}
+	
+	
 
 
 
@@ -401,6 +404,8 @@ public class Schedule {
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
+		result.addAll(prereqs);
+		result.addAll(GER.reqList);
 		return result;
 	}
 
@@ -454,7 +459,20 @@ public class Schedule {
 
 
 	private void recalcGERMajor(){
-		majorsList.set(0,masterList.getGERMajor(languagePrefix, this.determineGER()));
+		int type = this.determineGER();
+		if(type == -1){
+			type = CourseList.BA;
+		}
+		this.GER = masterList.getGERMajor(languagePrefix, type);
+		updateTotalCoursesNeeded();
+	}
+	
+	private void updateTotalCoursesNeeded(){
+		totalCoursesNeeded = 0;
+		ArrayList<ScheduleElement> empty = new ArrayList<ScheduleElement>();
+		for(Requirement r : getAllRequirements()){
+			totalCoursesNeeded += r.minMoreNeeded(empty, false);
+		}
 	}
 
 
@@ -617,7 +635,8 @@ public class Schedule {
 			HashSet<Prefix> needed = new HashSet<Prefix>();
 
 			for(ScheduleElement p : afterOld){
-				if(masterList.getPrereqsShallow(p.getPrefix()).isSatisfiedBy(newP)){
+				Requirement r = masterList.getPrereqsShallow(p.getPrefix());
+				if(r != null && r.isSatisfiedBy(newP)){
 					//throw new PrerequsiteException(new Prefix[]{newP}, p);
 					needed.add(p.getPrefix());
 				}
@@ -826,18 +845,27 @@ public class Schedule {
 	 * courses have been taken .
 	 *  
 	 */
-	public void updateReqs(){
+	private void updateReqs(){
 
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 
 
-		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
+		HashSet<Requirement> reqList = this.getAllRequirements();
 		for(Requirement r : reqList){
 			updateRequirement(r);
 		}
 		reqsValid = true;
+	}
+	
+	/**
+	 * check if anything needs to be updated, and update if it does.
+	 */
+	public void checkUpdateReqs(){
+		if(!reqsValid){
+			updateReqs();
+		}
 	}
 
 	/**
@@ -861,7 +889,8 @@ public class Schedule {
 
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
-		return r.minMoreNeeded(satisficers,  true);
+		int result = r.minMoreNeeded(satisficers,  true);
+		return result;
 
 	}
 
@@ -929,11 +958,9 @@ public class Schedule {
 
 	private void updateRequirementsSatisfied(Course c){
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
-		for(Major m : this.majorsList){
-			for(Requirement r : m.reqList){
-				if(r.isSatisfiedBy(c.getPrefix())){
-					allSatisfied.add(r);
-				}
+		for(Requirement r : this.getAllRequirements()){
+			if(r.isSatisfiedBy(c.getPrefix())){
+				allSatisfied.add(r);
 			}
 		}
 		// If this course satisfies two requirements that don't play well with
@@ -974,18 +1001,37 @@ public class Schedule {
 	}
 
 
+	/**
+	 * doesn't update the requirements (this would cause an infinite loop, 
+	 * updating a requirement means knowing all requirements, which can't happen unless
+	 * you get all majors.)
+	 * @return
+	 */
 	public ArrayList<Major> getMajors(){
-		//Update major requirements.
-		// This may need to be done even if requirementsList is valid,
-		// because validating the requirements list only validates one
-		// copy of each requirement. If multiple majors have the same 
-		// requirement the old update method won't catch it.
-		for (Major m : this.majorsList){
-			for (Requirement r : m.reqList){
-				updateRequirement(r);
+		ArrayList<Major> result = new ArrayList<Major>();
+		if(GER != null){
+			result.add(GER);
+		}
+		if(prereqs.size() > 0){
+			Major prereqsM = new Major("Prereqs");
+			for(Requirement r : prereqs){
+				prereqsM.addRequirement(r);
+			}
+			result.add(prereqsM);
+		}
+		result.addAll(this.majorsList);
+		return result;
+	}
+	
+	
+	public void updatePrereqs(){
+		prereqs = new ArrayList<Requirement>();
+		for(ScheduleElement e : getAllElements()){
+			Requirement r = masterList.getPrereqsShallow(e.getPrefix());
+			if(r != null){
+				prereqs.add(r);
 			}
 		}
-		return this.majorsList;
 	}
 
 
@@ -1000,13 +1046,22 @@ public class Schedule {
 		}
 		return result;
 	}
+	
+	public SemesterDate getStartDate(){
+		return this.semesters.get(0).semesterDate;
+	}
+	public ArrayList<Semester> getSemesters(){
+		return this.semesters;
+	}
+	
+	
 
 
 
 
 
 	public ArrayList<Major> filterAlreadyChosenMajors(ArrayList<Major> collectionOfMajors ) {
-		collectionOfMajors.removeAll(this.majorsList);
+		collectionOfMajors.removeAll(this.getMajors());
 		return collectionOfMajors;
 
 	}
@@ -1043,7 +1098,7 @@ public class Schedule {
 		//associate each requirement with its major.
 		for(Requirement r : enemies){
 			boolean found = false;
-			for(Major m : this.majorsList){
+			for(Major m : this.getMajors()){
 				if(found != true){
 					if(m.reqList.contains(r)){
 						found = true;

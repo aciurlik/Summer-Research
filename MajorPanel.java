@@ -2,7 +2,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,20 +43,19 @@ public class MajorPanel extends JPanel {
 			reqsLeft += r.storedCoursesLeft;
 		}
 
-
+		
 		//Make this major's panel
 		this.setLayout(new BorderLayout());
-
+		
 		//Holds all the things on the top
 		top = new JPanel ();
 		top.setLayout(new BorderLayout());
 		top.setBorder(new CompoundBorder(new EmptyBorder(4, 4, 4, 4), new MatteBorder(0, 0, 1, 0, Color.BLACK)));
-
-
+		
+		
 		//Holds the things at the top left (currently major name and # unscheduled)
 		JPanel topLeftPanel = new JPanel(); 
 		topLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
 		JLabel topLeftLabel =new JLabel(m.name + "         " + Math.max(0, reqsLeft)  + " Unscheduled"); 
 		topLeftLabel.setFont(FurmanOfficial.smallHeaderFont);
 		topLeftPanel.add(topLeftLabel);
@@ -71,18 +69,8 @@ public class MajorPanel extends JPanel {
 			remove.setEnabled(false);
 
 		}
-		if(MenuOptions.UIType){
-			remove.setBackground(FurmanOfficial.nimbus);
-			remove.setMargin(new Insets(1,1,1,1));
-			remove.setPreferredSize(new Dimension(nimbusWidth, nibusHeight));
-		}
-		else{
-			remove.setBackground(FurmanOfficial.darkPurple);
-			remove.setPreferredSize(new Dimension (20, 20));
-		}
-		
-		remove.setForeground(Color.WHITE);
-	
+		remove.setBackground(FurmanOfficial.darkPurple);
+		remove.setPreferredSize(new Dimension (15, 15));
 		remove.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				removeSelf();
@@ -91,9 +79,9 @@ public class MajorPanel extends JPanel {
 			}
 		});
 		topRightPanel.add(remove);
-
-
-
+		
+		
+		
 		top.add(topLeftPanel, BorderLayout.WEST);
 		top.add(topRightPanel, BorderLayout.EAST);
 
@@ -113,7 +101,7 @@ public class MajorPanel extends JPanel {
 		this.add(bottom, BorderLayout.CENTER);
 	}
 
-
+	
 	/*
 	public int getPreferredHeight(){
 		int result = 0;
@@ -122,7 +110,7 @@ public class MajorPanel extends JPanel {
 		return result;
 
 	}
-	 */
+	*/
 
 	public void removeSelf(){
 		d.GUIRemoveMajor(this);

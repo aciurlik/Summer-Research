@@ -26,7 +26,7 @@ public class RequirementPanel extends JPanel {
 	public Driver d;
 	int percentComplete;
 	JLabel shown;
-
+	
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
@@ -42,23 +42,19 @@ public class RequirementPanel extends JPanel {
 		// will begin a dragEvent.
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
-		if(MenuOptions.UIType){
-			this.setBackground(FurmanOfficial.nimbus);
-		}
-		else{
-			this.setBackground(background);
-		}
-
+		
+		this.setBackground(background);
+		
 		update(req);
 
 	}
-
-
+	
+	
 	@Override 
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
-
-
+		
+		
 		//paint a grey block over the proportion of this
 		int width = this.getWidth();
 		int height = this.getHeight();
@@ -68,35 +64,35 @@ public class RequirementPanel extends JPanel {
 		//  |          |
 		//  |__________|          (width, height)
 		//
-
+		
 		Color c = g.getColor();
 		g.setColor(GreyedOut);
 		g.fillRect(0, 0, (width * percentComplete)/100, height);
 		g.setColor(c);
-
-
+		
+		
 	}
-
-
-
+	
+	
+	
 	public void update(Requirement req){
 		this.req =req;
 
-
+		
 		//The full text (displayed on hover over) will be
 		// chopped down to size in order to fit in the requirement panel
 		String fullText = "";
-
-
+		
+		
 		this.percentComplete =(int) Math.round(req.storedPercentComplete * 100);
 		if(percentComplete > 0 && percentComplete < 100){
 			fullText = "(" + percentComplete + "%)" ;
 			fullText += req.storedCoursesLeft + "left\n";
 		}
 		fullText += req.getDisplayString();
-
-
-
+		
+		
+		
 		int numChars = 20;
 		String labelText = fullText;
 		if(labelText.length() > numChars){
@@ -107,7 +103,7 @@ public class RequirementPanel extends JPanel {
 		shown.setFont(FurmanOfficial.normalFont);
 		shown.setToolTipText(req.choices.toString());
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
-
+		
 
 		this.removeAll();
 		this.add(shown);
