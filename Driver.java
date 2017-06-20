@@ -480,7 +480,10 @@ public class Driver{
 	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
 		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
-			JOptionPane.showMessageDialog(popUP, "There were no courses to choose from :( ", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
+			JOptionPane.showMessageDialog(popUP, 
+					 "There were no courses to choose from. \n"
+					+"If you have a course in mind, you can add a note to the semester,\n"
+					+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
 			return null;
 		}
 		String[] displayed = new String[finalListOfCourses.length];
@@ -495,22 +498,15 @@ public class Driver{
 			}
 
 			String displayedString = "";
+			String clockTime = "";
 			if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
-				displayedString = String.format(
-						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
-						reqsFulfilled,
-						c.c.meetingTime[0].clockTime(),
-						c.getPrefix().toString() + " " +c.c.professor);
-
+				clockTime = c.c.meetingTime[0].clockTime();
 			}
-			else{
-				displayedString = String.format(
-						"(%d new reqs) %-12s \t %-30s", //Each of the values separated by tabs
-						reqsFulfilled,
-						"",
-						c.getPrefix().toString() + " " +c.c.professor);
-
-			}
+			displayedString = String.format(
+					"(%d new reqs) %-12s %-30s", 
+					reqsFulfilled,
+					clockTime,
+					c.getPrefix().toString() + " " +c.c.professor);
 
 			displayed[i] = displayedString;
 		}

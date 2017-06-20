@@ -30,11 +30,14 @@ public class FurmanOfficial {
 	
 	
 	static{
-		
+
+		Font listFont = new Font("MONOSPACED", Font.PLAIN, 12);
 		UIManager.put("OptionPane.messageFont", getFont(12));
 		UIManager.put("OptionPane.font", getFont(12));
 		UIManager.put("OptionPane.buttonFont", getFont(12));
-		UIManager.put("List.font", new Font("MONOSPACED", Font.PLAIN, 12));
+		UIManager.put("List.font",listFont);
+		UIManager.put("ComboBox.font", listFont);
+	
 	
 	
 		try {
@@ -58,6 +61,7 @@ public class FurmanOfficial {
 			officialAlpha = bouzarthDarkWithAlpha(200);
 		}
 		
+
 	}
 	
 	

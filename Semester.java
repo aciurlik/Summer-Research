@@ -58,7 +58,7 @@ public class Semester implements Comparable<Semester>{
 	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
 
-		if(addition == null || ( ! (addition instanceof Course))){
+		if(addition == null || ( ! (addition instanceof ScheduleCourse))){
 			return false;
 		}
 		ArrayList<ScheduleCourse> courses = allCourses();
