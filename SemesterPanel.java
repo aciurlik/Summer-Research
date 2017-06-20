@@ -81,6 +81,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		this.hidePanel.setBackground(FurmanOfficial.grey(50));
 		JButton showSemester = new JButton(MenuOptions.showSemester);
 		showSemester.setActionCommand(MenuOptions.showSemester);
+		showSemester.setToolTipText("Show Semester");
 		if(MenuOptions.UIType){
 			showSemester.setPreferredSize(new Dimension(NimbusWidth+2, NimbusHeight));
 			showSemester.setMargin(new Insets(1,1,1,1));
@@ -103,12 +104,14 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		fallSpring = new JLabel("", JLabel.CENTER);
 		deleteSemesterButton = new JButton(MenuOptions.deleteSemester);
+		deleteSemesterButton.setToolTipText("Delete Semester");
 		deleteSemesterButton.setActionCommand(MenuOptions.deleteSemester);
 		deleteSemesterButton.addActionListener(this);
 		deleteSemesterButton.setEnabled(false);
 
 
 		JButton hideSem = new JButton(MenuOptions.hideSemester);
+		hideSem.setToolTipText("Hide Semester");
 		hideSem.setPreferredSize(new Dimension(15,15));
 		hideSem.addActionListener(this);
 		if(MenuOptions.UIType){
@@ -141,7 +144,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		menuPanel = new JPanel();
 		menuPanel.setOpaque(false);
 		menuPanel.setLayout(new BorderLayout());
-		topPanel.add(menuPanel);
+		topPanel.add(menuPanel, BorderLayout.EAST);
 
 		this.setLayout(new GridLayout(1, 1, 0, 0));
 		this.setPreferredSize(new Dimension(300,height));
@@ -402,12 +405,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	public void setHilighted(boolean b){
 		if(b){
-			if(MenuOptions.UIType){
-				this.setBackground(FurmanOfficial.nimbus);
-			}
-			else{
-				this.setBackground(FurmanOfficial.bouzarthDarkPurple);
-			}
+			this.setBackground(FurmanOfficial.official);
 
 		}
 		else{

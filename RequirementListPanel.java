@@ -32,7 +32,7 @@ import javax.swing.border.MatteBorder;
  * @author dannyrivers
  *
  */
-public class RequirementListPanel extends JPanel{
+public class RequirementListPanel extends JPanel implements ActionListener{
 	public JScrollPane scroll;
 	public JPanel inner;
 	public Driver d;
@@ -82,9 +82,14 @@ public class RequirementListPanel extends JPanel{
 		reqsLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
 		clpLeftLabel = new JLabel();
 		clpLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
+		JButton checkAllErrors = new JButton(MenuOptions.checkAllErrors);
+		checkAllErrors.addActionListener(this);
+		
+		
 		this.infoPanel.add(reqsLeftLabel);
 		this.infoPanel.add(creditHoursLabel);
 		this.infoPanel.add(clpLeftLabel);
+		this.infoPanel.add(checkAllErrors);
 		this.infoPanel.setBackground(this.getBackground());
 		this.add(infoPanel, BorderLayout.NORTH);
 		
@@ -143,7 +148,13 @@ public class RequirementListPanel extends JPanel{
 		}
 	}
 
-
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
+			d.GUICheckAllErrors();
+		}
+	}
+	
 	public static void main(String[] args){
 		// Testing the requirementList panel for the first time
 		RequirementListPanel p = new RequirementListPanel(Schedule.testSchedule(), null);
@@ -155,5 +166,6 @@ public class RequirementListPanel extends JPanel{
 		frame.setVisible(true);
 
 	}
+
 
 }

@@ -16,7 +16,8 @@ public class FurmanOfficial {
 	public static final int[] greyRGB = {91, 91, 91};
 	public static final Color nimbus = new Color(93,45, 133);
 	public static final Color nimbusAlpha = new Color(93, 45, 133, 200);
-	
+	public static Color official;
+	public static Color officialAlpha;
 	
 	
 	public static final Color bouzarthDarkPurple = darkPurple(230);
@@ -29,13 +30,41 @@ public class FurmanOfficial {
 	
 	
 	static{
+
 		Font listFont = new Font("MONOSPACED", Font.PLAIN, 12);
 		UIManager.put("OptionPane.messageFont", getFont(12));
 		UIManager.put("OptionPane.font", getFont(12));
 		UIManager.put("OptionPane.buttonFont", getFont(12));
 		UIManager.put("List.font",listFont);
 		UIManager.put("ComboBox.font", listFont);
+	
+	
+	
+		try {
+		
+			// Set cross-platform Java L&F (also called "Metal")
+			UIManager.setLookAndFeel(
+					"javax.swing.plaf.nimbus.NimbusLookAndFeel"	);
+			
+			MenuOptions.setUIType(true);
+		} 
+		catch (Exception e) {
+			UIManager.getCrossPlatformLookAndFeelClassName();
+			MenuOptions.setUIType(false);
+		}
+		if(MenuOptions.UIType){
+			official = nimbus;
+			officialAlpha = nimbusAlpha;
+		}
+		else{
+			official= bouzarthDarkPurple;
+			officialAlpha = bouzarthDarkWithAlpha(200);
+		}
+		
+
 	}
+	
+	
 	
 	/**
 	 * Rescale this RGB value according to the given alpha

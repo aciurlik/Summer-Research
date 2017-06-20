@@ -43,12 +43,7 @@ public class RequirementPanel extends JPanel {
 		MouseListener listener = ComponentDragHandler.getDragListener();
 		this.addMouseListener(listener);
 
-		if(MenuOptions.UIType){
-			this.setBackground(FurmanOfficial.nimbus);
-		}
-		else{
-			this.setBackground(background);
-		}
+		this.setBackground(FurmanOfficial.official);
 
 		update(req);
 

@@ -28,6 +28,7 @@ public class ScheduleElementPanel extends JPanel {
 	public ScheduleElementPanel reference = this;
 	int nimbusWidth = 40;
 	int nimbusHeight = 20;
+	JPanel remove = new JPanel();
 
 
 	//	Driver coursesSatisfy = new Driver();
@@ -89,20 +90,19 @@ public class ScheduleElementPanel extends JPanel {
 
 
 		//Adds remove Button
-		JPanel remove = new JPanel();
+		
 		remove.setOpaque(false);
 		JButton toRemove = new JButton(removeButtonText);
 		if(MenuOptions.UIType){
 			toRemove.setPreferredSize(new Dimension(nimbusWidth, nimbusHeight));
 			toRemove.setMargin(new Insets(1,1,1,1));
-			toRemove.setBackground(FurmanOfficial.nimbus);
+			
 
 		}
 		else{
-			toRemove.setForeground(FurmanOfficial.bouzarthDarkPurple);
 			toRemove.setPreferredSize(buttonSize);
 		}
-
+		
 		if(s instanceof ScheduleCourse){
 			if (((ScheduleCourse) s).isTaken()){
 				toRemove.setEnabled(false);
@@ -139,20 +139,19 @@ public class ScheduleElementPanel extends JPanel {
 					}
 				}
 			});
-			this.add(addCourse, BorderLayout.CENTER);
+			JPanel stack = new JPanel();
+			stack.setBackground(this.getBackground());
+			addCourse.setPreferredSize(new Dimension(130,20));
+			remove.add(addCourse);
+			this.add(stack, BorderLayout.CENTER);
 		}	
 		else{
 			JLabel noCourse = new JLabel("No courses avaliable");
 			noCourse.setFont(FurmanOfficial.normalFont);
-			if(MenuOptions.UIType){
-				noCourse.setBackground(FurmanOfficial.nimbus);
-			}
-			else{
-				noCourse.setBackground(FurmanOfficial.bouzarthDarkPurple);
-			}
+			noCourse.setBackground(FurmanOfficial.official);
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
-			this.add(noCourse, BorderLayout.CENTER);
+			remove.add(noCourse);
 
 		}
 	}

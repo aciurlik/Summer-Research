@@ -84,18 +84,20 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 	public JButton addButton(String s){
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setBackground(this.getBackground());
+		buttonPanel.setOpaque(false);
+	
 
 		JButton button = new JButton(s);
 		button.setFont(FurmanOfficial.normalFont);
 		button.setForeground(Color.white);
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
+		
 		button.setBackground(FurmanOfficial.darkPurple);
-		button.setBorderPainted(false);
+		//button.setBorderPainted(false);
 		button.setPreferredSize(new Dimension(153, 20));
 		button.setOpaque(true);
 		button.addActionListener(this);
-		button.setBorder(new BevelBorder(BevelBorder.RAISED));
+		//button.setBorder(new BevelBorder(BevelBorder.RAISED));
 
 		buttonPanel.add(button);
 		this.add(buttonPanel);

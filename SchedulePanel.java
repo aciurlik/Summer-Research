@@ -72,6 +72,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		addExtraSemesterButtonPanel.add(addSemester);
 		scrollPanel.add(addExtraSemesterButtonPanel);
 		addSemester.addActionListener(this);
+		addSemester.setToolTipText("Add Semester");
 
 
 
