@@ -50,15 +50,13 @@ public class BellTower extends JPanel{
 		overlap.setSize(icon.getIconWidth(), newHeight);
 		overlap.setLocation(0, icon.getIconHeight()-newHeight);
 		overlap.setBackground(FurmanOfficial.bouzarthDarkWithAlpha(230));
-		if(percentDone==icon.getIconHeight()-1){
-			if(sch.checkAllErrors().isEmpty()){
+		if(sch.isComplete()){
+			if(sch.checkAllErrors().isEmpty() && sch.isComplete()){
 				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
 			}
 			else{
 				sch.d.GUICheckAllErrors();
 			}
-
-
 		}
 	}
 }

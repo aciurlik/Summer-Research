@@ -482,9 +482,16 @@ public class CourseList  {
 			}
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
+		m.addRequirement(FYWRequirement());
 		return m;
 	}
 
+	public Requirement FYWRequirement(){
+		Requirement result = new Requirement();
+		result.addRequirement(TerminalRequirement.readFrom("FYW>0"));
+		result.setName("FYW");
+		return result;
+	}
 
 	/**
 	 * Given the collection of GERs that this course satisfies
