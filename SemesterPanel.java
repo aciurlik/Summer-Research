@@ -13,6 +13,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +32,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
-public class SemesterPanel extends JPanel implements ActionListener, DocumentListener{
+public class SemesterPanel extends JPanel implements ActionListener, DocumentListener, MouseListener{
 
 
 
@@ -49,7 +51,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	Semester sem;
 	private JButton changeCourse;
 	final static int height=300;
-	JTextArea notes = new JTextArea();
+	JTextArea notes;
 	JPanel menuPanel;
 	int NimbusWidth = 40;
 	int NimbusHeight = 20;
@@ -66,6 +68,13 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		super();
 		this.sem=sem;
 		this.d = d;
+		
+		this.addMouseListener(this);
+		
+		
+		
+		
+		this.notes  = new JTextArea();
 
 
 		//Setup the defaultPanel, the panel which is visible whenever this
@@ -289,11 +298,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			defaultPanel.add(element);
 			element.updatePanel();
 		}
-
-
-
-
-
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
@@ -308,11 +312,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 				defaultPanel.add(emptyLabel);
 
 			}
-
-
-
-
-
 		}
 
 
@@ -338,7 +337,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			defaultPanel.add(scrollPane);
 			notes.getDocument().addDocumentListener(this);
-
 		}
 		topPanel.setBackground(this.semesterColor(this.sem));
 		defaultPanel.setBackground(this.semesterColor(this.sem));
@@ -504,6 +502,36 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 
 
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		System.out.println("Hi");
+		this.requestFocusInWindow();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 
