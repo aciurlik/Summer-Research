@@ -55,11 +55,22 @@ public class MenuOptions {
 	public static final  String exploreMayX = "Explore MayX Opportunities";
 	public static final  String help ="Help";
 	public static String checkAllErrors = "Check all Errors";
-
-
-
 	
 	
-	
+	public static boolean UIType;
+
+
+	public boolean isUIType() {
+		return UIType;
+	}
+
+
+	public static void setUIType(boolean uIType) {
+		UIType = uIType;
+	}
 	
 }
+
+
+
+
