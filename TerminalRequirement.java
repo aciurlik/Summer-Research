@@ -289,6 +289,35 @@ public class TerminalRequirement extends Requirement {
 		return false;
 	}
 	
+	@Override
+	public boolean alsoCompletes(Requirement r){
+		if(this.isExact()){
+			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
+			//TODO instead of 4, make this accurate.
+			taken.add(new PrefixHours(this.p, 4));
+			return r.isComplete(taken, false);
+		}
+		else{
+			if(r instanceof TerminalRequirement){
+				TerminalRequirement t = (TerminalRequirement)r;
+				if(t.usesMax){
+					if(!this.usesMax || this.max > t.max){
+						return false;
+					}
+				}
+				if(t.usesMin){
+					if(!this.usesMin || this.min < t.min){
+						return false;
+					}
+				}
+				return true;
+			}
+			//what if it's just a requirement?
+			return false;
+		}
+		
+	}
+	
 
 	/**
 	 * test whether this requirement uses min or max, or instead
@@ -404,6 +433,46 @@ public class TerminalRequirement extends Requirement {
 		System.out.println("Finished testing");
 	}
 	
+	//INFINITELOOPHAZARD
+	public boolean isCompletedBy(HashSet<TerminalRequirement> s){
+		if(s.contains(this)){
+			return true;
+		}
+		for(TerminalRequirement t : s){
+			if(this.completedBy(t)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean completedBy(TerminalRequirement t){
+		if(this.isExact()){
+			return t.p.equals(this.p);
+		}
+		if(!t.p.getSubject().equals(this.p.getSubject())){
+			return false;
+		}
+		int left = Integer.MIN_VALUE;
+		int right = Integer.MAX_VALUE;
+		int otherLeft = Integer.MIN_VALUE;
+		int otherRight = Integer.MAX_VALUE;
+		if(this.usesMin){
+			left = this.min;
+		}
+		if(this.usesMax){
+			right = this.max;
+		}
+		if(t.usesMin){
+			otherLeft=  t.min;
+		}
+		if(t.usesMax){
+			otherRight = t.max;
+		}
+		Interval<Integer> ourInterval = new Interval<Integer>(left, right);
+		Interval<Integer> theirInterval = new Interval<Integer>(otherLeft, otherRight);
+		return theirInterval.contains(ourInterval);
+	}
 	
 	
 	

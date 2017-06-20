@@ -19,6 +19,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	boolean storedIsComplete;
 	int storedCoursesLeft;
 	double storedPercentComplete;
+	
+	boolean allCompletionSetsCalculated=false;
+	HashSet<HashSet<TerminalRequirement>> allCompletionSets;
 
 	//Used to check if %complete is close to 0.
 	public static final double tolerance = 1000 * Double.MIN_VALUE;
@@ -105,12 +108,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	// 			|								|
 	//			|								V
 	// 			-----recurse on choices----- MMN(taken)
-	//											|
-	//											|
-	//											|
-	// isSatisfied(p) <----recurse on choices---
-	// |		  ^		
-	// | 		  |	
+	//											|  
+	//											|  
+	//											|  
+	// isSatisfied(p) <----recurse on choices---   
+	// |		  ^								   
+	// | 		  |				
 	// |			--------
 	// |					|
 	// -recurse on choices--
@@ -124,8 +127,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	private int numPlannedLater(ArrayList<ScheduleElement> taken){
 		int numPlanned = 0;
 		for(ScheduleElement s : taken){
-			if(s == this){
-				numPlanned ++;
+			if(s instanceof Requirement){
+				if(s == this){
+					numPlanned ++;
+				}
+				else{
+					if(((Requirement) s).alsoCompletes(this)){
+						numPlanned ++;
+					}
+				}
 			}
 		}
 		return numPlanned;
@@ -193,6 +203,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	private int minMoreNeeded(ArrayList<ScheduleElement> taken, int numPlannedLater, boolean storeValue){
 		int result = minMoreNeeded(taken);
 		result = result - numPlannedLater;
+		result = Math.max(result, 0);
 		if(storeValue){
 			this.storedCoursesLeft = result;
 		}
@@ -222,7 +233,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 					int credits = ((HasCreditHours)e).getCreditHours();
 					boolean found = false;
 					for(Requirement r : completedSubreqs){
-						if(r.isSatisfiedBy(e.getPrefix())){
+						if(r.isSatisfiedBy(e)){
 							found = true;
 							break;
 						}
@@ -239,7 +250,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		else{ //this doesn't use credit hours.
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
-			// if there is a requirement in taken, we need to see
+			
+			for(Requirement r : choices){
+				otherNums.add(r.minMoreNeeded(taken));
+			}
+			Collections.sort(otherNums);
+			int result = 0;
+			for(int i = 0; i < numToChoose ; i ++){
+				result += otherNums.get(i);
+			}
+
+			// if there is a requirement in taken, it might contribute to
+			// minMoreNeeded. We need to see
 			// first whether it satisfies a choice, and if not, if it
 			// satisfies this requirement. If it satisfies a choice,
 			// then we should let that choice use it. If it satisfies
@@ -252,24 +274,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				}
 			}
 			for(Requirement t : takenRequirements){
-				if(t.isSubset(this)){
+				if(t.alsoCompletes(this)){
 					boolean canUse = true;
 					for(Requirement choice : choices){
-						if(t.isSubset(choice)){
+						if(t.alsoCompletes(choice)){
 							canUse = false;
 						}
 					}
-					
+					if(canUse){
+						result --;
+					}
 				}
-			}
-			
-			for(Requirement r : choices){
-				otherNums.add(r.minMoreNeeded(taken));
-			}
-			Collections.sort(otherNums);
-			int result = 0;
-			for(int i = 0; i < numToChoose ; i ++){
-				result += otherNums.get(i);
 			}
 			return result;
 		}
@@ -298,9 +313,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	
 	
 	
-
+	public boolean isSatisfiedBy(ScheduleElement e) {
+		if(e instanceof Requirement){
+			if (((Requirement)e).alsoCompletes(this)){
+				return true;
+			}
+		}
+		return isSatisfiedBy(e.getPrefix());
+	}
 	//INFINITELOOPHAZARD
-	public boolean isSatisfiedBy(Prefix p) {
+	public boolean isSatisfiedBy(Prefix p){
 		for(Requirement r : this.choices){
 			if(r.isSatisfiedBy(p)){
 				return true;
@@ -309,11 +331,174 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return false;
 	}
 	
-	public boolean isSubset(Requirement r){
-		//TODO
+	//INFINITELOOPHAZARD
+	/**
+	 * Return true if any strategy for completing this requirement
+	 * will also complete r.
+	 * Currently does not handle credit hours requirements.
+	 * @param r
+	 * @return
+	 */
+	public boolean alsoCompletes(Requirement r){
+		if(this.equals(r)){
+			return true;
+		}
+		if(!RequirementGraph.doesPlayNice(this, r)){
+			return false;
+		}
+		CompletionSetsIter csi = new CompletionSetsIter(this);
+		while(csi.hasNext()){
+			HashSet<TerminalRequirement> nextCompletionSet = csi.next();
+			//System.out.println(nextCompletionSet);
+			if(!r.isCompletedBy(nextCompletionSet)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean equals(Requirement r){
 		return false;
 	}
 	
+	//INFINITELOOPHAZARD
+	public boolean isCompletedBy(HashSet<TerminalRequirement> s){
+		int numSubComplete = 0;
+		for(Requirement r : choices){
+			if(r.isCompletedBy(s)){
+				numSubComplete ++;
+				if(numSubComplete >= numToChoose){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+
+	
+	
+	/**
+	 * This class iterates over a requirement's possible completion sets.
+	 * Each completion set is a set of terminal requirements.
+	 * @author dannyrivers
+	 *
+	 */
+	private class CompletionSetsIter implements Iterator<HashSet<TerminalRequirement>>{
+		SizedPowerSetsIter<Requirement> iter;
+		ArrayList<Requirement> workingSetOfRequirementsToChoose;
+		ArrayList<CompletionSetsIter> subIters;
+		boolean isTerminal;
+		boolean start;
+		public CompletionSetsIter(Requirement r){
+			
+			if(r instanceof TerminalRequirement){
+				start = true;
+				isTerminal = true;
+				workingSetOfRequirementsToChoose = new ArrayList<Requirement>();
+				workingSetOfRequirementsToChoose.add(r);
+			}
+			else{
+				isTerminal = false;
+				this.iter = new SizedPowerSetsIter<Requirement> (r.choices, r.numToChoose);
+				subIters = new ArrayList<CompletionSetsIter>(r.numToChoose);
+				for(int i = 0; i < r.numToChoose ; i ++){
+					subIters.add(null);
+				}
+				refreshSubiters();
+				start = true;
+			}
+		}
+		@Override
+		public boolean hasNext() {
+			if(start){
+				return true;
+			}
+			if(isTerminal){
+				return false;
+			}
+			if(!iter.hasNext()){
+				return nextSubiterToIncrement() == -1;
+			}
+			else{
+				return true;
+			}
+		}
+		@Override
+		public HashSet<TerminalRequirement> next() {
+			if(start){
+				start = false;
+				return fullSet();
+			}
+			if(isTerminal){
+				HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
+				result.add((TerminalRequirement)workingSetOfRequirementsToChoose.get(0));
+				return result;
+			}
+			int nextToIncrement = nextSubiterToIncrement();
+			if(nextToIncrement == -1){
+				//We've finished this working set of requirements, time 
+				// to make a new one.
+				refreshSubiters();
+				return fullSet();
+				
+			}
+			else{
+				//increment the next subiter, while restarting any
+				// subiter above it in the list
+				subIters.get(nextToIncrement).next();
+				for(int i = nextToIncrement - 1 ; i >= 0 ; i --){
+					subIters.set(i, new CompletionSetsIter(workingSetOfRequirementsToChoose.get(i)));
+				}
+				return fullSet();
+			}
+		}
+		
+		private void refreshSubiters(){
+			workingSetOfRequirementsToChoose = new ArrayList<Requirement>(iter.next());
+			//System.out.println(workingSetOfRequirementsToChoose);
+			for(int i = 0; i < workingSetOfRequirementsToChoose.size() ; i ++){
+				Requirement chosenReq = workingSetOfRequirementsToChoose.get(i);
+				//System.out.println(chosenReq instanceof TerminalRequirement);
+				CompletionSetsIter newIter = new CompletionSetsIter(chosenReq);
+				subIters.set(i,newIter);
+			}
+		}
+		//If we think of each subiter as on its own row,
+		// with the first subiter on the top row,
+		// find the first subiter that does have a next.
+		private int nextSubiterToIncrement(){
+			for(int i = 0 ; i <subIters.size(); i ++){
+				if(subIters.get(i) == null){
+					return -1;
+				}
+				if(subIters.get(i).hasNext()){
+					return i;
+				}
+			}
+			return -1;
+		}
+		/**
+		 * Returns one full set of terminal requirements without changing
+		 * any state of the iter.
+		 * @return
+		 */
+		public HashSet<TerminalRequirement> fullSet(){
+			HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
+			if(isTerminal){
+				TerminalRequirement thisReq = (TerminalRequirement)workingSetOfRequirementsToChoose.get(0);
+				result.add(thisReq);
+				return result;
+			}
+			for(CompletionSetsIter csi : subIters){
+				result.addAll(csi.fullSet());
+			}
+			return result;
+		}
+		@Override
+		public void remove() {
+		}
+	}
 	
 	
 	
@@ -430,8 +615,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> r) {
-		ArrayList<Requirement> result = new ArrayList<Requirement>(1);
-		result.add(this);
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		for(Requirement otherReq : r){
+			if(otherReq.equals(this)){
+				result.add(otherReq);
+			}
+			else{
+				if(this.alsoCompletes(otherReq)){
+					result.add(otherReq);
+				}
+			}
+		}
 		return result;
 	}
 	
@@ -756,6 +950,43 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return result;
 	}
 
+	
+	public static void testAlsoCompletes(){
+		String[] tests = new String[]{
+				"(MTH-110)", // 1, 2
+				"2 of (MTH-110, 2 of (MTH 120, MTH 130))",  //0, 2
+				"3 of (MTH-110, MTH 120, MTH 130)", //0, 1
+				"4 of (MTH-100, MTH-200, MTH-300, MTH-400, MTH-500)", //4
+				"3 of (MTH-100, MTH-200, MTH-300, MTH-400)", //3
+				"3 of (1 of (MTH-1, MTH-2, MTH-3, MTH-4), MTH-200, MTH-300, MTH-400)",//6, 7
+				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400)",//5, 7
+				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400, 1 of (MTH-1, MTH-4))"//5, 6
+				
+		};
+		int[][] matchups = new int[][]
+			{
+				{0,1, 2},
+				{0,1, 2},
+				{0,1, 2},
+				{4},
+				{3},
+				{6, 7},
+				{5, 7},
+				{5, 6}
+			};
+		
+		
+		for(int i = 0; i < matchups.length ; i ++){
+			Requirement r = Requirement.readFrom(tests[i]);
+			for(int j : matchups[i]){
+				Requirement t = Requirement.readFrom(tests[j]);
+				boolean forward = r.alsoCompletes(t);
+				//boolean backward = t.alsoCompletes(r);
+				System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
+			}
+		}
+		
+	}
 
 	public static void testReading(){
 		String[] tests = new String[]{
@@ -829,7 +1060,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 	
 	public static void main(String[] args){
-		testReading();
+		testAlsoCompletes();
 	}
 
 

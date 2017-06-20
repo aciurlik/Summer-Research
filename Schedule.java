@@ -13,7 +13,7 @@ public class Schedule {
 	CourseList masterList;
 	private int CLP; 
 	private Prefix languagePrefix;
-	private int totalCoursesNeeded=0;
+	private int totalCoursesNeeded;
 
 
 
@@ -87,9 +87,7 @@ public class Schedule {
 
 
 		}
-		
-		this.addMajor(masterList.getGERMajor(null, CourseList.BA));
-
+		this.recalcGERMajor();
 
 	}
 
@@ -221,9 +219,7 @@ public class Schedule {
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
 		}
-		for(Requirement r: newMajor.reqList){
-			totalCoursesNeeded += r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		}
+		updateTotalCoursesNeeded();
 	}
 
 
@@ -233,9 +229,7 @@ public class Schedule {
 		if(!major.name.equals("GER")){
 			recalcGERMajor();
 		}
-		for(Requirement r: major.reqList){
-			totalCoursesNeeded -= r.minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		}
+		updateTotalCoursesNeeded();
 	}
 
 	public int determineGER(){
@@ -251,14 +245,19 @@ public class Schedule {
 		return highestDegree;
 	}
 
-	public int getPercentDone(int iconHeight) {
-		int haveDone = this.estimatedCoursesLeft();
-		int toPercent = totalCoursesNeeded-haveDone;
-		float percent = (toPercent*100)/totalCoursesNeeded;
-		int newHeight = (int)(percent*iconHeight)/100;
-
-		return newHeight-1;
+	/**
+	 * Return a number between 0 and 1 representing the completion level.
+	 * @param iconHeight
+	 * @return
+	 */
+	public double getPercentDone() {
+		int leftToDo = this.estimatedCoursesLeft();
+		int done = totalCoursesNeeded-leftToDo;
+		double result = (done)/totalCoursesNeeded;
+		return result;
 	}
+	
+	
 
 
 
@@ -388,6 +387,8 @@ public class Schedule {
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
+		result.addAll(prereqs);
+		result.addAll(GER.reqList);
 		return result;
 	}
 
@@ -416,7 +417,20 @@ public class Schedule {
 	}
 
 	private void recalcGERMajor(){
-		majorsList.set(0,masterList.getGERMajor(languagePrefix, this.determineGER()));
+		int type = this.determineGER();
+		if(type == -1){
+			type = CourseList.BA;
+		}
+		this.GER = masterList.getGERMajor(languagePrefix, type);
+		updateTotalCoursesNeeded();
+	}
+	
+	private void updateTotalCoursesNeeded(){
+		totalCoursesNeeded = 0;
+		ArrayList<ScheduleElement> empty = new ArrayList<ScheduleElement>();
+		for(Requirement r : getAllRequirements()){
+			totalCoursesNeeded += r.minMoreNeeded(empty, false);
+		}
 	}
 
 
@@ -796,7 +810,7 @@ public class Schedule {
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 
 
-		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
+		HashSet<Requirement> reqList = this.getAllRequirements();
 		for(Requirement r : reqList){
 			updateRequirement(r);
 		}
@@ -833,7 +847,8 @@ public class Schedule {
 
 		r.isComplete(satisficers, true);
 		r.percentComplete(satisficers, true);
-		return r.minMoreNeeded(satisficers,  true);
+		int result = r.minMoreNeeded(satisficers,  true);
+		return result;
 
 	}
 
@@ -894,11 +909,9 @@ public class Schedule {
 
 	private void updateRequirementsSatisfied(Course c){
 		ArrayList<Requirement> allSatisfied = new ArrayList<Requirement>();
-		for(Major m : this.majorsList){
-			for(Requirement r : m.reqList){
-				if(r.isSatisfiedBy(c.getPrefix())){
-					allSatisfied.add(r);
-				}
+		for(Requirement r : this.getAllRequirements()){
+			if(r.isSatisfiedBy(c.getPrefix())){
+				allSatisfied.add(r);
 			}
 		}
 		// If this course satisfies two requirements that don't play well with
@@ -961,6 +974,7 @@ public class Schedule {
 		return result;
 	}
 	
+	
 	public void updatePrereqs(){
 		prereqs = new ArrayList<Requirement>();
 		for(ScheduleElement e : getAllElements()){
@@ -1000,7 +1014,7 @@ public class Schedule {
 
 
 	public ArrayList<Major> filterAlreadyChosenMajors(ArrayList<Major> collectionOfMajors ) {
-		collectionOfMajors.removeAll(this.majorsList);
+		collectionOfMajors.removeAll(this.getMajors());
 		return collectionOfMajors;
 
 	}
@@ -1034,7 +1048,7 @@ public class Schedule {
 		//associate each requirement with its major.
 		for(Requirement r : enemies){
 			boolean found = false;
-			for(Major m : this.majorsList){
+			for(Major m : this.getMajors()){
 				if(found != true){
 					if(m.reqList.contains(r)){
 						found = true;
