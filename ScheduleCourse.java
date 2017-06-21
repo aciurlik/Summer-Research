@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ScheduleCourse implements ScheduleElement{
+public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	Course c;
 	public boolean taken;
 	ArrayList<Requirement> userSpecifiedReqs = null;
@@ -20,10 +20,10 @@ public class ScheduleCourse implements ScheduleElement{
 
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
-		if(! ( other instanceof Course )){
+		if(! ( other instanceof ScheduleCourse )){
 			return false;
 		}
-		return this.c.coursePrefix.compareTo(((Course)other).coursePrefix) == 0;
+		return this.getPrefix().compareTo(other.getPrefix()) == 0;
 	}
 
 
@@ -38,7 +38,7 @@ public class ScheduleCourse implements ScheduleElement{
 		result = result + this.c.semester.getSeason(this.c.semester.sNumber)+ " "+ this.c.semester.year + " ";
 
 		result = result + this.c.coursePrefix.toString() + " "; 
-		if(!this.c.sectionNumber.equals(null)){
+		if(this.c.sectionNumber !=(null)){
 			result = result + this.c.sectionNumber+ " ";
 		}
 

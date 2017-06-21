@@ -110,6 +110,7 @@ public class ScheduleElementPanel extends JPanel {
 		if(s instanceof ScheduleCourse){
 			if (((ScheduleCourse) s).isTaken()){
 				toRemove.setEnabled(false);
+				elementLabel.setForeground(FurmanOfficial.grey(170));
 			}
 		}
 		toRemove.addActionListener(new ActionListener(){
@@ -178,7 +179,7 @@ public class ScheduleElementPanel extends JPanel {
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
-			container.removeElement((ScheduleElementPanel) dragged);
+			//container.removeElement((ScheduleElementPanel) dragged);
 			container.d.dragEnded();
 
 		}

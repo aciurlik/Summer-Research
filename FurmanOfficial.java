@@ -4,7 +4,9 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 public class FurmanOfficial {
@@ -42,8 +44,18 @@ public class FurmanOfficial {
 		try {
 		
 			// Set cross-platform Java L&F (also called "Metal")
-			UIManager.setLookAndFeel(
-					"javax.swing.plaf.nimbus.NimbusLookAndFeel"	);
+			 UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+
+			      @Override
+			      public UIDefaults getDefaults() {
+			       UIDefaults ret = super.getDefaults();
+			       ret.put("List.font",
+			    		   monospaced); // supersize me
+			  
+			       return ret;
+			      }
+
+			     });
 			
 			MenuOptions.setUIType(true);
 		} 

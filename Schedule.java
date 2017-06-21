@@ -15,8 +15,8 @@ public class Schedule {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
-	
-	
+
+
 	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
 
 
@@ -38,8 +38,8 @@ public class Schedule {
 	}
 
 	public void readFromPrior(){
-		
-		this.setLanguagePrefix(new Prefix("SPN", "201"));
+
+		this.setLanguagePrefix(new Prefix("SPN", "115"));
 
 
 		//Class One 
@@ -84,7 +84,7 @@ public class Schedule {
 		this.prereqs = new ArrayList<Requirement>();
 		reqsValid = false;
 		this.masterList = masterList;
-		
+
 
 
 		//Semesters
@@ -183,7 +183,6 @@ public class Schedule {
 	 * @param s
 	 */
 	public boolean removeElement (ScheduleElement e, Semester s){
-		System.out.println("I AM REmoving");
 		if(this.checkErrorsWhenRemoving(e, s)){
 			return false;
 		}
@@ -197,7 +196,6 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-		System.out.println("I AM ADDING");
 
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
@@ -214,7 +212,6 @@ public class Schedule {
 
 
 	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
-		System.out.println("I am moving");
 		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
 			return false;
 		}
@@ -276,7 +273,7 @@ public class Schedule {
 		double result = (done*1.0)/totalCoursesNeeded;
 		return result;
 	}
-	
+
 	public boolean isComplete(){
 		if(getPercentDone() > 1.0 - 0.000000000001){
 			if(majorsList.size() >= 1){
@@ -285,7 +282,7 @@ public class Schedule {
 		}
 		return false;
 	}
-	
+
 
 
 
@@ -458,17 +455,37 @@ public class Schedule {
 	}
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
+		String[] Language = {"110", "120", "201"};
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
-		Requirement r = this.masterList.getPrereqsShallow(languagePrefix);
-		for(Requirement req: r.choices){
-			if(!req.getPrefix().getNumber().equals("115")){
-				Course c = new Course(req.getPrefix(), new SemesterDate(priorSemester.semesterDate.year,priorSemester.semesterDate.sNumber), null, null, 4, null );
+		int savedLocation = -1;
+		for(int i=0; i<Language.length; i++){
+			if(languagePrefix.getNumber().equals(Language[i])){
+				savedLocation=i;
+			}
+		}
+		if(savedLocation != -1){
+			for(int p=0; p<savedLocation; p++){
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemesters().get(0).semesterDate, null, null, 
+						0, null);
+				ScheduleCourse cc = new ScheduleCourse(c, this);
+				cc.setTaken(true);
+				priorSemester.add(cc);
+			}
+
+		}
+		if((savedLocation == -1) && (!languagePrefix.getNumber().equals("115"))){
+			for(int p=0; p<Language.length; p++){
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemesters().get(0).semesterDate, null, null, 
+						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
 				cc.setTaken(true);
 				priorSemester.add(cc);
 			}
 		}
+
+
+
 	}
 
 
@@ -483,7 +500,7 @@ public class Schedule {
 		this.GER = masterList.getGERMajor(languagePrefix, type);
 		updateTotalCoursesNeeded();
 	}
-	
+
 	private void updateTotalCoursesNeeded(){
 		totalCoursesNeeded = 0;
 		ArrayList<ScheduleElement> empty = new ArrayList<ScheduleElement>();
@@ -890,7 +907,7 @@ public class Schedule {
 		}
 		reqsValid = true;
 	}
-	
+
 	/**
 	 * check if anything needs to be updated, and update if it does.
 	 */
@@ -1054,8 +1071,8 @@ public class Schedule {
 		result.addAll(this.majorsList);
 		return result;
 	}
-	
-	
+
+
 	public void updatePrereqs(){
 		prereqs = new ArrayList<Requirement>();
 		for(ScheduleElement e : getAllElements()){
@@ -1078,15 +1095,15 @@ public class Schedule {
 		}
 		return result;
 	}
-	
+
 	public SemesterDate getStartDate(){
 		return this.semesters.get(0).semesterDate;
 	}
 	public ArrayList<Semester> getSemesters(){
 		return this.semesters;
 	}
-	
-	
+
+
 
 
 

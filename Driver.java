@@ -486,30 +486,37 @@ public class Driver{
 					+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
 			return null;
 		}
+		String reqsString = "";
 		String[] displayed = new String[finalListOfCourses.length];
 		HashSet<Requirement> allReqs = sch.getAllRequirements();
 		for(int i = 0; i < finalListOfCourses.length ; i ++){
 			ScheduleCourse c = finalListOfCourses[i];
 			int reqsFulfilled = 0;
+			reqsString = new String();
 			for(Requirement r : allReqs){
 				if(r.isSatisfiedBy(c.getPrefix())){
+					reqsString = reqsString + String.format("%-7s", r.shortString());
 					reqsFulfilled ++;
+					
 				}
+				
 			}
-
 			String displayedString = "";
 			String clockTime = "";
 			if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
 				clockTime = c.c.meetingTime[0].clockTime();
 			}
 			displayedString = String.format(
-					"(%d new reqs) %-12s %-30s", 
+					"(%d new reqs) %-12s %-50s %s", 
 					reqsFulfilled,
 					clockTime,
-					c.getPrefix().toString() + " " +c.c.professor);
+					c.getPrefix().toString() + " " +c.c.professor,
+					reqsString);
+					
 
 			displayed[i] = displayedString;
 		}
+		
 		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
 		int chosenIndex = 0;
 		for(; chosenIndex < displayed.length ; chosenIndex ++){
