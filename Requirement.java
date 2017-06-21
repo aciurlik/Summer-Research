@@ -574,10 +574,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 
-	//TODO Let the user decide which comparisons should come first.
-	//This comparison method is used to sort the 
-	// requirementList displayed to the user.
 	@Override
+	/**
+	 * This comparison method is used to sort a 
+	 * requirementList displayed to the user.
+	 */
 	public int compareTo(Requirement o) {
 		if(! (o instanceof Requirement)){
 			//Requirements are greater than terminalRequirements.

@@ -68,7 +68,6 @@ public class ListOfMajors {
 			bf.close();
 			System.out.println(f.getAbsolutePath());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

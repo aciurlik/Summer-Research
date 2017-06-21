@@ -243,7 +243,6 @@ public class TerminalRequirement extends Requirement {
 
 	@Override 
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
-		//TODO what if this usesCreditHours? Is that even possible? (I don't think so).
 		int result = numToChoose;
 		for(ScheduleElement e : taken){
 			if(isSatisfiedBy(e.getPrefix())){

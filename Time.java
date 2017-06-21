@@ -416,7 +416,6 @@ public class Time implements Comparable<Time>{
 	}
 
 	public String toString(){
-		//TODO make this fancier
 		return simpleString();
 	}
 	/**
