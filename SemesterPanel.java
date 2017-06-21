@@ -509,7 +509,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("Hi");
 		this.requestFocusInWindow();
 	}
 
