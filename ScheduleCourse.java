@@ -38,7 +38,7 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 		result = result + this.c.semester.getSeason(this.c.semester.sNumber)+ " "+ this.c.semester.year + " ";
 
 		result = result + this.c.coursePrefix.toString() + " "; 
-		if(!this.c.sectionNumber.equals(null)){
+		if(this.c.sectionNumber != null){
 			result = result + this.c.sectionNumber+ " ";
 		}
 

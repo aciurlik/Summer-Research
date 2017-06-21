@@ -380,6 +380,22 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return false;
 	}
 	
+	
+	public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
+		this.percentComplete(taken, true);
+		this.minMoreNeeded(taken, true);
+		this.isComplete(taken, true);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	
 	
