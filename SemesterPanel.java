@@ -68,12 +68,12 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		super();
 		this.sem=sem;
 		this.d = d;
-		
+
 		this.addMouseListener(this);
-		
-		
-		
-		
+
+
+
+
 		this.notes  = new JTextArea();
 
 
@@ -348,8 +348,11 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		}
 		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO  || sem.lastSemester){
-			deleteSemesterButton.setEnabled(true);
+			if(!sem.undeletableSemester){
+				deleteSemesterButton.setEnabled(true);
+			}
 		}
+
 		else{
 			deleteSemesterButton.setEnabled(false);
 		}
@@ -513,25 +516,25 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
 

@@ -85,7 +85,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		this.setPreferredSize(new Dimension(700,SemesterPanel.height+4*insetsWidth+scrollWidth));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		
+
 		this.add(scrollPane, BorderLayout.CENTER); 
 
 	}
@@ -97,7 +97,7 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		d.GUISemesterPanelAdded();
 
 	}
-	
+
 	public void dragStarted(ScheduleElement e){
 		for(SemesterPanel s : this.allSemesterPanels){
 			s.dragStarted(e);
@@ -130,6 +130,9 @@ public class SchedulePanel extends JPanel implements ActionListener{
 			if(s.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
 				s.setLastSemester(true);
 			}
+			if(s.equals(sch.getAllSemesters().get(1))){
+				s.setUndeletableSemester(true);
+			}
 			if(foundp != null){
 				foundp.updatePanel(s);
 				scrollPanel.add(foundp, gbc);
@@ -142,17 +145,22 @@ public class SchedulePanel extends JPanel implements ActionListener{
 				}
 				else{
 					s.setLastSemester(false);
-					
+				}
+				if(semester.equals(sch.getAllSemesters().get(1))){
+					s.setUndeletableSemester(true);
+				}
+				else{
+					s.setUndeletableSemester(false);
 				}
 				allSemesterPanels.add(semester);
 				scrollPanel.add(semester, gbc);
 				gbc.gridx ++;
 			}
-			
-			
-	
+
+
+
 		}
-		
+
 
 		gbc.fill = gbc.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
