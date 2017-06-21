@@ -475,6 +475,13 @@ public class TerminalRequirement extends Requirement {
 	}
 	
 	
+	//INFINITELOOPHAZARD
+	public boolean equals(Requirement r){
+		//TODO
+		return r == this;
+	}
+	
+	
 	
 	
 	

@@ -346,6 +346,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		if(!RequirementGraph.doesPlayNice(this, r)){
 			return false;
 		}
+		long start = System.currentTimeMillis();
 		CompletionSetsIter csi = new CompletionSetsIter(this);
 		while(csi.hasNext()){
 			HashSet<TerminalRequirement> nextCompletionSet = csi.next();
@@ -353,11 +354,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			if(!r.isCompletedBy(nextCompletionSet)){
 				return false;
 			}
+			if(System.currentTimeMillis() - start > 50){
+				return false;
+			}
 		}
 		return true;
 	}
 	
 	public boolean equals(Requirement r){
+		//TODO make this correct
 		return false;
 	}
 	
@@ -611,7 +616,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		if(result.length () > 20 && this.name == null){
 			result = result.replaceAll(" ", "");
 			if(result.length() > 40){
-				System.out.println("long");
 				result = result.substring(0, 40);
 			}
 		}
