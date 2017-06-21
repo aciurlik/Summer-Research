@@ -361,9 +361,38 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return true;
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		if(!(o instanceof Requirement)){
+			return false;
+		}
+		return equals((Requirement)o);
+	}
+	
+	//INFINITELOOPHAZARD
 	public boolean equals(Requirement r){
-		//TODO make this correct
-		return false;
+		if(r instanceof TerminalRequirement){
+			return false;
+		}
+		if(r.numToChoose != this.numToChoose){
+			return false;
+		}
+		for(Requirement choice : choices){
+			if(!r.choices.contains(choice)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	//INFINITELOOPHAZARD
+	@Override
+	public int hashCode(){
+		int total = 0;
+		for(Requirement r : choices){
+			total += r.hashCode();
+		}
+		return total;
 	}
 	
 	//INFINITELOOPHAZARD
@@ -1019,6 +1048,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				"(MTH 110)",
 				"(MTH-110)",
 				"MTH110",
+				"MTH-110",
+				"MTH 110",
 				"2 of (MTH 110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, MTH 130)",
 				"2 of (ACC-110, MTH 120, MTH 130)",
@@ -1051,10 +1082,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		System.out.println();
 		System.out.println();
+		
+		Requirement previous = new Requirement();
 
 		for(String toRead : tests){
 			boolean needsToBeShown = false;
 			Requirement r = Requirement.readFrom(toRead);
+			boolean equalToLast = r.equals(previous);
+			previous = r;
 			boolean complete = r.isComplete(takens, 0, true);
 			double percentComplete = r.percentComplete(takens, true);
 			int minLeft = r.minMoreNeeded(takens, true);
@@ -1072,7 +1107,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 			if(needsToBeShown){
 				System.out.println("ReadingFrom \"" +toRead + "\"");
-				System.out.println("    got \"" + r.getDisplayString() + "\"");
+				System.out.println("    got \"" + r.saveString() + "\"");
+				System.out.println("Equal to last?" + equalToLast);
 				System.out.println("Uses CH? " + r.usesCreditHours);
 				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
 				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
@@ -1086,7 +1122,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 	
 	public static void main(String[] args){
-		testAlsoCompletes();
+		testReading();
 	}
 
 
