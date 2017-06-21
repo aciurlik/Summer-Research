@@ -456,8 +456,7 @@ public class Course implements HasCreditHours{
 		System.out.println(c.saveString());
 		Course d = Course.readFrom(c.saveString());
 		System.out.println(d.saveString());
-		//TODO check out when you read in again it's military time?
-
+		
 
 	}
 

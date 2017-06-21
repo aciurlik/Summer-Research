@@ -691,7 +691,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 	public int getCreditHours() {
-		// TODO Auto-generated method stub
 		return 4;
 	}
 
