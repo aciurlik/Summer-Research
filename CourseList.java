@@ -457,8 +457,6 @@ public class CourseList  {
 							r.choices.add(new TerminalRequirement(p));
 						}
 					}
-					//TODO set the double dip number of NW and NWL to be different.
-					// r.setDoubleDipNumber
 					break;
 				case "NWL":
 					//Music majors don't need this requirement.
@@ -473,7 +471,6 @@ public class CourseList  {
 					break;
 				case "WC":
 				case "NE":
-					// TODO set doubleDipNumber differently from all the others
 
 				}
 				if(includeDefaultPrefixes){
@@ -492,6 +489,9 @@ public class CourseList  {
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
+		
+		//TODO make NW and NWL enemies
+		// TODO Make WC and NE enemies of all the other requirements.
 		return m;
 	}
 

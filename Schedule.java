@@ -1018,8 +1018,7 @@ public class Schedule {
 	}
 
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
-		//TODO fill this in
-		return false;
+		return !RequirementGraph.doesPlayNice(r1, r2);
 	}
 
 
@@ -1078,7 +1077,6 @@ public class Schedule {
 
 
 	public int getCreditHoursComplete(){
-		//TODO replace with each semester's getCreditHours method
 		int result = 0;
 		for (Semester s : this.getAllSemesters()){
 			result = result + s.getCreditHours();

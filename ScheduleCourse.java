@@ -175,7 +175,6 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	}
 
 	public SemesterDate getSemester() {
-		// TODO Auto-generated method stub
 		return c.getSemester();
 	}
 
