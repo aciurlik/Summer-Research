@@ -1,5 +1,5 @@
 import java.awt.BorderLayout;
-
+import java.awt.Color;
 import java.awt.Desktop;
 
 import java.io.File;
@@ -111,8 +111,8 @@ public class Driver{
 	public void GUINewSchedule() {
 		CourseList l = CourseList.testList();
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-
 		Schedule current = new Schedule(l, sch.getStartSemester().semesterDate, null);
+		current.readFromPrior();
 		this.b.setSchedule(current);
 		setSchedule(current);
 		this.update();

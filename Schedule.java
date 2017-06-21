@@ -28,40 +28,43 @@ public class Schedule {
 
 		CourseList l = CourseList.testList();
 		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
-		result.setLanguagePrefix(new Prefix("SPN", "201"));
-
-
-		//Class One 
-		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
-		ScheduleCourse aa = new ScheduleCourse(a, result);
-		aa.setTaken(true);
-		result.addScheduleElement(aa, result.semesters.get(0));
-
-
-		//Class Two
-		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
-
-		ScheduleCourse bb = new ScheduleCourse(b, result);
-		bb.setTaken(true);
-		result.addScheduleElement(bb , result.semesters.get(0));
-
-
-
-		//Class Three
-		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null,  4, "03");
-		ScheduleCourse dd = new ScheduleCourse(d, result);
-		dd.setTaken(true);
-		result.addScheduleElement(dd, result.semesters.get(0));
-		//result.semesters.add(b);
-
-
-		result.setCLP(10);
+		result.readFromPrior();
 
 
 		return result;
 	}
 
+	public void readFromPrior(){
+		
+		this.setLanguagePrefix(new Prefix("SPN", "201"));
 
+
+		//Class One 
+		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
+		ScheduleCourse aa = new ScheduleCourse(a, this);
+		aa.setTaken(true);
+		this.addScheduleElement(aa,this.semesters.get(0));
+
+
+		//Class Two
+		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
+
+		ScheduleCourse bb = new ScheduleCourse(b,this);
+		bb.setTaken(true);
+		this.addScheduleElement(bb , this.semesters.get(0));
+
+
+
+		//Class Three
+		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null,  4, "03");
+		ScheduleCourse dd = new ScheduleCourse(d, this);
+		dd.setTaken(true);
+		this.addScheduleElement(dd, this.semesters.get(0));
+		//result.semesters.add(b);
+
+
+		this.setCLP(10);
+	}
 
 	/**
 	 * Make a new schedule of semesters where firstSemester is the first shown semester 

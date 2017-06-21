@@ -14,15 +14,16 @@ public class Semester implements Comparable<Semester>{
 	public String notes = "";
 	boolean isAP = false;
 	public boolean studyAway = false;
-	protected boolean extraSemester = false;
 	protected boolean lastSemester = false;
-
+	//For the first semester 
+	protected boolean undeletableSemester = false;
 
 
 
 
 
 	
+
 
 	public Semester(SemesterDate sD, Schedule s){
 		elements = new ArrayList<ScheduleElement>();
@@ -304,11 +305,15 @@ public class Semester implements Comparable<Semester>{
 		}
 	}
 
-	public void setExtraSemester(boolean b) {
-		this.extraSemester =b;
-		
-	}
 	
+
+	public boolean isUndeletableSemester() {
+		return undeletableSemester;
+	}
+
+	public void setUndeletableSemester(boolean undeletableSemester) {
+		this.undeletableSemester = undeletableSemester;
+	}
 
 	public void setLastSemester(boolean lastSemester) {
 		this.lastSemester = lastSemester;
