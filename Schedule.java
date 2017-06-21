@@ -159,31 +159,13 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 
-	/**
-	 * In semester s, replace oldElement with newElement.
-	 * @param s
-	 * @param oldElement
-	 * @param newElement
-	 */
-	public boolean replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
-		if	(checkErrorsWhenReplacing(s, s, oldElement, newElement)){
-			return false;
-		}
-		if(s.replace(oldElement, newElement)){
-			this.reqsValid = false;
-			updatePrereqs();
-			return true;
-		}
-		System.out.println("repace didn't work");
-		return false;
-	}
+
 	/**
 	 * In semester S, remove ScheduleElement e.
 	 * @param e
 	 * @param s
 	 */
 	public boolean removeElement (ScheduleElement e, Semester s){
-		System.out.println("I AM REmoving");
 		if(this.checkErrorsWhenRemoving(e, s)){
 			return false;
 		}
@@ -197,7 +179,6 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-		System.out.println("I AM ADDING");
 
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
@@ -212,18 +193,37 @@ public class Schedule {
 		return false;
 	}
 
-
-	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
-		System.out.println("I am moving");
-		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
+	
+	/**
+	 * Replace the old element with new element.
+	 * Assumes that oldSemester contains oldElement and
+	 * that newSemester does NOT contain newElement.
+	 * @param oldElement
+	 * @param newElement
+	 * @param oldSemester
+	 * @param newSemester
+	 * @return
+	 */
+	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement, Semester oldSemester, Semester newSemester){
+		if(this.checkErrorsWhenReplacing(oldSemester, newSemester, oldElement, newElement)){
 			return false;
 		}
-		if(newSem.add(element)){
-			return true;
+		
+		//Perform the addition and removal
+		if(!oldSemester.remove(oldElement)){
+			System.out.println("Replace didn't work");
+			return false;
 		}
-		System.out.println("move didn't work");
-		return false;
-
+		if(!newSemester.add(newElement)){
+			System.out.println("Replace didn't work");
+			return false;
+		}
+		//update things.
+		if(oldElement != newElement){
+			this.reqsValid = false;
+			updatePrereqs();
+		}
+		return true;
 	}
 
 	///////////////////////////////
@@ -546,8 +546,6 @@ public class Schedule {
 				if(needed != null){
 					boolean complete = needed.isComplete(taken, true);
 					if(!complete){
-						System.out.println(needed);
-						System.out.println(taken);
 						ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
 						prereq.setOffendingCourse(e);
 						prereq.setNeededCourses(needed);
@@ -580,18 +578,26 @@ public class Schedule {
 		}
 		return false;
 	}
+	
+	/**
+	 * Find the prereqs needed for this prefix if taken at the given
+	 * time.
+	 * @param p
+	 * @param sD
+	 * @return
+	 */
 	public Requirement prereqsNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
 			return null;
 		}
 		else{
 			ArrayList<ScheduleElement> taken = elementsTakenBefore(sD);
-			taken.addAll(elementsTakenIn(sD));
+			if(this.prereqsCanBeSatisfiedInSameSemester){
+				taken.addAll(elementsTakenIn(sD));
+			}
 			Requirement needed = masterList.getPrereqsShallow(p);
 			if(needed != null){
-				needed.isComplete(taken, true);
-				needed.minMoreNeeded(taken, true);
-
+				needed.updateAllStoredValues(taken);
 			}
 			return needed;
 		}
@@ -619,69 +625,75 @@ public class Schedule {
 		return false;
 	}
 
+	/**
+	 * If an error is found, return true.
+	 * @param oldSem
+	 * @param newSem
+	 * @param oldE
+	 * @param newE
+	 * @return
+	 */
 	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
 			ScheduleElement oldE, ScheduleElement newE){
-
-		//If one of the prefixes is null or 
-		// if the prefixes are different, 
-		// we're really just doing an
-		// add and a remove.
-		Prefix newP = newE.getPrefix();
-		if(newP == null){
-
-			return(checkPrerequsitesRemoving(oldE, oldSem));
-			//	checkPrerequsitesFor(newE, newSem.semesterDate);
-		}
-		Prefix oldP = oldE.getPrefix();
-		if(oldP == null){
-
-			return checkPrerequsitesAdding(newE, newSem.semesterDate);
-		}
-		//If they're equal, we're really moving the time we take this class.
+		//If the elements are equal, we're really moving the time we take it.
 		// Check to see if anything happening before the new placement but
-		// after the old placement now has a prerequsite not filled.
-		if(newP.equals(oldP)){
+		// after the old placement now has an unfilled prereq.
+		if(newE.equals(oldE)){
 			//If we're moving the course backward in time 
+			// we might no longer satisfy its prereqs.
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
-				ArrayList<ScheduleElement> taken  = this.elementsTakenBefore(newSem.semesterDate);
-				taken.addAll(this.elementsTakenIn(newSem.semesterDate));
-				Requirement missing =masterList.getPrereqsShallow(oldE.getPrefix());
-				if(missing != null && !missing.isComplete(taken, true)){
+				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
+				
+				if(stillNeeded != null && !stillNeeded.storedIsComplete){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
-					preReq.setNeededCourses(missing);
+					preReq.setNeededCourses(stillNeeded);
 					//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
-
 					return((!this.userOverride(preReq)));
 				}
+				else{
+					return false;
+				}
 			}
-			//If we're moving the course forward in time. The only courses that need to be checked are those in between the new position and
-			//the old position of the moving course, this is because any other course has already had an error thrown, and therefore has been checked by the user. 
-
-			//prefixes between oldSem and newSem inclusive.
+			//If we're moving the course forward in time. 
+			//The only courses that need to be checked are those in between the new position and
+			//the old position of the moving course, this is because any other course 
+			//has already had an error thrown, and therefore has been checked by the user. 
+			
+			//prefixes between oldSem and newSem.
+			// In the following code, new refers to the new location for the element, and 
+			// to the semester who's date comes later. (2020 is new, 2018 is old).
 			ArrayList<ScheduleElement> beforeNew = this.elementsTakenBefore(newSem.semesterDate);
 			ArrayList<ScheduleElement> afterOld = this.elementsTakenAfter(oldSem.semesterDate);
 			ArrayList<ScheduleElement> old = this.elementsTakenIn(oldSem);
-			afterOld.addAll(old);
+			if(this.prereqsCanBeSatisfiedInSameSemester){
+				afterOld.addAll(old);
+			}
 			afterOld.retainAll(beforeNew);
-			HashSet<Prefix> needed = new HashSet<Prefix>();
-
-			for(ScheduleElement p : afterOld){
+			ArrayList<ScheduleElement> intersection = afterOld;
+			
+			//for each element we're jumping over, check if
+			// we satisfied one of that element's prereqs.
+			HashSet<Prefix> elementsThatUsedTheMovingElement = new HashSet<Prefix>();
+			for(ScheduleElement p : intersection){
 				Requirement r = masterList.getPrereqsShallow(p.getPrefix());
-				if(r != null && r.isSatisfiedBy(newP)){
-					//throw new PrerequsiteException(new Prefix[]{newP}, p);
-					needed.add(p.getPrefix());
+				if(r != null && r.isSatisfiedBy(newE)){
+					elementsThatUsedTheMovingElement.add(p.getPrefix());
 				}
 			}
-			if(!needed.isEmpty()){
+			if(!elementsThatUsedTheMovingElement.isEmpty()){
 				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
-				preReq.setNeededCourses(new Requirement(needed.toArray(new Prefix[needed.size()]),1));
-
+				preReq.setNeededCourses(new Requirement(elementsThatUsedTheMovingElement
+						.toArray(new Prefix[elementsThatUsedTheMovingElement.size()]),1));
+				preReq.setOffendingCourse(newE);
 				return(!this.userOverride(preReq));
 			}
 			return false;
 
 		}
+		//If the element's aren't the same,
+		// we're really just doing an
+		// add and a remove.
 		else{
 			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesAdding(newE, newSem.semesterDate));
 		}
@@ -905,7 +917,7 @@ public class Schedule {
 	 * satisfying this requirement.
 	 * @param r
 	 */
-	public int updateRequirement(Requirement r){
+	public void updateRequirement(Requirement r){
 		//For each requirement, find all the schedule elements that satisfy it
 		// (this prevents enemy requirements from both seeing the same course)s
 		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
@@ -918,12 +930,7 @@ public class Schedule {
 				satisficers.add(e);
 			}
 		}
-
-		r.isComplete(satisficers, true);
-		r.percentComplete(satisficers, true);
-		int result = r.minMoreNeeded(satisficers,  true);
-		return result;
-
+		r.updateAllStoredValues(satisficers);
 	}
 
 

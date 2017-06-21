@@ -185,16 +185,12 @@ public class Driver{
 		if(p.getElement() instanceof ScheduleCourse){
 
 			Requirement r=	new Requirement(new Prefix[]{p.getElement().getPrefix()}, 1);
-			sch.replaceElement(old, p.getElement(), r);
-			sch.moveElement(r, old, newSemesterPanel.sem);
-			//This requirement is not removing itself
-			old.remove(r);
-			this.update();
+			sch.replace(p.getElement(), r, old, newSemesterPanel.sem);
 		}
 		else{
-			sch.moveElement(p.getElement(), old, newSemesterPanel.sem);
-			this.update();
+			sch.replace(p.getElement(), p.getElement(), old, newSemesterPanel.sem);
 		}
+		this.update();
 	}
 
 
@@ -229,7 +225,7 @@ public class Driver{
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
 		ScheduleElement old = toChange.getElement();
-		sch.replaceElement(s, old, newValue);
+		sch.replace(old, newValue, s, s);
 		update();
 	}
 
@@ -622,8 +618,14 @@ public class Driver{
 			instruct += "\nIsses in :" + issueStrings.toString();
 		}
 		if(s.error.equals(ScheduleError.preReqError)){
+			System.out.println("1");
+			try{
 			header = "Prerequisites Error";
 			instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
+			System.out.println("2");
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		//if(s.error.equals(ScheduleError.preReqErrorPrefix)){
 		//	header = "Prerequisites Error";
@@ -633,8 +635,10 @@ public class Driver{
 			header = "Duplicate Error";
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
+		System.out.println("3");
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		System.out.println("4");
 		return (n==JOptionPane.OK_OPTION);
 
 	}
