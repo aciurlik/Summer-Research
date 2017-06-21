@@ -67,10 +67,9 @@ public class MajorPanel extends JPanel {
 		JPanel topRightPanel = new JPanel();
 		topRightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		JButton remove = new JButton("x");
-		//Makes it so you can't exit GER's 
-		if(m.name.equals("GER")){
+		//Makes it so you can't exit GER's or prereqs
+		if(m.name.equals("GER") || m.name.equals("Prereqs")){
 			remove.setEnabled(false);
-
 		}
 		if(MenuOptions.UIType){
 			
