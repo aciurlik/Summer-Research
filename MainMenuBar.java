@@ -227,8 +227,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.addInternship)){
 			d.GUIOutsideLink(e.getActionCommand());
 		}
-		if(e.getActionCommand().equals(MenuOptions.addMayX) || e.getActionCommand().equals(MenuOptions.addSummerClass)){
+		if(e.getActionCommand().equals(MenuOptions.addMayX)){
 			d.GUIYearsPopUP(e.getActionCommand());
+		}
+		
+		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
+			d.GUIChooseSummerSession();
 		}
 		
 		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){

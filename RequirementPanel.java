@@ -26,6 +26,7 @@ public class RequirementPanel extends JPanel {
 	public Driver d;
 	int percentComplete;
 	JLabel shown;
+	MajorPanel m;
 
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
@@ -34,6 +35,7 @@ public class RequirementPanel extends JPanel {
 		super();
 		this.req = req;
 		this.d = d;
+		this.m=m;
 
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
@@ -45,7 +47,7 @@ public class RequirementPanel extends JPanel {
 
 		this.setBackground(FurmanOfficial.official);
 
-		update(req);
+		update(req, m);
 
 	}
 
@@ -75,9 +77,9 @@ public class RequirementPanel extends JPanel {
 
 
 
-	public void update(Requirement req){
+	public void update(Requirement req, MajorPanel m){
 		this.req =req;
-
+		this.m=m;
 
 		//The full text (displayed on hover over) will be
 		// chopped down to size in order to fit in the requirement panel
@@ -104,8 +106,10 @@ public class RequirementPanel extends JPanel {
 		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
-		String toolTipText = req.getDisplayString();
-		shown.setToolTipText(toolTipText);
+		if(!m.major.name.equals("GER")){
+			String toolTipText = req.getDisplayString();
+			shown.setToolTipText(toolTipText);
+		}
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 
