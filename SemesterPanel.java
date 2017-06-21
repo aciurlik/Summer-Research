@@ -483,7 +483,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		try {
 			this.d.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -494,7 +493,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		try {
 			this.d.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -505,7 +503,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		try {
 			this.d.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -519,25 +516,21 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 }

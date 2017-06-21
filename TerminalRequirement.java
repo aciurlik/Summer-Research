@@ -243,7 +243,6 @@ public class TerminalRequirement extends Requirement {
 
 	@Override 
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
-		//TODO what if this usesCreditHours? Is that even possible? (I don't think so).
 		int result = numToChoose;
 		for(ScheduleElement e : taken){
 			if(isSatisfiedBy(e.getPrefix())){
@@ -476,19 +475,60 @@ public class TerminalRequirement extends Requirement {
 	
 	
 	//INFINITELOOPHAZARD
+	@Override
 	public boolean equals(Requirement r){
-		//TODO
-		return r == this;
+		if(!(r instanceof TerminalRequirement)){
+			return false;
+		}
+		TerminalRequirement other = (TerminalRequirement)r;
+		if(this.isExact()){
+			return this.p.equals(other.p);
+		}
+		if(this.usesMin ^ other.usesMin){
+			return false;
+		}
+		if(this.usesMax ^ other.usesMax){
+			return false;
+		}
+		return (this.min == other.min && this.max == other.max);
+	}
+	
+	//INFINITELOOPHAZARD
+	@Override 
+	public int hashCode(){
+		int result = this.p.hashCode();
+		if(usesMin){
+			result += 10;
+			result += min;
+		}
+		if(usesMax){
+			result += 10;
+			result += max;
+		}
+		return result;
+	}
+	
+	
+	public static void testTerminalsEquality(){
+		TerminalRequirement t = TerminalRequirement.readFrom("MTH-150");
+		TerminalRequirement x = TerminalRequirement.readFrom("MTH-150");
+		System.out.println(t.equals(x));
+		System.out.println(x.equals(t));
+		System.out.println(t.hashCode());
+		System.out.println(x.hashCode());
+		
+		HashSet<TerminalRequirement> set = new HashSet<TerminalRequirement>();
+		set.add(t);
+		set.add(x);
+		System.out.println(set.size());
+		System.out.println(set.contains(x));
 	}
 	
 	
 	
 	
-	
-	
-	
 	public static void main(String[] args){
-		testTerminalRequirements();
+		testTerminalsEquality();
 	}
 	
 }

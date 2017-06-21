@@ -80,9 +80,7 @@ public class CourseList  {
 	 * @return
 	 */
 	public Requirement getPrereqsShallow(Prefix p){
-		
 		if(p == null){
-			
 			return null;
 		}
 		String originalRequirementString = this.rawPrereqs.get(p);
@@ -101,13 +99,24 @@ public class CourseList  {
 				// These will not be saved in savedPrereqMeanings.
 
 				//"any first year writing seminar" is common
+				if(originalRequirementString.equals("any first year writing seminar")){
+					Requirement result = new Requirement();
+					TerminalRequirement t = TerminalRequirement.readFrom("FYW>0");
+					t.setName("Any FYW");
+					result.addRequirement(t);
+					return result;
+				}
 
 				//"appropriate placement" is common
-
+				if(originalRequirementString.equals("appropriate placement")){
+					Requirement result = new Requirement();
+					result.addRequirement(new TerminalRequirement(new Prefix("Placement", p.getSubject() + "-" + p.getNumber())));
+					return result;
+				}
 				//"audition required" is common
 				if(originalRequirementString.equals("audition required")){
 					Requirement result = new Requirement();
-					result.addRequirement(new TerminalRequirement(new Prefix("audition", "")));
+					result.addRequirement(new TerminalRequirement(new Prefix("Audition", p.getSubject() + "-" + p.getNumber())));
 					return result;
 				}
 				//If none of the special strings happened, we 
@@ -448,8 +457,6 @@ public class CourseList  {
 							r.choices.add(new TerminalRequirement(p));
 						}
 					}
-					//TODO set the double dip number of NW and NWL to be different.
-					// r.setDoubleDipNumber
 					break;
 				case "NWL":
 					//Music majors don't need this requirement.
@@ -464,7 +471,6 @@ public class CourseList  {
 					break;
 				case "WC":
 				case "NE":
-					// TODO set doubleDipNumber differently from all the others
 
 				}
 				if(includeDefaultPrefixes){
@@ -483,6 +489,9 @@ public class CourseList  {
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
+		
+		//TODO make NW and NWL enemies
+		// TODO Make WC and NE enemies of all the other requirements.
 		return m;
 	}
 

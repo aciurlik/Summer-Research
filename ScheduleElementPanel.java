@@ -179,9 +179,8 @@ public class ScheduleElementPanel extends JPanel {
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
-			//container.removeElement((ScheduleElementPanel) dragged);
-			container.d.dragEnded();
 
+			container.d.dragEnded();
 		}
 
 	}
