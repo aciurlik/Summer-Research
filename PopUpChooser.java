@@ -9,7 +9,11 @@ import javax.swing.JOptionPane;
 
 
 
-
+/**
+ * This class lets the user choose a Major from a list of majors.
+ * 
+ *
+ */
 public class PopUpChooser {
 	JList <Major> addList;
 	Driver d;
@@ -50,14 +54,14 @@ public class PopUpChooser {
 			createDiaologBox(type);
 
 		}
-
-
-
 	}
 
 
 
-	//Creates dialog box
+	/**
+	 * Create the dialog box and get the user's choice of major.
+	 * @param s
+	 */
 	public void createDiaologBox(String s){
 		Major[] dialogList = new Major[displayThings.size()];
 
@@ -68,9 +72,6 @@ public class PopUpChooser {
 		if((m != null) && (m instanceof Major)){
 			d.GUIAddMajor(m);
 		}
-
-
-
 	}
 }
 

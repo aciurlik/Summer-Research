@@ -132,13 +132,14 @@ public class Semester implements Comparable<Semester>{
 
 
 	/**
+	 * Check if adding addition would make an overload
 	 * This is able to take a null input. 
 	 * @param forAll true if checking all errors, false otherwise
 	 * @param addition the schedule Element you are adding to your semester
 	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
 	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
-
+		System.out.println("checking overload");
 		int totalHours = 0;
 
 		if(addition instanceof ScheduleCourse){

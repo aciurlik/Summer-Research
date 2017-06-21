@@ -1,14 +1,12 @@
 import java.awt.BorderLayout;
-
+import java.awt.Color;
 import java.awt.Desktop;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-
 import java.util.HashSet;
 
 import javax.swing.ImageIcon;
@@ -18,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
@@ -325,7 +322,9 @@ public class Driver{
 	}
 
 	/**
-	 * A general method for some types of popups
+	 * A method for letting the user choose among a list of majors.
+	 * The string determines whether it chooses between actual majors,
+	 * minors, or tracks.
 	 * @param s
 	 */
 	public void GUIPopUP(String s){
