@@ -17,12 +17,13 @@ public class Semester implements Comparable<Semester>{
 	protected boolean lastSemester = false;
 	//For the first semester 
 	protected boolean undeletableSemester = false;
+	protected boolean taken = false;
 
 
 
 
 
-	
+
 
 
 	public Semester(SemesterDate sD, Schedule s){
@@ -175,38 +176,38 @@ public class Semester implements Comparable<Semester>{
 		if(newElement instanceof HasCreditHours){
 			totalHours= totalHours + ((HasCreditHours) newElement).getCreditHours();
 		}
-		
+
 		totalHours = totalHours + getCreditHours();
 		if(totalHours > OverloadLimit){
 			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
 			overload.setOverloadLimit(this.OverloadLimit);
 			overload.setOffendingCourse(newElement);
 			//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
-		
-				return (!this.schedule.userOverride(overload));
-		
+
+			return (!this.schedule.userOverride(overload));
+
 		}
 		return false;
 	}
-	
-	
+
+
 	public int getCreditHours(){
 		int totalHours = 0;
 		for(ScheduleElement e : this.elements){
-			
+
 			if(e instanceof ScheduleCourse){
 				totalHours = totalHours + ((ScheduleCourse) e).getCreditHours();
-			
-				
+
+
 			}
-			
+
 			if(e instanceof Requirement){
 				totalHours = totalHours + ((Requirement) e).getCreditHours();
-				
+
 			}
 		}
 		return totalHours;
-		
+
 	}
 
 
@@ -267,7 +268,7 @@ public class Semester implements Comparable<Semester>{
 	}
 
 
-	
+
 
 	public ArrayList<ScheduleCourse> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
@@ -305,7 +306,7 @@ public class Semester implements Comparable<Semester>{
 		this.studyAway = studyAway;
 	}
 
-	
+
 
 
 	public int getOverloadLimit() {
@@ -330,7 +331,7 @@ public class Semester implements Comparable<Semester>{
 		}
 	}
 
-	
+
 
 	public boolean isUndeletableSemester() {
 		return undeletableSemester;
@@ -343,6 +344,29 @@ public class Semester implements Comparable<Semester>{
 	public void setLastSemester(boolean lastSemester) {
 		this.lastSemester = lastSemester;
 	}
+
+	public boolean isTaken() {
+		if(this.elements.size()==0){
+			return false;
+		}
+		for(ScheduleElement s: this.elements){
+			if(s instanceof ScheduleCourse){
+				ScheduleCourse c = (ScheduleCourse) s;
+				if(!c.taken){
+					return false;
+				}
+			}
+			else{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void setTaken(boolean taken) {
+		this.taken = taken;
+	}
+
 
 
 }

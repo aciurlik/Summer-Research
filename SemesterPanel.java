@@ -222,6 +222,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		if(s.studyAway){
 			return FurmanOfficial.grey;
 		}
+		if(s.taken){
+			return FurmanOfficial.grey(170);
+		}
 		int ColorNum = 0;
 		if(s.getDate().sNumber<SemesterDate.FALL){
 			ColorNum = s.getDate().year;
@@ -320,13 +323,14 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 
 
-		if(sem.studyAway){
+		if(sem.studyAway || sem.taken){
 
 
 			dropLabel.setForeground(Color.white);
 			fallSpring.setForeground(Color.white);
-			fallSpring.setText("Study Away " + sem.semesterDate.getSeason(sem.semesterDate.sNumber)+ " "+ sem.semesterDate.year);
-
+			if(sem.studyAway){
+				fallSpring.setText("Study Away " + sem.semesterDate.getSeason(sem.semesterDate.sNumber)+ " "+ sem.semesterDate.year);
+			}
 
 
 		}
@@ -356,6 +360,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		else{
 			deleteSemesterButton.setEnabled(false);
 		}
+
 	}
 
 

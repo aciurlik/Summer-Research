@@ -127,6 +127,10 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		for(Semester s: sch.getAllSemesters()){
 			SemesterPanel foundp = this.findPanelFor(s);
 			s.setLastSemester(false);
+			if(s.equals(sch.getAllSemesters().get(0))|| s.isTaken()){
+				s.setTaken(true);
+				
+			}
 			if(s.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
 				s.setLastSemester(true);
 			}
