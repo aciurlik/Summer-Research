@@ -194,10 +194,6 @@ public class Schedule {
 	}
 
 
-
-	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
-		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
-
 	
 	/**
 	 * Replace the old element with new element.
