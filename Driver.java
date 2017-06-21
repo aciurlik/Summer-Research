@@ -185,16 +185,12 @@ public class Driver{
 		if(p.getElement() instanceof ScheduleCourse){
 
 			Requirement r=	new Requirement(new Prefix[]{p.getElement().getPrefix()}, 1);
-			sch.replaceElement(old, p.getElement(), r);
-			sch.moveElement(r, old, newSemesterPanel.sem);
-			//This requirement is not removing itself
-			old.remove(r);
-			this.update();
+			sch.replace(p.getElement(), r, old, newSemesterPanel.sem);
 		}
 		else{
-			sch.moveElement(p.getElement(), old, newSemesterPanel.sem);
-			this.update();
+			sch.replace(p.getElement(), p.getElement(), old, newSemesterPanel.sem);
 		}
+		this.update();
 	}
 
 
@@ -229,7 +225,7 @@ public class Driver{
 	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
 		ScheduleElement old = toChange.getElement();
-		sch.replaceElement(s, old, newValue);
+		sch.replace(old, newValue, s, s);
 		update();
 	}
 

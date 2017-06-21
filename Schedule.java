@@ -159,31 +159,13 @@ public class Schedule {
 	///////////////////////////////
 	///////////////////////////////
 
-	/**
-	 * In semester s, replace oldElement with newElement.
-	 * @param s
-	 * @param oldElement
-	 * @param newElement
-	 */
-	public boolean replaceElement(Semester s, ScheduleElement oldElement , ScheduleElement newElement){
-		if	(checkErrorsWhenReplacing(s, s, oldElement, newElement)){
-			return false;
-		}
-		if(s.replace(oldElement, newElement)){
-			this.reqsValid = false;
-			updatePrereqs();
-			return true;
-		}
-		System.out.println("repace didn't work");
-		return false;
-	}
+
 	/**
 	 * In semester S, remove ScheduleElement e.
 	 * @param e
 	 * @param s
 	 */
 	public boolean removeElement (ScheduleElement e, Semester s){
-		System.out.println("I AM REmoving");
 		if(this.checkErrorsWhenRemoving(e, s)){
 			return false;
 		}
@@ -197,7 +179,6 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-		System.out.println("I AM ADDING");
 
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
@@ -212,18 +193,30 @@ public class Schedule {
 		return false;
 	}
 
-
-	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
-		System.out.println("I am moving");
-		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
+	
+	/**
+	 * Replace the old element with new element.
+	 * Assumes that oldSemester contains oldElement and
+	 * that newSemester does NOT contain newElement.
+	 * @param oldElement
+	 * @param newElement
+	 * @param oldSemester
+	 * @param newSemester
+	 * @return
+	 */
+	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement, Semester oldSemester, Semester newSemester){
+		if(this.checkErrorsWhenReplacing(oldSemester, newSemester, oldElement, newElement)){
 			return false;
 		}
-		if(newSem.add(element)){
-			return true;
+		if(!oldSemester.remove(oldElement)){
+			System.out.println("Replace didn't work");
+			return false;
 		}
-		System.out.println("move didn't work");
-		return false;
-
+		if(!newSemester.add(newElement)){
+			System.out.println("Replace didn't work");
+			return false;
+		}
+		return true;
 	}
 
 	///////////////////////////////

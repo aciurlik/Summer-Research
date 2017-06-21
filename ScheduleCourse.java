@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ScheduleCourse implements ScheduleElement{
+public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	Course c;
 	public boolean taken;
 	ArrayList<Requirement> userSpecifiedReqs = null;
