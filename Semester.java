@@ -140,7 +140,6 @@ public class Semester implements Comparable<Semester>{
 	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
 	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
-		System.out.println("checking overload");
 		int totalHours = 0;
 
 		if(addition instanceof ScheduleCourse){
@@ -167,7 +166,30 @@ public class Semester implements Comparable<Semester>{
 		return false;
 	}
 
+	private boolean checkReplaceOverload(ScheduleElement newElement, ScheduleElement oldElement) {
+		int totalHours = 0;
+		if(oldElement instanceof HasCreditHours){
+			totalHours=totalHours- ((HasCreditHours) oldElement).getCreditHours();
+		}
 
+		if(newElement instanceof HasCreditHours){
+			totalHours= totalHours + ((HasCreditHours) newElement).getCreditHours();
+		}
+		
+		totalHours = totalHours + getCreditHours();
+		if(totalHours > OverloadLimit){
+			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
+			overload.setOverloadLimit(this.OverloadLimit);
+			overload.setOffendingCourse(newElement);
+			//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
+		
+				return (!this.schedule.userOverride(overload));
+		
+		}
+		return false;
+	}
+	
+	
 	public int getCreditHours(){
 		int totalHours = 0;
 		for(ScheduleElement e : this.elements){
@@ -225,7 +247,7 @@ public class Semester implements Comparable<Semester>{
 
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
-		if(!this.checkOverload(false, newElement)){
+		if(!this.checkReplaceOverload(newElement, oldElement)){
 			//	System.out.println(oldElement);
 
 			int i = this.elements.indexOf(oldElement);
@@ -244,6 +266,8 @@ public class Semester implements Comparable<Semester>{
 
 	}
 
+
+	
 
 	public ArrayList<ScheduleCourse> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);

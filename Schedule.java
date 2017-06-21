@@ -180,6 +180,7 @@ public class Schedule {
 	 * @param s
 	 */
 	public boolean removeElement (ScheduleElement e, Semester s){
+		System.out.println("I AM REmoving");
 		if(this.checkErrorsWhenRemoving(e, s)){
 			return false;
 		}
@@ -193,6 +194,7 @@ public class Schedule {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
+		System.out.println("I AM ADDING");
 
 		if(this.checkErrorsWhenAdding(element, sem)){
 			return false;
@@ -209,6 +211,7 @@ public class Schedule {
 
 
 	public boolean moveElement(ScheduleElement element, Semester oldSem, Semester newSem){
+		System.out.println("I am moving");
 		if(this.checkErrorsWhenReplacing(oldSem, newSem, element, element)){
 			return false;
 		}
