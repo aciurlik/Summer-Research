@@ -140,7 +140,6 @@ public class Semester implements Comparable<Semester>{
 	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
 	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
-		System.out.println("checking overload");
 		int totalHours = 0;
 
 		if(addition instanceof ScheduleCourse){

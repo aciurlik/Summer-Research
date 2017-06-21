@@ -15,6 +15,9 @@ public class Schedule {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
+	
+	
+	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
 
 
 
@@ -524,12 +527,24 @@ public class Schedule {
 		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		Collections.sort(semesters);
-		for(Semester s : semesters){
+		//Go through semesters one at a time so that you efficiently
+		// build the list of prior-taken elements.
+		for(Semester s : getAllSemesters()){
+			ArrayList<ScheduleElement> inSemester = new ArrayList<ScheduleElement>();
+			for(ScheduleElement e : s.getElements()){
+				inSemester.add(e);
+			}
+			if(this.prereqsCanBeSatisfiedInSameSemester){
+				taken.addAll(inSemester);
+			}
 			for (ScheduleElement e : s.getElements()){
+				inSemester.add(e);
 				Requirement needed = masterList.getPrereqsShallow(e.getPrefix());
 				if(needed != null){
 					boolean complete = needed.isComplete(taken, true);
 					if(!complete){
+						System.out.println(needed);
+						System.out.println(taken);
 						ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
 						prereq.setOffendingCourse(e);
 						prereq.setNeededCourses(needed);
@@ -537,6 +552,9 @@ public class Schedule {
 						result.add(prereq);
 					}
 				}
+			}
+			if(!this.prereqsCanBeSatisfiedInSameSemester){
+				taken.addAll(inSemester);
 			}
 		}
 		return result;
@@ -1142,7 +1160,6 @@ public class Schedule {
 				overload.setOffendingSemester(s);
 				allErrors.add(overload);	
 			}
-
 		}
 		allErrors.addAll(this.checkAllPrerequsites());
 		allErrors.addAll(this.checkAllDuplicates());
