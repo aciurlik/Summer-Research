@@ -1,18 +1,14 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
+
 import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.event.ActionListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+
 import java.util.HashSet;
 
 import javax.swing.ImageIcon;
@@ -22,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
+
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
