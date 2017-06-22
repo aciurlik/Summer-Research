@@ -140,7 +140,7 @@ public class Driver{
 		JPanel stack = new JPanel();
 
 		for(int i = 0; i<enemies.size(); i++){
-			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).getDisplayString() + " (" +  majors.get(i).name + ")" );
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString() + " (" +  majors.get(i).name + ")" );
 			stack.add(combattingReqs);
 			userOptions.add(combattingReqs);
 		}
