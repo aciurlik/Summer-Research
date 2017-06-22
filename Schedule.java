@@ -963,6 +963,7 @@ public class Schedule {
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 		for(ScheduleElement e : allTakenElements){
+			
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
 			}
@@ -983,14 +984,14 @@ public class Schedule {
 
 			if((n.usesCreditHours)){
 
-				counter += n.minMoreNeeded(courseEst, true)/4;
+				counter += n.storedCoursesLeft()/4;
 
 			}
 
 
 			else{
 
-				counter += n.minMoreNeeded(courseEst, true);
+				counter += n.storedCoursesLeft();
 
 			}
 

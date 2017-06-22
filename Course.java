@@ -28,9 +28,6 @@ public class Course implements HasCreditHours{
 
 	String professor;
 
-	HashSet<Requirement> oldEnemyList;
-	HashSet<Requirement> userSpecifiedReqs;
-
 
 
 	/**
@@ -47,8 +44,7 @@ public class Course implements HasCreditHours{
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
-		userSpecifiedReqs = new HashSet<Requirement>();
-		oldEnemyList = new HashSet<Requirement>();
+	
 	}
 
 	/**
