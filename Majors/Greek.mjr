@@ -4,3 +4,4 @@ Possible Degree(s):BA
 R0 5 GRK Electives:5 of (GRK-310, GRK-320, GRK-331, GRK-332, GRK-333, or GRK-504)
 R1 3 Additional:3 of (ART-230, CLS-111, CLS-120, CLS-210, CLS-211, CLS-220, CLS-221, CLS-230, CLS-231, CLS-320, CLS-504, GRK-310, GRK-320, GRK-331, GRK-332, GRK-333, GRK-504, or HST-101)
 Collection of Requirement Enemies:
+R0: R1

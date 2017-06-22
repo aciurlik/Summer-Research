@@ -1,6 +1,6 @@
 Health Sciences
 Type: Major
-Possible Degree(s):BA
+Possible Degree(s):BA, BS
 R0:(HSC-101)
 R1:(HSC-201)
 R2:(HSC-210)
@@ -8,3 +8,4 @@ R3 Science of Human Body:2 of (HSC-211, HSC-221, HSC-311, or HSC-323)
 R4 Public Health:2 of (HSC-205, HSC-302, HSC-304, or HSC-401)
 R5 Electives:(4 of HSC>210)
 Collection of Requirement Enemies:
+R5:R4,R3,R2,R1,R0

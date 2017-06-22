@@ -9,3 +9,6 @@ R4:(CSC>199)
 R5:(CSC>299)
 R6 Cognate Courses:(3 of ACC>199, 3 of ADC>199, 3 of ANT>199, 3 of ARB>199, 3 of ART>199, 3 of AST>199, 3 of BIO>199, 3 of BUS>199, 3 of CHM>199, 3 of CHN>199, 3 of CLS>199, 3 of COM>199, 3 of DSC>199, 3 of ECN>199, 3 of EDU>199, 3 of EES>199, 3 of ENG>199, 3 of EST>199, 3 of FRN>199, 3 of FST>199, 3 of GGY>199, 3 of GRK>199, 3 of GRM>199, 3 of HSC>199, 3 of HST>199, 3 of HUM>199, 3 of IDS>199, 3 of ITL>199, 3 of JPN>199, 3 of LAS>199, 3 of LNG>199, 3 of LTN>199, 3 of MES>199, 3 of MLL>199, 3 of MSL>199, 3 of MTH>199, 3 of MUS>199, 3 of NSC>199, 3 of PHL>199, 3 of PHY>199, 3 of POL>199, 3 of PSY>199, 3 of PVS>199, 3 of REL>199, 3 of SEI>199, 3 of SOC>199, 3 of SPN>199, 3 of SUS>199, 3 of THA>199, 3 of UST>199, or 3 of WGS>199)
 Collection of Requirement Enemies:
+R4:R5
+Notes:
+You must have at least a 2.00 grade point average in all your computer science classes to graduate with a degree in information technology.
