@@ -51,6 +51,7 @@ public class FurmanOfficial {
 			       UIDefaults ret = super.getDefaults();
 			       ret.put("List.font",
 			    		   monospaced); // supersize me
+			       ret.put("ComboBox.font",monospaced);
 			  
 			       return ret;
 			      }
