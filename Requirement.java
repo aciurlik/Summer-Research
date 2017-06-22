@@ -124,6 +124,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	//
 	
 	
+	
+	
+	
+	/**
+	 * Given this ordered list of schedule elements, calculate the number
+	 * of elements that are not courses but that satisfy this requirement.
+	 * @param taken
+	 * @return
+	 */
 	private int numPlannedLater(ArrayList<ScheduleElement> taken){
 		int numPlanned = 0;
 		for(ScheduleElement s : taken){

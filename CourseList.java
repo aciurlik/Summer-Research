@@ -108,7 +108,7 @@ public class CourseList  {
 				}
 
 				//"appropriate placement" is common
-				if(originalRequirementString.equals("appropriate placement")){
+				if(originalRequirementString.toUpperCase().equals("APPROPRIATE PLACEMENT")){
 					Requirement result = new Requirement();
 					result.addRequirement(new TerminalRequirement(new Prefix("Placement", p.getSubject() + "-" + p.getNumber())));
 					return result;
@@ -172,8 +172,9 @@ public class CourseList  {
 						userInput.toUpperCase().equals("SKIP") ||
 						userInput.toUpperCase().equals("S")){
 					System.out.println("Ok, I'll skip this one until next time");
+					//If the user said to skip, do this:
 					result = new Requirement();
-					result.numToChoose = 0;
+					result.setName(originalRequirementString);
 					return result;
 				}
 				System.out.print(e.getMessage() + "\n" + originalRequirementString + "\n>>>");
@@ -685,6 +686,46 @@ public class CourseList  {
 		}
 
 	}
+	
+	/**
+	 * TODO Doesn't catch requirements that auto-read from strings of the form
+	 * "MTH-110, MTH-220".
+	 */
+	public void viewKnownPrereqs(){
+		for(Prefix key : rawPrereqs.keySet()){
+			String theirs = rawPrereqs.get(key);
+			String ours  = savedPrereqMeanings.get(theirs);
+			if(ours != null){
+				String keyString = key.toString();
+				String tabs = "\t\t";
+				if(keyString.length () > 7){
+					tabs = "\t\t";
+				}
+				System.out.println( key.toString() + tabs + "theirs:" + theirs +  "\tours:" + ours);
+			}
+		}
+	}
+	
+	public void addToPrereqMeanings(){
+		for(Prefix p : rawPrereqs.keySet()){
+			Requirement r = getPrereqsShallow(p);
+		}
+	}
+	public ArrayList<String> allUnknownPrereqs(){
+		ArrayList<String> result = new ArrayList<String>();
+		for(Prefix p : rawPrereqs.keySet()){
+			String originalString = rawPrereqs.get(p);
+			if(originalString.toUpperCase().equals("APPROPRIATE PLACEMENT")
+					|| originalString.equals("any first year writing seminar")
+					|| originalString.equals("audition required")){
+				continue;
+			}
+			if(savedPrereqMeanings.get(originalString) == null){
+				result.add(p.toString() + ":\t" + originalString);
+			}
+		}
+		return result;
+	}
 
 	//////////////////////////////
 	//////////////////////////////
@@ -694,10 +735,10 @@ public class CourseList  {
 
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
-
-		for(Prefix p : c.rawPrereqs.keySet()){
-			c.getPrereqsShallow(p);
-		}
+		c.viewKnownPrereqs();
+		/*for(String s : c.allUnknownPrereqs()){
+			System.out.println(s);
+		}*/
 		/*for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
 		}*/
