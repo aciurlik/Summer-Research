@@ -486,19 +486,23 @@ public class Driver{
 		for(int i = 0; i < finalListOfCourses.length ; i ++){
 			ScheduleCourse c = finalListOfCourses[i];
 			int reqsFulfilled = 0;
-			reqsString = new String();
+			reqsString = "";
 			for(Requirement r : allReqs){
 				if(r.isSatisfiedBy(c.getPrefix())){
-					if(r.shortString().length()>10){
-						reqsString = reqsString + r.shortString().substring(0, 10) + "   ";
+					String s = r.shortString();
+					if(s.length()>7){
+						reqsString = reqsString + s.substring(0, 7) + "... ";
 					}
 					else{
-						reqsString = reqsString + r.shortString() + "   ";
+						int length = s.length();
+						reqsString = reqsString + s + " ";
+						while(length < 10){
+							reqsString += " ";
+							length ++;
+ 						}
 					}
 					reqsFulfilled ++;
-
 				}
-
 			}
 			String displayedString = "";
 			String clockTime = "";
@@ -506,7 +510,7 @@ public class Driver{
 				clockTime = c.c.meetingTime[0].clockTime();
 			}
 			displayedString = String.format(
-					"%-12s %-50s %3d %10s", 
+					"%-12s %-50s %3d   %s", 
 					clockTime,
 					c.getPrefix().toString() + " " +c.c.professor,
 					reqsFulfilled,
