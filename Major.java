@@ -291,8 +291,9 @@ public class Major {
 	 * @return
 	 */
 	public static Major readFrom(String saveString){
+		saveString = saveString.replaceAll("\\r", "\n");
 		saveString = saveString.trim();
-		String[] lines = saveString.split("[\n]+");
+		String[] lines = saveString.split("[\\n]+");
 		Major result = new Major(lines[0]);
 		int startIndex = 1;
 		if(lines[startIndex].contains(typeString)){
