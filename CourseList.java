@@ -367,6 +367,7 @@ public class CourseList  {
 
 				Requirement r = new Requirement();
 				r.setName(key);
+				int newNumToChoose = 1;
 				boolean includeDefaultPrefixes = true;
 
 
@@ -441,12 +442,12 @@ public class CourseList  {
 						 */
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.choices.add(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						for(Prefix p : GERRequirements.get("NW")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.choices.add(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						includeDefaultPrefixes = false;
@@ -455,7 +456,7 @@ public class CourseList  {
 					case CourseList.BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
-							r.choices.add(new TerminalRequirement(p));
+							r.addRequirement(new TerminalRequirement(p));
 						}
 					}
 					break;
@@ -468,7 +469,7 @@ public class CourseList  {
 					break;
 				case "HB":
 					//every major type needs 2 hb.
-					r.numToChoose = 2;
+					newNumToChoose = 2;
 					break;
 				case "WC":
 				case "NE":
@@ -476,9 +477,11 @@ public class CourseList  {
 				}
 				if(includeDefaultPrefixes){
 					for(Prefix p : GERRequirements.get(key)){
-						r.choices.add(new TerminalRequirement(p));
+						r.addRequirement(new TerminalRequirement(p));
 					}
 				}
+				
+				r.setNumToChoose(newNumToChoose);
 
 				if(!r.name.equals("FL")){
 					m.addRequirement(r);
@@ -490,7 +493,7 @@ public class CourseList  {
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
-		
+
 		//TODO make NW and NWL enemies
 		// TODO Make WC and NE enemies of all the other requirements.
 		return m;
@@ -536,39 +539,39 @@ public class CourseList  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
-		
-		
+
+
 		if (p != null){
 
-			r.choices.add(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
+			r.addRequirement(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
 
 		}
-		
+
 		if(p==null || !p.getSubject().equals("GRK") ) {
 
-			r.choices.add(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("LTN")){
 
-			r.choices.add(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("JPN")){
 
-			r.choices.add(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("FRN")){
 
-			r.choices.add(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("SPN")){
 
-			r.choices.add(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("CHN")){
 
-			r.choices.add(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
 		}
-		
+
 
 		return r;
 	}
@@ -631,7 +634,7 @@ public class CourseList  {
 							if( newDuplicateCourse != duplicateCourse){
 								if(duplicateCourse != null){
 
-							
+
 
 									this.add(duplicateCourse);	
 								}
@@ -686,7 +689,7 @@ public class CourseList  {
 		}
 
 	}
-	
+
 	/**
 	 * TODO Doesn't catch requirements that auto-read from strings of the form
 	 * "MTH-110, MTH-220".
@@ -705,7 +708,7 @@ public class CourseList  {
 			}
 		}
 	}
-	
+
 	public void addToPrereqMeanings(){
 		for(Prefix p : rawPrereqs.keySet()){
 			Requirement r = getPrereqsShallow(p);

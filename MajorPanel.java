@@ -38,12 +38,12 @@ public class MajorPanel extends JPanel {
 		ArrayList<Requirement> reqList = new ArrayList<Requirement>(m.reqList);
 		
 		//Do a different kind of sort.
-		Collections.sort(reqList);
+		//Collections.sort(reqList);
 
 		//Calculate the requirements left in this major
 		int reqsLeft = 0;
 		for(Requirement r : reqList){
-			reqsLeft += r.storedCoursesLeft;
+			reqsLeft += r.storedCoursesLeft();
 		}
 
 

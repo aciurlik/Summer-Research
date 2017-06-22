@@ -251,6 +251,14 @@ public class TerminalRequirement extends Requirement {
 					return result;
 				}
 			}
+			if(e instanceof TerminalRequirement){
+				if(((TerminalRequirement)e).alsoCompletes(this)){
+					result --;
+					if(result <= 0){
+						return result;
+					}
+				}
+			}
 		}
 		return result;
 	}
@@ -370,6 +378,15 @@ public class TerminalRequirement extends Requirement {
 		}
 		TerminalRequirement other = (TerminalRequirement)o;
 		return this.saveString().compareTo(other.saveString());
+	}
+	
+	@Override
+	public boolean isTerminal(){
+		return true;
+	}
+	@Override
+	public TerminalRequirement getTerminal(){
+		return this;
 	}
 	
 

@@ -8,7 +8,7 @@ import java.util.Stack;
 
 
 public class Requirement implements ScheduleElement, Comparable<Requirement>{
-	HashSet<Requirement> choices;
+	private HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
 	// should be set to 2.
@@ -16,9 +16,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	// of credit hours, and storedCoursesLeft stores the number of credit hours left.
 	boolean usesCreditHours;
 	String name;
-	boolean storedIsComplete;
-	int storedCoursesLeft;
-	double storedPercentComplete;
+	private int originalCoursesNeeded;
+	private int storedCoursesLeft;
 	
 	boolean allCompletionSetsCalculated=false;
 	HashSet<HashSet<TerminalRequirement>> allCompletionSets;
@@ -30,6 +29,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public Requirement(){
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
+		this.originalCoursesNeeded = 1;
 		usesCreditHours = false;
 	}
 
@@ -54,6 +54,22 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
+		this.recalcOriginalCoursesNeeded();
+	}
+	public void setNumToChoose(int n){
+		if(n > choices.size()){
+			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
+		}
+		this.numToChoose = n;
+		recalcOriginalCoursesNeeded();
+	}
+	
+	public int storedCoursesLeft(){
+		return storedCoursesLeft;
+	}
+	
+	public void recalcOriginalCoursesNeeded(){
+		this.originalCoursesNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
 	}
 	
 	public void setHoursNeeded(int hours){
@@ -137,62 +153,49 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		int numPlanned = 0;
 		for(ScheduleElement s : taken){
 			if(s instanceof Requirement){
-				if(s == this){
+				if(s == this || s.equals(this)){
 					numPlanned ++;
-				}
-				else{
-					if(((Requirement) s).alsoCompletes(this)){
-						numPlanned ++;
-					}
 				}
 			}
 		}
 		return numPlanned;
 	}
-	/**
-	 * Find the subset of schedule elements that have prefixes
-	 * @param taken
-	 * @return
-	 */
-	private HashSet<ScheduleElement> takenPrefixes(ArrayList<ScheduleElement> taken){
-		HashSet<ScheduleElement> takenElements = new HashSet<ScheduleElement>();
-		for(ScheduleElement s : taken){
-			if(s.getPrefix()!= null){
-				takenElements.add(s);
-			}
-		}
-		return takenElements;
-	}
+	
 	
 	/**
 	 * Check whether this set of schedule elements completes this requirements.
 	 * If storeValue is true, this requirement will store the value it calculates
-	 *   in the field storedCompletionValue.
+	 * from minMoreNeeded.
 	 * @param taken
 	 * @param storeValue
 	 * @return
 	 */
 	public boolean isComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
-		int numPlanned = numPlannedLater(taken);
-		return isComplete(taken, numPlanned, storeValue);
+		return minMoreNeeded(taken, storeValue) <= 0;
+	}
+	public boolean storedIsComplete(){
+		return this.storedCoursesLeft <= 0;
 	}
 
-	/** 
-	 * Check if these prefixes satisfy this requirement.
-	 * Requirements are optimists - if this set of taken things
-	 *  has any shot of satisfying this requirement, then the requirement.
-	 *  will say that it does. 
-	 *  For credit hours, all future requirements are assumed to satisfy 4 credits.
+
+	/**
+	 *  Find, given the best case scenario, the maximum % complete this
+	 *  requirement could be given this collection of schedule elements.
 	 * @param taken
+	 * @param storeValue
 	 * @return
 	 */
-	private boolean isComplete(ArrayList<ScheduleElement> taken, int numPlannedLater, boolean storeValue){
-		boolean result = minMoreNeeded(taken, numPlannedLater, storeValue) <= 0;
-		if(storeValue){
-			this.storedIsComplete = result;
-		}
+	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
+		double minNeeded = minMoreNeeded(taken, storeValue);
+		double originalNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		double result = (1.0 - minNeeded/originalNeeded);
 		return result;
 	}
+	public double storedPercentComplete(){
+		double result = (1.0 - (storedCoursesLeft * 1.0/  this.originalCoursesNeeded)); 
+		return result;
+	}
+
 
 	/**
 	 * Find the minimum number of courses or credits you would need to completely
@@ -202,7 +205,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public int minMoreNeeded(ArrayList<ScheduleElement> taken, boolean storeValue){
+		
 		int numPlanned = numPlannedLater(taken);
+		for(int i = 0 ; i < taken.size(); i ++){
+			if(taken.get(i) instanceof Requirement){
+				Requirement r = (Requirement) taken.get(i);
+				if(r.isTerminal()){
+					taken.set(i, r.getTerminal());
+				}
+			}
+		}
 		return minMoreNeeded(taken, numPlanned, storeValue);
 	}
 	/**
@@ -259,7 +271,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		else{ //this doesn't use credit hours.
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
-			
+
 			for(Requirement r : choices){
 				otherNums.add(r.minMoreNeeded(taken));
 			}
@@ -268,33 +280,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			for(int i = 0; i < numToChoose ; i ++){
 				result += otherNums.get(i);
 			}
-
-			// if there is a requirement in taken, it might contribute to
-			// minMoreNeeded. We need to see
-			// first whether it satisfies a choice, and if not, if it
-			// satisfies this requirement. If it satisfies a choice,
-			// then we should let that choice use it. If it satisfies
-			// no subchoice but does satisfy this requirement, then
-			// we should subtract 1 from minMoreNeeded.
-			ArrayList<Requirement> takenRequirements = new ArrayList<Requirement>();
-			for(ScheduleElement e : taken){
-				if(e instanceof Requirement){
-					takenRequirements.add((Requirement)e);
-				}
-			}
-			for(Requirement t : takenRequirements){
-				if(t.alsoCompletes(this)){
-					boolean canUse = true;
-					for(Requirement choice : choices){
-						if(t.alsoCompletes(choice)){
-							canUse = false;
-						}
-					}
-					if(canUse){
-						result --;
-					}
-				}
-			}
+			
 			return result;
 		}
 	}
@@ -302,25 +288,25 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 
-
-	/**
-	 *  Find, given the best case scenario, the maximum % complete this
-	 *  requirement could be given this collection of schedule elements.
-	 * @param taken
-	 * @param storeValue
-	 * @return
-	 */
-	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
-		double minNeeded = minMoreNeeded(taken, storeValue);
-		double originalNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		double result = (1.0 - minNeeded/originalNeeded);
-		if(storeValue){
-			this.storedPercentComplete = result;
+	
+	public boolean isTerminal(){
+		if(this.choices.size() != 1){
+			return false;
 		}
-		return result;
+		if(this.numToChoose != 1){
+			return false;
+		}
+		for(Requirement r : choices){
+			return r.isTerminal();
+		}
+		return false;
 	}
-	
-	
+	public TerminalRequirement getTerminal(){
+		for(Requirement r : choices){
+			return r.getTerminal();
+		}
+		return null;
+	}
 	
 	public boolean isSatisfiedBy(ScheduleElement e) {
 		if(e instanceof Requirement){
@@ -420,9 +406,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	
 	
 	public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
-		this.percentComplete(taken, true);
 		this.minMoreNeeded(taken, true);
-		this.isComplete(taken, true);
 	}
 	
 	
@@ -595,15 +579,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		Requirement other = (Requirement)o;
 		//first compare based on whether they're complete, completed coming later
-		if(this.storedIsComplete && !other.storedIsComplete){
+		if(this.storedCoursesLeft <= 0 && !(other.storedCoursesLeft <= 0)){
 			return 1;
 		}
-		if(!this.storedIsComplete && other.storedIsComplete){
+		if(!(this.storedCoursesLeft <= 0) && other.storedCoursesLeft <= 0){
 			return -1;
 		}
 
 		//Then compare based on % complete
-		double percentDifference = storedPercentComplete - other.storedPercentComplete;
+		double percentDifference = this.storedPercentComplete() - other.storedPercentComplete();
 		if(percentDifference < tolerance){
 			return -1;
 		}
@@ -1055,10 +1039,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	public static void testReading(){
 		String[] tests = new String[]{
 				"(MTH 110)",
-				"(MTH-110)",
+				//"(MTH-110)",
 				"MTH110",
-				"MTH-110",
-				"MTH 110",
+				//"MTH-110",
+				//"MTH 110",
 				"2 of (MTH 110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, MTH 130)",
 				"2 of (ACC-110, MTH 120, MTH 130)",
@@ -1081,9 +1065,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		
 		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
 
-		takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
-		takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
-
+		//takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
+		//takens.add(TerminalRequirement.readFrom("MTH-110"));
+		takens.add(Requirement.readFrom("(MTH-110)"));
+		//takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
+		//takens.add(TerminalRequirement.readFrom("MTH-120"));
+		takens.add(Requirement.readFrom("(MTH-120)"));
 
 		System.out.print("Taken prefixes: ");
 		for(ScheduleElement p : takens){
@@ -1099,15 +1086,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 			Requirement r = Requirement.readFrom(toRead);
 			boolean equalToLast = r.equals(previous);
 			previous = r;
-			boolean complete = r.isComplete(takens, 0, true);
+			boolean complete = r.isComplete(takens, true);
 			double percentComplete = r.percentComplete(takens, true);
 			int minLeft = r.minMoreNeeded(takens, true);
 			
 			double tol = Double.MIN_VALUE * 10000;
-			if(r.storedIsComplete != complete){
+			if(r.storedIsComplete() != complete){
 				needsToBeShown = true;
 			}
-			if(r.storedPercentComplete != percentComplete){
+			if(r.storedPercentComplete() != percentComplete){
 				needsToBeShown = true;
 			}
 
@@ -1115,13 +1102,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 			if(needsToBeShown){
-				System.out.println("ReadingFrom \"" +toRead + "\"");
+				//System.out.println("ReadingFrom \"" +toRead + "\"");
 				System.out.println("    got \"" + r.saveString() + "\"");
-				System.out.println("Equal to last?" + equalToLast);
-				System.out.println("Uses CH? " + r.usesCreditHours);
-				System.out.println("Complete?" + complete + "/" + r.storedIsComplete);
-				System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete);
-				System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
+				//System.out.println("Equal to last?" + equalToLast);
+				//System.out.println("Uses CH? " + r.usesCreditHours);
+				System.out.println("Complete?" + complete );
+				//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());
+				//System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
 				System.out.println();
 			}
 			
