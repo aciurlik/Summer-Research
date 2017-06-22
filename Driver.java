@@ -55,7 +55,7 @@ public class Driver{
 
 
 	public Driver() {
-		
+
 		popUP = new JFrame();
 		icon = new ImageIcon("src/BellTower(T).png");
 		l = ListOfMajors.readFrom(new File("Majors"));
@@ -63,7 +63,7 @@ public class Driver{
 		//Make data
 		sch = Schedule.testSchedule();
 		sch.setDriver(this);
-		
+
 
 
 
@@ -477,9 +477,9 @@ public class Driver{
 		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
 			JOptionPane.showMessageDialog(popUP, 
-					 "There were no courses to choose from. \n"
-					+"If you have a course in mind, you can add a note to the semester,\n"
-					+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
+					"There were no courses to choose from. \n"
+							+"If you have a course in mind, you can add a note to the semester,\n"
+							+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
 			return null;
 		}
 		String reqsString = "";
@@ -491,11 +491,16 @@ public class Driver{
 			reqsString = new String();
 			for(Requirement r : allReqs){
 				if(r.isSatisfiedBy(c.getPrefix())){
-					reqsString = reqsString + String.format("%-7s", r.shortString());
+					if(r.shortString().length()>10){
+						reqsString = reqsString + r.shortString().substring(0, 10) + "   ";
+					}
+					else{
+						reqsString = reqsString + r.shortString() + "   ";
+					}
 					reqsFulfilled ++;
-					
+
 				}
-				
+
 			}
 			String displayedString = "";
 			String clockTime = "";
@@ -503,16 +508,16 @@ public class Driver{
 				clockTime = c.c.meetingTime[0].clockTime();
 			}
 			displayedString = String.format(
-					"(%d new reqs) %-12s %-50s %s", 
-					reqsFulfilled,
+					"%-12s %-50s %3d %10s", 
 					clockTime,
 					c.getPrefix().toString() + " " +c.c.professor,
+					reqsFulfilled,
 					reqsString);
-					
+
 
 			displayed[i] = displayedString;
 		}
-		
+
 		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
 		int chosenIndex = 0;
 		for(; chosenIndex < displayed.length ; chosenIndex ++){
@@ -627,9 +632,9 @@ public class Driver{
 		if(s.error.equals(ScheduleError.preReqError)){
 			System.out.println("1");
 			try{
-			header = "Prerequisites Error";
-			instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
-			System.out.println("2");
+				header = "Prerequisites Error";
+				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
+				System.out.println("2");
 			}catch(Exception e){
 				e.printStackTrace();
 			}
@@ -741,7 +746,7 @@ public class Driver{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		
+
 		//new Driver();
 		testDriver();
 

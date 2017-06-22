@@ -47,7 +47,9 @@ public class ListOfMajors {
 				)){
 		
 			try{
-				result.add(Major.readFrom(f));
+				Major major = Major.readFrom(f);
+				//System.out.println(major.saveString());
+				result.add(major);
 			
 				
 			}
@@ -66,7 +68,6 @@ public class ListOfMajors {
 			BufferedWriter bf = new BufferedWriter(new FileWriter(f));
 			bf.write(m.saveString());
 			bf.close();
-			System.out.println(f.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
