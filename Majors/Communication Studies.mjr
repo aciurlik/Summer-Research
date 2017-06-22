@@ -8,3 +8,10 @@ R3:(COM-221)
 R4:(3 of COM>299<500)
 R5:(2 of COM>0, 2 of (COM>0, ENG-212))
 Collection of Requirement Enemies:
+R5: R4, R3, R2, R1, R0
+R4: R3, R2, R1, R0
+Notes:
+Students must have a GPA of 2.00 in all courses used to satisfy major requirements.
+
+Only one course (4 credits) involving individualized instruction (independent study, research, or internships numbered between 501 and 509) may contribute to major requirements, and no more than two courses (8 credits) completed away from Furman may contribute.
+

@@ -1,14 +1,13 @@
 Sustainability Science
 Possible Degree(s):BS
-REQ:{Number to Choose: {1} Choices: {{EES-112}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-120}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-240}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-241}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-242}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-472}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{SUS-473}} DDN: {0} Requirement Name:{null}}
-REQ:{Number to Choose: {2} Choices: {{MTH-120}{MTH-145}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {1} Choices: {{MTH-150}} DDN: {1} Requirement Name:{null}}
-REQ:{Number to Choose: {5} Choices: {{ANT-303}{BIO-340}{BIO-341}{BIO-342}{BIO-344}{BIO-343}{EES-343}{BIO-401}{BIO-423}{BIO-430}{EES-201}{EES-230}{EES-301}{EES-410}{EST-301}{POL-213}} DDN: {0} Requirement Name:{Environmental Security Elective}}
-REQ:{Number to Choose: {5} Choices: {{ECN-237}{ENG-242}{GGY-230}{HSC-304}{PHL-245}{PHL-304}{PVS-101}{POL-214}{REL-248}} DDN: {0} Requirement Name:{Human Security Elective}}
-REQ:{Number to Choose: {5} Choices: {{BUS-312}{ECN-236}{ECN-243}{POL-227}} DDN: {0} Requirement Name:{Sustainable Production and Consumption Elective}}
+R0:(EES-112)
+R1:(SUS-120)
+R2:(SUS-240)
+R3:(SUS-241)
+R4:(SUS-242)
+R5:1 of (SUS-472, SUS-473)
+R6 SUS Elective: 5 of (ANT-303,BIO-340,BIO-341,BIO-342,BIO-344,BIO-343,EES-343,BIO-401,BIO-423,BIO-430,EES-201,EES-230,EES-301,EES-410,EST-301,POL-213,ECN-237,ENG-242,GGY-230,HSC-304,PHL-245,PHL-304,PVS-101,POL-214,REL-248,BUS-312,ECN-236,ECN-243,POL-227)
+Collection of Requirement Enemies:
+Notes:
+For the Sustainability elective you cannot take more than three classes from any one group of courses. (Environmental Security, Human Security, Sustainable Production and Consumption).
+To get the complete list of courses in these categories go to the Sustainability page on Furman's website. 

@@ -6,8 +6,15 @@ R1:(SOC-301)
 R2:(SOC-302)
 R3:(SOC-303)
 R4:(SOC-470)
-R5:(SOC-241, SOC-242, or SOC-243)
-R6 200 Elective:(SOC-201, SOC-211, SOC-212, SOC-213, SOC-215, SOC-220, SOC-223, SOC-225, SOC-231, SOC-232, SOC-233, SOC-234, SOC-235, SOC-241, SOC-242, SOC-243, SOC-251, SOC-260, SOC-261, or SOC-262)
-R7 400 Elective:(SOC-470, SOC-475)
-R8 Other Sociology Elective:(SOC-120, SOC-150, SOC-201, SOC-211, SOC-212, SOC-213, SOC-215, SOC-220, SOC-223, SOC-225, SOC-231, SOC-232, SOC-233, SOC-234, SOC-235, SOC-241, SOC-242, SOC-243, SOC-251, SOC-260, SOC-261, SOC-262, SOC-301, SOC-302, SOC-303, SOC-470, SOC-475, SOC-501, or SOC-503)
+R5 Diversity/Inclusion:(SOC-241, SOC-242, or SOC-243)
+R6 200 Elective:(SOC>=200 <300)
+R7 400 Elective:(SOC>=400 <500)
+R8 Other Sociology Elective:(SOC>100)
 Collection of Requirement Enemies:
+R8:R0, R1, R2, R3, R4, R5, R6, R7
+R7:R4
+R6:R5
+Notes:
+Each course must be at least three credits. To graduate with a major in sociology, a student must have a cumulative grade point average of at least 2.0 for all sociology courses. 
+To graduate with a major in sociology, a student must have a cumulative grade point average of at least 2.0 for all sociology courses. 
+SOC-302, and SOC-303 must be taken in sequential semesters. (302 in the Fall, and 303 in the Spring) 
