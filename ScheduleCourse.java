@@ -5,12 +5,16 @@ import java.util.HashSet;
 public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	Course c;
 	public boolean taken;
-	ArrayList<Requirement> userSpecifiedReqs = null;
+	HashSet<Requirement> userSpecifiedReqs; //when enemy list is not empty, this list specifies which reqs the user chose to satisfy
+	private HashSet<Requirement> oldEnemyList;//this is a list of enemy requirements that this schedule course satisfied last time the schedule told this course to update.
+	// used to tell if we need to ask the user for userSpecifiedReqs again.
 	Schedule s;
 
 	public ScheduleCourse(Course c, Schedule s){
 		this.c=c;
 		this.s=s;
+		this.userSpecifiedReqs = new HashSet<Requirement>();
+		this.oldEnemyList = new HashSet<Requirement>();
 	}
 
 	@Override
@@ -77,29 +81,34 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded) {
 		HashSet<Requirement> result = new HashSet<Requirement>();
 		for(Requirement r : loaded){
-			if(r.isSatisfiedBy(this.c.coursePrefix)){
+			if(r.isSatisfiedBy(this.getPrefix())){
 				result.add(r);
 			}
 		}
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
-		if(! /*sets equal*/ ((enemies.containsAll(this.c.oldEnemyList)) && this.c.oldEnemyList.containsAll(enemies)) ){
-
-			//the enemies changed. TODO
-			//ask the user which requirements should now be satisfied by this course.
-			//sch.conflictingRequirements(this
-			/**
-			 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
+		result.removeAll(enemies);
+		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
+			if(enemies.isEmpty()){
+				this.userSpecifiedReqs = new HashSet<Requirement>();
+				this.oldEnemyList = enemies;
+			}
+			else{
+				//the enemies changed. TODO
+				//ask the user which requirements should now be satisfied by this course.
+				//sch.conflictingRequirements(this
+				/**
+				 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
 					+ enemies.toString() + "\n"
 					+ " Which one should get the credit hours?");
-			 * 
-			 */
+				 * 
+				 */
 
-			HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
-			this.c.userSpecifiedReqs = kept;
-			this.c.oldEnemyList = enemies;
+				HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
+				this.userSpecifiedReqs = kept;
+				this.oldEnemyList = enemies;
+			}
 		}
-		result.removeAll(this.c.oldEnemyList);
-		for(Requirement specified : this.c.userSpecifiedReqs){
+		for(Requirement specified : this.userSpecifiedReqs){
 			result.add(specified);
 		}
 		return new ArrayList<Requirement>(result);
