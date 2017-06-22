@@ -31,6 +31,8 @@ public class CourseList  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
+	
+	public static final boolean masterIsNotAround = true;
 
 	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
 
@@ -108,7 +110,7 @@ public class CourseList  {
 				}
 
 				//"appropriate placement" is common
-				if(originalRequirementString.equals("appropriate placement")){
+				if(originalRequirementString.toUpperCase().equals("APPROPRIATE PLACEMENT")){
 					Requirement result = new Requirement();
 					result.addRequirement(new TerminalRequirement(new Prefix("Placement", p.getSubject() + "-" + p.getNumber())));
 					return result;
@@ -156,12 +158,20 @@ public class CourseList  {
 
 
 	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
-		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What does that requirement mean?\n>>>");
-		//TODO ask the user
+		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""
+				+ originalRequirementString 
+				+"\"\n What does that requirement mean?\n>>>");
+		Requirement result = null;
+		if(masterIsNotAround){
+			return null;
+			//result = new Requirement();
+			//result.setName("Unknown:" + originalRequirementString);
+			//result.addRequirement(TerminalRequirement.readFrom("SSS<0"));
+			//return result;
+		}
 		Scanner scan = new Scanner(System.in);
 		String userInput = scan.nextLine();
 
-		Requirement result = null;
 		boolean valid = false;
 		while(!valid){
 			try{
@@ -172,8 +182,9 @@ public class CourseList  {
 						userInput.toUpperCase().equals("SKIP") ||
 						userInput.toUpperCase().equals("S")){
 					System.out.println("Ok, I'll skip this one until next time");
+					//If the user said to skip, do this:
 					result = new Requirement();
-					result.numToChoose = 0;
+					result.setName(originalRequirementString);
 					return result;
 				}
 				System.out.print(e.getMessage() + "\n" + originalRequirementString + "\n>>>");
@@ -366,6 +377,7 @@ public class CourseList  {
 
 				Requirement r = new Requirement();
 				r.setName(key);
+				int newNumToChoose = 1;
 				boolean includeDefaultPrefixes = true;
 
 
@@ -440,12 +452,12 @@ public class CourseList  {
 						 */
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.choices.add(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						for(Prefix p : GERRequirements.get("NW")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.choices.add(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						includeDefaultPrefixes = false;
@@ -454,7 +466,7 @@ public class CourseList  {
 					case CourseList.BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
-							r.choices.add(new TerminalRequirement(p));
+							r.addRequirement(new TerminalRequirement(p));
 						}
 					}
 					break;
@@ -467,7 +479,7 @@ public class CourseList  {
 					break;
 				case "HB":
 					//every major type needs 2 hb.
-					r.numToChoose = 2;
+					newNumToChoose = 2;
 					break;
 				case "WC":
 				case "NE":
@@ -475,9 +487,11 @@ public class CourseList  {
 				}
 				if(includeDefaultPrefixes){
 					for(Prefix p : GERRequirements.get(key)){
-						r.choices.add(new TerminalRequirement(p));
+						r.addRequirement(new TerminalRequirement(p));
 					}
 				}
+				
+				r.setNumToChoose(newNumToChoose);
 
 				if(!r.name.equals("FL")){
 					m.addRequirement(r);
@@ -489,7 +503,7 @@ public class CourseList  {
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
-		
+
 		//TODO make NW and NWL enemies
 		// TODO Make WC and NE enemies of all the other requirements.
 		return m;
@@ -535,39 +549,39 @@ public class CourseList  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
-		
-		
+
+
 		if (p != null){
 
-			r.choices.add(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
+			r.addRequirement(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
 
 		}
-		
+
 		if(p==null || !p.getSubject().equals("GRK") ) {
 
-			r.choices.add(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("LTN")){
 
-			r.choices.add(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("JPN")){
 
-			r.choices.add(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("FRN")){
 
-			r.choices.add(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("SPN")){
 
-			r.choices.add(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("CHN")){
 
-			r.choices.add(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
+			r.addRequirement(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
 		}
-		
+
 
 		return r;
 	}
@@ -630,7 +644,7 @@ public class CourseList  {
 							if( newDuplicateCourse != duplicateCourse){
 								if(duplicateCourse != null){
 
-							
+
 
 									this.add(duplicateCourse);	
 								}
@@ -686,6 +700,46 @@ public class CourseList  {
 
 	}
 
+	/**
+	 * TODO Doesn't catch requirements that auto-read from strings of the form
+	 * "MTH-110, MTH-220".
+	 */
+	public void viewKnownPrereqs(){
+		for(Prefix key : rawPrereqs.keySet()){
+			String theirs = rawPrereqs.get(key);
+			String ours  = savedPrereqMeanings.get(theirs);
+			if(ours != null){
+				String keyString = key.toString();
+				String tabs = "\t\t";
+				if(keyString.length () > 7){
+					tabs = "\t\t";
+				}
+				System.out.println( key.toString() + tabs + "theirs:" + theirs +  "\tours:" + ours);
+			}
+		}
+	}
+
+	public void addToPrereqMeanings(){
+		for(Prefix p : rawPrereqs.keySet()){
+			Requirement r = getPrereqsShallow(p);
+		}
+	}
+	public ArrayList<String> allUnknownPrereqs(){
+		ArrayList<String> result = new ArrayList<String>();
+		for(Prefix p : rawPrereqs.keySet()){
+			String originalString = rawPrereqs.get(p);
+			if(originalString.toUpperCase().equals("APPROPRIATE PLACEMENT")
+					|| originalString.equals("any first year writing seminar")
+					|| originalString.equals("audition required")){
+				continue;
+			}
+			if(savedPrereqMeanings.get(originalString) == null){
+				result.add(p.toString() + ":\t" + originalString);
+			}
+		}
+		return result;
+	}
+
 	//////////////////////////////
 	//////////////////////////////
 	/////  Testing
@@ -694,10 +748,10 @@ public class CourseList  {
 
 	public static void main(String[] args){
 		CourseList c = CourseList.readAll(); //CourseList.testList();
-
-		for(Prefix p : c.rawPrereqs.keySet()){
-			c.getPrereqsShallow(p);
-		}
+		c.viewKnownPrereqs();
+		/*for(String s : c.allUnknownPrereqs()){
+			System.out.println(s);
+		}*/
 		/*for(Course cour : c.listOfCourses){
 			System.out.println(cour.saveString());
 		}*/

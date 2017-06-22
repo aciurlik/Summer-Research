@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class Schedule {
 	private ArrayList<Major> majorsList;
 	private ArrayList<Semester> semesters;
-	private ArrayList<Requirement> prereqs;
+	private HashSet<Requirement> prereqs;
 	private Major GER;
 	Driver d; 
 	CourseList masterList;
@@ -15,6 +15,9 @@ public class Schedule {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
+	
+	private SemesterDate firstSemester;
+	private SemesterDate currentSemester;
 
 
 	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
@@ -24,23 +27,75 @@ public class Schedule {
 
 
 
-	boolean reqsValid; // The set of requirements entailed by all majors is up to date
+	//boolean reqsValid; // The set of requirements entailed by all majors is up to date
 
 
 	public static Schedule testSchedule(){
-
 		CourseList l = CourseList.testList();
-		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
+		Schedule result = new Schedule(l);
 		result.readFromPrior();
-
-
 		return result;
 	}
 
+
+	/**
+	 * Make a new schedule of semesters where firstSemester is the first shown semester 
+	 * and currentSemester is the first semester that might be scheduled
+	 * (assume that earlier semesters have passed and already have their courses fixed.)
+	 * @param masterList
+	 * @param firstYear
+	 * @param currentSemester
+	 */
+	public Schedule(CourseList masterList){
+
+		//Majors and requirements
+		this.majorsList= new ArrayList<Major>();
+		this.prereqs = new HashSet<Requirement>();
+		this.masterList = masterList;
+
+
+		readFromPrior(); //loads first semester and current semester, among others.
+
+		//Semesters
+		this.semesters = new ArrayList<Semester>();
+		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
+		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
+		for(int i = 0;i < 9 ; i ++){
+			if(i==0){
+				s.isAP=true;
+				priorSemester =s;
+			}
+			else{
+				s = new Semester(firstSemester, this);
+				this.semesters.add(s);
+				firstSemester = firstSemester.next();
+			}
+
+
+		}
+		this.recalcGERMajor();
+
+	}
+
+	public void setDriver(Driver d){
+		this.d = d;
+	}
+	
+
 	public void readFromPrior(){
-
+		//readFromTestPrior();
+		readBlankTestPrior();
+	}
+	
+	public void readBlankTestPrior(){
+		firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+	}
+	
+	public void readFromTestPrior(){
+		readBlankTestPrior();
+		
+		
 		this.setLanguagePrefix(new Prefix("SPN", "115"));
-
 
 		//Class One 
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
@@ -68,49 +123,13 @@ public class Schedule {
 
 		this.setCLP(10);
 	}
-
-	/**
-	 * Make a new schedule of semesters where firstSemester is the first shown semester 
-	 * and currentSemester is the first semester that might be scheduled
-	 * (assume that earlier semesters have passed and already have their courses fixed.)
-	 * @param masterList
-	 * @param firstYear
-	 * @param currentSemester
-	 */
-	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
-
-		//Majors and requirements
-		this.majorsList= new ArrayList<Major>();
-		this.prereqs = new ArrayList<Requirement>();
-		reqsValid = false;
-		this.masterList = masterList;
-
-
-
-		//Semesters
-		this.semesters = new ArrayList<Semester>();
-		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
-		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
-		for(int i = 0;i < 9 ; i ++){
-			if(i==0){
-				s.isAP=true;
-				priorSemester =s;
-			}
-			else{
-				s = new Semester(firstSemester, this);
-				this.semesters.add(s);
-				firstSemester = firstSemester.next();
-			}
-
-
-		}
-		this.recalcGERMajor();
-
-	}
-
-	public void setDriver(Driver d){
-		this.d = d;
-	}
+	
+	
+	
+	
+	
+	
+	
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -147,8 +166,8 @@ public class Schedule {
 
 	public void removeSemester(Semester sem) {
 		this.semesters.remove(sem);
-		this.reqsValid = false;
 		Collections.sort(semesters);
+		updateReqs();
 	}
 
 
@@ -170,8 +189,8 @@ public class Schedule {
 			return false;
 		}
 		if(s.remove(e)){
-			reqsValid = false;
 			updatePrereqs();
+			updateReqs();
 			return true;
 		}
 		System.out.println("Remove didn't work");
@@ -186,13 +205,12 @@ public class Schedule {
 		if(sem.add(element)){
 			updateRequirementsSatisfied(element);
 			updatePrereqs();
-			reqsValid = false;
+			updateReqs();
 			return true;
 		}
 		System.out.println("add didn't work");
 		return false;
 	}
-
 
 
 	
@@ -223,8 +241,8 @@ public class Schedule {
 		}
 		//update things.
 		if(oldElement != newElement){
-			this.reqsValid = false;
 			updatePrereqs();
+			updateReqs();
 		}
 		return true;
 	}
@@ -238,20 +256,20 @@ public class Schedule {
 
 	public void addMajor(Major newMajor){
 		majorsList.add(newMajor);
-		reqsValid = false;
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
 		}
+		updateReqs();
 		updateTotalCoursesNeeded();
 	}
 
 
 	public void removeMajor(Major major) {
 		majorsList.remove(major);
-		reqsValid = false;
 		if(!major.name.equals("GER")){
 			recalcGERMajor();
 		}
+		updateReqs();
 		updateTotalCoursesNeeded();
 	}
 
@@ -589,7 +607,7 @@ public class Schedule {
 		if(needed == null){
 			return false; //no errors found
 		}
-		if(!needed.storedIsComplete){
+		if(!needed.storedIsComplete()){
 
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
@@ -667,7 +685,7 @@ public class Schedule {
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
 				
-				if(stillNeeded != null && !stillNeeded.storedIsComplete){
+				if(stillNeeded != null && !stillNeeded.storedIsComplete()){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(stillNeeded);
@@ -913,26 +931,22 @@ public class Schedule {
 	 *  
 	 */
 	private void updateReqs(){
-
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-
-
 		HashSet<Requirement> reqList = this.getAllRequirements();
 		for(Requirement r : reqList){
 			updateRequirement(r);
 		}
-		reqsValid = true;
 	}
 
 	/**
 	 * check if anything needs to be updated, and update if it does.
 	 */
 	public void checkUpdateReqs(){
-		if(!reqsValid){
+		/*if(!reqsValid){*/
 			updateReqs();
-		}
+		//}
 	}
 
 	/**
@@ -1045,23 +1059,6 @@ public class Schedule {
 	}
 
 
-
-
-
-	/**
-	 * Return an up-to-date list of all requirements from any major,
-	 * but remove duplicate requirements (according to Requirement.equals)
-	 * @return
-	 */
-	public ArrayList<Requirement> getUniqueRequirementsList(){
-		if(! reqsValid){
-			updateReqs();
-		}
-		HashSet<Requirement> result = new HashSet<Requirement>(this.getAllRequirements());
-		return new ArrayList<Requirement>(result);
-	}
-
-
 	/**
 	 * doesn't update the requirements (this would cause an infinite loop, 
 	 * updating a requirement means knowing all requirements, which can't happen unless
@@ -1086,7 +1083,7 @@ public class Schedule {
 
 
 	public void updatePrereqs(){
-		prereqs = new ArrayList<Requirement>();
+		prereqs = new HashSet<Requirement>();
 		for(ScheduleElement e : getAllElements()){
 			Requirement r = masterList.getPrereqsShallow(e.getPrefix());
 			if(r != null){

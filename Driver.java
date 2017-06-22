@@ -43,10 +43,8 @@ public class Driver{
 	BellTower b;
 
 	public static Driver testDriver(){
-		Driver results = new Driver();
-		testSchedule = Schedule.testSchedule();	
-
-		testSchedule.setDriver(results);
+		testSchedule = Schedule.testSchedule();
+		Driver results = new Driver(testSchedule);
 		return results;
 	}
 
@@ -54,14 +52,14 @@ public class Driver{
 
 
 
-	public Driver() {
+	public Driver(Schedule sch) {
+		
 
 		popUP = new JFrame();
 		icon = new ImageIcon("src/BellTower(T).png");
 		l = ListOfMajors.readFrom(new File("Majors"));
 
-		//Make data
-		sch = Schedule.testSchedule();
+		this.sch = sch;
 		sch.setDriver(this);
 
 
@@ -106,11 +104,11 @@ public class Driver{
 	 * Create a new, blank schedule to work from.
 	 */
 	public void GUINewSchedule() {
-		CourseList l = CourseList.testList();
+		CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.getStartSemester().semesterDate, null);
-		current.readFromPrior();
+		Schedule current = new Schedule(l);
 		this.b.setSchedule(current);
+		//TODO make sure nothing else needs to be set
 		setSchedule(current);
 		this.update();
 	}
@@ -630,11 +628,12 @@ public class Driver{
 			instruct += "\nIsses in :" + issueStrings.toString();
 		}
 		if(s.error.equals(ScheduleError.preReqError)){
-			System.out.println("1");
 			try{
+
 				header = "Prerequisites Error";
 				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
-				System.out.println("2");
+				
+
 			}catch(Exception e){
 				e.printStackTrace();
 			}
@@ -647,10 +646,8 @@ public class Driver{
 			header = "Duplicate Error";
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
-		System.out.println("3");
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
-		System.out.println("4");
 		return (n==JOptionPane.OK_OPTION);
 
 	}
