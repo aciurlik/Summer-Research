@@ -271,7 +271,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 		else{ //this doesn't use credit hours.
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
-
+			
 			for(Requirement r : choices){
 				otherNums.add(r.minMoreNeeded(taken));
 			}
@@ -668,11 +668,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		for(Requirement otherReq : r){
 			if(otherReq.equals(this)){
 				result.add(otherReq);
-			}
-			else{
-				if(this.alsoCompletes(otherReq)){
-					result.add(otherReq);
-				}
 			}
 		}
 		return result;
