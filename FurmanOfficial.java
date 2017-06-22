@@ -33,7 +33,7 @@ public class FurmanOfficial {
 	
 	static{
 
-		Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
+		final Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
 		UIManager.put("OptionPane.messageFont", getFont(12));
 		UIManager.put("OptionPane.font", getFont(12));
 		UIManager.put("OptionPane.buttonFont", getFont(12));
