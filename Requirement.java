@@ -179,7 +179,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 	/**
-	 *  Find, given the best case scenario, the maximum % complete this
+	 *  Find the maximum % complete this
 	 *  requirement could be given this collection of schedule elements.
 	 * @param taken
 	 * @param storeValue
@@ -187,8 +187,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 */
 	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
 		double minNeeded = minMoreNeeded(taken, storeValue);
-		double originalNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		double result = (1.0 - minNeeded/originalNeeded);
+		double originalNeeded = this.originalCoursesNeeded;
+		double result = (1.0 - (minNeeded * 1.0/originalNeeded));
 		return result;
 	}
 	public double storedPercentComplete(){
@@ -843,9 +843,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		catch(Exception e){
 			Stack<String> tokens = tokenize(saveString);
 			Requirement result = parse(tokens);
+			result.recalcOriginalCoursesNeeded();
 			if(!tokens.isEmpty()){
 				throw new RuntimeException("End of string while parsing requirement");
-
 			}
 			return result;
 		}
