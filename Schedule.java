@@ -15,6 +15,9 @@ public class Schedule {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
+	
+	private SemesterDate firstSemester;
+	private SemesterDate currentSemester;
 
 
 	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
@@ -28,19 +31,71 @@ public class Schedule {
 
 
 	public static Schedule testSchedule(){
-
 		CourseList l = CourseList.testList();
-		Schedule result = new Schedule(l, new SemesterDate(2016, SemesterDate.FALL), null);
+		Schedule result = new Schedule(l);
 		result.readFromPrior();
-
-
 		return result;
 	}
 
+
+	/**
+	 * Make a new schedule of semesters where firstSemester is the first shown semester 
+	 * and currentSemester is the first semester that might be scheduled
+	 * (assume that earlier semesters have passed and already have their courses fixed.)
+	 * @param masterList
+	 * @param firstYear
+	 * @param currentSemester
+	 */
+	public Schedule(CourseList masterList){
+
+		//Majors and requirements
+		this.majorsList= new ArrayList<Major>();
+		this.prereqs = new HashSet<Requirement>();
+		this.masterList = masterList;
+
+
+		readFromPrior(); //loads first semester and current semester, among others.
+
+		//Semesters
+		this.semesters = new ArrayList<Semester>();
+		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
+		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
+		for(int i = 0;i < 9 ; i ++){
+			if(i==0){
+				s.isAP=true;
+				priorSemester =s;
+			}
+			else{
+				s = new Semester(firstSemester, this);
+				this.semesters.add(s);
+				firstSemester = firstSemester.next();
+			}
+
+
+		}
+		this.recalcGERMajor();
+
+	}
+
+	public void setDriver(Driver d){
+		this.d = d;
+	}
+	
+
 	public void readFromPrior(){
-
+		//readFromTestPrior();
+		readBlankTestPrior();
+	}
+	
+	public void readBlankTestPrior(){
+		firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+	}
+	
+	public void readFromTestPrior(){
+		readBlankTestPrior();
+		
+		
 		this.setLanguagePrefix(new Prefix("SPN", "115"));
-
 
 		//Class One 
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
@@ -68,48 +123,13 @@ public class Schedule {
 
 		this.setCLP(10);
 	}
-
-	/**
-	 * Make a new schedule of semesters where firstSemester is the first shown semester 
-	 * and currentSemester is the first semester that might be scheduled
-	 * (assume that earlier semesters have passed and already have their courses fixed.)
-	 * @param masterList
-	 * @param firstYear
-	 * @param currentSemester
-	 */
-	public Schedule(CourseList masterList, SemesterDate firstSemester, SemesterDate currentSemester){
-
-		//Majors and requirements
-		this.majorsList= new ArrayList<Major>();
-		this.prereqs = new HashSet<Requirement>();
-		this.masterList = masterList;
-
-
-
-		//Semesters
-		this.semesters = new ArrayList<Semester>();
-		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
-		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
-		for(int i = 0;i < 9 ; i ++){
-			if(i==0){
-				s.isAP=true;
-				priorSemester =s;
-			}
-			else{
-				s = new Semester(firstSemester, this);
-				this.semesters.add(s);
-				firstSemester = firstSemester.next();
-			}
-
-
-		}
-		this.recalcGERMajor();
-
-	}
-
-	public void setDriver(Driver d){
-		this.d = d;
-	}
+	
+	
+	
+	
+	
+	
+	
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
