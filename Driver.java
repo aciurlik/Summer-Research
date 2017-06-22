@@ -43,10 +43,8 @@ public class Driver{
 	BellTower b;
 
 	public static Driver testDriver(){
-		Driver results = new Driver();
-		testSchedule = Schedule.testSchedule();	
-
-		testSchedule.setDriver(results);
+		testSchedule = Schedule.testSchedule();
+		Driver results = new Driver(testSchedule);
 		return results;
 	}
 
@@ -54,14 +52,13 @@ public class Driver{
 
 
 
-	public Driver() {
+	public Driver(Schedule sch) {
 		
 		popUP = new JFrame();
 		icon = new ImageIcon("src/BellTower(T).png");
 		l = ListOfMajors.readFrom(new File("Majors"));
 
-		//Make data
-		sch = Schedule.testSchedule();
+		this.sch = sch;
 		sch.setDriver(this);
 		
 
@@ -106,11 +103,11 @@ public class Driver{
 	 * Create a new, blank schedule to work from.
 	 */
 	public void GUINewSchedule() {
-		CourseList l = CourseList.testList();
+		CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l, sch.getStartSemester().semesterDate, null);
-		current.readFromPrior();
+		Schedule current = new Schedule(l);
 		this.b.setSchedule(current);
+		//TODO make sure nothing else needs to be set
 		setSchedule(current);
 		this.update();
 	}

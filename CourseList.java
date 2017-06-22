@@ -31,6 +31,8 @@ public class CourseList  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
+	
+	public static final boolean masterIsNotAround = true;
 
 	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
 
@@ -156,12 +158,20 @@ public class CourseList  {
 
 
 	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
-		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""+ originalRequirementString +"\"\n What does that requirement mean?\n>>>");
-		//TODO ask the user
+		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""
+				+ originalRequirementString 
+				+"\"\n What does that requirement mean?\n>>>");
+		Requirement result = null;
+		if(masterIsNotAround){
+			return null;
+			//result = new Requirement();
+			//result.setName("Unknown:" + originalRequirementString);
+			//result.addRequirement(TerminalRequirement.readFrom("SSS<0"));
+			//return result;
+		}
 		Scanner scan = new Scanner(System.in);
 		String userInput = scan.nextLine();
 
-		Requirement result = null;
 		boolean valid = false;
 		while(!valid){
 			try{
