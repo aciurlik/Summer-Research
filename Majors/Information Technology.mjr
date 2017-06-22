@@ -5,10 +5,10 @@ R0:(CSC-105)
 R1:(CSC-121)
 R2:(CSC-122)
 R3:(CSC-475, CSC-502)
-R4:(CSC>199)
-R5:(CSC>299)
-R6 Cognate Courses:(3 of ACC>199, 3 of ADC>199, 3 of ANT>199, 3 of ARB>199, 3 of ART>199, 3 of AST>199, 3 of BIO>199, 3 of BUS>199, 3 of CHM>199, 3 of CHN>199, 3 of CLS>199, 3 of COM>199, 3 of DSC>199, 3 of ECN>199, 3 of EDU>199, 3 of EES>199, 3 of ENG>199, 3 of EST>199, 3 of FRN>199, 3 of FST>199, 3 of GGY>199, 3 of GRK>199, 3 of GRM>199, 3 of HSC>199, 3 of HST>199, 3 of HUM>199, 3 of IDS>199, 3 of ITL>199, 3 of JPN>199, 3 of LAS>199, 3 of LNG>199, 3 of LTN>199, 3 of MES>199, 3 of MLL>199, 3 of MSL>199, 3 of MTH>199, 3 of MUS>199, 3 of NSC>199, 3 of PHL>199, 3 of PHY>199, 3 of POL>199, 3 of PSY>199, 3 of PVS>199, 3 of REL>199, 3 of SEI>199, 3 of SOC>199, 3 of SPN>199, 3 of SUS>199, 3 of THA>199, 3 of UST>199, or 3 of WGS>199)
+R4:(CSC>=200)
+R5:(CSC>=300)
+R6 Cognate Courses:2 of ( 2 of ACC>199, 1 of ACC>299),2 of ( 2 of ADC>199, 1 of ADC>299),2 of ( 2 of ANT>199, 1 of ANT>299),2 of ( 2 of ARB>199, 1 of ARB>299),2 of ( 2 of ART>199, 1 of ART>299),2 of ( 2 of AST>199, 1 of AST>299),2 of ( 2 of BIO>199, 1 of BIO>299),2 of ( 2 of BUS>199, 1 of BUS>299),2 of ( 2 of CHM>199, 1 of CHM>299),2 of ( 2 of CHN>199, 1 of CHN>299),2 of ( 2 of CLS>199, 1 of CLS>299),2 of ( 2 of COM>199, 1 of COM>299),2 of ( 2 of DSC>199, 1 of DSC>299),2 of ( 2 of ECN>199, 1 of ECN>299),2 of ( 2 of EDU>199, 1 of EDU>299),2 of ( 2 of EES>199, 1 of EES>299),2 of ( 2 of ENG>199, 1 of ENG>299),2 of ( 2 of EST>199, 1 of EST>299),2 of ( 2 of FRN>199, 1 of FRN>299),2 of ( 2 of FST>199, 1 of FST>299),2 of ( 2 of GGY>199, 1 of GGY>299),2 of ( 2 of GRK>199, 1 of GRK>299),2 of ( 2 of GRM>199, 1 of GRM>299),2 of ( 2 of HSC>199, 1 of HSC>299),2 of ( 2 of HST>199, 1 of HST>299),2 of ( 2 of HUM>199, 1 of HUM>299),2 of ( 2 of IDS>199, 1 of IDS>299),2 of ( 2 of ITL>199, 1 of ITL>299),2 of ( 2 of JPN>199, 1 of JPN>299),2 of ( 2 of LAS>199, 1 of LAS>299),2 of ( 2 of LNG>199, 1 of LNG>299),2 of ( 2 of LTN>199, 1 of LTN>299),2 of ( 2 of MES>199, 1 of MES>299),2 of ( 2 of MLL>199, 1 of MLL>299),2 of ( 2 of MSL>199, 1 of MSL>299),2 of ( 2 of MTH>199, 1 of MTH>299),2 of ( 2 of MUS>199, 1 of MUS>299),2 of ( 2 of NSC>199, 1 of NSC>299),2 of ( 2 of PHL>199, 1 of PHL>299),2 of ( 2 of PHY>199, 1 of PHY>299),2 of ( 2 of POL>199, 1 of POL>299),2 of ( 2 of PSY>199, 1 of PSY>299),2 of ( 2 of PVS>199, 1 of PVS>299),2 of ( 2 of REL>199, 1 of REL>299),2 of ( 2 of SEI>199, 1 of SEI>299),2 of ( 2 of SOC>199, 1 of SOC>299),2 of ( 2 of SPN>199, 1 of SPN>299),2 of ( 2 of SUS>199, 1 of SUS>299),2 of ( 2 of THA>199, 1 of THA>299),2 of ( 2 of UST>199, 1 of UST>299),2 of ( 2 of WGS>199, 1 of WGS>299)
 Collection of Requirement Enemies:
 R4:R5
 Notes:
-You must have at least a 2.00 grade point average in all your computer science classes to graduate with a degree in information technology.
+You must have at least a 2.00 GPA in all CSC classes to graduate with a degree in information technology
