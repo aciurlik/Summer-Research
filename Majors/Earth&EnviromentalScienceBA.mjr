@@ -3,6 +3,10 @@ Type: Major
 Possible Degree(s):BA
 R0 Entry EES:(EES-111, EES-112, EES-113, or EES-115)
 R1:(EES-220)
-R2 EES Elective:6 of (EES-200, EES-201, EES-210, EES-218, EES-221, EES-230, EES-301, EES-310, EES-325, EES-330, EES-343, EES-350, EES-351, EES-352, EES-353, EES-354, EES-355, EES-356, EES-357, EES-358, EES-360, EES-402, EES-410, EES-421, EES-425, EES-430, EES-472, EES-475, EES-502, or EES-504)
-R3 MTH Requirement:(MTH-120, MTH-145, or MTH-150)
+R2 EES Elective:6 of EES>0
+R3: 1 of (MTH-120, MTH-145, MTH-150)
 Collection of Requirement Enemies:
+R2, R1, R0
+Students anticipating graduate study and professional work in Earth and Environmental Sciences should obtain the B.S. degree. 
+
+Additional recommended courses can be found on the Furman EES program overview webpage.

@@ -7,5 +7,9 @@ R2 North American:(HST-120, HST-121, or HST-122)
 R3 Africa, Asia, or Latin America:(HST-141, HST-142, HST-145, HST-151, HST-152, HST-153, HST-155, HST-156, HST-161, HST-162, HST-165, or HST-166)
 R4 Advanced Courses:(4 of HST>199)
 R5:(HST>0)
-R6 Pre-modern Era:(HST-101, HST-102, HST-103, HST-141, HST-151, HST-152, HST-155, HST-161, HST-165, HST-201, HST-203, HST-206, HST-207, HST-208, or HST-251)
+R6 Pre-modern Era:(HST-101, HST-102, HST-103, HST-141, HST-151, HST-152, HST-155, HST-161, HST-165, HST-201, HST-203, HST-206, HST-207, HST-208, or HST-251, HST-209)
 Collection of Requirement Enemies:
+R5:R4,R3,R2,R1,R0,R6
+Notes:
+One first year seminar taught by a member of the history department may also contribute to the major, but will not be considered one of the three required foundation courses.
+ Further, no more than two exam equivalency courses (HST-100, HST-120, or HST-130) and/or first year seminars may contribute to major requirements.

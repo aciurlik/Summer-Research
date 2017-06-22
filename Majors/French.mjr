@@ -1,12 +1,15 @@
 French
 Type: Major
 Possible Degree(s):BA
-R0:(8 of FRN>201)
-R1:(FRN-214)
-R2:(FRN-215)
-R3:(FRN-331)
-R4:(FRN-332)
-R5:(FRN-333)
-R6:(2 of FRN>214)
-R7:(FRN>399)
+R0:(FRN-214)
+R1:(FRN-215)
+R2:(FRN-331)
+R3:(FRN-332)
+R4:(FRN-333)
+R5:(2 of FRN>214)
+R6:(FRN>399)
 Collection of Requirement Enemies:
+R5: R6, R4, R3, R2, R1, R0
+Notes:
+All majors must enroll in at least one course in their major language during both their junior and senior years.
+All majors are also strongly encouraged to participate in a study away program before their senior year as well.
