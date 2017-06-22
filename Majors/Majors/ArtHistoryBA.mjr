@@ -1,0 +1,31 @@
+Art History
+Type: Major
+Possible Degree(s):BA
+R0:(ART-130)
+R1:(ART-131)
+R2 Western Art History:4 of ART>=200<=299
+R3 Non-Western Art History:1 of ART>=200<=299
+R4:(ART-330)
+R5 1 Art History course:1 of (ART>=200<=299, FYW>0, HST>0)
+R6 1 Studio Art course:(ART>0)
+Collection of Requirement Enemies:
+R2:R3, R5, R6
+R3: R5, R6
+R5: R6
+Notes:
+WARNING: This program may suggest courses that the Art department does not approve of, or that do not satisfy a particular Art requirement. For example, this program cannot distinguish between Art History and Studio Art courses.
+Check with an advisor if you are unsure.
+
+Students must have a 2.00 GPA in all Art courses.
+
+The Western Art History requirement must include at least one course in each of the following areas: Ancient, Medieval, Renaissance/Baroque, and Modern.
+
+Courses displayed for the "Any Art History course" requirement may require department approval.
+
+For students planning graduate study, a reading proficiency in at least one foreign language (German or French preferred) is typically required. 
+
+See the department website for more information.
+
+
+
+

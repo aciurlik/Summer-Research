@@ -1,0 +1,32 @@
+Neuroscience
+Type: Major
+Possible Degree(s):BS
+R0:(BIO-111)
+R1:(PSY-111)
+R2:1 of (BIO-222, PSY-202)
+R3:(BIO-221)
+R4:(BIO-460)
+R5:(CHM-110)
+R6:(CHM-115)
+R7:(CHM-120)
+R8:(CHM-220)
+R9:(MTH-150)
+R10:(NSC-401)
+R11:(NSC-502)
+R12:(PSY-320)
+R13:(PSY-327)
+R14 Molecular Components: 1 of (BIO-300, BIO-302, BIO-303, BIO-444, BIO-455, CHM-460, PSY-321)
+R15 Physiological Elements: 1 of(BIO-320, BIO-322, IDS-310)
+R16 Behavioral: 1 of (PSY-211, PSY-213, PSY-218, PSY-322, PSY-323, PSY-324, PSY-414)
+R17 Other Electives: 1 of (BIO-300, BIO-302, BIO-303, BIO-444, BIO-455, CHM-460, PSY-321,BIO-320, BIO-322, IDS-310,PSY-211, PSY-213, PSY-218, PSY-322, PSY-323, PSY-324, PSY-414, BIO-420, BIO-426, BIO-442, BIO-450, PHL-321, PSY-214, PSY-404)
+
+Collection of Requirement Enemies:
+R17: R16, R15, R14
+R17:ALL
+R16:ALL
+R15:ALL
+R14:ALL
+Notes:
+Students will be advised in the selection of courses to ensure a balenced representation of suitable disciplines and focus in a particular area of interest. 
+Furthermore it is expected students will complete PSY-320 no later than the conclusion of the sophmore year and BIO-460 during the junior year. 
+None of the four courses a student uses as electives for the neuroscience major may also count toward another major.
