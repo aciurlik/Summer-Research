@@ -108,10 +108,8 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 				this.oldEnemyList = enemies;
 			}
 		}
-		for(Requirement specified : this.userSpecifiedReqs){
-			result.add(specified);
-		}
-		return new ArrayList<Requirement>(result);
+		result.addAll(this.userSpecifiedReqs);
+		return result;
 	}
 
 	public Interval<Time> examTime() {

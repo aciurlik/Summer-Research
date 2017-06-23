@@ -271,14 +271,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		//Figure out the season and add it
 
 		SemesterDate d = sem.getDate();
-		String season = d.getSeason(d.sNumber);
-
-
-		if(season == null){
-			season="Error";
-		}
-
-		season +=  " " + sem.semesterDate.year;
+		String season = d.getUserString();
+		
+		
 		fallSpring.setText(season);
 		fallSpring.setForeground(Color.black);
 

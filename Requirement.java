@@ -209,7 +209,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public int minMoreNeeded(ArrayList<ScheduleElement> taken, boolean storeValue){
-		
 		int numPlanned = numPlannedLater(taken);
 		for(int i = 0 ; i < taken.size(); i ++){
 			if(taken.get(i) instanceof Requirement){

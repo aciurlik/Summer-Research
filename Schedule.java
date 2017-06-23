@@ -17,6 +17,7 @@ public class Schedule {
 	private Semester priorSemester;
 	
 	private SemesterDate firstSemester;
+	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
 
 
@@ -88,7 +89,12 @@ public class Schedule {
 	}
 	
 	public void readBlankTestPrior(){
-		firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+		if(defaultFirstSemester!= null){
+			firstSemester = defaultFirstSemester;
+		}
+		else{
+			firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+		}
 	}
 	
 	public void readFromTestPrior(){

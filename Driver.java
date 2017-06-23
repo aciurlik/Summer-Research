@@ -31,7 +31,7 @@ public class Driver{
 	JList<Integer> pickYears;
 	String seasonName;
 	Integer[] yearsDialog;
-	ImageIcon icon;
+	static ImageIcon icon;
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
 	String instructCourse = "Please pick the course you would like to add to your ";
@@ -592,6 +592,44 @@ public class Driver{
 		this.update();
 
 	}
+	
+	/**
+	 * Given these objects, and this list of strings,
+	 * let the user pick one  
+	 * @return
+	 */
+	public static int GUICHooseAmong(ArrayList<Object> choicesList, ArrayList<String> displaysList, String message, String title){
+		Object[] choices = choicesList.toArray(new Object[choicesList.size()]);
+		Object[] displays = displaysList.toArray(new String[displaysList.size()]);
+		if(choices.length != displays.length){
+			throw new RuntimeException("Wrong sizes for choices and displays in GUICHooseAmong" + choices.length + "," + displays.length);
+		}
+		String chosenString = (String)JOptionPane.showInputDialog(new JFrame(), message , title , JOptionPane.PLAIN_MESSAGE, icon, displays, "Cats");
+		int chosenIndex = 0;
+		for(; chosenIndex < displays.length ; chosenIndex ++){
+			if(displays[chosenIndex] == chosenString){
+				break;
+			}
+		}
+		if(chosenIndex > choices.length){
+			return -1;
+		}
+		return chosenIndex;
+	}
+	
+	public static SemesterDate GUIChooseStartTime(ArrayList<SemesterDate> semesters){
+		ArrayList<String> semesterStrings = new ArrayList<String>();
+		ArrayList<Object> semesterObjects = new ArrayList<Object>();
+		for(SemesterDate d : semesters){
+			semesterStrings.add(d.getUserString());
+			semesterObjects.add(d);
+		}
+		int index = GUICHooseAmong(semesterObjects, semesterStrings, "Which was your first semester at furman? ", "Pick a semester");
+		if(index != -1){
+			return semesters.get(index);
+		}
+		return null;
+	}
 
 
 
@@ -747,6 +785,17 @@ public class Driver{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
+		
+		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
+		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
+		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2014, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2015, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
+		
+		SemesterDate start = GUIChooseStartTime(supportedSemesters);
+		Schedule.defaultFirstSemester = start;
 
 		//new Driver();
 		testDriver();

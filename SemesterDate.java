@@ -82,12 +82,19 @@ public class SemesterDate {
 			return new SemesterDate(this.year,(this.sNumber + 1)%4 );
 		}
 	}
+	
+	public String getUserString(){
+		String result = getSeason(sNumber);
+		if(result == null){
+			result="Error";
+		}
+		result +=  " " + year;
+		return result;
+	}
 
 	
 	public String getSeason(int p){
 		String[] season = {null, "Spring", "MayX", "Summer Session One", "Summer Session Two", "Fall", "Other"};
-
-
 		return season[p];
 	}
 	public static int toSNumber(String season){
