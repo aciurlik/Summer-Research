@@ -55,7 +55,7 @@ public class ListOfMajors {
 			}
 			catch(Exception e){
 				e.printStackTrace();
-				System.out.println("I'm skipping this major.");
+				System.out.println("I'm skipping  " + f.getName());
 			}
 
 		}
