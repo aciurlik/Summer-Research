@@ -1,0 +1,15 @@
+Religion
+Type: Major
+Possible Degree(s):BA
+R0:(REL-475)
+R1 Single Religion Focus:1 of (2 of (REL-210, REL-211, REL-212, REL-214, REL-216, REL-310, REL-311, REL-316, REL-317, REL-318, REL-319, REL-226, REL-232, REL-236, REL-237, REL-331, REL-332, REL-348, REL-360, REL-240, REL-242, REL-247, REL-248, REL-260, REL-340, REL-343, REL-344, REL-361, REL-363), 2 of (REL-220, REL-314), 2 of (REL-224, REL-327), 2 of (REL-222, REL-322, REL-323), 2 of (AST-220, REL-223, REL-325))
+R2 Religious Traditions: 2 of (REL-210, REL-211, REL-212, REL-214, REL-216, REL-310, REL-311, REL-316, REL-317, REL-318, REL-319, REL-226, REL-232, REL-236, REL-237, REL-331, REL-332, REL-348, REL-360, REL-240, REL-242, REL-247, REL-248, REL-260, REL-340, REL-343, REL-344, REL-361, REL-363, REL-220, REL-314, REL-224, REL-327, REL-222, REL-322, REL-323, AST-220, REL-223, REL-325)
+R3 Elective: 3 of (REL >= 100, ANT-344, AST-225, AST-220)
+Collection of Requirement Enemies:
+R1: R2, R3
+R2: R3
+Notes:
+The elective requirement may include one additional course from another department, with the department chair's approval. 
+REL-101, REL-11, REL-125 or a first year seminar on a religious topic may contribute to major requirements if complete prior to declaring the major subject to the approval from the department. 
+Two, 2-credit May Experiences courses taught by members of the religion department may also be considered as a single course for meeting major requirements. 
+An academic journal entry for each course after declaring the major. You must also attend the annual department colloquium each Spring. 
