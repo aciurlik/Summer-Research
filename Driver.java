@@ -56,7 +56,7 @@ public class Driver{
 		
 
 		popUP = new JFrame();
-		icon = new ImageIcon("src/BellTower(T).png");
+		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 		l = ListOfMajors.readFrom(new File("Majors"));
 
 		this.sch = sch;
