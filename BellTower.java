@@ -22,8 +22,8 @@ public class BellTower extends JPanel{
 		super();
 		
 		 overlap = new JPanel();
-		 icon = new ImageIcon("src/bellTower.jpg");
-		 firework = new ImageIcon("src/fireworks.jpg");
+		 icon = new ImageIcon(MenuOptions.resourcesFolder + "bellTower.jpg");
+		 firework = new ImageIcon(MenuOptions.resourcesFolder + "fireworks.jpg");
 		 fire  = new JPanel();
 		 fireWork = firework.getImage();
 		 fires = new ImageIcon(fireWork);

@@ -15,12 +15,12 @@ public class ListOfMajors {
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
 
 
-
+	public static final String majorsFile = MenuOptions.resourcesFolder + "Majors";
 
 
 
 	public static ListOfMajors testList(){
-		ListOfMajors result = readFrom(new File("Majors"));
+		ListOfMajors result = readFrom(new File(majorsFile));
 		return result;
 	}
 

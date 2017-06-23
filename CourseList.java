@@ -34,8 +34,8 @@ public class CourseList  {
 	
 	public static final boolean masterIsNotAround = true;
 
-	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
-
+	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
+	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
 	private Hashtable<Prefix, String> rawPrereqs;
@@ -596,7 +596,7 @@ public class CourseList  {
 
 	public static CourseList readAll(){
 		CourseList result = new CourseList();
-		File f = new File("CourseCatologs");
+		File f = new File(courseListFolder);
 		for ( File semesterFile : f.listFiles(new FilenameFilter(){
 			@Override
 			public boolean accept(File dir, String name) {
