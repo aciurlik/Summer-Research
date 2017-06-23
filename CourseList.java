@@ -126,6 +126,7 @@ public class CourseList  {
 				return askUserToDefine(p, originalRequirementString);
 			}
 		}
+		
 		return Requirement.readFrom(ourVersion);
 	}
 

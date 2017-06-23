@@ -42,7 +42,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 
 		ArrayList<Course> getReady = sch.masterList.getCoursesIn(s);
 		if(getReady.size()==0){
-			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 			JOptionPane.showMessageDialog(frame, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
 
 		}

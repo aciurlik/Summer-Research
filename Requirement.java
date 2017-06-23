@@ -68,8 +68,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		return storedCoursesLeft;
 	}
 	
+	/**
+	 * This will invalidate any stored courses taken
+	 */
 	public void recalcOriginalCoursesNeeded(){
 		this.originalCoursesNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		this.storedCoursesLeft = this.originalCoursesNeeded;
 	}
 	
 	public void setHoursNeeded(int hours){
@@ -215,7 +219,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 				}
 			}
 		}
-		return minMoreNeeded(taken, numPlanned, storeValue);
+		int result =  minMoreNeeded(taken, numPlanned, storeValue);
+		return result;
 	}
 	/**
 	 * Find the minimum number of courses or credits you would need to completely
@@ -367,6 +372,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	//INFINITELOOPHAZARD
 	public boolean equals(Requirement r){
 		if(r instanceof TerminalRequirement){
+			if(this.isTerminal()){
+				return this.getTerminal().equals(r);
+			}
 			return false;
 		}
 		if(r.numToChoose != this.numToChoose){
@@ -663,7 +671,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 
 
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> r) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement otherReq : r){
 			if(otherReq.equals(this)){
@@ -837,18 +845,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 	 * @return
 	 */
 	public static Requirement readFrom(String saveString){
-		try{
-			return Requirement.readFromJSON(saveString);
+		Stack<String> tokens = tokenize(saveString);
+		Requirement result = parse(tokens);
+		result.recalcOriginalCoursesNeeded();
+		if(!tokens.isEmpty()){
+			throw new RuntimeException("End of string while parsing requirement");
 		}
-		catch(Exception e){
-			Stack<String> tokens = tokenize(saveString);
-			Requirement result = parse(tokens);
-			result.recalcOriginalCoursesNeeded();
-			if(!tokens.isEmpty()){
-				throw new RuntimeException("End of string while parsing requirement");
-			}
-			return result;
-		}
+		return result;
 
 	}
 
@@ -960,38 +963,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>{
 		}
 	}
 
-
-
-
-
-	public static final String[] SAVE_DELIMETERS = {" of ","; \t "," Completed; DDN:"};
-	/**
-	 * Read from a JSON save string (kept for backwards compatability)
-	 * @param s
-	 * @return
-	 */
-	public static Requirement readFromJSON(String s) {
-		//Get the list of objects in this string, after chopping off the first and last characters 
-		// (hopefully "{" and "}" ) and ignoring anything outside brackets ("{" or "}").
-		Iterator<String> i = SaverLoader.fromJSON(SaverLoader.peel(s)).iterator();
-
-		//Peal off each piece of data from this iterator of strings.
-		int numToChoose = Integer.parseInt(SaverLoader.peel(i.next()));
-		Iterable<String> prefixes = SaverLoader.fromJSON(SaverLoader.peel(i.next()));
-		ArrayList<Prefix> choices = new ArrayList<Prefix>();
-		for(String p : prefixes){
-			choices.add(Prefix.readFromJSON(p));
-		}
-		int doubleDipNumber = Integer.parseInt(SaverLoader.peel(i.next()));
-		String name = SaverLoader.peel(i.next());
-		if(name.equals("null")){
-			name = null;
-		}
-		Requirement result = new Requirement(choices.toArray(new Prefix[choices.size()]), numToChoose);
-
-		result.setName(name);
-		return result;
-	}
 
 	
 	public static void testAlsoCompletes(){

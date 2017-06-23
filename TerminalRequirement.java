@@ -362,10 +362,13 @@ public class TerminalRequirement extends Requirement {
 		return this.saveString();
 	}
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> r) {
-		//TODO think through the implications of this
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		result.add(this);
+		for(Requirement t : r){
+			if(this.equals(t)){
+				result.add(t);
+			}
+		}
 		return result;
 	}
 	
@@ -496,10 +499,18 @@ public class TerminalRequirement extends Requirement {
 	@Override
 	public boolean equals(Requirement r){
 		if(!(r instanceof TerminalRequirement)){
-			return false;
+			if(r.isTerminal()){
+				return this.equals(r.getTerminal());
+			}
+			else{
+				return false;
+			}
 		}
 		TerminalRequirement other = (TerminalRequirement)r;
 		if(this.isExact()){
+			if(!other.isExact()){
+				return false;
+			}
 			return this.p.equals(other.p);
 		}
 		if(this.usesMin ^ other.usesMin){

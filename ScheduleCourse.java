@@ -78,8 +78,8 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	 * @return
 	 */
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded) {
-		HashSet<Requirement> result = new HashSet<Requirement>();
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded) {
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
 			if(r.isSatisfiedBy(this.getPrefix())){
 				result.add(r);

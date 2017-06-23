@@ -57,7 +57,7 @@ public class Driver{
 
 		popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-		l = ListOfMajors.readFrom(new File("Majors"));
+		l = ListOfMajors.readFrom(new File(ListOfMajors.majorsFile));
 
 		this.sch = sch;
 		sch.setDriver(this);
@@ -473,7 +473,7 @@ public class Driver{
 
 	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
 		if(finalListOfCourses.length <= 0){
-			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
+			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 			JOptionPane.showMessageDialog(popUP, 
 					"There were no courses to choose from. \n"
 							+"If you have a course in mind, you can add a note to the semester,\n"
@@ -482,7 +482,7 @@ public class Driver{
 		}
 		String reqsString = "";
 		String[] displayed = new String[finalListOfCourses.length];
-		HashSet<Requirement> allReqs = sch.getAllRequirements();
+		ArrayList<Requirement> allReqs = sch.getAllRequirements();
 		for(int i = 0; i < finalListOfCourses.length ; i ++){
 			ScheduleCourse c = finalListOfCourses[i];
 			int reqsFulfilled = 0;

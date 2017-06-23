@@ -37,7 +37,7 @@ public class PrefixHours implements ScheduleElement, HasCreditHours{
 	}
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(
-			HashSet<Requirement> loaded) {
+			ArrayList<Requirement> loaded) {
 		return null;
 	}
 

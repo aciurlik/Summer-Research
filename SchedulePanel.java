@@ -114,7 +114,6 @@ public class SchedulePanel extends JPanel implements ActionListener{
 	int counter = 0;
 	public void update(Schedule sch) {
 
-		long startTime = System.currentTimeMillis();
 		scrollPanel.removeAll();
 		scrollPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
