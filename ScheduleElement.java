@@ -47,7 +47,7 @@ public interface ScheduleElement {
 	 * if element has no requirements it fulfills, an empty ArrayList is returned.
 	 */
 
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded);
+	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded);
 
 	
 }

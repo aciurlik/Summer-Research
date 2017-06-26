@@ -34,8 +34,8 @@ public class CourseList  {
 	
 	public static final boolean masterIsNotAround = true;
 
-	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
-	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
+	public static final String prereqMeaningsFile = "PrereqMeanings.txt";
+
 
 	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
 	private Hashtable<Prefix, String> rawPrereqs;
@@ -126,7 +126,6 @@ public class CourseList  {
 				return askUserToDefine(p, originalRequirementString);
 			}
 		}
-		
 		return Requirement.readFrom(ourVersion);
 	}
 
@@ -505,21 +504,8 @@ public class CourseList  {
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
 
-		//make NW and NWL enemies
-		Requirement nwl = m.getRequirement("NWL");
-		Requirement nw = m.getRequirement("NW");
-		RequirementGraph.putEdge(nwl, nw);
-		// Make WC and NE enemies 
-		Requirement wc = m.getRequirement("WC");
-		Requirement ne = m.getRequirement("NE");
-		RequirementGraph.putEdge(wc, ne);
-		
-		//put WC and NE at the end.
-		m.removeRequirement(wc);
-		m.removeRequirement(ne);
-		m.addRequirement(wc);
-		m.addRequirement(ne);
-		
+		//TODO make NW and NWL enemies
+		// TODO Make WC and NE enemies of all the other requirements.
 		return m;
 	}
 
@@ -610,7 +596,7 @@ public class CourseList  {
 
 	public static CourseList readAll(){
 		CourseList result = new CourseList();
-		File f = new File(courseListFolder);
+		File f = new File("CourseCatologs");
 		for ( File semesterFile : f.listFiles(new FilenameFilter(){
 			@Override
 			public boolean accept(File dir, String name) {

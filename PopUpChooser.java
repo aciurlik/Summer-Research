@@ -21,7 +21,7 @@ public class PopUpChooser {
 	JFrame frame = new JFrame();
 	ArrayList <Major> displayThings;
 	String polite = "Please ";
-	ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "dioglogIcon.gif");
+	ImageIcon icon = new ImageIcon("src/dioglogIcon.gif");
 
 
 
