@@ -37,8 +37,16 @@ public class PrefixHours implements ScheduleElement, HasCreditHours{
 	}
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(
-			HashSet<Requirement> loaded) {
-		return null;
+
+			ArrayList<Requirement> loaded) {
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		for(Requirement r : loaded){
+			if(r.isSatisfiedBy(this.p)){
+				result.add(r);
+			}
+		}
+		return result;
+
 	}
 
 

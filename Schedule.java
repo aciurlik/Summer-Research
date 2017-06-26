@@ -203,7 +203,7 @@ public class Schedule {
 			return false;
 		}
 		if(sem.add(element)){
-			updateRequirementsSatisfied(element);
+			//updateRequirementsSatisfied(element);
 			updatePrereqs();
 			updateReqs();
 			return true;
@@ -1021,7 +1021,7 @@ public class Schedule {
 	 * 
 	 * @param e
 	 */
-	public void updateRequirementsSatisfied(ScheduleElement e){
+	/*public void updateRequirementsSatisfied(ScheduleElement e){
 		if(e instanceof Course){
 			updateRequirementsSatisfied((Course) e);
 		}
@@ -1054,7 +1054,7 @@ public class Schedule {
 			}
 		}
 	}
-
+*/
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
 		return !RequirementGraph.doesPlayNice(r1, r2);
 	}
