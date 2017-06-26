@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class Schedule {
 	private ArrayList<Major> majorsList;
 	private ArrayList<Semester> semesters;
-	private HashSet<Requirement> prereqs;
+	public HashSet<Requirement> prereqs;
 	private Major GER;
 	Driver d; 
 	CourseList masterList;
@@ -17,6 +17,7 @@ public class Schedule {
 	private Semester priorSemester;
 	
 	private SemesterDate firstSemester;
+	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
 
 
@@ -88,7 +89,12 @@ public class Schedule {
 	}
 	
 	public void readBlankTestPrior(){
-		firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+		if(defaultFirstSemester!= null){
+			firstSemester = defaultFirstSemester;
+		}
+		else{
+			firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
+		}
 	}
 	
 	public void readFromTestPrior(){
@@ -167,6 +173,7 @@ public class Schedule {
 	public void removeSemester(Semester sem) {
 		this.semesters.remove(sem);
 		Collections.sort(semesters);
+		updatePrereqs();
 		updateReqs();
 	}
 
@@ -269,6 +276,7 @@ public class Schedule {
 		if(!major.name.equals("GER")){
 			recalcGERMajor();
 		}
+		updatePrereqs();//courses might be removed?
 		updateReqs();
 		updateTotalCoursesNeeded();
 	}
@@ -426,7 +434,7 @@ public class Schedule {
 	 */
 	public ArrayList<ScheduleElement> getAllElements(){
 		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
-		for(Semester s : semesters){
+		for(Semester s : this.getAllSemesters()){
 			result.addAll(s.getElements());
 		}
 		return result;
@@ -435,13 +443,15 @@ public class Schedule {
 	/**
 	 * Find the list of all requirements in any major of this schedule.
 	 * May include duplicate requirements if two majors share a requirement.
+	 * Can't updte requirements at the same time, because it would cause an infinite loop.
 	 * @return
 	 */
-	public HashSet<Requirement> getAllRequirements(){
-		HashSet<Requirement> result = new HashSet<Requirement>();
+	public ArrayList<Requirement> getAllRequirements(){
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
+		
 		result.addAll(prereqs);
 		result.addAll(GER.reqList);
 		return result;
@@ -934,9 +944,9 @@ public class Schedule {
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
 		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-		HashSet<Requirement> reqList = this.getAllRequirements();
+		ArrayList<Requirement> reqList = this.getAllRequirements();
 		for(Requirement r : reqList){
-			updateRequirement(r);
+			updateRequirement(r, reqList, allTakenElements);
 		}
 	}
 
@@ -954,16 +964,13 @@ public class Schedule {
 	 * satisfying this requirement.
 	 * @param r
 	 */
-	public void updateRequirement(Requirement r){
+	public void updateRequirement(Requirement r, ArrayList<Requirement> reqList, ArrayList<ScheduleElement> allTakenElements){
 		//For each requirement, find all the schedule elements that satisfy it
 		// (this prevents enemy requirements from both seeing the same course)s
-		HashSet<Requirement> reqList = new HashSet<Requirement>(this.getAllRequirements());
-		ArrayList<ScheduleElement> allTakenElements = getAllElements();
 
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 		for(ScheduleElement e : allTakenElements){
-			
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
 			}

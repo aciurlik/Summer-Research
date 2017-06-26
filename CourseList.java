@@ -126,6 +126,7 @@ public class CourseList  {
 				return askUserToDefine(p, originalRequirementString);
 			}
 		}
+		
 		return Requirement.readFrom(ourVersion);
 	}
 
@@ -504,8 +505,21 @@ public class CourseList  {
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
 
-		//TODO make NW and NWL enemies
-		// TODO Make WC and NE enemies of all the other requirements.
+		//make NW and NWL enemies
+		Requirement nwl = m.getRequirement("NWL");
+		Requirement nw = m.getRequirement("NW");
+		RequirementGraph.putEdge(nwl, nw);
+		// Make WC and NE enemies 
+		Requirement wc = m.getRequirement("WC");
+		Requirement ne = m.getRequirement("NE");
+		RequirementGraph.putEdge(wc, ne);
+		
+		//put WC and NE at the end.
+		m.removeRequirement(wc);
+		m.removeRequirement(ne);
+		m.addRequirement(wc);
+		m.addRequirement(ne);
+		
 		return m;
 	}
 
