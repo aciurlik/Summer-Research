@@ -134,16 +134,18 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 
 
 		for(Major m : majors){
+
 			MajorPanel majorPanel = new MajorPanel(m, d);
 			gbc.gridx = 0;
 			gbc.gridy = heightCounter;
 			heightCounter++;
 			this.inner.add(majorPanel, gbc);
-		
+			
+
+			this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
+			this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
+			this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
 		}
-		this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
-		this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
-		this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
 	}
 
 	@Override

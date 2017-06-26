@@ -31,7 +31,7 @@ public class Driver{
 	JList<Integer> pickYears;
 	String seasonName;
 	Integer[] yearsDialog;
-	static ImageIcon icon;
+	ImageIcon icon;
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
 	String instructCourse = "Please pick the course you would like to add to your ";
@@ -56,8 +56,8 @@ public class Driver{
 		
 
 		popUP = new JFrame();
-		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-		l = ListOfMajors.readFrom(new File(ListOfMajors.majorsFile));
+		icon = new ImageIcon("src/BellTower(T).png");
+		l = ListOfMajors.readFrom(new File("Majors"));
 
 		this.sch = sch;
 		sch.setDriver(this);
@@ -473,7 +473,7 @@ public class Driver{
 
 	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
 		if(finalListOfCourses.length <= 0){
-			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
+			ImageIcon icon = new ImageIcon("src/BellTower(T).png");
 			JOptionPane.showMessageDialog(popUP, 
 					"There were no courses to choose from. \n"
 							+"If you have a course in mind, you can add a note to the semester,\n"
@@ -482,7 +482,7 @@ public class Driver{
 		}
 		String reqsString = "";
 		String[] displayed = new String[finalListOfCourses.length];
-		ArrayList<Requirement> allReqs = sch.getAllRequirements();
+		HashSet<Requirement> allReqs = sch.getAllRequirements();
 		for(int i = 0; i < finalListOfCourses.length ; i ++){
 			ScheduleCourse c = finalListOfCourses[i];
 			int reqsFulfilled = 0;
@@ -591,44 +591,6 @@ public class Driver{
 		sem.setNotes("");
 		this.update();
 
-	}
-	
-	/**
-	 * Given these objects, and this list of strings,
-	 * let the user pick one  
-	 * @return
-	 */
-	public static int GUICHooseAmong(ArrayList<Object> choicesList, ArrayList<String> displaysList, String message, String title){
-		Object[] choices = choicesList.toArray(new Object[choicesList.size()]);
-		Object[] displays = displaysList.toArray(new String[displaysList.size()]);
-		if(choices.length != displays.length){
-			throw new RuntimeException("Wrong sizes for choices and displays in GUICHooseAmong" + choices.length + "," + displays.length);
-		}
-		String chosenString = (String)JOptionPane.showInputDialog(new JFrame(), message , title , JOptionPane.PLAIN_MESSAGE, icon, displays, "Cats");
-		int chosenIndex = 0;
-		for(; chosenIndex < displays.length ; chosenIndex ++){
-			if(displays[chosenIndex] == chosenString){
-				break;
-			}
-		}
-		if(chosenIndex > choices.length){
-			return -1;
-		}
-		return chosenIndex;
-	}
-	
-	public static SemesterDate GUIChooseStartTime(ArrayList<SemesterDate> semesters){
-		ArrayList<String> semesterStrings = new ArrayList<String>();
-		ArrayList<Object> semesterObjects = new ArrayList<Object>();
-		for(SemesterDate d : semesters){
-			semesterStrings.add(d.getUserString());
-			semesterObjects.add(d);
-		}
-		int index = GUICHooseAmong(semesterObjects, semesterStrings, "Which was your first semester at furman? ", "Pick a semester");
-		if(index != -1){
-			return semesters.get(index);
-		}
-		return null;
 	}
 
 
@@ -785,17 +747,6 @@ public class Driver{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		
-		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
-		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
-		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2014, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2015, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
-		
-		SemesterDate start = GUIChooseStartTime(supportedSemesters);
-		Schedule.defaultFirstSemester = start;
 
 		//new Driver();
 		testDriver();

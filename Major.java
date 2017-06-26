@@ -101,21 +101,6 @@ public class Major {
 	public void setChosenDegree(int chosenDegree) {
 		this.chosenDegree = chosenDegree;
 	}
-	
-	/**
-	 * If you know this major contains a particular requirement, 
-	 * you can ask for it.
-	 * Return null if not found.
-	 * @param reqName
-	 */
-	public Requirement getRequirement(String reqName){
-		for(Requirement r : reqList){
-			if(reqName.equals(r.name)){
-				return r;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * Sets the type of this major.
@@ -133,19 +118,6 @@ public class Major {
 	public void addRequirement(Requirement r){
 		this.reqList.add(r);
 		reqFriendGroups.add(0);
-	}
-	
-	public boolean removeRequirement(Requirement r){
-		int index = 0;
-		while(index < reqList.size() && !reqList.get(index).equals(r)){
-			index ++;
-		}
-		if(index >= reqList.size()){
-			return false;
-		}
-		this.reqList.remove(index);
-		reqFriendGroups.remove((int)index);
-		return true;
 	}
 	
 	public void addToNotes(String line){
@@ -407,7 +379,9 @@ public class Major {
 				RequirementGraph.makeLoner(this.reqList.get(firstReqNum));
 			}
 			else{
-				reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
+
+			reqFriendGroups.set(firstReqNum,Integer.parseInt(split[1]));
+
 			}
 		}
 	}
