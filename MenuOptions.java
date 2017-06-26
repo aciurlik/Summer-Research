@@ -1,3 +1,5 @@
+import java.io.File;
+
 import javax.swing.JButton;
 
 
@@ -32,6 +34,8 @@ public class MenuOptions {
 	public static final  String deleteSemester = "x";
 	public static final  String hideSemester = "-";
 	public static final  String showSemester = "+";
+	
+	public static final String resourcesFolder = "Resources" + File.separator;
 	
 	
 	

@@ -78,8 +78,8 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 	 * @return
 	 */
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(HashSet<Requirement> loaded) {
-		HashSet<Requirement> result = new HashSet<Requirement>();
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded) {
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
 			if(r.isSatisfiedBy(this.getPrefix())){
 				result.add(r);
@@ -125,10 +125,8 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 				}
 			}
 		}
-		for(Requirement specified : this.userSpecifiedReqs){
-			result.add(specified);
-		}
-		return new ArrayList<Requirement>(result);
+		result.addAll(this.userSpecifiedReqs);
+		return result;
 	}
 
 	public Interval<Time> examTime() {
