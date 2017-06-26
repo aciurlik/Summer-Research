@@ -88,24 +88,41 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
 		result.removeAll(enemies);
 		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
+
 			if(enemies.isEmpty()){
 				this.userSpecifiedReqs = new HashSet<Requirement>();
 				this.oldEnemyList = enemies;
 			}
 			else{
-				//the enemies changed. TODO
-				//ask the user which requirements should now be satisfied by this course.
-				//sch.conflictingRequirements(this
-				/**
-				 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
+				//the enemies changed.
+
+				//If some of the enemies are already scheduled, just use those.
+				HashSet<Requirement> scheduledRequirements = new HashSet<Requirement>();
+				for(ScheduleElement e : s.getAllElements()){
+					if(e instanceof Requirement){
+						scheduledRequirements.add((Requirement)e);
+					}
+				}
+				scheduledRequirements.retainAll(enemies);
+				if(!scheduledRequirements.isEmpty()){
+					this.userSpecifiedReqs = scheduledRequirements;
+					this.oldEnemyList = enemies;
+				}
+				else{
+					//If none of the enemies are scheduled, 
+					//ask the user which requirements should now be satisfied by this course.
+					//sch.conflictingRequirements(this
+					/**
+					 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
 					+ enemies.toString() + "\n"
 					+ " Which one should get the credit hours?");
-				 * 
-				 */
+					 * 
+					 */
 
-				HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
-				this.userSpecifiedReqs = kept;
-				this.oldEnemyList = enemies;
+					HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
+					this.userSpecifiedReqs = kept;
+					this.oldEnemyList = enemies;
+				}
 			}
 		}
 		result.addAll(this.userSpecifiedReqs);
