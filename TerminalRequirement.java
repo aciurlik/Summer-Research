@@ -14,17 +14,18 @@ import java.util.Stack;
  * 
  *
  */
-public class TerminalRequirement extends Requirement {
+public class TerminalRequirement extends Requirement implements HasCreditHours {
 	public Prefix p;
 	public int min;
 	public int max;
-	
 	boolean usesMin;
 	boolean usesMax;
-	
-	
-	
-	
+	public static int defaultCreditHours =4;
+
+
+
+
+
 	public TerminalRequirement(Prefix p){
 		this.p = p;
 		this.usesMin = false;
@@ -37,16 +38,22 @@ public class TerminalRequirement extends Requirement {
 	public TerminalRequirement(Prefix p, int min, int max){
 		this(p);
 	}
-	
-	
-	
-	
+
+	public int getCreditHours(){
+		if(this.isExact()){
+			return CourseList.getCoursesCreditHours(p);
+		}
+		return defaultCreditHours;
+
+	}
+
 	/////////////////////
 	/////////////////////
 	///// Adding comparison pieces
 	/////////////////////
 	/////////////////////
-	
+
+
 	private void allNumbersLEQ(int max){
 		this.max = max+1;
 		this.usesMax = true;
@@ -63,7 +70,7 @@ public class TerminalRequirement extends Requirement {
 		this.min = min;
 		this.usesMin = true;
 	}
-	
+
 	public void addComparison(String comp, int num){
 		switch(comp){
 		case "<":
@@ -82,18 +89,18 @@ public class TerminalRequirement extends Requirement {
 			throw new RuntimeException("The string \"" + comp + "\" Isn't a valid comparison.");
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	/////////////////////
 	/////////////////////
 	///// Reading / saving
 	/////////////////////
 	/////////////////////
-	
-	
-	
+
+
+
 	/**
 	 * Takes a string of the form MTH-140 or MTH140 
 	 * 
@@ -139,11 +146,11 @@ public class TerminalRequirement extends Requirement {
 		}
 		return result;
 	}
-	
+
 	private static void parseException(String s, String message){
 		throw new RuntimeException("Issue parsing \"" + s + "\" :\n" + message);
 	}
-	
+
 	private static TerminalRequirement readFromInequality(String s){
 		// MTH > 200
 		// MTH < 400 > 100
@@ -164,10 +171,10 @@ public class TerminalRequirement extends Requirement {
 			result.addComparison(secondComp, secondNum);
 		}
 		return result;
-		
-		
+
+
 	}
-	
+
 	private static String parseComparison(Stack<String> tokens){
 		String comp = tokens.pop();
 		if(!comp.equals(">") && ! comp.equals("<")){
@@ -180,8 +187,8 @@ public class TerminalRequirement extends Requirement {
 		}
 		return comp;
 	}
-	
-	
+
+
 	public static Stack<String> tokenize(String s){
 		// MTH > 200
 		// MTH < 400 > 100
@@ -190,16 +197,16 @@ public class TerminalRequirement extends Requirement {
 		s = s.replaceAll("=", " = ");
 		s = s.replaceAll("<", " < ");
 		s = s.replaceAll(">", " > ");
-		
+
 		String[] split = s.split("\\s+");
 		Stack<String> result = new Stack<String>();
 		for(int i = split.length - 1; i >= 0 ; i --){
 			result.push(split[i]);
 		}
 		return result;
-		
+
 	}
-	
+
 	public String saveString(){
 		String result = "";
 		if((!usesMin) && (!usesMax)){
@@ -219,21 +226,21 @@ public class TerminalRequirement extends Requirement {
 		}
 		return result;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/////////////////////
 	/////////////////////
 	///// Methods overwritten to prevent infinite loops in requirement
@@ -252,20 +259,22 @@ public class TerminalRequirement extends Requirement {
 					return result;
 				}
 			}
-			if(e instanceof TerminalRequirement){
-				if(((TerminalRequirement)e).alsoCompletes(this)){
-					result --;
-					if(result <= 0){
-						return result;
+			if(e instanceof Requirement){
+				if(((Requirement) e).isTerminal()){
+					if(((Requirement) e).getTerminal().alsoCompletes(this)){
+						result --;
+						if(result <= 0){
+							return result;
+						}
 					}
 				}
 			}
 		}
 		return result;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Efficiently calculate whether this prefix counts towards
 	 * this terminal requirement at all.
@@ -296,13 +305,12 @@ public class TerminalRequirement extends Requirement {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-			//TODO instead of 4, make this accurate.
-			taken.add(new PrefixHours(this.p, 4));
+			taken.add(new PrefixHours(this.p, CourseList.getCoursesCreditHours(this.p)));
 			return r.isComplete(taken, false);
 		}
 		else{
@@ -323,9 +331,9 @@ public class TerminalRequirement extends Requirement {
 			//what if it's just a requirement?
 			return false;
 		}
-		
+
 	}
-	
+
 
 	/**
 	 * test whether this requirement uses min or max, or instead
@@ -335,28 +343,28 @@ public class TerminalRequirement extends Requirement {
 	public boolean isExact(){
 		return ((!usesMin) && (!usesMax));
 	}
-	
+
 	public boolean isSatisfiedBy(ArrayList<ScheduleElement> taken){
 		return minMoreNeeded(taken) <= 0;
 	}
 
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	/////////////////////
 	/////////////////////
 	///// Methods from ScheduleElement
 	/////////////////////
 	/////////////////////
-	
+
 	@Override
 	public Prefix getPrefix() {
 		return p;
 	}
-	
+
 	@Override
 	public String getDisplayString() {
 		return this.saveString();
@@ -365,15 +373,20 @@ public class TerminalRequirement extends Requirement {
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement t : r){
-			if(this.equals(t)){
+			if(t.isSatisfiedBy(this.getTerminal())){
+				result.add(t);
+
+			}
+		
+			else if(this.equals(t)){
 				result.add(t);
 			}
 		}
 		return result;
 	}
-	
-	
-	
+
+
+
 	@Override
 	public int compareTo(Requirement o) {
 		if(!(o instanceof TerminalRequirement)){
@@ -383,7 +396,7 @@ public class TerminalRequirement extends Requirement {
 		TerminalRequirement other = (TerminalRequirement)o;
 		return this.saveString().compareTo(other.saveString());
 	}
-	
+
 	@Override
 	public boolean isTerminal(){
 		return true;
@@ -392,15 +405,15 @@ public class TerminalRequirement extends Requirement {
 	public TerminalRequirement getTerminal(){
 		return this;
 	}
-	
 
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	public static void testTerminalRequirements(){
 		String[] test = { 
 				"MTH-150",
@@ -417,14 +430,14 @@ public class TerminalRequirement extends Requirement {
 				"MTH >= 150 <= 200",
 				"2 of MTH>100"
 		};
-		
+
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		taken.add(new PrefixHours(new Prefix("MTH", 150), 4));
 		//taken.add(new Prefix("MTH", 120));
 
 
 		double tol = Double.MIN_VALUE * 10000;
-		
+
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
 			boolean sat =  t.isSatisfiedBy(taken);
@@ -443,16 +456,16 @@ public class TerminalRequirement extends Requirement {
 			if(percent < 1.0-tol && minMore <= 0){
 				show = true;
 			}
-			
+
 			//show = true;
 			if(show){
-			System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
-					+ ",\t" +minMore + ",\t" + percent);
+				System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
+						+ ",\t" +minMore + ",\t" + percent);
 			}
 		}
 		System.out.println("Finished testing");
 	}
-	
+
 	//INFINITELOOPHAZARD
 	public boolean isCompletedBy(HashSet<TerminalRequirement> s){
 		if(s.contains(this)){
@@ -465,7 +478,7 @@ public class TerminalRequirement extends Requirement {
 		}
 		return false;
 	}
-	
+
 	public boolean completedBy(TerminalRequirement t){
 		if(this.isExact()){
 			return t.p.equals(this.p);
@@ -493,8 +506,8 @@ public class TerminalRequirement extends Requirement {
 		Interval<Integer> theirInterval = new Interval<Integer>(otherLeft, otherRight);
 		return theirInterval.contains(ourInterval);
 	}
-	
-	
+
+
 	//INFINITELOOPHAZARD
 	@Override
 	public boolean equals(Requirement r){
@@ -521,7 +534,7 @@ public class TerminalRequirement extends Requirement {
 		}
 		return (this.min == other.min && this.max == other.max);
 	}
-	
+
 	//INFINITELOOPHAZARD
 	@Override 
 	public int hashCode(){
@@ -536,8 +549,8 @@ public class TerminalRequirement extends Requirement {
 		}
 		return result;
 	}
-	
-	
+
+
 	public static void testTerminalsEquality(){
 		TerminalRequirement t = TerminalRequirement.readFrom("MTH-150");
 		TerminalRequirement x = TerminalRequirement.readFrom("MTH-150");
@@ -545,19 +558,19 @@ public class TerminalRequirement extends Requirement {
 		System.out.println(x.equals(t));
 		System.out.println(t.hashCode());
 		System.out.println(x.hashCode());
-		
+
 		HashSet<TerminalRequirement> set = new HashSet<TerminalRequirement>();
 		set.add(t);
 		set.add(x);
 		System.out.println(set.size());
 		System.out.println(set.contains(x));
 	}
-	
-	
-	
-	
+
+
+
+
 	public static void main(String[] args){
 		testTerminalsEquality();
 	}
-	
+
 }

@@ -271,8 +271,8 @@ public class Semester implements Comparable<Semester>{
 
 
 	public ArrayList<ScheduleCourse> getCoursesSatisfying(Requirement r){
-		ArrayList<Course> semesterCourses = this.schedule.masterList.getCoursesIn(this);
-		ArrayList<Course> finalCourse = this.schedule.masterList.onlyThoseSatisfying(semesterCourses, r);
+		ArrayList<Course> semesterCourses =CourseList.getCoursesIn(this);
+		ArrayList<Course> finalCourse = CourseList.onlyThoseSatisfying(semesterCourses, r);
 		ArrayList<ScheduleCourse> coursesSatisfying = new ArrayList<ScheduleCourse>();
 		for(Course c : finalCourse){
 			ScheduleCourse s = new ScheduleCourse(c, this.schedule);

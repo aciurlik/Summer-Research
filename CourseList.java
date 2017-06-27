@@ -37,24 +37,26 @@ public class CourseList  {
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 
-	private ArrayList<Course> listOfCourses = new ArrayList<Course>();
-	private Hashtable<Prefix, String> rawPrereqs;
-	private Hashtable<String, String> savedPrereqMeanings;
-	public Hashtable<String, HashSet<Prefix>> GERRequirements;
+	private static ArrayList<Course> listOfCourses = new ArrayList<Course>();
+	private static Hashtable<Prefix, String> rawPrereqs;
+	private static Hashtable<String, String> savedPrereqMeanings;
+	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
 
-
+	static{
+		readAll();
+	}
 
 	public static CourseList testList(){
 		return readAll();
 	}
 
 
-	public CourseList (){
-		this.listOfCourses = new ArrayList<Course>();
-		this.rawPrereqs = new Hashtable<Prefix, String>();
-		this.savedPrereqMeanings = new Hashtable<String, String>();
-		loadPrereqMeanings(this.prereqMeaningsFile);
-		this.GERRequirements = new Hashtable<String, HashSet<Prefix>>();
+	public CourseList(){
+		listOfCourses = new ArrayList<Course>();
+		rawPrereqs = new Hashtable<Prefix, String>();
+		savedPrereqMeanings = new Hashtable<String, String>();
+		loadPrereqMeanings(prereqMeaningsFile);
+		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 	}
 
 
@@ -81,21 +83,21 @@ public class CourseList  {
 	 * @param p
 	 * @return
 	 */
-	public Requirement getPrereqsShallow(Prefix p){
+	public static Requirement getPrereqsShallow(Prefix p){
 		if(p == null){
 			return null;
 		}
-		String originalRequirementString = this.rawPrereqs.get(p);
+		String originalRequirementString = rawPrereqs.get(p);
 		if(originalRequirementString == null){
 			return null;
 		}
-		String ourVersion = this.savedPrereqMeanings.get(originalRequirementString);
+		String ourVersion = savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){
 			//try to parse this requirement from the raw data
 			try{
 				Requirement r = Requirement.readFromFurmanPrereqs(originalRequirementString);
 				ourVersion = r.saveString();
-				this.addPrereqMeaning(originalRequirementString, ourVersion);
+				addPrereqMeaning(originalRequirementString, ourVersion);
 			}catch (Exception e){
 				//Handle special strings
 				// These will not be saved in savedPrereqMeanings.
@@ -151,14 +153,14 @@ public class CourseList  {
 	//  into valid, unambiguous requirement strings.
 	//
 
-	public boolean addRawPrereq(Course c, String prereqString){
-		this.rawPrereqs.put(c.getPrefix(), prereqString);
+	public static boolean addRawPrereq(Course c, String prereqString){
+		rawPrereqs.put(c.getPrefix(), prereqString);
 		return true;
 	}
 
 
 
-	public Requirement askUserToDefine(Prefix p, String originalRequirementString){
+	public static Requirement askUserToDefine(Prefix p, String originalRequirementString){
 		System.out.print("\nI need help here (" + p + "). Furman says it needs \n\t\""
 				+ originalRequirementString 
 				+"\"\n What does that requirement mean?\n>>>");
@@ -198,12 +200,12 @@ public class CourseList  {
 
 	}
 
-	public void addPrereqMeaning(String originalString, String ourMeaning){
+	public static void addPrereqMeaning(String originalString, String ourMeaning){
 		savedPrereqMeanings.put(originalString,ourMeaning);
-		savePrereqMeanings(this.prereqMeaningsFile);
+		savePrereqMeanings(prereqMeaningsFile);
 	}
 
-	public void loadPrereqMeanings(String fileName){
+	public static void loadPrereqMeanings(String fileName){
 		File f = new File(fileName);
 		if(!f.exists()){
 			try{
@@ -223,7 +225,7 @@ public class CourseList  {
 			e.printStackTrace();
 		}
 	}
-	public void savePrereqMeanings(String fileName){
+	public static void savePrereqMeanings(String fileName){
 		try{
 			FileOutputStream fos = new FileOutputStream(fileName, false); //overwrite, don't append.
 			ObjectOutputStream out = new ObjectOutputStream(fos);
@@ -248,22 +250,22 @@ public class CourseList  {
 	//////////////////////////////
 	//////////////////////////////
 
-	public boolean add(Course c){
+	public static boolean add(Course c){
 		return listOfCourses.add(c);
 	}
 
-	public void addAt(Course c, int i){
+	public static void addAt(Course c, int i){
 		listOfCourses.add(i, c);
 	}
 
-	public Course removeCourse(Course c){
+	public static Course removeCourse(Course c){
 
 		listOfCourses.remove(c);
 		return c;
 	}
 
 
-	public Course removeAtIndex(int i){
+	public static Course removeAtIndex(int i){
 
 		Course c = listOfCourses.remove(i);
 		return c;
@@ -283,7 +285,7 @@ public class CourseList  {
 	 * @param s
 	 * @return
 	 */
-	public ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
+	public static ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
 		ArrayList<Course> SemesterList = new ArrayList<Course>();
 
 		for(Course course : input){
@@ -295,12 +297,12 @@ public class CourseList  {
 		return SemesterList;
 	}
 
-	public  ArrayList<Course> getCoursesIn(Semester s){
+	public static  ArrayList<Course> getCoursesIn(Semester s){
 		ArrayList<Course> result =  onlyThoseIn(listOfCourses,s);
 		return result;
 	}
 
-	public ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
+	public static ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c : input){
 			if(r.isSatisfiedBy(c.getPrefix())){
@@ -309,10 +311,27 @@ public class CourseList  {
 		}
 		return result;
 	}
-	public  ArrayList<Course> getCoursesSatisfying(Requirement r){
-		return onlyThoseSatisfying(this.listOfCourses,r);
+	public  static ArrayList<Course> getCoursesSatisfying(Requirement r){
+		return onlyThoseSatisfying(listOfCourses,r);
 	}
-
+	
+	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
+		ArrayList<Course> result = new ArrayList<Course>();
+		for(Course c: input){
+			if(c.getPrefix().equals(p)){
+				result.add(c);
+			}
+		}
+		return result;
+	}
+	
+	public static ArrayList<Course> getCoursesSatisfying(Prefix p){
+		return onlyThoseSatisfyingPrefix(listOfCourses, p);
+	}
+	
+	public static int getCoursesCreditHours(Prefix p){
+		return getCoursesSatisfying(p).get(0).creditHours;
+	}
 
 
 
@@ -365,10 +384,8 @@ public class CourseList  {
 	 * @param MajorType
 	 * @return
 	 */
-	public Major getGERMajor(Prefix forignLang,int majorType){
+	public static Major getGERMajor(Prefix forignLang,int majorType){
 		Major m = new Major("GER");
-
-
 		outerloop:
 			for(String key : GERRequirements.keySet()){
 				//Special cases first, then default behavior.
@@ -523,7 +540,7 @@ public class CourseList  {
 		return m;
 	}
 
-	public Requirement FYWRequirement(){
+	public static Requirement FYWRequirement(){
 		Requirement result = new Requirement();
 		result.addRequirement(TerminalRequirement.readFrom("FYW>0"));
 		result.setName("FYW");
@@ -537,11 +554,11 @@ public class CourseList  {
 	 * @param GERs
 	 * @param c
 	 */
-	public void setCourseSatisfiesGER(String GERs, Course c){
+	public static void setCourseSatisfiesGER(String GERs, Course c){
 		String[] allGERs = GERs.trim().split(" ");
 
 		for(String s : allGERs){
-			HashSet<Prefix> old = this.GERRequirements.get(s);
+			HashSet<Prefix> old = GERRequirements.get(s);
 			if(old == null){
 				old = new HashSet<Prefix>();
 				GERRequirements.put(s, old);
@@ -553,7 +570,7 @@ public class CourseList  {
 
 
 
-	public Requirement FLRequirement(Prefix p, int degreeType){
+	public static Requirement FLRequirement(Prefix p, int degreeType){
 		int standard=0;
 		Requirement	r= new Requirement();
 		r.setName("FL");
@@ -627,7 +644,7 @@ public class CourseList  {
 	}
 
 
-	public void addCoursesIn(File furmanCoursesFile){
+	public static void addCoursesIn(File furmanCoursesFile){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
 		Course duplicateCourse =null;
@@ -649,7 +666,7 @@ public class CourseList  {
 					//If it's a new course, make a new one.
 					lastSectionNumber = sectionNumber;
 					if(lastCourse != null){
-						this.add(lastCourse);
+						add(lastCourse);
 					}
 					lastCourse = Course.readFromFurmanData(data);
 					if(data.get(0).contains("Summer")){
@@ -660,7 +677,7 @@ public class CourseList  {
 
 
 
-									this.add(duplicateCourse);	
+									add(duplicateCourse);	
 								}
 								duplicateCourse=newDuplicateCourse;
 							}
@@ -675,7 +692,7 @@ public class CourseList  {
 					}
 					String prerequsitesString = data.get(16);
 					if(!prerequsitesString.equals("")){
-						this.addRawPrereq(lastCourse, prerequsitesString.trim());
+						addRawPrereq(lastCourse, prerequsitesString.trim());
 					}
 				}
 				//If this isn't a new course, then it's either a lab or an exam.
@@ -701,11 +718,11 @@ public class CourseList  {
 			}
 			br.close();
 			if(lastCourse != null){
-				this.add(lastCourse);
+				add(lastCourse);
 
 			}
 			if(duplicateCourse != null){
-				this.add(duplicateCourse);
+				add(duplicateCourse);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -718,7 +735,7 @@ public class CourseList  {
 	 * TODO Doesn't catch requirements that auto-read from strings of the form
 	 * "MTH-110, MTH-220".
 	 */
-	public void viewKnownPrereqs(){
+	public static void viewKnownPrereqs(){
 		for(Prefix key : rawPrereqs.keySet()){
 			String theirs = rawPrereqs.get(key);
 			String ours  = savedPrereqMeanings.get(theirs);
@@ -733,12 +750,12 @@ public class CourseList  {
 		}
 	}
 
-	public void addToPrereqMeanings(){
+	public static void addToPrereqMeanings(){
 		for(Prefix p : rawPrereqs.keySet()){
 			Requirement r = getPrereqsShallow(p);
 		}
 	}
-	public ArrayList<String> allUnknownPrereqs(){
+	public static ArrayList<String> allUnknownPrereqs(){
 		ArrayList<String> result = new ArrayList<String>();
 		for(Prefix p : rawPrereqs.keySet()){
 			String originalString = rawPrereqs.get(p);

@@ -135,6 +135,13 @@ public class SemesterDate {
 
 	}
 	
+
+public String toString(){
+	String result = "";
+	result= result +this.getSeason(sNumber)+ ",  " + this.year;
+	return result;
+}
+	
  @Override 
  public boolean equals(Object other){
 	 if(!(other instanceof SemesterDate)){

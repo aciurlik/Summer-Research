@@ -299,10 +299,12 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		if(sem.semesterDate.sNumber==SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO){
 			normalNumberofClasses = 2;
 		}
+		
+		
 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 
-		if(sem.semesterDate.sNumber != SemesterDate.MAYX ){
+		if(sem.semesterDate.sNumber != SemesterDate.MAYX && !sem.taken){
 
 			defaultPanel.add(dropLabel);
 			for (int i= 0; i<DropsNeeded-1; i++){

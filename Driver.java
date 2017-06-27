@@ -104,9 +104,9 @@ public class Driver{
 	 * Create a new, blank schedule to work from.
 	 */
 	public void GUINewSchedule() {
-		CourseList l = sch.masterList;
+		//CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		Schedule current = new Schedule(l);
+		Schedule current = new Schedule();
 		this.b.setSchedule(current);
 		//TODO make sure nothing else needs to be set
 		setSchedule(current);

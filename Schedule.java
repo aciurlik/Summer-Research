@@ -19,6 +19,11 @@ public class Schedule {
 	private SemesterDate firstSemester;
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
+	private String name;
+
+
+
+
 
 
 	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
@@ -32,8 +37,8 @@ public class Schedule {
 
 
 	public static Schedule testSchedule(){
-		CourseList l = CourseList.testList();
-		Schedule result = new Schedule(l);
+	//	CourseList l = CourseList.testList();
+		Schedule result = new Schedule();
 		result.readFromPrior();
 		return result;
 	}
@@ -47,12 +52,12 @@ public class Schedule {
 	 * @param firstYear
 	 * @param currentSemester
 	 */
-	public Schedule(CourseList masterList){
+	public Schedule(){
 
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Requirement>();
-		this.masterList = masterList;
+		//this.masterList = masterList;
 
 
 		readFromPrior(); //loads first semester and current semester, among others.
@@ -210,7 +215,7 @@ public class Schedule {
 			return false;
 		}
 		if(sem.add(element)){
-			//updateRequirementsSatisfied(element);
+			updateRequirementsSatisfied(element);
 			updatePrereqs();
 			updateReqs();
 			return true;
@@ -531,7 +536,7 @@ public class Schedule {
 		if(type == -1){
 			type = CourseList.BA;
 		}
-		this.GER = masterList.getGERMajor(languagePrefix, type);
+		this.GER =CourseList.getGERMajor(languagePrefix, type);
 		updateTotalCoursesNeeded();
 	}
 
@@ -593,7 +598,7 @@ public class Schedule {
 			}
 			for (ScheduleElement e : s.getElements()){
 				inSemester.add(e);
-				Requirement needed = masterList.getPrereqsShallow(e.getPrefix());
+				Requirement needed = CourseList.getPrereqsShallow(e.getPrefix());
 				if(needed != null){
 					boolean complete = needed.isComplete(taken, true);
 					if(!complete){
@@ -646,7 +651,7 @@ public class Schedule {
 			if(this.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(elementsTakenIn(sD));
 			}
-			Requirement needed = masterList.getPrereqsShallow(p);
+			Requirement needed = CourseList.getPrereqsShallow(p);
 			if(needed != null){
 				needed.updateAllStoredValues(taken);
 			}
@@ -727,7 +732,7 @@ public class Schedule {
 			// we satisfied one of that element's prereqs.
 			HashSet<Prefix> elementsThatUsedTheMovingElement = new HashSet<Prefix>();
 			for(ScheduleElement p : intersection){
-				Requirement r = masterList.getPrereqsShallow(p.getPrefix());
+				Requirement r = CourseList.getPrereqsShallow(p.getPrefix());
 				if(r != null && r.isSatisfiedBy(newE)){
 					elementsThatUsedTheMovingElement.add(p.getPrefix());
 				}
@@ -975,6 +980,7 @@ public class Schedule {
 				satisficers.add(e);
 			}
 		}
+
 		r.updateAllStoredValues(satisficers);
 	}
 
@@ -1028,7 +1034,7 @@ public class Schedule {
 	 * 
 	 * @param e
 	 */
-	/*public void updateRequirementsSatisfied(ScheduleElement e){
+	public void updateRequirementsSatisfied(ScheduleElement e){
 		if(e instanceof Course){
 			updateRequirementsSatisfied((Course) e);
 		}
@@ -1061,7 +1067,7 @@ public class Schedule {
 			}
 		}
 	}
-*/
+
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
 		return !RequirementGraph.doesPlayNice(r1, r2);
 	}
@@ -1093,7 +1099,7 @@ public class Schedule {
 	public void updatePrereqs(){
 		prereqs = new HashSet<Requirement>();
 		for(ScheduleElement e : getAllElements()){
-			Requirement r = masterList.getPrereqsShallow(e.getPrefix());
+			Requirement r = CourseList.getPrereqsShallow(e.getPrefix());
 			if(r != null){
 				prereqs.add(r);
 			}
@@ -1205,7 +1211,7 @@ public class Schedule {
 
 
 	public ArrayList<ScheduleCourse> getCoursesInSemester(Semester s) {
-		ArrayList<Course> toFinal = this.masterList.getCoursesIn(s);
+		ArrayList<Course> toFinal = CourseList.getCoursesIn(s);
 		ArrayList<ScheduleCourse> scheduleCoursesInSemester = new ArrayList<ScheduleCourse>();
 		for(Course c: toFinal){
 			ScheduleCourse sc = new ScheduleCourse(c, this);
@@ -1217,8 +1223,29 @@ public class Schedule {
 
 
 
+	public String printString(){
+		StringBuilder result = new StringBuilder();
+		result.append(name + "\n");
+		for(Semester s: this.semesters){
+			result.append(s.semesterDate.toString() + "\n");
+			
+			
+		}
+		
+		return result.toString();
+		
+		
+	}
+
+	
+	public String getName() {
+		return name;
+	}
 
 
+	public void setName(String name) {
+		this.name = name;
+	}
 
-
+	
 }
