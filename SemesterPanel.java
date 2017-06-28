@@ -32,10 +32,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
-public class SemesterPanel extends JPanel implements ActionListener, DocumentListener, MouseListener{
+public class SemesterPanel extends JPanel implements ActionListener, DocumentListener, MouseListener, java.io.Serializable{
 
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int classCounter = 0;
 	private int requirementNumber=0;
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button

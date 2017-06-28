@@ -8,7 +8,11 @@ import java.util.Scanner;
 
 
 
-public class Major {
+public class Major implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String name;
 	int groupNumber;
 	ArrayList<Requirement> reqList;

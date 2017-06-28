@@ -20,7 +20,11 @@ import javax.swing.JScrollPane;
 
 
 
-public class SchedulePanel extends JPanel implements ActionListener{
+public class SchedulePanel extends JPanel implements ActionListener, java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 
 	 */

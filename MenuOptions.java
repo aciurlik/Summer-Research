@@ -7,7 +7,11 @@ import javax.swing.JButton;
 
 
 
-public class MenuOptions {
+public class MenuOptions implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Both Additions and Menu
 	public static final  String addMajor = "Add Major";
 	public static final  String addMinor = "Add Minor";

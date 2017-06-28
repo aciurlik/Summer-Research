@@ -1,6 +1,8 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
@@ -25,7 +27,11 @@ import javax.swing.JList;
 
 
 
-public class MainMenuBar extends JMenuBar implements ActionListener {
+public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	JTextArea output;
 	JScrollPane scrollPane;
 	Driver d;
@@ -133,8 +139,21 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		
 		
 		
+		menuItem = new JMenuItem("Save Schedule");
+		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
+		menuItem.addActionListener(this);
+		saveSched.add(menuItem);
+		menu.add(menuItem);
 		
-	
+		
+		
+		menuItem = new JMenuItem("Print Schedule");
+		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
+		menuItem.addActionListener(this);
+		printSched.add(menuItem);
+		menu.add(menuItem);
+		
+		
 		
 		menuItem = new JMenuItem("Check all Errors");
 		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
@@ -245,20 +264,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			System.out.println("Watch me open this bad boy");
 		}
 		if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
-			System.out.println("Watch me save this bad boy");
+			d.GUISaveSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.printSchedule)){
-			System.out.println("Watch me print this bad boy");
+		
+				d.GUIPrintSchedule();
 		}
+		
 		if(e.getActionCommand().equals(MenuOptions.help)){
 			System.out.println("HElp yourself");
 		}
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			d.GUICheckAllErrors();
+			d.GUICheckAllErrors(true);
 		}
 	}
 
 
-}
+	}
 
 

@@ -4,10 +4,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class Course implements HasCreditHours{
+public class Course implements HasCreditHours, java.io.Serializable{
 
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected int creditHours;
 	protected Prefix coursePrefix;
 	protected String sectionNumber; //was originally an int, but for courses like

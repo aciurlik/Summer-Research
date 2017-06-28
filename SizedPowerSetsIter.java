@@ -3,7 +3,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 
-public class SizedPowerSetsIter<T> implements Iterator {
+public class SizedPowerSetsIter<T> implements Iterator, java.io.Serializable {
 	ArrayList<T> data;
 	ArrayList<Integer> currentSubset;
 	public SizedPowerSetsIter(Iterable<T> input, int size){

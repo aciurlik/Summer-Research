@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 
-public class Semester implements Comparable<Semester>{
+public class Semester implements Comparable<Semester>, java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public SemesterDate semesterDate;
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;

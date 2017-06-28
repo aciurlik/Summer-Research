@@ -2,9 +2,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.StringJoiner;
 
 
-public class Schedule {
+public class Schedule implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Major> majorsList;
 	private ArrayList<Semester> semesters;
 	public HashSet<Requirement> prereqs;
@@ -15,7 +20,7 @@ public class Schedule {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
-	
+
 	private SemesterDate firstSemester;
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
@@ -37,7 +42,7 @@ public class Schedule {
 
 
 	public static Schedule testSchedule(){
-	//	CourseList l = CourseList.testList();
+		//	CourseList l = CourseList.testList();
 		Schedule result = new Schedule();
 		result.readFromPrior();
 		return result;
@@ -86,13 +91,13 @@ public class Schedule {
 	public void setDriver(Driver d){
 		this.d = d;
 	}
-	
+
 
 	public void readFromPrior(){
 		//readFromTestPrior();
 		readBlankTestPrior();
 	}
-	
+
 	public void readBlankTestPrior(){
 		if(defaultFirstSemester!= null){
 			firstSemester = defaultFirstSemester;
@@ -101,11 +106,11 @@ public class Schedule {
 			firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
 		}
 	}
-	
+
 	public void readFromTestPrior(){
 		readBlankTestPrior();
-		
-		
+
+
 		this.setLanguagePrefix(new Prefix("SPN", "115"));
 
 		//Class One 
@@ -134,13 +139,13 @@ public class Schedule {
 
 		this.setCLP(10);
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -215,7 +220,7 @@ public class Schedule {
 			return false;
 		}
 		if(sem.add(element)){
-			updateRequirementsSatisfied(element);
+			//updateRequirementsSatisfied(element);
 			updatePrereqs();
 			updateReqs();
 			return true;
@@ -225,7 +230,7 @@ public class Schedule {
 	}
 
 
-	
+
 	/**
 	 * Replace the old element with new element.
 	 * Assumes that oldSemester contains oldElement and
@@ -241,7 +246,7 @@ public class Schedule {
 
 			return false;
 		}
-		
+
 		//Perform the addition and removal
 		if(!oldSemester.remove(oldElement)){
 			System.out.println("Replace didn't work");
@@ -456,7 +461,7 @@ public class Schedule {
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
-		
+
 		result.addAll(prereqs);
 		result.addAll(GER.reqList);
 		return result;
@@ -634,7 +639,7 @@ public class Schedule {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Find the prereqs needed for this prefix if taken at the given
 	 * time.
@@ -699,7 +704,7 @@ public class Schedule {
 			// we might no longer satisfy its prereqs.
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
-				
+
 				if(stillNeeded != null && !stillNeeded.storedIsComplete()){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
@@ -715,7 +720,7 @@ public class Schedule {
 			//The only courses that need to be checked are those in between the new position and
 			//the old position of the moving course, this is because any other course 
 			//has already had an error thrown, and therefore has been checked by the user. 
-			
+
 			//prefixes between oldSem and newSem.
 			// In the following code, new refers to the new location for the element, and 
 			// to the semester who's date comes later. (2020 is new, 2018 is old).
@@ -727,7 +732,7 @@ public class Schedule {
 			}
 			afterOld.retainAll(beforeNew);
 			ArrayList<ScheduleElement> intersection = afterOld;
-			
+
 			//for each element we're jumping over, check if
 			// we satisfied one of that element's prereqs.
 			HashSet<Prefix> elementsThatUsedTheMovingElement = new HashSet<Prefix>();
@@ -960,7 +965,7 @@ public class Schedule {
 	 */
 	public void checkUpdateReqs(){
 		/*if(!reqsValid){*/
-			updateReqs();
+		updateReqs();
 		//}
 	}
 
@@ -1223,21 +1228,85 @@ public class Schedule {
 
 
 
-	public String printString(){
+	public String printScheduleString(){
 		StringBuilder result = new StringBuilder();
-		result.append(name + "\n");
-		for(Semester s: this.semesters){
-			result.append(s.semesterDate.toString() + "\n");
-			
-			
+		result.append("Schedule Layout \n");
+		//Add Majors
+		if(!this.majorsList.isEmpty()){
+			result.append("MAJORS: ");
 		}
-		
+		StringJoiner comma = new StringJoiner(", ");
+		for(Major m: this.majorsList){
+			comma.add(m.name);
+
+		}
+		result.append(comma);
+		result.append("\n");
+		//Adds all the scheduleElements from each major
+		for(Semester s: this.getAllSemesters()){
+			if(s.isAP){
+				result.append("Prior Courses:" + "\n");
+			}
+			else{
+				result.append(s.semesterDate.toString() + ": \n");
+			}
+			for(ScheduleElement se : s.elements){
+				result.append(se.getDisplayString() + "\n");
+			}
+
+		}
+		//If any Errors Prints them 
+		if(!d.GUICheckAllErrors(false).equals("")){
+			result.append("Scheduling Errors: \n" + d.GUICheckAllErrors(false));
+		}
+		//Things left CLPS, Estimated Courses Left, CrditHours
+		result.append("The Final Countdown:  \n");
+		result.append("CLPs Left: " + Math.max(0, 32 - this.getCLP()) + "\n");
+		result.append("Estimated Courses Left: " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
+		result.append("Credit Hours Left: " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
+
+
+		System.out.println(result);
 		return result.toString();
-		
-		
+
+
+
+
 	}
 
-	
+
+
+	public String printRequirementString(){
+		StringBuilder result = new StringBuilder();
+		result.append("Requirement Layout \n");
+		for(Requirement r: this.GER.reqList){
+			result.append(r.getDisplayString() + " Number of Courses Left "  +   r.minMoreNeeded(getAllElements(), false) + "\n");
+			for(ScheduleElement se: this.getAllElements()){
+				if(r.isSatisfiedBy(se)){
+					result.append(se.getDisplayString() + " satisfies " + r.getDisplayString() + "\n");
+				}
+			}
+
+		}
+		for(Major m: this.majorsList){
+			result.append(m.name + "\n");
+			for(Requirement r: m.reqList){
+				result.append(r.getDisplayString() + " Number of Courses Left "  +   r.minMoreNeeded(getAllElements(), false) + "\n");
+				for(ScheduleElement se: this.getAllElements()){
+					if(r.isSatisfiedBy(se)){
+						result.append(se.getDisplayString() + " satisfies " + r.getDisplayString() + "\n");
+					}
+				}
+			}
+
+		}
+
+		System.out.println(result);
+		return result.toString();
+
+	}
+
+
 	public String getName() {
 		return name;
 	}
@@ -1247,5 +1316,5 @@ public class Schedule {
 		this.name = name;
 	}
 
-	
+
 }

@@ -2,7 +2,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ScheduleCourse implements ScheduleElement, HasCreditHours{
+public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Course c;
 	public boolean taken;
 	HashSet<Requirement> userSpecifiedReqs; //when enemy list is not empty, this list specifies which reqs the user chose to satisfy
@@ -93,19 +97,41 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours{
 				this.oldEnemyList = enemies;
 			}
 			else{
-				//the enemies changed. TODO
-				//ask the user which requirements should now be satisfied by this course.
-				//sch.conflictingRequirements(this
-				/**
-				 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n"
-					+ enemies.toString() + "\n"
-					+ " Which one should get the credit hours?");
-				 * 
-				 */
+				//the enemies changed. 
+				//If some of the enemies are already scheduled, just use those. 
+				HashSet<Requirement> scheduledRequirements = new HashSet<Requirement>(); 
+				for(ScheduleElement e : s.getAllElements()){ 
+					if(e instanceof Requirement){ 
+						scheduledRequirements.add((Requirement)e); 
 
-				HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c);
-				this.userSpecifiedReqs = kept;
-				this.oldEnemyList = enemies;
+					} 
+
+				} 
+
+				scheduledRequirements.retainAll(enemies); 
+
+				if(!scheduledRequirements.isEmpty()){ 
+
+					this.userSpecifiedReqs = scheduledRequirements; 
+
+					this.oldEnemyList = enemies; 
+
+				} 
+
+				else{ 
+					//If none of the enemies are scheduled,  
+					//ask the user which requirements should now be satisfied by this course.
+					//sch.conflictingRequirements(this 
+					/**
+					 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n" 
+				 	+ enemies.toString() + "\n" 
+				 	" Which one should get the credit hours?"); 
+					 */
+					HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c); 
+					this.userSpecifiedReqs = kept; 
+					this.oldEnemyList = enemies; 
+
+				}
 			}
 		}
 		result.addAll(this.userSpecifiedReqs);

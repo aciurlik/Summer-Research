@@ -8,7 +8,7 @@
  * @author dannyrivers
  *
  */
-public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>>{
+public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>>, java.io.Serializable{
 	T start;
 	T end;
 
