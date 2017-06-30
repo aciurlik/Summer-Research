@@ -224,4 +224,6 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		return false;	
 	}
 
+
+
 }

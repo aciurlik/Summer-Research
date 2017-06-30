@@ -15,7 +15,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	public Schedule schedule;
 	private int OverloadLimit;
 	public boolean hasNotes = false;
-	public String notes = "";
+	String notes = "";
 	boolean isAP = false;
 	public boolean studyAway = false;
 	protected boolean lastSemester = false;

@@ -40,6 +40,7 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String showSemester = "+";
 	
 	public static final String resourcesFolder = "Resources" + File.separator;
+	public static final String savedScheduleFolder = MenuOptions.resourcesFolder + "SavedSchedule" + File.separator;
 	
 	
 	

@@ -113,11 +113,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menu.add(menuItem);
 		
 		/**
-		 * menuItem = new JMenuItem(MenuOptions.openSchedule);
-		JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
-		menuItem.addActionListener(this);
-		openSched.add(menuItem);
-		menu.add(menuItem);
+		 *
 		 * 
 		 * 
 		 * 
@@ -136,6 +132,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		saveSched.add(menuItem);
 		menu.add(menuItem);
 		 */
+		
+		
+		 menuItem = new JMenuItem(MenuOptions.openSchedule);
+			JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
+			menuItem.addActionListener(this);
+			openSched.add(menuItem);
+			menu.add(menuItem);
 		
 		
 		
@@ -261,7 +264,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			d.GUINewSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.openSchedule)){
-			System.out.println("Watch me open this bad boy");
+			d.openSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
 			d.GUISaveSchedule();
