@@ -15,7 +15,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
-public class MajorPanel extends JPanel {
+public class MajorPanel extends JPanel implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public  Major major;
 	public Driver d;
 

@@ -2,27 +2,31 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 
-public class PrefixHours implements ScheduleElement, HasCreditHours{
+public class PrefixHours implements ScheduleElement, HasCreditHours, java.io.Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int creditHours;
 	Prefix p;
 	public PrefixHours(Prefix p, int creditHours){
 		this.p = p;
 		this.creditHours = creditHours;
 	}
-	
-	
+
+
 	@Override
 	public int getCreditHours(){
 		return creditHours;
 	}
-	
-	
+
+
 	public String toString(){
 		return p.toString() + ", " + creditHours + " hours";
 	}
-	
-	
+
+
 	@Override
 	public Prefix getPrefix() {
 		return p;
@@ -38,7 +42,13 @@ public class PrefixHours implements ScheduleElement, HasCreditHours{
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(
 			ArrayList<Requirement> loaded) {
-		return null;
+		ArrayList<Requirement> result = new ArrayList<Requirement>(); 
+		for(Requirement r : loaded){ 
+			if(r.isSatisfiedBy(this.p)){ 
+				result.add(r); 
+			} 
+		} 
+		return result; 
 	}
 
 

@@ -7,7 +7,11 @@ import java.util.Iterator;
 import java.util.Stack;
 
 
-public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours{
+public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours,  java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
 	// If this is a "2 of these choices" requirement, then numToChoose
@@ -19,6 +23,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	private int originalCoursesNeeded;
 	private int storedCoursesLeft;
 	public static int defaultCreditHours =4;
+	public SemesterDate scheduledSemester = null;
+
+
 
 	boolean allCompletionSetsCalculated=false;
 	HashSet<HashSet<TerminalRequirement>> allCompletionSets;
@@ -705,7 +712,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
+	
+	public SemesterDate getScheduledSemester() {
+		return scheduledSemester;
+	}
 
+
+	public void setScheduledSemester(SemesterDate scheduledSemester) {
+		this.scheduledSemester = scheduledSemester;
+	}
 
 
 
@@ -1094,6 +1109,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		System.out.println("Finished testing");
 	}
+
+
+	
 
 
 	public static void main(String[] args){

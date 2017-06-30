@@ -6,7 +6,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class BellTower extends JPanel{
+public class BellTower extends JPanel implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Schedule sch;
 	JPanel overlap ;
 	ImageIcon icon ;
@@ -67,7 +71,7 @@ public class BellTower extends JPanel{
 				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
 			}
 			else{
-				sch.d.GUICheckAllErrors();
+				sch.d.GUICheckAllErrors(true);
 			}
 		}
 	}

@@ -23,7 +23,11 @@ import java.util.Scanner;
  *
  */
 
-public class CourseList  {
+public class CourseList implements java.io.Serializable  {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
 	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
 	//added, the one with the higer degree Type value will dictate the GER list

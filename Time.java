@@ -7,9 +7,13 @@ import java.util.regex.Pattern;
  * @author dannyrivers
  *
  */
-public class Time implements Comparable<Time>{
+public class Time implements Comparable<Time>, java.io.Serializable{
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final int SUNDAY = 0;
 	public static final int MONDAY = 1;
 	public static final int TUESDAY = 2;

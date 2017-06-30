@@ -3,7 +3,7 @@ import java.util.regex.Pattern;
 
 
 
-public class SemesterDate {
+public class SemesterDate implements java.io.Serializable {
 	public static final int SPRING = 1;
 	public static final int FALL = 5;
 	public static final int SUMMERONE = 3;

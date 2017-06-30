@@ -17,7 +17,7 @@ import java.util.Hashtable;
  * @author dannyrivers
  *
  */
-public class RequirementGraph {
+public class RequirementGraph implements java.io.Serializable {
 	//We will use the edge list format for storing this graph, because
 	// it will probably be sparse.
 	static Hashtable<Requirement, HashSet<Requirement>> edges = new Hashtable<Requirement, HashSet<Requirement>>();

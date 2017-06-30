@@ -149,7 +149,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			d.GUICheckAllErrors();
+			d.GUICheckAllErrors(true);
 		}
 	}
 	

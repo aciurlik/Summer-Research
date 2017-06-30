@@ -1,6 +1,10 @@
 import java.util.HashSet;
 
-public class ScheduleError {
+public class ScheduleError implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String error; 
 	ScheduleElement[] elementList;
 	Prefix offendingPrefix;

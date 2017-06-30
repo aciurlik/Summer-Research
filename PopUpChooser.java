@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  * 
  *
  */
-public class PopUpChooser {
+public class PopUpChooser implements java.io.Serializable {
 	JList <Major> addList;
 	Driver d;
 	Schedule s;

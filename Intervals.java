@@ -2,8 +2,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class Intervals<T extends Comparable<T>> {
+public class Intervals<T extends Comparable<T>> implements java.io.Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	ArrayList<Interval<T>> intervals;
 
 	public Intervals(){

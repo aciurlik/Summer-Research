@@ -13,7 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class SupriseMe extends JPanel implements ActionListener, Runnable {
+public class SupriseMe extends JPanel implements ActionListener, Runnable, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Driver d;
 	Course c;
 	Semester s;
@@ -41,6 +45,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable {
 
 
 		ArrayList<Course> getReady =CourseList.getCoursesIn(s);
+
 		if(getReady.size()==0){
 			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 			JOptionPane.showMessageDialog(frame, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );

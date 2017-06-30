@@ -19,7 +19,11 @@ import javax.swing.JPanel;
 
 
 
-public class ScheduleElementPanel extends JPanel {
+public class ScheduleElementPanel extends JPanel implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int updateCount = 0;
 	private ScheduleElement s;
 	public SemesterPanel container;

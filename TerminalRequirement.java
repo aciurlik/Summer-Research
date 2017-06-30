@@ -14,7 +14,11 @@ import java.util.Stack;
  * 
  *
  */
-public class TerminalRequirement extends Requirement implements HasCreditHours {
+public class TerminalRequirement extends Requirement implements HasCreditHours, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public Prefix p;
 	public int min;
 	public int max;

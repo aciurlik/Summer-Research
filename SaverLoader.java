@@ -10,7 +10,13 @@ import java.util.Iterator;
  * As soon as we transfer all stored majors over into the new format, 
  * this class should be deleted.
  */
-public class SaverLoader {
+public class SaverLoader implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * Will create a string of the form

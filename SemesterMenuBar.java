@@ -11,9 +11,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class SemesterMenuBar extends JMenuBar implements ActionListener{
+public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io.Serializable{
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	SemesterPanel semPanel;
 
 

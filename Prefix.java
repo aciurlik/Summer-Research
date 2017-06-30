@@ -5,7 +5,11 @@
  * @author dannyrivers
  *
  */
-public class Prefix implements Comparable<Prefix>{
+public class Prefix implements Comparable<Prefix>, java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String subject;
 	private String courseNumber; //Became a string when we found a few strange courses.
 

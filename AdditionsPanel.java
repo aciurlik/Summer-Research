@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
-public class AdditionsPanel extends JPanel implements ActionListener{
+public class AdditionsPanel extends JPanel implements ActionListener, java.io.Serializable{
 	/**
 	 * 
 	 */

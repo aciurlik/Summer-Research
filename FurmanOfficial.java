@@ -9,7 +9,11 @@ import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
-public class FurmanOfficial {
+public class FurmanOfficial implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final Color lightPurple = new Color(76,42,135);
 	public static final int[] lightPurpleRGB = {76, 42, 135};
 	public static final Color darkPurple = new Color(62,24,94);

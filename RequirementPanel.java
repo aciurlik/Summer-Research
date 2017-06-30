@@ -21,7 +21,11 @@ import javax.swing.border.BevelBorder;
  * @author dannyrivers
  *
  */
-public class RequirementPanel extends JPanel {
+public class RequirementPanel extends JPanel implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public Requirement req;
 	public Driver d;
 	int percentComplete;

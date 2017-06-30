@@ -1,11 +1,33 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -16,12 +38,18 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
 
-public class Driver{ 
+public class Driver implements java.io.Serializable{ 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Schedule sch;
 	static Schedule testSchedule;
 	SchedulePanel schP;
@@ -41,6 +69,7 @@ public class Driver{
 	ScheduleElement beingDragged;
 	ListOfMajors l;
 	BellTower b;
+	PrintWriter pW;
 
 	public static Driver testDriver(){
 		testSchedule = Schedule.testSchedule();
@@ -53,7 +82,7 @@ public class Driver{
 
 
 	public Driver(Schedule sch) {
-		
+
 
 		popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
@@ -499,7 +528,7 @@ public class Driver{
 						while(length < 10){
 							reqsString += " ";
 							length ++;
- 						}
+						}
 					}
 					reqsFulfilled ++;
 				}
@@ -592,7 +621,7 @@ public class Driver{
 		this.update();
 
 	}
-	
+
 	/**
 	 * Given these objects, and this list of strings,
 	 * let the user pick one  
@@ -616,7 +645,7 @@ public class Driver{
 		}
 		return chosenIndex;
 	}
-	
+
 	public static SemesterDate GUIChooseStartTime(ArrayList<SemesterDate> semesters){
 		ArrayList<String> semesterStrings = new ArrayList<String>();
 		ArrayList<Object> semesterObjects = new ArrayList<Object>();
@@ -674,7 +703,7 @@ public class Driver{
 
 				header = "Prerequisites Error";
 				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
-				
+
 
 			}catch(Exception e){
 				e.printStackTrace();
@@ -696,10 +725,12 @@ public class Driver{
 
 
 
-	public void GUICheckAllErrors() {
+	public String GUICheckAllErrors(boolean displayPopUp) {
+		boolean hasErrors = false;
 		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
 		String result = new String();
 		if(!allErrors.isEmpty()){
+			hasErrors=true;
 			for(ScheduleError s : allErrors){
 				if(s.error.equals(ScheduleError.overlapError)){
 					result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
@@ -717,10 +748,12 @@ public class Driver{
 			if(result.length() < 2){
 				result = "Your Schedule had no errors! You're a pretty savy scheduler";
 			}
-			JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+			if(displayPopUp)
+				JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
 		else{
-			JOptionPane.showMessageDialog(popUP, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+			if(displayPopUp)
+				JOptionPane.showMessageDialog(popUP, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
 		String majorNotes = "";
 		boolean hasNotes = false;
@@ -732,9 +765,16 @@ public class Driver{
 			}
 		}
 
-		if(hasNotes){
+		if(hasNotes && displayPopUp){
 			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
+		if(hasErrors){
+			return result;
+		}
+		else{
+			return "";
+		}
+
 	}
 
 
@@ -785,7 +825,7 @@ public class Driver{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		
+
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
 		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
@@ -793,7 +833,7 @@ public class Driver{
 		supportedSemesters.add( new SemesterDate(2015, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
-		
+
 		SemesterDate start = GUIChooseStartTime(supportedSemesters);
 		Schedule.defaultFirstSemester = start;
 
@@ -802,6 +842,191 @@ public class Driver{
 
 
 	}
+
+
+
+
+
+	public void GUIPrintSchedule(){
+		JPanel options = new JPanel();
+		ArrayList<JCheckBox> userOptions = new ArrayList<JCheckBox>();
+
+		options.setLayout(new BorderLayout());
+		JCheckBox ReqLayout = new JCheckBox("Requirement Layout");
+		ReqLayout.setToolTipText("This is provides a checklist of all the requirements for your major, and GER. This will list out what has/hasn't been satisfied");
+		userOptions.add(ReqLayout);
+		JCheckBox ScheduleLayout = new JCheckBox("Schedule Layout");
+		ScheduleLayout.setToolTipText("Diplays a the schedule created semester-by-semester. Includes scheduling errors ");
+		userOptions.add(ScheduleLayout);
+
+
+
+		JLabel instruct = new JLabel("Which format would you like to print out your schedule?");
+		options.add(instruct, BorderLayout.NORTH);
+		options.add(ReqLayout, BorderLayout.EAST);
+		options.add(ScheduleLayout, BorderLayout.WEST);
+		String finalPrint = new String();
+		JOptionPane.showMessageDialog(popUP, options);
+		//Schedule
+		if(userOptions.get(1).isSelected()){
+			finalPrint = finalPrint+ sch.printScheduleString() + "\n";
+		}
+		//Reqs
+		if(userOptions.get(0).isSelected()){
+			for(Semester s: sch.getSemesters()){
+				sch.setReqScheduledSemester(s);
+
+			}
+			finalPrint = finalPrint + sch.printRequirementString() + "\n";
+		}
+
+
+		if(userOptions.get(1).isSelected() || userOptions.get(0).isSelected()){
+			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 50);
+			schedulePrint.setWrapStyleWord(true);
+			schedulePrint.setLineWrap(true);
+			schedulePrint.setEditable(false);
+			schedulePrint.setFont(FurmanOfficial.getFont(10));
+			JScrollPane scrollPane = new JScrollPane(schedulePrint);
+			String[] choices= {"Print", "Cancel"};
+
+			int userChoice = (int) JOptionPane.showOptionDialog(popUP, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+
+			if(userChoice == 0){
+				try {
+					schedulePrint.print();
+				} catch (PrinterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+
+
+	public void GUISaveSchedule(){
+		String  alreadySavedOption = null;
+		if(sch.savedSchedule){
+			String[] options ={"Save Schedule", "Save and Rename"};
+			alreadySavedOption = (String)JOptionPane.showInputDialog(popUP, "How would you like to save your schedule?", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, options, null);
+		}
+		if(!sch.savedSchedule || alreadySavedOption != null){
+			if(!sch.savedSchedule || alreadySavedOption.equals("Save and Rename")){
+				String schedName = (String)JOptionPane.showInputDialog(popUP, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, null, null);
+				sch.setName(schedName);
+			}
+		}
+		if(sch.getName()!= null){
+			sch.setSavedSchedule(true);
+			ObjectOutputStream save = null;
+			FileOutputStream saveFile = null;
+			try {
+				saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + sch.getName() + ".ser");
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+
+				save = new ObjectOutputStream(saveFile);
+				save.writeObject(this.sch);	
+				save.close();
+
+
+
+
+
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+
+				System.out.println(e.getLocalizedMessage());
+			} 
+		}
+
+
+	}
+
+
+
+
+	public void openSchedule() {
+		ArrayList<String> scheduleNames = new ArrayList<String>();
+		File folder = new File(MenuOptions.savedScheduleFolder);
+
+		for (File f: folder.listFiles(
+				new FileFilter(){
+					@Override
+
+					public boolean accept(File pathname) {
+
+						String fullName = pathname.getAbsolutePath();
+						int i = fullName.lastIndexOf('.');
+						if(i <= 0){
+							return false;
+						}
+						String extension = fullName.substring(i+1);
+						return pathname.isFile() && extension.equals("ser");
+					}
+				}
+				)){
+
+
+			scheduleNames.add(f.getName());
+
+
+		}
+		String[] finalSchedNames = new String[scheduleNames.size()];
+		for(int i=0; i<finalSchedNames.length; i++){
+			finalSchedNames[i]=scheduleNames.get(i);
+		}
+		String chosenSched = (String) JOptionPane.showInputDialog(popUP, "Which schedule would you like to open?", "Open Schedule", JOptionPane.PLAIN_MESSAGE, icon, finalSchedNames, finalSchedNames[0]);		
+		if(chosenSched !=null){
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ObjectInputStream ois = null;
+			try {
+				ois = new ObjectInputStream(fis);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				Schedule result = (Schedule) ois.readObject();
+				this.b.setSchedule(result);
+				//TODO make sure nothing else needs to be set
+				setSchedule(result);
+				this.update();
+
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				ois.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+		}
+	}
+
+
+
+
+
 }
 
 

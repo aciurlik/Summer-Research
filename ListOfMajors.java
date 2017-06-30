@@ -10,7 +10,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ListOfMajors {
+public class ListOfMajors implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
 
