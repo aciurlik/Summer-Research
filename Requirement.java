@@ -23,6 +23,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	private int originalCoursesNeeded;
 	private int storedCoursesLeft;
 	public static int defaultCreditHours =4;
+	public SemesterDate scheduledSemester = null;
+
+
 
 	boolean allCompletionSetsCalculated=false;
 	HashSet<HashSet<TerminalRequirement>> allCompletionSets;
@@ -709,7 +712,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
+	
+	public SemesterDate getScheduledSemester() {
+		return scheduledSemester;
+	}
 
+
+	public void setScheduledSemester(SemesterDate scheduledSemester) {
+		this.scheduledSemester = scheduledSemester;
+	}
 
 
 
@@ -1098,6 +1109,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		System.out.println("Finished testing");
 	}
+
+
+	
 
 
 	public static void main(String[] args){

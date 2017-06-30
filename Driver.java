@@ -1,14 +1,24 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -28,6 +38,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
@@ -842,8 +853,10 @@ public class Driver implements java.io.Serializable{
 
 		options.setLayout(new BorderLayout());
 		JCheckBox ReqLayout = new JCheckBox("Requirement Layout");
+		ReqLayout.setToolTipText("This is provides a checklist of all the requirements for your major, and GER. This will list out what has/hasn't been satisfied");
 		userOptions.add(ReqLayout);
 		JCheckBox ScheduleLayout = new JCheckBox("Schedule Layout");
+		ScheduleLayout.setToolTipText("Diplays a the schedule created semester-by-semester. Includes scheduling errors ");
 		userOptions.add(ScheduleLayout);
 
 
@@ -854,52 +867,160 @@ public class Driver implements java.io.Serializable{
 		options.add(ScheduleLayout, BorderLayout.WEST);
 		String finalPrint = new String();
 		JOptionPane.showMessageDialog(popUP, options);
-		if(userOptions.get(0).isSelected()){
-			finalPrint = finalPrint + sch.printRequirementString();
-		}
+		//Schedule
 		if(userOptions.get(1).isSelected()){
-
-			finalPrint = finalPrint+ sch.printScheduleString();
+			finalPrint = finalPrint+ sch.printScheduleString() + "\n";
 		}
-		JTextArea schedulePrint = new JTextArea();
-		schedulePrint.setLineWrap(true);
-		schedulePrint.append(finalPrint);
-		try {
-			schedulePrint.print();
-		} catch (PrinterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		//Reqs
+		if(userOptions.get(0).isSelected()){
+			for(Semester s: sch.getSemesters()){
+				sch.setReqScheduledSemester(s);
+
+			}
+			finalPrint = finalPrint + sch.printRequirementString() + "\n";
+		}
+
+
+		if(userOptions.get(1).isSelected() || userOptions.get(0).isSelected()){
+			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 50);
+			schedulePrint.setWrapStyleWord(true);
+			schedulePrint.setLineWrap(true);
+			schedulePrint.setEditable(false);
+			schedulePrint.setFont(FurmanOfficial.getFont(10));
+			JScrollPane scrollPane = new JScrollPane(schedulePrint);
+			String[] choices= {"Print", "Cancel"};
+
+			int userChoice = (int) JOptionPane.showOptionDialog(popUP, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+
+			if(userChoice == 0){
+				try {
+					schedulePrint.print();
+				} catch (PrinterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
 
 
-
-
 	public void GUISaveSchedule(){
-		String schedName = (String)JOptionPane.showInputDialog(popUP, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, null, null);
-		sch.setName(schedName);
-		ObjectOutputStream save = null;
-		FileOutputStream saveFile = null;
-		try {
-			saveFile = new FileOutputStream(schedName + "txt");
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		String  alreadySavedOption = null;
+		if(sch.savedSchedule){
+			String[] options ={"Save Schedule", "Save and Rename"};
+			alreadySavedOption = (String)JOptionPane.showInputDialog(popUP, "How would you like to save your schedule?", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, options, null);
 		}
-		try {
-			save = new ObjectOutputStream(saveFile);
-			save.writeObject(this.sch);
-			save.close();
+		if(!sch.savedSchedule || alreadySavedOption != null){
+			if(!sch.savedSchedule || alreadySavedOption.equals("Save and Rename")){
+				String schedName = (String)JOptionPane.showInputDialog(popUP, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, null, null);
+				sch.setName(schedName);
+			}
+		}
+		if(sch.getName()!= null){
+			sch.setSavedSchedule(true);
+			ObjectOutputStream save = null;
+			FileOutputStream saveFile = null;
+			try {
+				saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + sch.getName() + ".ser");
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		
-			System.out.println(e.getLocalizedMessage());
+				save = new ObjectOutputStream(saveFile);
+				save.writeObject(this.sch);	
+				save.close();
+
+
+
+
+
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+
+				System.out.println(e.getLocalizedMessage());
+			} 
 		}
 
 
+	}
+
+
+
+
+	public void openSchedule() {
+		ArrayList<String> scheduleNames = new ArrayList<String>();
+		File folder = new File(MenuOptions.savedScheduleFolder);
+
+		for (File f: folder.listFiles(
+				new FileFilter(){
+					@Override
+
+					public boolean accept(File pathname) {
+
+						String fullName = pathname.getAbsolutePath();
+						int i = fullName.lastIndexOf('.');
+						if(i <= 0){
+							return false;
+						}
+						String extension = fullName.substring(i+1);
+						return pathname.isFile() && extension.equals("ser");
+					}
+				}
+				)){
+
+
+			scheduleNames.add(f.getName());
+
+
+		}
+		String[] finalSchedNames = new String[scheduleNames.size()];
+		for(int i=0; i<finalSchedNames.length; i++){
+			finalSchedNames[i]=scheduleNames.get(i);
+		}
+		String chosenSched = (String) JOptionPane.showInputDialog(popUP, "Which schedule would you like to open?", "Open Schedule", JOptionPane.PLAIN_MESSAGE, icon, finalSchedNames, finalSchedNames[0]);		
+		if(chosenSched !=null){
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ObjectInputStream ois = null;
+			try {
+				ois = new ObjectInputStream(fis);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				Schedule result = (Schedule) ois.readObject();
+				this.b.setSchedule(result);
+				//TODO make sure nothing else needs to be set
+				setSchedule(result);
+				this.update();
+
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				ois.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+		}
 	}
 
 
