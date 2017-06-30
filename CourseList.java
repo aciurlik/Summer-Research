@@ -35,7 +35,8 @@ public class CourseList implements java.io.Serializable  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
-	
+	public static final int defaultCreditHours =4;
+
 	public static final boolean masterIsNotAround = true;
 
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
@@ -132,7 +133,7 @@ public class CourseList implements java.io.Serializable  {
 				return askUserToDefine(p, originalRequirementString);
 			}
 		}
-		
+
 		return Requirement.readFrom(ourVersion);
 	}
 
@@ -318,22 +319,25 @@ public class CourseList implements java.io.Serializable  {
 	public  static ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(listOfCourses,r);
 	}
-	
+
 	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c: input){
-			if(c.getPrefix().equals(p)){
+			if(c.getPrefix().getSubject().equals(p.getSubject())){
 				result.add(c);
 			}
 		}
 		return result;
 	}
-	
+
 	public static ArrayList<Course> getCoursesSatisfying(Prefix p){
 		return onlyThoseSatisfyingPrefix(listOfCourses, p);
 	}
-	
+
 	public static int getCoursesCreditHours(Prefix p){
+		if(getCoursesSatisfying(p).isEmpty()){
+			return defaultCreditHours;
+		}
 		return getCoursesSatisfying(p).get(0).creditHours;
 	}
 
@@ -512,7 +516,7 @@ public class CourseList implements java.io.Serializable  {
 						r.addRequirement(new TerminalRequirement(p));
 					}
 				}
-				
+
 				r.setNumToChoose(newNumToChoose);
 
 				if(!r.name.equals("FL")){
@@ -527,20 +531,23 @@ public class CourseList implements java.io.Serializable  {
 		m.addRequirement(FYWRequirement());
 
 		//make NW and NWL enemies
-		Requirement nwl = m.getRequirement("NWL");
-		Requirement nw = m.getRequirement("NW");
-		RequirementGraph.putEdge(nwl, nw);
+		if(majorType!= CourseList.BM){
+			Requirement nwl = m.getRequirement("NWL");
+			Requirement nw = m.getRequirement("NW");
+			RequirementGraph.putEdge(nwl, nw);
+		}
+
 		// Make WC and NE enemies 
 		Requirement wc = m.getRequirement("WC");
 		Requirement ne = m.getRequirement("NE");
 		RequirementGraph.putEdge(wc, ne);
-		
+
 		//put WC and NE at the end.
 		m.removeRequirement(wc);
 		m.removeRequirement(ne);
 		m.addRequirement(wc);
 		m.addRequirement(ne);
-		
+
 		return m;
 	}
 

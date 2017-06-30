@@ -25,7 +25,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	boolean usesMin;
 	boolean usesMax;
 	public static int defaultCreditHours =4;
-
+	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
+	
 
 
 
