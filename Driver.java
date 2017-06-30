@@ -733,16 +733,16 @@ public class Driver implements java.io.Serializable{
 			hasErrors=true;
 			for(ScheduleError s : allErrors){
 				if(s.error.equals(ScheduleError.overlapError)){
-					result = result + s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
+					result = result + "  " +s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
 				}
 				if(s.error.equals(ScheduleError.overloadError)){
-					result = result + s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
+					result = result + "  " +s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
 				}
 				if(s.error.equals(ScheduleError.preReqError)){
-					result = result + s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
 				}
 				if(s.error.equals(ScheduleError.duplicateError)){
-					result = result + s.offendingCourse.shortString() + " is a duplicate course \n";
+					result = result + "  "+ s.offendingCourse.shortString() + " is a duplicate course \n";
 				}
 			}
 			if(result.length() < 2){
@@ -820,29 +820,6 @@ public class Driver implements java.io.Serializable{
 
 	}
 
-	public static void main(String[] args){
-
-		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
-
-		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
-		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
-		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2014, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2015, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
-		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
-
-		SemesterDate start = GUIChooseStartTime(supportedSemesters);
-		Schedule.defaultFirstSemester = start;
-
-		//new Driver();
-		testDriver();
-
-
-	}
-
 
 
 
@@ -873,7 +850,7 @@ public class Driver implements java.io.Serializable{
 		}
 		//Reqs
 		if(userOptions.get(0).isSelected()){
-			for(Semester s: sch.getSemesters()){
+			for(Semester s: sch.getAllSemesters()){
 				sch.setReqScheduledSemester(s);
 
 			}
@@ -1023,6 +1000,29 @@ public class Driver implements java.io.Serializable{
 		}
 	}
 
+
+	public static void main(String[] args){
+
+		//This just loads FurmanOfficial into memory so that the UIManager
+		// will be set before other static code gets run.
+		Color c = FurmanOfficial.grey;
+
+		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
+		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
+		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2014, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2015, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
+		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
+
+		SemesterDate start = GUIChooseStartTime(supportedSemesters);
+		Schedule.defaultFirstSemester = start;
+
+		//new Driver();
+		testDriver();
+
+
+	}
 
 
 

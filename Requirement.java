@@ -23,7 +23,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	private int originalCoursesNeeded;
 	private int storedCoursesLeft;
 	public static int defaultCreditHours =4;
-	public SemesterDate scheduledSemester = null;
+	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
 
 
 
@@ -35,6 +35,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public Requirement(){
+		this.scheduledSemester = new ArrayList<SemesterDate>();
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
 		this.originalCoursesNeeded = 1;
@@ -50,6 +51,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 */
 	public Requirement(Prefix[] choices, int numToChoose){
 		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
+		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 
 	public Requirement(HashSet<Prefix> choices, int numToChoose){
@@ -59,6 +61,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			this.choices.add(r);
 		}
 		this.numToChoose = numToChoose;
+		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 
 	public void addRequirement(Requirement r){
@@ -713,13 +716,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	
-	public SemesterDate getScheduledSemester() {
+	public ArrayList<SemesterDate> getScheduledSemester() {
 		return scheduledSemester;
 	}
 
 
-	public void setScheduledSemester(SemesterDate scheduledSemester) {
-		this.scheduledSemester = scheduledSemester;
+	public void addScheduledSemester(SemesterDate toAdd) {
+		scheduledSemester.add(toAdd);
 	}
 
 

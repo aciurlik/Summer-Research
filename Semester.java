@@ -146,7 +146,6 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
 		int totalHours = 0;
-
 		if(addition instanceof ScheduleCourse){
 			ScheduleCourse toAdd = (ScheduleCourse) addition;
 			totalHours= totalHours + toAdd.getCreditHours();
@@ -154,7 +153,11 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		if(addition instanceof Requirement){
 			Requirement toAdd = (Requirement) addition;
 			totalHours = totalHours + toAdd.getCreditHours();
+	
 		}
+		
+		
+		
 		totalHours = totalHours + getCreditHours();
 		if(totalHours > OverloadLimit){
 			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);

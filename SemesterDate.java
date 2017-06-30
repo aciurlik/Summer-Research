@@ -138,7 +138,7 @@ public class SemesterDate implements java.io.Serializable {
 
 public String toString(){
 	String result = "";
-	result= result +this.getSeason(sNumber)+ ",  " + this.year;
+	result= result +this.getSeason(sNumber)+ " " + this.year;
 	return result;
 }
 	
