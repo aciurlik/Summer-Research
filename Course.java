@@ -388,7 +388,7 @@ public class Course implements HasCreditHours, java.io.Serializable{
 			Interval<Time> sessionInterval = new  Interval<Time>(times[0], times[2]);
 
 
-			if(sessionInterval.contains(SummerSessionOne)){
+			if(sessionInterval.contains(SummerSessionOne, true)){
 
 				semester = new SemesterDate(semester.year, SemesterDate.SUMMERONE);
 				Time midpoint = times[0].findMidPoint(times[2]);
@@ -396,7 +396,7 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 
 			}
-			if(sessionInterval.contains(SummerSessionTwo)){
+			if(sessionInterval.contains(SummerSessionTwo, true)){
 				semester = new SemesterDate(semester.year,SemesterDate.SUMMERTWO);
 				Time midpoint = times[0].findMidPoint(times[2]);
 				SummerSessionTwo = SummerSessionTwo.findMidPoint(midpoint);

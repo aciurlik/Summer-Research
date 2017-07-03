@@ -80,15 +80,38 @@ public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>
 			return first;
 		}
 	}
-	
-	public boolean contains(T other){
-		if(this.start.compareTo(other)==-1 && this.end.compareTo(other)==1){
-			return true;
+	/**
+	 * Check if other is contained within this interval.
+	 * 
+	 * includeEndpoints is used for strict containment, as in the following example.
+	 * 
+	 * if includeEndpoints, then (3,8).contains( 3 ) is true,
+	 *  if not includeEndpoints, then (3,8).contains( 3 ) is false,
+	 * @param other
+	 * @param includeEndpoints
+	 * @return
+	 */
+	public boolean contains(T other, boolean includeEndpoints){
+		if(includeEndpoints){
+			return (this.start.compareTo(other)<=0 && this.end.compareTo(other)>=0);
 		}
-		return false;
+		else{
+			return (this.start.compareTo(other)<0 && this.end.compareTo(other)>0);
+		}
 	}
-	public boolean contains(Interval<T> other){
-		return (this.start.compareTo(other.start) <= 0 && this.end.compareTo(other.end) >= 0); 
+	
+	/**
+	 * check if the other interval is contained in this one.
+	 * 
+	 * If includeEndpoints is false, then both endpoints of other must be 
+	 * 		inside this. For example, (3,7) would not be contained in (3,8)
+	 * 		because the 3 is not strictly contained.
+	 * If includeEndpoints is true, then (3,7) would be contained in (3,8).
+	 * @param other
+	 * @return
+	 */
+	public boolean contains(Interval<T> other, boolean includeEndpoints){
+		return (this.contains(other.start, includeEndpoints) && this.contains(other.end, includeEndpoints)); 
 	}
 
 	public static void main(String[] args){

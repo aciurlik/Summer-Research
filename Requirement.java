@@ -325,17 +325,30 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return null;
 	}
 
+	
+	/**
+	 * Note - this method is used by TerminalRequirement.
+	 * @param e
+	 * @return
+	 */
 	public boolean isSatisfiedBy(ScheduleElement e) {
 		if(e instanceof Requirement){
-			if(e.equals(this)){
+			Requirement r = (Requirement)e;
+			if (r.isTerminal()){
+				if (r.getTerminal().alsoCompletes(this)){
+					return true;
+				}
+			}
+			else if(r.equals(this)){
 				return true;
 			}
-			else if (((Requirement)e).alsoCompletes(this)){
-				return true;
-			}
+			return false;
 		}
-		return isSatisfiedBy(e.getPrefix());
+		else{
+			return isSatisfiedBy(e.getPrefix());
+		}
 	}
+	
 	//INFINITELOOPHAZARD
 	public boolean isSatisfiedBy(Prefix p){
 		for(Requirement r : this.choices){
@@ -395,8 +408,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(r.numToChoose != this.numToChoose){
 			return false;
 		}
+		//check that this contains that and that contains this.
 		for(Requirement choice : choices){
 			if(!r.choices.contains(choice)){
+				return false;
+			}
+		}
+		for(Requirement choice : r.choices){
+			if(!this.choices.contains(choice)){
 				return false;
 			}
 		}
@@ -686,16 +705,27 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		if(this.isTerminal()){
-			return this.getTerminal().getRequirementsFulfilled(r);
+			//remove all enemies
+			ArrayList<Requirement> enemyless = new ArrayList<Requirement>();
+			for(Requirement r : reqList){
+				if(RequirementGraph.doesPlayNice(this, r)){
+					enemyless.add(r);
+				}
+			}
+			return this.getTerminal().getRequirementsFulfilled(enemyless);
 		}
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		for(Requirement otherReq : r){
-			if(otherReq.equals(this)){
-				result.add(otherReq);
+		for(Requirement otherReq : reqList){
+			//Remove enemies as you go
+			if(RequirementGraph.doesPlayNice(otherReq, this)){
+				if(otherReq.equals(this)){
+					result.add(otherReq);
+				}
 			}
 		}
+		
 		return result;
 	}
 
@@ -707,7 +737,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	public int getCreditHours() {
 		if(this.isTerminal()){
-			return CourseList.getCoursesCreditHours(this.getTerminal().p);
+			return this.getTerminal().getCreditHours();
 		}
 		else{
 			return defaultCreditHours;
