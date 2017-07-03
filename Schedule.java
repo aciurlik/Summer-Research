@@ -226,11 +226,13 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-
+		
+		
 		if(this.checkErrorsWhenAdding(element, sem)){
 			System.out.println("add didn't work");
 			return false;
 		}
+		
 		if(sem.add(element)){
 			//updateRequirementsSatisfied(element);
 			updatePrereqs();
@@ -238,6 +240,8 @@ public class Schedule implements java.io.Serializable {
 			return true;
 		}
 		System.out.println("add didn't work");
+	
+		
 		return false;
 	}
 
@@ -284,7 +288,6 @@ public class Schedule implements java.io.Serializable {
 
 
 	public void addMajor(Major newMajor){
-		System.out.println(newMajor.degreeType);
 		majorsList.add(newMajor);
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
@@ -1000,12 +1003,13 @@ public class Schedule implements java.io.Serializable {
 
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
+		
 		for(ScheduleElement e : allTakenElements){
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
 			}
-		}
 
+		}
 		r.updateAllStoredValues(satisficers);
 	}
 

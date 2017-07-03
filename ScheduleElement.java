@@ -45,6 +45,11 @@ public interface ScheduleElement {
 	 * 
 	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
 	 * if element has no requirements it fulfills, an empty ArrayList is returned.
+	 * 
+	 * If this element doesn't satisfy some requirement due to an
+	 * issue with requirement enemies, then issue requirements should not be 
+	 * in the returned list (if enemy issues are overridden, then the requirements
+	 * that were allowed to use this element may be in the list).
 	 */
 
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded);
