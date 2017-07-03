@@ -16,7 +16,7 @@ public class Schedule implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Major> majorsList;
 	private ArrayList<Semester> semesters;
-	public HashSet<Requirement> prereqs;
+	public HashSet<Prereq> prereqs;
 	private Major GER;
 	//transient is for Serializable purposes.
 	public transient Driver d;
@@ -71,7 +71,7 @@ public class Schedule implements java.io.Serializable {
 
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
-		this.prereqs = new HashSet<Requirement>();
+		this.prereqs = new HashSet<Prereq>();
 		//this.masterList = masterList;
 
 
@@ -81,6 +81,7 @@ public class Schedule implements java.io.Serializable {
 		this.semesters = new ArrayList<Semester>();
 		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
 		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
+		//TODO Redo this logic by just changing the indices.
 		for(int i = 0;i < 9 ; i ++){
 			if(i==0){
 				s.isAP=true;
@@ -444,6 +445,7 @@ public class Schedule implements java.io.Serializable {
 	 * @return The first real (not prior Semester)
 	 */
 	public Semester getStartSemester(){
+		//TODO is the sort necessary?
 		Collections.sort(this.semesters);
 		return this.semesters.get(0);
 	}
@@ -452,63 +454,55 @@ public class Schedule implements java.io.Serializable {
 
 	/**
 	 * Find the list of all ScheduleElements in any semester of this Schedule.
+	 * Will be sorted based on the time the element was scheduled.
 	 * @return
 	 */
-	public ArrayList<ScheduleElement> getAllElements(){
+	public ArrayList<ScheduleElement> getAllElementsSorted(){
 		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
-		for(Semester s : this.getAllSemesters()){
+		for(Semester s : this.getAllSemestersSorted()){
 			result.addAll(s.getElements());
 		}
 		return result;
 	}
+	
 
 	/**
 	 * Find the list of all requirements in any major of this schedule.
 	 * May include duplicate requirements if two majors share a requirement.
-	 * Can't updte requirements at the same time, because it would cause an infinite loop.
+	 * 
+	 * Doesn't update requirements
+	 * 		it can't, because it would cause an infinite loop.
 	 * @return
 	 */
 	public ArrayList<Requirement> getAllRequirements(){
+		ArrayList<Requirement> result = getAllRequirementsMinusPrereqs();
+		for(Prereq p : prereqs){
+			result.add(p.getRequirement());
+		}
+		return result;
+	}
+	public ArrayList<Requirement> getAllRequirementsMinusPrereqs(){
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
 			result.addAll(m.reqList);
 		}
-
-		result.addAll(prereqs);
 		result.addAll(GER.reqList);
 		return result;
 	}
 
 
-
-	public int getCLP() {
-		return CLP;
-	}
-
-
-
-	public void setCLP(int cLP) {
-		CLP = cLP;
-	}
-
-
-	public Prefix getLanguagePrefix() {
-		return languagePrefix;
-	}
-
 	/**
-	 * This has the prior semester first, and then the "regular" scheduled Semesters second, 
-	 * prior should always be in the first place/ 
-	 * 
+	 * Return the list of semesters sorted in chronological order.
+	 * PriorSemester is earlier than all other semesters.
 	 */
-
-	public ArrayList<Semester> getAllSemesters(){
+	public ArrayList<Semester> getAllSemestersSorted(){
 		ArrayList<Semester> allSemesters = new ArrayList<Semester>();
 		allSemesters.add(priorSemester);
+		Collections.sort(this.semesters);
 		allSemesters.addAll(this.semesters);
 		return allSemesters;
-
 	}
+	
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		String[] Language = {"110", "120", "201"};
@@ -522,7 +516,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(savedLocation != -1){
 			for(int p=0; p<savedLocation; p++){
-				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemesters().get(0).semesterDate, null, null, 
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
 				cc.setTaken(true);
@@ -532,7 +526,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		if((savedLocation == -1) && (!languagePrefix.getNumber().equals("115"))){
 			for(int p=0; p<Language.length; p++){
-				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemesters().get(0).semesterDate, null, null, 
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
 				cc.setTaken(true);
@@ -609,10 +603,9 @@ public class Schedule implements java.io.Serializable {
 	public ArrayList<ScheduleError> checkAllPrerequsites(){
 		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		Collections.sort(semesters);
 		//Go through semesters one at a time so that you efficiently
 		// build the list of prior-taken elements.
-		for(Semester s : getAllSemesters()){
+		for(Semester s : getAllSemestersSorted()){
 			ArrayList<ScheduleElement> inSemester = new ArrayList<ScheduleElement>();
 			for(ScheduleElement e : s.getElements()){
 				inSemester.add(e);
@@ -684,8 +677,10 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	public boolean checkPrerequsitesRemoving(ScheduleElement e, Semester s){
+		//TODO fix this logic to use the sorted nature of getAllSemestersSorted
+		// right now it's checking every semester when that's not necessary.
 		Prefix currentP = e.getPrefix();
-		for(Semester other : this.semesters){
+		for(Semester other : this.getAllSemestersSorted()){
 			if(other.getDate().compareTo(s.getDate()) >= 0 ){
 				for(ScheduleElement oElement : s.getElements()){
 					Requirement needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
@@ -787,7 +782,7 @@ public class Schedule implements java.io.Serializable {
 	 */
 	public ArrayList<ScheduleElement> elementsTakenBefore(SemesterDate sd){
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		for(Semester s : semesters){
+		for(Semester s : this.getAllSemestersSorted()){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sd) < 0){
 				taken.addAll(elementsTakenIn(s));
@@ -802,7 +797,7 @@ public class Schedule implements java.io.Serializable {
 	 */
 	public ArrayList<ScheduleElement> elementsTakenAfter(SemesterDate sd){
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		for(Semester s : semesters){
+		for(Semester s : this.getAllSemestersSorted()){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sd) > 0){
 				taken.addAll(elementsTakenIn(s));
@@ -812,7 +807,7 @@ public class Schedule implements java.io.Serializable {
 	}
 	public ArrayList<ScheduleElement> elementsTakenIn(SemesterDate sD){
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		for(Semester s : semesters){
+		for(Semester s : this.getAllSemestersSorted()){
 			// Allow courses taken before or in the same semester.
 			if(s.semesterDate.compareTo(sD) == 0){
 				taken.addAll(elementsTakenIn(s));
@@ -868,7 +863,7 @@ public class Schedule implements java.io.Serializable {
 
 	public ArrayList<ScheduleError> checkAllDuplicates(){
 		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
-		for(ScheduleElement element : getAllElements()){
+		for(ScheduleElement element : getAllElementsSorted()){
 			if(checkDuplicates(element, true, true)){
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
 				duplicate.setOffendingCourse(element);
@@ -886,7 +881,7 @@ public class Schedule implements java.io.Serializable {
 			exactDuplicateCount = 0;
 		}
 
-		for(ScheduleElement e1 : getAllElements()){
+		for(ScheduleElement e1 : getAllElementsSorted()){
 			if(e1 == e){
 				exactDuplicateCount++;
 				if(exactDuplicateCount > 1){
@@ -938,6 +933,7 @@ public class Schedule implements java.io.Serializable {
 	 */
 	public ArrayList<ScheduleError> checkOverlap(){
 		ArrayList<ScheduleError> result = new ArrayList<ScheduleError>();
+		//This check intentionally does not check for overlap in PriorSemester
 		for(Semester s : semesters){
 			result.addAll(s.checkAllOverlap());
 		}
@@ -966,17 +962,22 @@ public class Schedule implements java.io.Serializable {
 	/**
 	 * Forces a full update of all of the requirements,
 	 * ensuring that all majors know which relevant 
-	 * courses have been taken .
+	 * courses have been taken.
+	 * 
+	 * Also updates the prereqs 
 	 *  
 	 */
 	private void updateReqs(){
 		//This list cannot be a set because we need duplicate requirements
 		// to potentially be satisfied twice.
-		ArrayList<ScheduleElement> allTakenElements = getAllElements();
-		ArrayList<Requirement> reqList = this.getAllRequirements();
+		ArrayList<ScheduleElement> allTakenElements = getAllElementsSorted();
+		//Same issue here.
+		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
 		for(Requirement r : reqList){
 			updateRequirement(r, reqList, allTakenElements);
 		}
+		
+		updatePrereqs();
 	}
 
 	/**
@@ -1013,25 +1014,16 @@ public class Schedule implements java.io.Serializable {
 	 * Get the number of requirements still left to put in the schedule.
 	 * @return
 	 */
-
 	public int estimatedCoursesLeft(){
 		int counter = 0;
-		ArrayList<ScheduleElement> courseEst = this.getAllElements();
+		ArrayList<ScheduleElement> courseEst = this.getAllElementsSorted();
 		for(Requirement n: this.getAllRequirements()){
-
 			if((n.usesCreditHours)){
-
 				counter += n.storedCoursesLeft()/4;
-
 			}
-
-
 			else{
-
 				counter += n.storedCoursesLeft();
-
 			}
-
 		}
 		return counter;
 	}
@@ -1058,7 +1050,7 @@ public class Schedule implements java.io.Serializable {
 	 * 
 	 * @param e
 	 */
-	public void updateRequirementsSatisfied(ScheduleElement e){
+	/*public void updateRequirementsSatisfied(ScheduleElement e){
 		if(e instanceof Course){
 			updateRequirementsSatisfied((Course) e);
 		}
@@ -1091,6 +1083,7 @@ public class Schedule implements java.io.Serializable {
 			}
 		}
 	}
+	*/
 
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
 		return !RequirementGraph.doesPlayNice(r1, r2);
@@ -1110,10 +1103,16 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(prereqs.size() > 0){
 			Major prereqsM = new Major("Prereqs");
-			for(Requirement r : prereqs){
-				prereqsM.addRequirement(r);
+			boolean unfulfilledPrereq = false;
+			for(Prereq p : prereqs){
+				if(!p.getRequirement().storedIsComplete()){
+					prereqsM.addRequirement(p.getRequirement());
+					unfulfilledPrereq = true;
+				}
 			}
-			result.add(prereqsM);
+			if(unfulfilledPrereq){
+				result.add(prereqsM);
+			}
 		}
 		result.addAll(this.majorsList);
 		return result;
@@ -1121,32 +1120,25 @@ public class Schedule implements java.io.Serializable {
 
 
 	public void updatePrereqs(){
-		prereqs = new HashSet<Requirement>();
-		for(ScheduleElement e : getAllElements()){
+		//Make sure prereqs accurately reflect the currently scheduled elements.
+		prereqs = new HashSet<Prereq>();
+		for(ScheduleElement e : getAllElementsSorted()){
 			Requirement r = CourseList.getPrereqsShallow(e.getPrefix());
 			if(r != null){
-				prereqs.add(r);
+				Prereq newPrereq = new Prereq(r, e.getPrefix());
+				prereqs.add(newPrereq);
 			}
 		}
-	}
-
-
-
-
-
-	public int getCreditHoursComplete(){
-		int result = 0;
-		for (Semester s : this.getAllSemesters()){
-			result = result + s.getCreditHours();
+		
+		//Actually update the prereqs.
+		for(Prereq p : prereqs){
+			updatePrereq(p);
 		}
-		return result;
 	}
-
-	public SemesterDate getStartDate(){
-		return this.semesters.get(0).semesterDate;
-	}
-	public ArrayList<Semester> getSemesters(){
-		return this.semesters;
+	
+	public void updatePrereq(Prereq p){
+		ArrayList<ScheduleElement> elementsBefore = this.elementsBefore(p.getPrefix(), prereqsCanBeSatisfiedInSameSemester);
+		p.updateOn(elementsBefore);
 	}
 
 
@@ -1162,7 +1154,7 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	public ArrayList<ScheduleCourse> filterAlreadyChosenCourses(ArrayList<ScheduleCourse> collectionOfCourses){
-		collectionOfCourses.removeAll(this.getAllElements());
+		collectionOfCourses.removeAll(this.getAllElementsSorted());
 		return collectionOfCourses;
 	}
 
@@ -1217,6 +1209,7 @@ public class Schedule implements java.io.Serializable {
 
 	public  ArrayList<ScheduleError> checkAllErrors(){
 		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
+		//Don't check for errors in PriorSemester
 		for(Semester s: this.semesters){
 			if(s.checkAllOverlap()!=null){
 				allErrors.addAll(s.checkAllOverlap());
@@ -1263,7 +1256,7 @@ public class Schedule implements java.io.Serializable {
 
 		result.append("\n		Schedule");
 		//Adds all the scheduleElements from each major
-		for(Semester s: this.getAllSemesters()){
+		for(Semester s: this.getAllSemestersSorted()){
 			result.append("\n");
 			if(s.isAP){
 				result.append("Prior Courses:" + "\n");
@@ -1333,11 +1326,11 @@ public class Schedule implements java.io.Serializable {
 		for(Requirement r: this.GER.reqList){
 			int NumberToPrint=r.numToChoose;
 			result.append("\n" + r.getDisplayString() + "-");
-			if(r.minMoreNeeded(getAllElements(),false)!=0){
-				result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	");
+			if(r.minMoreNeeded(getAllElementsSorted(),false)!=0){
+				result.append( r.minMoreNeeded(getAllElementsSorted(), false) + " Course(s) Needed	");
 				int counter = 0;
 				StringJoiner joiner = new StringJoiner("\n");
-				for(ScheduleElement se: this.getAllElements()){
+				for(ScheduleElement se: this.getAllElementsSorted()){
 					if(r.isSatisfiedBy(se)){
 						if(NumberToPrint>0){
 							if(counter ==0){
@@ -1371,7 +1364,7 @@ public class Schedule implements java.io.Serializable {
 			else{
 				int counter = 0;
 				StringJoiner joiner = new StringJoiner("\n");
-				for(ScheduleElement se: this.getAllElements()){
+				for(ScheduleElement se: this.getAllElementsSorted()){
 
 					if(r.isSatisfiedBy(se)){
 						if(NumberToPrint>0){
@@ -1410,11 +1403,11 @@ public class Schedule implements java.io.Serializable {
 			for(Requirement r: m.reqList){
 
 				result.append("\n" + r.getDisplayString() + "-");
-				if(r.minMoreNeeded(getAllElements(),false)!=0){
-					result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	");
+				if(r.minMoreNeeded(getAllElementsSorted(),false)!=0){
+					result.append( r.minMoreNeeded(getAllElementsSorted(), false) + " Course(s) Needed	");
 					int counter = 0;
 					StringJoiner joiner = new StringJoiner("\n");
-					for(ScheduleElement se: this.getAllElements()){
+					for(ScheduleElement se: this.getAllElementsSorted()){
 						if(r.isSatisfiedBy(se)){
 							if(counter ==0){
 								result.append("Partially Satisfied by: \n");
@@ -1444,7 +1437,7 @@ public class Schedule implements java.io.Serializable {
 				else{
 					int counter = 0;
 					StringJoiner joiner = new StringJoiner("\n");
-					for(ScheduleElement se: this.getAllElements()){
+					for(ScheduleElement se: this.getAllElementsSorted()){
 
 						if(r.isSatisfiedBy(se)){
 							if(counter ==0){
@@ -1486,10 +1479,77 @@ public class Schedule implements java.io.Serializable {
 	public String getName() {
 		return name;
 	}
-
-
 	public void setName(String name) {
 		this.name = name;
+	}
+	public int getCLP() {
+		return CLP;
+	}
+	public void setCLP(int cLP) {
+		CLP = cLP;
+	}
+	public Prefix getLanguagePrefix() {
+		return languagePrefix;
+	}
+	
+
+
+
+
+	public int getCreditHoursComplete(){
+		int result = 0;
+		for (Semester s : this.getAllSemestersSorted()){
+			result = result + s.getCreditHours();
+		}
+		return result;
+	}
+
+	public SemesterDate getStartDate(){
+		return this.getStartSemester().semesterDate;
+	}
+	public ArrayList<Semester> getSemesters(){
+		return this.semesters;
+	}
+	
+	
+	
+	/**
+	 * find the first (temporal first) scheduled instance of this prefix,
+	 * and return the list of all elements before it.
+	 * 
+	 * If includeElementsInSameSemester, then the element with prefix p will
+	 * also be included in the list.
+	 * 
+	 * returns empty array list if this prefix isn't scheduled.
+	 * 
+	 * @param e
+	 * @param includeElementsInSameSemester
+	 * @return
+	 */
+	public ArrayList<ScheduleElement> elementsBefore(Prefix p, boolean includeElementsInSameSemester){
+		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
+		SemesterDate firstScheduledTime = null;
+		//Find the first semesterdate when this element was scheduled
+		for(Semester s : this.getAllSemestersSorted()){
+			for(ScheduleElement e : s.getElements()){
+				if(e.getPrefix() != null && e.getPrefix().equals(p)){
+					firstScheduledTime = s.getDate();
+					break;
+				}
+			}
+		}
+		if(firstScheduledTime == null){
+			return result;
+		}
+		result.addAll(this.elementsTakenBefore(firstScheduledTime));
+		if(includeElementsInSameSemester){
+			result.addAll(this.elementsTakenIn(firstScheduledTime));
+		}
+		return result;
+		
+		//Collect all the elemtns before that semester date.
+		
+		
 	}
 
 

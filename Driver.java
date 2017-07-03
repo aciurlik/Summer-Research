@@ -429,7 +429,7 @@ public class Driver implements java.io.Serializable{
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
 
-		ArrayList<Semester> allSemesters = sch.getAllSemesters();
+		ArrayList<Semester> allSemesters = sch.getAllSemestersSorted();
 		int last = (allSemesters.size()-1);
 		int end = allSemesters.get(last).semesterDate.year;
 		//Two first is Prior, second is odd one out
@@ -850,7 +850,7 @@ public class Driver implements java.io.Serializable{
 		}
 		//Reqs
 		if(userOptions.get(0).isSelected()){
-			for(Semester s: sch.getAllSemesters()){
+			for(Semester s: sch.getAllSemestersSorted()){
 				sch.setReqScheduledSemester(s);
 
 			}

@@ -100,7 +100,7 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 				//the enemies changed. 
 				//If some of the enemies are already scheduled, just use those. 
 				HashSet<Requirement> scheduledRequirements = new HashSet<Requirement>(); 
-				for(ScheduleElement e : s.getAllElements()){ 
+				for(ScheduleElement e : s.getAllElementsSorted()){ 
 					if(e instanceof Requirement){ 
 						scheduledRequirements.add((Requirement)e); 
 
