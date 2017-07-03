@@ -320,10 +320,17 @@ public class CourseList implements java.io.Serializable  {
 		return onlyThoseSatisfying(listOfCourses,r);
 	}
 
+	/**
+	 * Returns an empty list if 
+	 * @param input
+	 * @param p
+	 * @return
+	 */
 	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
+		
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c: input){
-			if(c.getPrefix().getSubject().equals(p.getSubject())){
+			if(c.getPrefix()!= null && c.getPrefix().equals(p)){
 				result.add(c);
 			}
 		}
@@ -334,12 +341,19 @@ public class CourseList implements java.io.Serializable  {
 		return onlyThoseSatisfyingPrefix(listOfCourses, p);
 	}
 
+	/**
+	 * Return the 
+	 * @param p
+	 * @return
+	 */
 	public static int getCoursesCreditHours(Prefix p){
 		if(getCoursesSatisfying(p).isEmpty()){
 			return defaultCreditHours;
 		}
 		return getCoursesSatisfying(p).get(0).creditHours;
 	}
+	
+	
 
 
 
