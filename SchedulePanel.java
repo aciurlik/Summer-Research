@@ -127,19 +127,19 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
 
 
-		for(Semester s: sch.getAllSemesters()){
+		for(Semester s: sch.getAllSemestersSorted()){
 			int reallyBigNumber = 100; //Makes it so you can have a lot of credit hours before it gives you an error
 			SemesterPanel foundp = this.findPanelFor(s);
 			s.setLastSemester(false);
-			if(s.equals(sch.getAllSemesters().get(0))|| s.isTaken()){
+			if(s.equals(sch.getAllSemestersSorted().get(0))|| s.isTaken()){
 				s.setOverloadLimit(reallyBigNumber);
 				s.setTaken(true);
 				
 			}
-			if(s.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
+			if(s.equals(sch.getAllSemestersSorted().get(sch.getAllSemestersSorted().size()-1))){
 				s.setLastSemester(true);
 			}
-			if(s.equals(sch.getAllSemesters().get(1))){
+			if(s.equals(sch.getAllSemestersSorted().get(1))){
 				s.setUndeletableSemester(true);
 			}
 			if(foundp != null){
@@ -149,13 +149,13 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 			}
 			else{
 				SemesterPanel semester = new SemesterPanel(s, this.d);
-				if(semester.equals(sch.getAllSemesters().get(sch.getAllSemesters().size()-1))){
+				if(semester.equals(sch.getAllSemestersSorted().get(sch.getAllSemestersSorted().size()-1))){
 					s.setLastSemester(true);
 				}
 				else{
 					s.setLastSemester(false);
 				}
-				if(semester.equals(sch.getAllSemesters().get(1))){
+				if(semester.equals(sch.getAllSemestersSorted().get(1))){
 					s.setUndeletableSemester(true);
 				}
 				else{

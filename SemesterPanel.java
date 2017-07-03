@@ -457,7 +457,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		@Override
 		public void recievedDrop(Container receiver, Component draggedItem) {
 			if(draggedItem instanceof RequirementPanel){
-				
 				RequirementPanel d =  (RequirementPanel) draggedItem;
 				addElement(d);
 			}
