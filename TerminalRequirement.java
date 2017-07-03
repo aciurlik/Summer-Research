@@ -48,8 +48,9 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		if(this.isExact()){
 			return CourseList.getCoursesCreditHours(p);
 		}
-		return defaultCreditHours;
-
+		else{
+			return defaultCreditHours;
+		}
 	}
 
 	/////////////////////
