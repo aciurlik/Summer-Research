@@ -472,6 +472,7 @@ public class Schedule implements java.io.Serializable {
 	/**
 	 * Find the list of all requirements in any major of this schedule.
 	 * May include duplicate requirements if two majors share a requirement.
+	 * Includes prereq requirements too.
 	 * 
 	 * Doesn't update requirements
 	 * 		it can't, because it would cause an infinite loop.
@@ -556,9 +557,8 @@ public class Schedule implements java.io.Serializable {
 
 	private void updateTotalCoursesNeeded(){
 		totalCoursesNeeded = 0;
-		ArrayList<ScheduleElement> empty = new ArrayList<ScheduleElement>();
 		for(Requirement r : getAllRequirements()){
-			totalCoursesNeeded += r.minMoreNeeded(empty, false);
+			totalCoursesNeeded += r.getOriginalCoursesNeeded();
 		}
 	}
 
@@ -1015,19 +1015,16 @@ public class Schedule implements java.io.Serializable {
 
 
 	/**
-	 * Get the number of requirements still left to put in the schedule.
+	 * Get an estimate of the number of scheduleElements still needed for this
+	 * schedule to be complete. This is probably an overestimate (it can 
+	 * be done in fewer steps) because some elements may be able to satisfy
+	 * multiple requirements at once.
 	 * @return
 	 */
 	public int estimatedCoursesLeft(){
 		int counter = 0;
-		ArrayList<ScheduleElement> courseEst = this.getAllElementsSorted();
-		for(Requirement n: this.getAllRequirements()){
-			if((n.usesCreditHours)){
-				counter += n.storedCoursesLeft()/4;
-			}
-			else{
-				counter += n.storedCoursesLeft();
-			}
+		for(Requirement r: this.getAllRequirements()){
+			counter += r.storedCoursesLeft();
 		}
 		return counter;
 	}

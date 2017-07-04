@@ -137,7 +137,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 			}catch(Exception e){
 				parseException(s, "the 'of' in a Terminal Requirement must be preceeded by an integer.");
 			}
-			result.recalcOriginalCoursesNeeded();
+			result.recalcOriginalNumberNeeded();
 			return result;
 		}
 		if(s.contains(">") || s.contains("<")){
