@@ -137,7 +137,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 			}catch(Exception e){
 				parseException(s, "the 'of' in a Terminal Requirement must be preceeded by an integer.");
 			}
-			result.recalcOriginalCoursesNeeded();
+			result.recalcOriginalNumberNeeded();
 			return result;
 		}
 		if(s.contains(">") || s.contains("<")){
@@ -368,10 +368,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return p;
 	}
 
-	@Override
-	public String getDisplayString() {
-		return this.saveString();
-	}
+	//Terminal requirement uses Requirement's getDisplayString.
+	
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();

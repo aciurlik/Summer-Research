@@ -162,8 +162,10 @@ public class Driver implements java.io.Serializable{
 		JPanel problems = new JPanel();
 		problems.setLayout(new BorderLayout());
 
-		JLabel instruct = new JLabel("The course "+ c.getPrefix() + " satisfies some requirements that don't want to share.\n"
-				+ "Which requirements should it satisfy?");
+		JLabel instruct = new JLabel(
+		    "The course "+ c.getPrefix() + " might satisfy the following requirements,"
+		+ "\n   but it is not allowed to satisfy all of them at once. "
+		+ "\nWhich requirements do you want it to satisfy?");
 
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
@@ -284,8 +286,6 @@ public class Driver implements java.io.Serializable{
 		}
 		this.sch.addMajor(m);
 		this.update();
-
-
 	}
 
 
@@ -627,7 +627,7 @@ public class Driver implements java.io.Serializable{
 	 * let the user pick one  
 	 * @return
 	 */
-	public static int GUICHooseAmong(ArrayList<Object> choicesList, ArrayList<String> displaysList, String message, String title){
+	public static int GUIChooseAmong(ArrayList<Object> choicesList, ArrayList<String> displaysList, String message, String title){
 		Object[] choices = choicesList.toArray(new Object[choicesList.size()]);
 		Object[] displays = displaysList.toArray(new String[displaysList.size()]);
 		if(choices.length != displays.length){
@@ -640,7 +640,7 @@ public class Driver implements java.io.Serializable{
 				break;
 			}
 		}
-		if(chosenIndex > choices.length){
+		if(chosenIndex >= choices.length){
 			return -1;
 		}
 		return chosenIndex;
@@ -653,7 +653,7 @@ public class Driver implements java.io.Serializable{
 			semesterStrings.add(d.getUserString());
 			semesterObjects.add(d);
 		}
-		int index = GUICHooseAmong(semesterObjects, semesterStrings, "Which was your first semester at furman? ", "Pick a semester");
+		int index = GUIChooseAmong(semesterObjects, semesterStrings, "Which was your first semester at furman? ", "Pick a semester");
 		if(index != -1){
 			return semesters.get(index);
 		}
@@ -999,14 +999,8 @@ public class Driver implements java.io.Serializable{
 
 		}
 	}
-
-
-	public static void main(String[] args){
-
-		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
-
+	
+	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
 		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
@@ -1015,11 +1009,30 @@ public class Driver implements java.io.Serializable{
 		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
-		SemesterDate start = GUIChooseStartTime(supportedSemesters);
-		Schedule.defaultFirstSemester = start;
+		return GUIChooseStartTime(supportedSemesters);
+		
+	}
 
-		//new Driver();
-		testDriver();
+
+	public static void main(String[] args){
+
+		//This just loads FurmanOfficial into memory so that the UIManager
+		// will be set before other static code gets run.
+		Color c = FurmanOfficial.grey;
+		
+		SemesterDate start = tryPickStartDate();
+		
+		if(start == null){
+			//this will close any running code, including the JOptionPanes which don't get collected by 
+			// the garbage collector for some reason.
+			System.exit(0);
+			return;
+		}
+		else{
+			Schedule.defaultFirstSemester = start;
+			//new Driver();
+			testDriver();
+		}
 
 
 	}
