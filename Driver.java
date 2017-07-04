@@ -999,14 +999,8 @@ public class Driver implements java.io.Serializable{
 
 		}
 	}
-
-
-	public static void main(String[] args){
-
-		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
-
+	
+	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
 		//supportedSemesters.add( new SemesterDate(2013, SemesterDate.FALL ));
@@ -1015,13 +1009,27 @@ public class Driver implements java.io.Serializable{
 		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
-		SemesterDate start = GUIChooseStartTime(supportedSemesters);
+		return GUIChooseStartTime(supportedSemesters);
+		
+	}
+
+
+	public static void main(String[] args){
+
+		//This just loads FurmanOfficial into memory so that the UIManager
+		// will be set before other static code gets run.
+		Color c = FurmanOfficial.grey;
+		
+		SemesterDate start = tryPickStartDate();
+		
 		if(start == null){
+			//this will close any running code, including the JOptionPanes which don't get collected by 
+			// the garbage collector for some reason.
+			System.exit(0);
 			return;
 		}
 		else{
 			Schedule.defaultFirstSemester = start;
-
 			//new Driver();
 			testDriver();
 		}
