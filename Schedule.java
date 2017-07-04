@@ -1323,9 +1323,6 @@ public class Schedule implements java.io.Serializable {
 		for(ScheduleElement e : this.getAllElements()){
 			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
 		}
-
-
-
 		for(Major m: this.getMajors()){
 			result.append("\n");
 			result.append("\n");
@@ -1338,11 +1335,18 @@ public class Schedule implements java.io.Serializable {
 					result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	\n");
 				}
 				int counter = 0;
-				int numToChoose = r.numToChoose;
+				ArrayList<Integer> satisfiedSEPointers = new ArrayList<Integer>();
 				for(int i=0; i<this.getAllElements().size(); i++){
-					ScheduleElement se = this.getAllElements().get(i);
+					ScheduleElement se = allOrderedElements.get(i);
 
 					if(elementsSatisfy.get(se).contains(r)){
+						satisfiedSEPointers.add(i);
+					}
+				}
+
+					ArrayList<Integer> finalList = trimSEList(satisfiedSEPointers, allOrderedElements, r);
+					for(int p=0; p<finalList.size(); p++){
+						ScheduleElement se = allOrderedElements.get(finalList.get(p));
 						if(counter ==0 && !isComplete){
 							result.append("Partially Satisfied by: \n");
 						}
@@ -1352,50 +1356,63 @@ public class Schedule implements java.io.Serializable {
 
 						StringJoiner joiner = new StringJoiner("\n");
 						StringBuilder part = new StringBuilder();
-						if(numToChoose>0){
 							part.append("   "+ se.getDisplayString());
 							if(se instanceof ScheduleCourse){
 								part.append(", " +((ScheduleCourse) se).getSemester().toString() + "\n");
 							}
 							else if(se instanceof Requirement){
-								if(coorespondingDates.get(i).equals(defaultPrior)){
+								if(coorespondingDates.get(finalList.get(p)).equals(defaultPrior)){
 									part.append("," + "Taken before Furman \n");
 								}
 								else{
-									part.append(", " + coorespondingDates.get(i).toString() + "\n");
+									part.append(", " + coorespondingDates.get(finalList.get(p)).toString() + "\n");
 								}
 
-							}
-							if(m.name.equals("GER")){
-								numToChoose--;
-							}
+							
+							
 						}
-					
 						joiner.add(part.toString());
 						counter++;
 						result.append(joiner.toString());
-
-
-
 					}
+
+					
+
+
+
 				}
-			}
+			
+		}
+	
+
+	return result.toString();
+
+}
+
+
+private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, ArrayList<ScheduleElement> allOrderedElements, Requirement r) {
+	ArrayList<ScheduleElement> toCompleteR = new ArrayList<ScheduleElement>();
+	for(int i: satisfiedSEPointers){
+		toCompleteR.add(allOrderedElements.get(i));
+	}
+	for(int i = 0; i<satisfiedSEPointers.size(); i++){
+		ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
+		toCompleteR.remove(toRemove);
+		if(!r.isComplete(toCompleteR, false)){
+			toCompleteR.add(i, toRemove);
+		}
+		else{
+			satisfiedSEPointers.remove(i);
 		}
 
-
-
-
-
-
-
-
-
-
-		return result.toString();
-
 	}
-
-
+	return satisfiedSEPointers;
 
 
 }
+}
+
+
+
+
+
