@@ -26,7 +26,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	boolean usesMax;
 	public static int defaultCreditHours =4;
 	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
-	
+	public int storedCreditHours = -1;
 
 
 
@@ -44,12 +44,20 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		this(p);
 	}
 
-	public int getCreditHours(){
+	public int calculateCreditHours(){
 		if(this.isExact()){
 			return CourseList.getCoursesCreditHours(p);
 		}
-		return defaultCreditHours;
-
+		else{
+			return defaultCreditHours;
+		}
+	}
+	
+	public int getCreditHours(){
+		if(this.storedCreditHours == -1){
+			this.storedCreditHours = calculateCreditHours();
+		}
+		return this.storedCreditHours;
 	}
 
 	/////////////////////
@@ -129,7 +137,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 			}catch(Exception e){
 				parseException(s, "the 'of' in a Terminal Requirement must be preceeded by an integer.");
 			}
-			result.recalcOriginalCoursesNeeded();
+			result.recalcOriginalNumberNeeded();
 			return result;
 		}
 		if(s.contains(">") || s.contains("<")){
@@ -258,12 +266,6 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
 		int result = numToChoose;
 		for(ScheduleElement e : taken){
-			if(isSatisfiedBy(e.getPrefix())){
-				result --;
-				if(result <= 0){
-					return result;
-				}
-			}
 			if(e instanceof Requirement){
 				if(((Requirement) e).isTerminal()){
 					if(((Requirement) e).getTerminal().alsoCompletes(this)){
@@ -272,6 +274,12 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 							return result;
 						}
 					}
+				}
+			}
+			if(isSatisfiedBy(e.getPrefix())){
+				result --;
+				if(result <= 0){
+					return result;
 				}
 			}
 		}
@@ -315,25 +323,15 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-			taken.add(new PrefixHours(this.p, CourseList.getCoursesCreditHours(this.p)));
+			taken.add(new PrefixHours(this.p, this.getCreditHours()));
 			return r.isComplete(taken, false);
 		}
 		else{
-			if(r instanceof TerminalRequirement){
-				TerminalRequirement t = (TerminalRequirement)r;
-				if(t.usesMax){
-					if(!this.usesMax || this.max > t.max){
-						return false;
-					}
-				}
-				if(t.usesMin){
-					if(!this.usesMin || this.min < t.min){
-						return false;
-					}
-				}
-				return true;
+			if(r.isTerminal()){
+				TerminalRequirement t = r.getTerminal();
+				return t.completedBy(this);
 			}
-			//what if it's just a requirement?
+			//TODO what if this isn't exact, and r is a full blown requirement?
 			return false;
 		}
 
@@ -370,25 +368,27 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return p;
 	}
 
+	//Terminal requirement uses Requirement's getDisplayString.
+	
 	@Override
-	public String getDisplayString() {
-		return this.saveString();
-	}
-	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		for(Requirement t : r){
-			if(t.isSatisfiedBy(this.getTerminal())){
-				result.add(t);
-
+		for(Requirement r : reqList){
+			if(this.equals(r)){
+				result.add(r);
 			}
-		
-			else if(this.equals(t)){
-				result.add(t);
+			else{
+				if(RequirementGraph.doesPlayNice(r, this)){
+					if(r.isSatisfiedBy(this)){
+						result.add(r);
+					}
+				}
 			}
 		}
 		return result;
 	}
+	
+	
 
 
 
@@ -471,21 +471,13 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		System.out.println("Finished testing");
 	}
 
-	//INFINITELOOPHAZARD
-	public boolean isCompletedBy(HashSet<TerminalRequirement> s){
-		if(s.contains(this)){
-			return true;
-		}
-		for(TerminalRequirement t : s){
-			if(this.completedBy(t)){
-				return true;
-			}
-		}
-		return false;
-	}
 
+	
 	public boolean completedBy(TerminalRequirement t){
 		if(this.isExact()){
+			if(!t.isExact()){
+				return false;
+			}
 			return t.p.equals(this.p);
 		}
 		if(!t.p.getSubject().equals(this.p.getSubject())){
@@ -509,13 +501,15 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		Interval<Integer> ourInterval = new Interval<Integer>(left, right);
 		Interval<Integer> theirInterval = new Interval<Integer>(otherLeft, otherRight);
-		return theirInterval.contains(ourInterval);
+		return ourInterval.contains(theirInterval, true);
 	}
 
 
 	//INFINITELOOPHAZARD
 	@Override
 	public boolean equals(Requirement r){
+		//If r isn't a terminal, we can quickly recurse with a
+		// terminal or else say no.
 		if(!(r instanceof TerminalRequirement)){
 			if(r.isTerminal()){
 				return this.equals(r.getTerminal());
@@ -524,20 +518,12 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 				return false;
 			}
 		}
+		//after recursion, r is a terminal.
 		TerminalRequirement other = (TerminalRequirement)r;
-		if(this.isExact()){
-			if(!other.isExact()){
-				return false;
-			}
-			return this.p.equals(other.p);
+		if(this.completedBy(other) && other.completedBy(this)){
+			return this.numToChoose == other.numToChoose;
 		}
-		if(this.usesMin ^ other.usesMin){
-			return false;
-		}
-		if(this.usesMax ^ other.usesMax){
-			return false;
-		}
-		return (this.min == other.min && this.max == other.max);
+		return false;
 	}
 
 	//INFINITELOOPHAZARD
@@ -557,11 +543,16 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 
 	public static void testTerminalsEquality(){
-		TerminalRequirement t = TerminalRequirement.readFrom("MTH-150");
-		TerminalRequirement x = TerminalRequirement.readFrom("MTH-150");
+		TerminalRequirement t = TerminalRequirement.readFrom("ART>199<300");
+		TerminalRequirement x = TerminalRequirement.readFrom("ART>199<300");
+		Requirement y = Requirement.readFrom("(ART>199<300)");
 		System.out.println(t.equals(x));
 		System.out.println(x.equals(t));
-		System.out.println(t.hashCode());
+		System.out.println(y.equals(x));
+		System.out.println(x.equals(y));
+		
+		
+		/*System.out.println(t.hashCode());
 		System.out.println(x.hashCode());
 
 		HashSet<TerminalRequirement> set = new HashSet<TerminalRequirement>();
@@ -569,6 +560,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		set.add(x);
 		System.out.println(set.size());
 		System.out.println(set.contains(x));
+		*/
 	}
 
 

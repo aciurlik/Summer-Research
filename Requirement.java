@@ -18,10 +18,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// should be set to 2.
 	// if this requirement usesCreditHours, then numToChoose is the number
 	// of credit hours, and storedCoursesLeft stores the number of credit hours left.
-	boolean usesCreditHours;
+	private boolean usesCreditHours;
 	String name;
-	private int originalCoursesNeeded;
-	private int storedCoursesLeft;
+	private int originalNumberNeeded; //This is one of the stored fields for requirement(used to make computation faster).
+	// It stores how many courses you'd need to schedule to satisfy this requirement if you had just started from scratch.
+	private int storedNumberLeft; //This is one of the stored fields for requirement(used to make computation faster and 
+	// to pass information between the data side and the GUI side).
+	// There are a number of methods that modify it, and it is up to other classes (like schedule) to ensure that
+	// the correct value is stored and is not overwritten at the wrong time.
 	public static int defaultCreditHours =4;
 	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
 
@@ -38,7 +42,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.scheduledSemester = new ArrayList<SemesterDate>();
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
-		this.originalCoursesNeeded = 1;
+		this.originalNumberNeeded = 1;
 		usesCreditHours = false;
 	}
 
@@ -63,29 +67,52 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.numToChoose = numToChoose;
 		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
+	
+	
+	/////////////////////////
+	/////////////////////////
+	////Getters and setters
+	/////////////////////////
+	/////////////////////////
 
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
-		this.recalcOriginalCoursesNeeded();
+		this.recalcOriginalNumberNeeded();
+		this.storedNumberLeft = this.originalNumberNeeded;
 	}
 	public void setNumToChoose(int n){
 		if(n > choices.size()){
 			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
 		}
 		this.numToChoose = n;
-		recalcOriginalCoursesNeeded();
-	}
-
-	public int storedCoursesLeft(){
-		return storedCoursesLeft;
+		recalcOriginalNumberNeeded();
+		this.storedNumberLeft = this.originalNumberNeeded;
 	}
 
 	/**
-	 * This will invalidate any stored courses taken
+	 * Return an estimate of the number of courses this requirement still
+	 * needs in order to be complete. Automatically takes creditHours requirements
+	 * into account.
+	 * @return
 	 */
-	public void recalcOriginalCoursesNeeded(){
-		this.originalCoursesNeeded = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		this.storedCoursesLeft = this.originalCoursesNeeded;
+	public int storedCoursesLeft(){
+		if(this.usesCreditHours()){
+			return storedNumberLeft / 4;
+		}
+		return storedNumberLeft;
+	}
+	
+	/**
+	 * Return the number needed - may be a number of courses or a number of
+	 * credit hours.
+	 * @return
+	 */
+	public int storedNumberLeft(){
+		return this.storedNumberLeft;
+	}
+	
+	public boolean usesCreditHours(){
+		return usesCreditHours;
 	}
 
 	public void setHoursNeeded(int hours){
@@ -99,6 +126,45 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 	public String getName() {
 		return this.name;
+	}
+	
+
+	public int getCreditHours() {
+		if(this.isTerminal()){
+			return this.getTerminal().getCreditHours();
+		}
+		else{
+			return defaultCreditHours;
+		}
+	}
+	
+	public ArrayList<SemesterDate> getScheduledSemester() {
+		return scheduledSemester;
+	}
+
+
+	public void addScheduledSemester(SemesterDate toAdd) {
+		scheduledSemester.add(toAdd);
+	}
+	
+	
+	
+	/**
+	 * recalculate how many courses it would take to complete this requirement
+	 * if you started over from scratch.
+	 */
+	public void recalcOriginalNumberNeeded(){
+		int result = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		this.originalNumberNeeded = result;
+	}
+	
+	public int getOriginalCoursesNeeded(){
+		if(this.usesCreditHours){
+			return this.originalNumberNeeded / 4;
+		}
+		else{
+			return this.originalNumberNeeded;
+		}
 	}
 
 
@@ -190,7 +256,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return minMoreNeeded(taken, storeValue) <= 0;
 	}
 	public boolean storedIsComplete(){
-		return this.storedCoursesLeft <= 0;
+		return this.storedNumberLeft <= 0;
 	}
 
 
@@ -203,12 +269,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 */
 	public double percentComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
 		double minNeeded = minMoreNeeded(taken, storeValue);
-		double originalNeeded = this.originalCoursesNeeded;
+		double originalNeeded = this.originalNumberNeeded;
 		double result = (1.0 - (minNeeded * 1.0/originalNeeded));
 		return result;
 	}
 	public double storedPercentComplete(){
-		double result = (1.0 - (storedCoursesLeft * 1.0/  this.originalCoursesNeeded)); 
+		double result = (1.0 - (storedNumberLeft * 1.0/  this.originalNumberNeeded)); 
 		return result;
 	}
 
@@ -242,7 +308,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		result = result - numPlannedLater;
 		result = Math.max(result, 0);
 		if(storeValue){
-			this.storedCoursesLeft = result;
+			this.storedNumberLeft = result;
 		}
 		return result;
 	}
@@ -325,18 +391,40 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return null;
 	}
 
+	
+	/**
+	 * Note - this method is used by TerminalRequirement.
+	 * @param e
+	 * @return
+	 */
 	public boolean isSatisfiedBy(ScheduleElement e) {
 		if(e instanceof Requirement){
-			if(e.equals(this)){
+			Requirement r = (Requirement)e;
+			if (r.isTerminal()){
+				if (r.getTerminal().alsoCompletes(this)){
+					return true;
+				}
+			}
+			else if(r.equals(this)){
 				return true;
 			}
-			else if (((Requirement)e).alsoCompletes(this)){
-				return true;
-			}
+			return false;
 		}
-		return isSatisfiedBy(e.getPrefix());
+		else{
+			return isSatisfiedBy(e.getPrefix());
+		}
 	}
+	
 	//INFINITELOOPHAZARD
+	/**
+	 * See if this prefix could ever possibly help this 
+	 * requirement become more satisfied.
+	 * 
+	 * Formally, this is equivalent to checking if
+	 *   minMoreNeeded(emptyset) > minMoreNeeded({p})
+	 * @param p
+	 * @return
+	 */
 	public boolean isSatisfiedBy(Prefix p){
 		for(Requirement r : this.choices){
 			if(r.isSatisfiedBy(p)){
@@ -345,37 +433,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return false;
 	}
-
-	//INFINITELOOPHAZARD
-	/**
-	 * Return true if any strategy for completing this requirement
-	 * will also complete r.
-	 * Currently does not handle credit hours requirements.
-	 * @param r
-	 * @return
-	 */
-	public boolean alsoCompletes(Requirement r){
-		if(this.equals(r)){
-			return true;
-		}
-		if(!RequirementGraph.doesPlayNice(this, r)){
-			return false;
-		}
-		long start = System.currentTimeMillis();
-		CompletionSetsIter csi = new CompletionSetsIter(this);
-		while(csi.hasNext()){
-			HashSet<TerminalRequirement> nextCompletionSet = csi.next();
-			//System.out.println(nextCompletionSet);
-			if(!r.isCompletedBy(nextCompletionSet)){
-				return false;
-			}
-			if(System.currentTimeMillis() - start > 50){
-				return false;
-			}
-		}
-		return true;
-	}
-
 	@Override
 	public boolean equals(Object o){
 		if(!(o instanceof Requirement)){
@@ -395,8 +452,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(r.numToChoose != this.numToChoose){
 			return false;
 		}
+		//check that this contains that and that contains this.
 		for(Requirement choice : choices){
 			if(!r.choices.contains(choice)){
+				return false;
+			}
+		}
+		for(Requirement choice : r.choices){
+			if(!this.choices.contains(choice)){
 				return false;
 			}
 		}
@@ -412,22 +475,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return total;
 	}
-
-	//INFINITELOOPHAZARD
-	public boolean isCompletedBy(HashSet<TerminalRequirement> s){
-		int numSubComplete = 0;
-		for(Requirement r : choices){
-			if(r.isCompletedBy(s)){
-				numSubComplete ++;
-				if(numSubComplete >= numToChoose){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+	
+	
+	
+	
 
 
+	/**
+	 * Ensure that all stored values (storedIsComplete(), storedPercentComplete(), storedMinMoreNeeded())
+	 * reflect the values that would be returned based on this taken set
+	 * i.e. unless overwritten storedIsComplete() will return the same value as isComplete(taken).
+	 * @param taken
+	 */
 	public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
 		this.minMoreNeeded(taken, true);
 	}
@@ -436,13 +495,85 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
+	//////////////////////////////////////
+	//////////////////////////////////////
+	/////alsoCompletes methods
+	//////////////////////////////////////
+	//////////////////////////////////////
 
 
 
 
 
+	//INFINITELOOPHAZARD
+			/**
+			 * Return true if each strategy for completing this requirement
+			 * will also complete r.
+			 * Currently does not handle credit hours requirements.
+			 * 
+			 * This method is a brute force method and takes 
+			 * extreme amounts of time - it is currently restricted to
+			 * take at most 50- 60 milliseconds and then quit 
+			 * 	(if it times out, it may give an incorrect response).
+			 * 
+			 * TODO WARNING - CompletionSetsIter has a bug. It should be
+			 * returning an ArrayList of terminal requirements rather than a
+			 * hash set (if a requirement has 2 instances of the same terminal requirement,
+			 *  then this method may display incorrect behavior). However, this
+			 *  bug makes the method much faster and the method is only incorrect in
+			 *  a few cases, so it may be worth leaving it as is...
+			 * @param r
+			 * @return
+			 */
+			public boolean alsoCompletes(Requirement r){
+				if(this.equals(r)){
+					return true;
+				}
+				if(!RequirementGraph.doesPlayNice(this, r)){
+					return false;
+				}
+				//This method can take a very long time due to
+				// the extreme number of ways to 
+				long start = System.currentTimeMillis();
+				CompletionSetsIter csi = new CompletionSetsIter(this);
+				while(csi.hasNext()){
+					HashSet<TerminalRequirement> nextCompletionSet = csi.next();
+					//System.out.println(nextCompletionSet);
+					if(!r.isCompletedBy(nextCompletionSet)){
+						return false;
+					}
+					if(System.currentTimeMillis() - start > 50){
+						return false;
+					}
+				}
+				return true;
+			}
 
-
+		//INFINITELOOPHAZARD
+		/**
+		 * Check if this set of terminal requirements fully completes this
+		 * requirement. 
+		 * 
+		 * formally, (with bad notation,) returns true if minMoreNeeded(s) <= 0.
+		 * 
+		 * This is contrasted from isSatisfiedBy(), which only
+		 * checks to see if one individual object might help this requirements
+		 * out. 
+		 * @param s
+		 * @return
+		 */
+		public boolean isCompletedBy(HashSet<TerminalRequirement> s){
+			int numSubComplete = 0;
+			for(Requirement r : choices){
+				if(r.isCompletedBy(s)){
+					numSubComplete ++;
+					if(numSubComplete >= numToChoose){
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
 	/**
 	 * This class iterates over a requirement's possible completion sets.
@@ -602,10 +733,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		Requirement other = (Requirement)o;
 		//first compare based on whether they're complete, completed coming later
-		if(this.storedCoursesLeft <= 0 && !(other.storedCoursesLeft <= 0)){
+		if(this.storedNumberLeft <= 0 && !(other.storedNumberLeft <= 0)){
 			return 1;
 		}
-		if(!(this.storedCoursesLeft <= 0) && other.storedCoursesLeft <= 0){
+		if(!(this.storedNumberLeft <= 0) && other.storedNumberLeft <= 0){
 			return -1;
 		}
 
@@ -686,16 +817,27 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> r) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		if(this.isTerminal()){
-			return this.getTerminal().getRequirementsFulfilled(r);
+			//remove all enemies
+			ArrayList<Requirement> enemyless = new ArrayList<Requirement>();
+			for(Requirement r : reqList){
+				if(RequirementGraph.doesPlayNice(this, r)){
+					enemyless.add(r);
+				}
+			}
+			return this.getTerminal().getRequirementsFulfilled(enemyless);
 		}
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		for(Requirement otherReq : r){
-			if(otherReq.equals(this)){
-				result.add(otherReq);
+		for(Requirement otherReq : reqList){
+			//Remove enemies as you go
+			if(RequirementGraph.doesPlayNice(otherReq, this)){
+				if(otherReq.equals(this)){
+					result.add(otherReq);
+				}
 			}
 		}
+		
 		return result;
 	}
 
@@ -704,26 +846,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return this.getDisplayString();
 	}
 
-
-	public int getCreditHours() {
-		if(this.isTerminal()){
-			return CourseList.getCoursesCreditHours(this.getTerminal().p);
-		}
-		else{
-			return defaultCreditHours;
-		}
-	}
-
-
-	
-	public ArrayList<SemesterDate> getScheduledSemester() {
-		return scheduledSemester;
-	}
-
-
-	public void addScheduledSemester(SemesterDate toAdd) {
-		scheduledSemester.add(toAdd);
-	}
 
 
 
@@ -878,7 +1000,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public static Requirement readFrom(String saveString){
 		Stack<String> tokens = tokenize(saveString);
 		Requirement result = parse(tokens);
-		result.recalcOriginalCoursesNeeded();
+		result.recalcOriginalNumberNeeded();
 		if(!tokens.isEmpty()){
 			throw new RuntimeException("End of string while parsing requirement");
 		}
@@ -1106,6 +1228,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				System.out.println("Complete?" + complete );
 				//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());
 				//System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
+				System.out.println(r.numToChoose);
 				System.out.println();
 			}
 

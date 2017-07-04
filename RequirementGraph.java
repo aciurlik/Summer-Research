@@ -31,6 +31,9 @@ public class RequirementGraph implements java.io.Serializable {
 	 * @param r2
 	 */
 	public static void putEdge(Requirement r1, Requirement r2){
+		if(r1.equals(r2)){
+			System.out.println("You're trying make two requirements into enemies, but they are equal! "+ r1 + ", " + r2);
+		}
 		HashSet<Requirement> outEdges1 = edges.get(r1);
 		HashSet<Requirement> outEdges2 = edges.get(r2);
 		if(outEdges1 == null){
