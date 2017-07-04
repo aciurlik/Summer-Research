@@ -4,7 +4,10 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringJoiner;
 
 
@@ -28,9 +31,8 @@ public class Schedule implements java.io.Serializable {
 
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
-	private String name;
 	SemesterDate firstSemester;
-	boolean savedSchedule;
+
 
 
 
@@ -566,14 +568,6 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	public boolean isSavedSchedule() {
-		return savedSchedule;
-	}
-
-
-	public void setSavedSchedule(boolean savedSchedule) {
-		this.savedSchedule = savedSchedule;
-	}
 
 
 
@@ -1304,178 +1298,97 @@ public class Schedule implements java.io.Serializable {
 
 	}
 
-	public void setReqScheduledSemester(Semester s){
-		ArrayList<Requirement> repeat = new ArrayList<Requirement>();
-		for(ScheduleElement se: s.elements){
-			if(s.isAP){
-				if(se instanceof Requirement){
-						((Requirement) se).addScheduledSemester(new SemesterDate(1995, SemesterDate.OTHER));
-						repeat.add((Requirement) se);
-
-				}
-			}
-			else if(se instanceof Requirement){
-				if(!repeat.contains(se)){
-					((Requirement) se).addScheduledSemester(s.semesterDate);
-					repeat.add((Requirement) se);
-				}
-				
-			}
-		}
-
-	}
 
 
 	public String printRequirementString(){
+		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
+		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
+		ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
+		for(Semester s: this.getAllSemesters()){
+			for(ScheduleElement se: s.elements){
+				allOrderedElements.add(se);
+				if(s.isAP){
+					coorespondingDates.add(defaultPrior);
+
+				}
+				else {
+					coorespondingDates.add(s.semesterDate);
+				}
+			}
+		}
 		StringBuilder result = new StringBuilder();
 		result.append("									Degree Checklist \n");
 		result.append("General Education Requirements");
-		for(Requirement r: this.GER.reqList){
-			int NumberToPrint=r.numToChoose;
-			result.append("\n" + r.getDisplayString() + "-");
-			if(r.minMoreNeeded(getAllElements(),false)!=0){
-				result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	");
-				int counter = 0;
-				StringJoiner joiner = new StringJoiner("\n");
-				for(ScheduleElement se: this.getAllElements()){
-					if(r.isSatisfiedBy(se)){
-						if(NumberToPrint>0){
-							if(counter ==0){
-								result.append("Partially Satisfied by: \n");
-							}
-							StringBuilder part = new StringBuilder();
-							part.append("   "+ se.getDisplayString());
-							if(se instanceof ScheduleCourse){
-								part.append(", " +((ScheduleCourse) se).getSemester().toString());
-							}
-							else if(se instanceof Requirement){
-								if(((Requirement) se).getScheduledSemester()!=null){
-									if(((Requirement) se).getScheduledSemester().equals(new SemesterDate(1995, SemesterDate.OTHER))){
-										part.append("," + "Taken before Furman");
-									}
-									else{
-										part.append(", " +((Requirement)se).getScheduledSemester().get(counter).toString());
-									}
-								}
-							}
-							joiner.add(part.toString());
-							counter++;
-							NumberToPrint--;
-						}
-					}
-
-				}
-				result.append(joiner.toString());
-
-			}
-			else{
-				int counter = 0;
-				StringJoiner joiner = new StringJoiner("\n");
-				for(ScheduleElement se: this.getAllElements()){
-
-					if(r.isSatisfiedBy(se)){
-						if(NumberToPrint>0){
-							if(counter ==0){
-								result.append("Satisfied by: \n");
-							}
-							StringBuilder part = new StringBuilder();
-							part.append("   "+ se.getDisplayString());
-							if(se instanceof ScheduleCourse){
-								part.append(", " +((ScheduleCourse) se).getSemester().toString());
-							}
-							else if(se instanceof Requirement){
-								if(((Requirement) se).getScheduledSemester().equals(new SemesterDate(1995, SemesterDate.OTHER))){
-									part.append("," + "Taken before Furman");
-								}
-								else if(((Requirement) se).getScheduledSemester()!=null){
-									part.append(", " +((Requirement)se).getScheduledSemester().get(counter).toString());
-								}
-							}
-							joiner.add(part.toString());
-							counter++;
-							NumberToPrint--;
-						}
-					}
-
-				}
-				result.append(joiner.toString());
-
-			}
+		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
+		for(ScheduleElement e : this.getAllElements()){
+			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
 		}
-		result.append("\n");
-		for(Major m: this.majorsList){
+
+
+
+		for(Major m: this.getMajors()){
 			result.append("\n");
 			result.append("\n");
 			result.append(m.name);
 			for(Requirement r: m.reqList){
 
-				result.append("\n" + r.getDisplayString() + "-");
-				if(r.minMoreNeeded(getAllElements(),false)!=0){
-					result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	");
-					int counter = 0;
-					StringJoiner joiner = new StringJoiner("\n");
-					for(ScheduleElement se: this.getAllElements()){
-						if(r.isSatisfiedBy(se)){
-							if(counter ==0){
-								result.append("Partially Satisfied by: \n");
-							}
-							StringBuilder part = new StringBuilder();
-							part.append("   "+ se.getDisplayString());
-							if(se instanceof ScheduleCourse){
-								part.append(", " +((ScheduleCourse) se).getSemester().toString());
-							}
-							else if(se instanceof Requirement){
-								if(((Requirement) se).getScheduledSemester().equals(new SemesterDate(1995, SemesterDate.OTHER))){
-									part.append("," + "Taken before Furman");
-								}
-								else if(((Requirement) se).getScheduledSemester()!=null){
-									part.append(", " +((Requirement)se).getScheduledSemester().get(counter).toString());
-								}
-							}
-							joiner.add(part.toString());
-							counter++;
-
-						}
-
-					}
-					result.append(joiner.toString());
-
+				result.append("\n" + r.getDisplayString() + "-  ");
+				boolean isComplete = r.storedIsComplete();
+				if(!isComplete){
+					result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	\n");
 				}
-				else{
-					int counter = 0;
-					StringJoiner joiner = new StringJoiner("\n");
-					for(ScheduleElement se: this.getAllElements()){
+				int counter = 0;
+				int numToChoose = r.numToChoose;
+				for(int i=0; i<this.getAllElements().size(); i++){
+					ScheduleElement se = this.getAllElements().get(i);
 
-						if(r.isSatisfiedBy(se)){
-							if(counter ==0){
-								result.append("Satisfied by: \n");
-							}
-							StringBuilder part = new StringBuilder();
+					if(elementsSatisfy.get(se).contains(r)){
+						if(counter ==0 && !isComplete){
+							result.append("Partially Satisfied by: \n");
+						}
+						else if(counter == 0 && isComplete){
+							result.append("Satisfied by: \n");
+						}
+
+						StringJoiner joiner = new StringJoiner("\n");
+						StringBuilder part = new StringBuilder();
+						if(numToChoose>0){
 							part.append("   "+ se.getDisplayString());
 							if(se instanceof ScheduleCourse){
-								part.append(", " +((ScheduleCourse) se).getSemester().toString());
+								part.append(", " +((ScheduleCourse) se).getSemester().toString() + "\n");
 							}
 							else if(se instanceof Requirement){
-								if(((Requirement) se).getScheduledSemester().equals(new SemesterDate(1995, SemesterDate.OTHER))){
-									part.append("," + "Taken before Furman");
+								if(coorespondingDates.get(i).equals(defaultPrior)){
+									part.append("," + "Taken before Furman \n");
 								}
-								else if(((Requirement) se).getScheduledSemester()!=null){
-									part.append(", " +((Requirement)se).getScheduledSemester().get(counter).toString());
+								else{
+									part.append(", " + coorespondingDates.get(i).toString() + "\n");
 								}
+
 							}
-							joiner.add(part.toString());
-							counter++;
-
-
+							if(m.name.equals("GER")){
+								numToChoose--;
+							}
 						}
-					}
-					result.append(joiner.toString());
+					
+						joiner.add(part.toString());
+						counter++;
+						result.append(joiner.toString());
 
+
+
+					}
 				}
 			}
-
-
 		}
+
+
+
+
+
+
+
+
 
 
 		return result.toString();
@@ -1483,14 +1396,6 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	public String getName() {
-		return name;
-	}
-
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 
 }

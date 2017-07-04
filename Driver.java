@@ -86,7 +86,7 @@ public class Driver implements java.io.Serializable{
 
 		popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-		l = ListOfMajors.readFrom(new File(ListOfMajors.majorsFile));
+		l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
 
 		this.sch = sch;
 		sch.setDriver(this);
@@ -95,8 +95,6 @@ public class Driver implements java.io.Serializable{
 
 
 		JFrame frame = new JFrame();
-		frame.setLayout(new BorderLayout());
-
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
 		menu.setFont(FurmanOfficial.normalFont);
@@ -136,7 +134,7 @@ public class Driver implements java.io.Serializable{
 		//CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
 		Schedule current = new Schedule();
-		this.b.setSchedule(current);
+	
 		//TODO make sure nothing else needs to be set
 		setSchedule(current);
 		this.update();
@@ -145,6 +143,7 @@ public class Driver implements java.io.Serializable{
 	private void setSchedule(Schedule current) {
 		sch=current;
 		this.sch.setDriver(this);
+		this.b.setSchedule(current);
 	}
 
 
@@ -850,10 +849,6 @@ public class Driver implements java.io.Serializable{
 		}
 		//Reqs
 		if(userOptions.get(0).isSelected()){
-			for(Semester s: sch.getAllSemesters()){
-				sch.setReqScheduledSemester(s);
-
-			}
 			finalPrint = finalPrint + sch.printRequirementString() + "\n";
 		}
 
@@ -883,121 +878,20 @@ public class Driver implements java.io.Serializable{
 
 
 	public void GUISaveSchedule(){
-		String  alreadySavedOption = null;
-		if(sch.savedSchedule){
-			String[] options ={"Save Schedule", "Save and Rename"};
-			alreadySavedOption = (String)JOptionPane.showInputDialog(popUP, "How would you like to save your schedule?", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, options, null);
-		}
-		if(!sch.savedSchedule || alreadySavedOption != null){
-			if(!sch.savedSchedule || alreadySavedOption.equals("Save and Rename")){
-				String schedName = (String)JOptionPane.showInputDialog(popUP, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, icon, null, null);
-				sch.setName(schedName);
-			}
-		}
-		if(sch.getName()!= null){
-			sch.setSavedSchedule(true);
-			ObjectOutputStream save = null;
-			FileOutputStream saveFile = null;
-			try {
-				saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + sch.getName() + ".ser");
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-
-				save = new ObjectOutputStream(saveFile);
-				save.writeObject(this.sch);	
-				save.close();
-
-
-
-
-
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-
-				System.out.println(e.getLocalizedMessage());
-			} 
-		}
-
-
+		FileHandler.saveSchedule(this.sch);
 	}
 
 
 
 
 	public void openSchedule() {
-		ArrayList<String> scheduleNames = new ArrayList<String>();
-		File folder = new File(MenuOptions.savedScheduleFolder);
-
-		for (File f: folder.listFiles(
-				new FileFilter(){
-					@Override
-
-					public boolean accept(File pathname) {
-
-						String fullName = pathname.getAbsolutePath();
-						int i = fullName.lastIndexOf('.');
-						if(i <= 0){
-							return false;
-						}
-						String extension = fullName.substring(i+1);
-						return pathname.isFile() && extension.equals("ser");
-					}
-				}
-				)){
-
-
-			scheduleNames.add(f.getName());
-
-
-		}
-		String[] finalSchedNames = new String[scheduleNames.size()];
-		for(int i=0; i<finalSchedNames.length; i++){
-			finalSchedNames[i]=scheduleNames.get(i);
-		}
-		String chosenSched = (String) JOptionPane.showInputDialog(popUP, "Which schedule would you like to open?", "Open Schedule", JOptionPane.PLAIN_MESSAGE, icon, finalSchedNames, finalSchedNames[0]);		
-		if(chosenSched !=null){
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ObjectInputStream ois = null;
-			try {
-				ois = new ObjectInputStream(fis);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				Schedule result = (Schedule) ois.readObject();
-				this.b.setSchedule(result);
+				Schedule result = FileHandler.openSchedule();
+				if(result!=null){
 				//TODO make sure nothing else needs to be set
 				setSchedule(result);
 				this.update();
+				}
 
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				ois.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-
-		}
 	}
 
 

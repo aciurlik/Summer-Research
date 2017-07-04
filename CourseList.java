@@ -39,30 +39,26 @@ public class CourseList implements java.io.Serializable  {
 
 	public static final boolean masterIsNotAround = true;
 
-	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
-	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
+	
 
-	private static ArrayList<Course> listOfCourses = new ArrayList<Course>();
+	private static ArrayList<Course> listOfCourses;
 	private static Hashtable<Prefix, String> rawPrereqs;
-	private static Hashtable<String, String> savedPrereqMeanings;
+	static Hashtable<String, String> savedPrereqMeanings;
 	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
 
 	static{
-		readAll();
-	}
-
-	public static CourseList testList(){
-		return readAll();
-	}
-
-
-	public CourseList(){
 		listOfCourses = new ArrayList<Course>();
+		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 		rawPrereqs = new Hashtable<Prefix, String>();
 		savedPrereqMeanings = new Hashtable<String, String>();
-		loadPrereqMeanings(prereqMeaningsFile);
-		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
+		readAll();
+		FileHandler.loadPrereqMeanings(FileHandler.prereqMeaningsFile);
 	}
+
+	public static void testList(){
+	}
+
+
 
 
 
@@ -207,42 +203,11 @@ public class CourseList implements java.io.Serializable  {
 
 	public static void addPrereqMeaning(String originalString, String ourMeaning){
 		savedPrereqMeanings.put(originalString,ourMeaning);
-		savePrereqMeanings(prereqMeaningsFile);
+		FileHandler.savePrereqMeanings();
 	}
 
-	public static void loadPrereqMeanings(String fileName){
-		File f = new File(fileName);
-		if(!f.exists()){
-			try{
-				f.createNewFile();
-			}catch(Exception e){}
-			savedPrereqMeanings = new Hashtable<String, String>();
-			savePrereqMeanings(fileName);
-			return;
-		}
-		try{
-			FileInputStream fis = new FileInputStream(fileName);
-			ObjectInputStream in = new ObjectInputStream(fis);
-			savedPrereqMeanings = (Hashtable<String, String>) in.readObject();
-			in.close();
-		}catch(Exception e){
-			System.out.println("There was an error loading the saved meanings");
-			e.printStackTrace();
-		}
-	}
-	public static void savePrereqMeanings(String fileName){
-		try{
-			FileOutputStream fos = new FileOutputStream(fileName, false); //overwrite, don't append.
-			ObjectOutputStream out = new ObjectOutputStream(fos);
-			out.writeObject(savedPrereqMeanings);
-			out.close();
-		}
-		catch(Exception e){
-			System.out.println("There was an error saving the meanings of your prereq strings");
-			e.printStackTrace();
-		}
-	}
 
+	
 
 
 
@@ -323,7 +288,7 @@ public class CourseList implements java.io.Serializable  {
 	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c: input){
-			if(c.getPrefix().getSubject().equals(p.getSubject())){
+			if(c.getPrefix().equals(p)){
 				result.add(c);
 			}
 		}
@@ -636,41 +601,25 @@ public class CourseList implements java.io.Serializable  {
 	//////////////////////////////
 
 
-	public static CourseList readAll(){
-		CourseList result = new CourseList();
-		File f = new File(courseListFolder);
-		for ( File semesterFile : f.listFiles(new FilenameFilter(){
-			@Override
-			public boolean accept(File dir, String name) {
-				if(name.contains(".csv")){
-					return true;
-				}
-				return false;
-			}
-
-		})){
-			result.addCoursesIn(semesterFile);
-		}
-		return result;
+	public static void readAll(){
+		FileHandler.readAllCourses();
+	
 	}
 
 
-	public static void addCoursesIn(File furmanCoursesFile){
+	public static void addCoursesIn(ArrayList<String> fileLines){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
 		Course duplicateCourse =null;
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(furmanCoursesFile));
+	
 			//skip the first line of field names
-
-			br.readLine();
-
-			String line = br.readLine();
-
+		
+			
+		
+			int index = 1;
 			//Read in each course
-			while(line != null){
-				ArrayList<String> data = SaverLoader.parseCSVLine(line);
+			while(index < fileLines.size()){
+				ArrayList<String> data = SaverLoader.parseCSVLine(fileLines.get(index));
 				String sectionNumber = data.get(1);
 				//Check if we've found a new course
 				if(! sectionNumber.equals( lastSectionNumber)){
@@ -725,9 +674,8 @@ public class CourseList implements java.io.Serializable  {
 						}
 					}
 				}
-				line = br.readLine();
+				index++;
 			}
-			br.close();
 			if(lastCourse != null){
 				add(lastCourse);
 
@@ -735,10 +683,7 @@ public class CourseList implements java.io.Serializable  {
 			if(duplicateCourse != null){
 				add(duplicateCourse);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		
 
 	}
 
@@ -789,8 +734,8 @@ public class CourseList implements java.io.Serializable  {
 	//////////////////////////////
 
 	public static void main(String[] args){
-		CourseList c = CourseList.readAll(); //CourseList.testList();
-		c.viewKnownPrereqs();
+		// CourseList.readAll(); //CourseList.testList();
+		viewKnownPrereqs();
 		/*for(String s : c.allUnknownPrereqs()){
 			System.out.println(s);
 		}*/

@@ -65,9 +65,11 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String exploreMayX = "Explore MayX Opportunities";
 	public static final  String help ="Help";
 	public static String checkAllErrors = "Check all Errors";
+	public static String deleteSchedule = "Delete Schedule";
 	
 	
 	public static boolean UIType;
+	
 
 
 	public boolean isUIType() {
