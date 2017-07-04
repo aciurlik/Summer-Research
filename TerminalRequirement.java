@@ -368,10 +368,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return p;
 	}
 
-	@Override
-	public String getDisplayString() {
-		return this.saveString();
-	}
+	//Terminal requirement uses Requirement's getDisplayString.
+	
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
