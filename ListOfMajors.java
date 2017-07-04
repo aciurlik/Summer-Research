@@ -21,52 +21,7 @@ public class ListOfMajors implements java.io.Serializable {
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
 
 
-	public static final String majorsFile = MenuOptions.resourcesFolder + "Majors";
 
-
-
-	public static ListOfMajors testList(){
-		ListOfMajors result = readFrom(new File(majorsFile));
-		return result;
-	}
-
-	public static ListOfMajors readFrom(File folder){
-		ListOfMajors result = new ListOfMajors();
-		for (File f: folder.listFiles(
-				
-				new FileFilter(){
-					
-					@Override
-					
-					public boolean accept(File pathname) {
-					
-						String fullName = pathname.getAbsolutePath();
-						int i = fullName.lastIndexOf('.');
-						if(i <= 0){
-							return false;
-						}
-						String extension = fullName.substring(i+1);
-						return pathname.isFile() && extension.equals("mjr");
-					}
-
-				}
-				)){
-		
-			try{
-				Major major = Major.readFrom(f);
-				//System.out.println(major.saveString());
-				result.add(major);
-			
-				
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				System.out.println("I'm skipping  " + f.getName());
-			}
-
-		}
-		return result;
-	}
 
 
 	public void saveMe(Major m, File f){
@@ -195,7 +150,7 @@ public class ListOfMajors implements java.io.Serializable {
 	}
 
 	public static void main(String[] args){
-		ListOfMajors l = ListOfMajors.readFrom(new File("Majors"));
+		ListOfMajors l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
 		for(Major m : l.completeMajorsList){
 			System.out.println("Start of Major:");
 			System.out.println(m.saveString());

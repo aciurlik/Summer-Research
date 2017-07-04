@@ -103,61 +103,45 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		//Build the file menu-> Add/Save Schedule
 		menu = new JMenu("File");
 		this.add(menu);
-	
-		
+
+
 		menuItem = new JMenuItem("New Schedule",
 				KeyEvent.VK_T);
 		JPopupMenu newSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
 		newSched.add(menuItem);
 		menu.add(menuItem);
-		
-		/**
-		 *
-		 * 
-		 * 
-		 * 
-		 * 	menuItem = new JMenuItem("Save Schedule");
-		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
-		menuItem.addActionListener(this);
-		saveSched.add(menuItem);
-		menu.add(menuItem);
-		
-	
-		
 
-		menuItem = new JMenuItem("Print Schedule");
-		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
+
+		menuItem = new JMenuItem(MenuOptions.openSchedule);
+		JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
-		saveSched.add(menuItem);
+		openSched.add(menuItem);
 		menu.add(menuItem);
-		 */
-		
-		
-		 menuItem = new JMenuItem(MenuOptions.openSchedule);
-			JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
-			menuItem.addActionListener(this);
-			openSched.add(menuItem);
-			menu.add(menuItem);
-		
-		
-		
+
+
+
 		menuItem = new JMenuItem("Save Schedule");
 		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
 		menuItem.addActionListener(this);
 		saveSched.add(menuItem);
 		menu.add(menuItem);
-		
-		
-		
+
+
+
 		menuItem = new JMenuItem("Print Schedule");
 		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
 		menuItem.addActionListener(this);
 		printSched.add(menuItem);
 		menu.add(menuItem);
-		
-		
-		
+
+		menuItem = new JMenuItem("Delete Schedule");
+		JPopupMenu deleteSched = new JPopupMenu(MenuOptions.deleteSchedule);
+		menuItem.addActionListener(this);
+		deleteSched.add(menuItem);
+		menu.add(menuItem);
+
+
 		menuItem = new JMenuItem("Check all Errors");
 		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
 		menuItem.addActionListener(this);
@@ -207,23 +191,23 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		trackPopup.add(menuItem);
 		submenu.add(menuItem);
 
-	
+
 
 		menu.add(submenu);
 
-/**
- * //Add Help
+		/**
+		 * //Add Help
 		menu = new JMenu("Help");
 		JPopupMenu helpMePopup = new JPopupMenu(MenuOptions.help);
 		menu.addActionListener(this);
 		helpMePopup.add(menu);
 		this.add(menu);
 
- * 
- * 
- * 
- */
-		
+		 * 
+		 * 
+		 * 
+		 */
+
 
 
 
@@ -252,11 +236,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		if(e.getActionCommand().equals(MenuOptions.addMayX)){
 			d.GUIYearsPopUP(e.getActionCommand());
 		}
-		
+
 		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
 			d.GUIChooseSummerSession();
 		}
-		
+
 		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
 			d.GUIPopUP(e.getActionCommand());
 		}
@@ -270,19 +254,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			d.GUISaveSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.printSchedule)){
-		
-				d.GUIPrintSchedule();
+
+			d.GUIPrintSchedule();
 		}
-		
+
 		if(e.getActionCommand().equals(MenuOptions.help)){
-			System.out.println("HElp yourself");
+			System.out.println("Help yourself");
 		}
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
 			d.GUICheckAllErrors(true);
 		}
+		if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
+			FileHandler.deleteSchedule();
+		}
 	}
 
 
-	}
+}
 
 
