@@ -33,17 +33,7 @@ public class Schedule implements java.io.Serializable {
 	private SemesterDate currentSemester;
 	SemesterDate firstSemester;
 
-
-
-
-
-
-
-
-
-
-
-	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
+	public static final boolean prereqsCanBeSatisfiedInSameSemester = false;
 
 
 
@@ -1098,6 +1088,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(prereqs.size() > 0){
 			Major prereqsM = new Major("Prereqs");
+			prereqsM.chosenDegree = -1;
 			boolean unfulfilledPrereq = false;
 			for(Prereq p : prereqs){
 				if(!p.getRequirement().storedIsComplete()){

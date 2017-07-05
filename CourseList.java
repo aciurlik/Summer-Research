@@ -268,6 +268,9 @@ public class CourseList implements java.io.Serializable  {
 	}
 
 	public static  ArrayList<Course> getCoursesIn(Semester s){
+		if(s.isAP){
+			return new ArrayList<Course>();
+		}
 		ArrayList<Course> result =  onlyThoseIn(listOfCourses,s);
 		return result;
 	}
@@ -765,6 +768,11 @@ public class CourseList implements java.io.Serializable  {
 		}
 		return result;
 	}
+	
+	public static void setPrereqMeaning(String theirString, String ourString){
+		savedPrereqMeanings.put(theirString, ourString);
+		FileHandler.savePrereqMeanings();
+	}
 
 	//////////////////////////////
 	//////////////////////////////
@@ -773,14 +781,9 @@ public class CourseList implements java.io.Serializable  {
 	//////////////////////////////
 
 	public static void main(String[] args){
-		// CourseList.readAll(); //CourseList.testList();
+		//setPrereqMeaning("PSY-202 or BIO-222", "(PSY-202, BIO-222 )");
+		//setPrereqMeaning("PSY-201 or BIO-222", "(PSY-201, BIO-222 )");
 		viewKnownPrereqs();
-		/*for(String s : c.allUnknownPrereqs()){
-			System.out.println(s);
-		}*/
-		/*for(Course cour : c.listOfCourses){
-			System.out.println(cour.saveString());
-		}*/
 
 	}
 
