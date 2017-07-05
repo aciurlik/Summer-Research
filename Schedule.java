@@ -33,17 +33,7 @@ public class Schedule implements java.io.Serializable {
 	private SemesterDate currentSemester;
 	SemesterDate firstSemester;
 
-
-
-
-
-
-
-
-
-
-
-	public static boolean prereqsCanBeSatisfiedInSameSemester = true;
+	public static final boolean prereqsCanBeSatisfiedInSameSemester = false;
 
 
 

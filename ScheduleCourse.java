@@ -92,10 +92,6 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		}
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
 		result.removeAll(enemies);
-		if(this.c.professor.equals("Dr. Tom Allen")){
-			System.out.println(enemies);
-			System.out.println("OLD ENEMY" + this.oldEnemyList);
-		}
 		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
 			if(enemies.isEmpty()){
 				this.userSpecifiedReqs = new HashSet<Requirement>();
