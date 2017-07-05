@@ -433,22 +433,6 @@ public class Major implements java.io.Serializable{
 	}
 
 
-
-	public static Major readFrom(File f){
-
-		Scanner scan;
-		try {
-			scan = new Scanner(f);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		scan.useDelimiter("\\Z");
-		String contents = scan.next();
-		scan.close();
-		return readFrom(contents);
-	}
-
 	@Override
 	public String toString(){
 		return this.name;

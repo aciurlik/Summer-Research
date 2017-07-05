@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -186,11 +187,8 @@ public class FileHandler {
 				)){
 
 			try{
-				Major major = Major.readFrom(f);
-				//System.out.println(major.saveString());
+				Major major = Major.readFrom(fileToString(f));
 				result.add(major);
-
-
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -201,11 +199,17 @@ public class FileHandler {
 		return result;
 	}
 
-	public static ArrayList<String> fileToString(File furmanCoursesFile){
+	/**
+	 * Return the contents of this file as a list of strings, where
+	 * each element of the list is one line.
+	 * @param f
+	 * @return
+	 */
+	public static ArrayList<String> fileToStrings(File f){
 		BufferedReader br = null;
 		ArrayList<String> result = new ArrayList<String>();
 		try {
-			br = new BufferedReader(new FileReader(furmanCoursesFile));
+			br = new BufferedReader(new FileReader(f));
 			String nextLine = br.readLine();
 			while (nextLine!=null){
 				result.add(nextLine);
@@ -214,12 +218,35 @@ public class FileHandler {
 			br.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println("There was an issue reading from " + furmanCoursesFile.getAbsolutePath());
+			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
-
 		return result;
-
+	}
+	
+	/**
+	 * Return the contents of this file as one large string.
+	 * @param f
+	 * @return
+	 */
+	public static String fileToString(File f){
+		BufferedReader br = null;
+		StringBuilder result = new StringBuilder();
+		try {
+			br = new BufferedReader(new FileReader(f));
+			String nextLine = br.readLine();
+			while (nextLine!=null){
+				result.append(nextLine);
+				result.append("\n");
+				nextLine=br.readLine();
+			}
+			br.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("There was an issue reading from " + f.getAbsolutePath());
+			e.printStackTrace();
+		}
+		return result.toString();
 	}
 
 
@@ -236,7 +263,7 @@ public class FileHandler {
 
 		})){
 
-			CourseList.addCoursesIn(fileToString(semesterFile));
+			CourseList.addCoursesIn(fileToStrings(semesterFile));
 		}
 
 	}
