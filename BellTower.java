@@ -20,19 +20,19 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	Image fireWork;
 	ImageIcon fires;
 	JLabel almost;
-
+	boolean alreadyComplete = false;
 
 	public BellTower(Schedule sch) {
 		super();
-		
-		 overlap = new JPanel();
-		 icon = new ImageIcon(MenuOptions.resourcesFolder + "bellTower.jpg");
-		 firework = new ImageIcon(MenuOptions.resourcesFolder + "fireworks.jpg");
-		 fire  = new JPanel();
-		 fireWork = firework.getImage();
-		 fires = new ImageIcon(fireWork);
-		 almost = new JLabel(fires);
-		
+
+		overlap = new JPanel();
+		icon = new ImageIcon(MenuOptions.resourcesFolder + "bellTower.jpg");
+		firework = new ImageIcon(MenuOptions.resourcesFolder + "fireworks.jpg");
+		fire  = new JPanel();
+		fireWork = firework.getImage();
+		fires = new ImageIcon(fireWork);
+		almost = new JLabel(fires);
+
 		fire.add(almost);
 		this.sch= sch;
 		int givenHeight = 300;
@@ -50,7 +50,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 	}
 
-	
+
 	public void setSchedule(Schedule s){
 		this.sch=s;
 	}
@@ -60,19 +60,27 @@ public class BellTower extends JPanel implements java.io.Serializable{
 
 		double percentDone= sch.getPercentDone();
 		int newHeight = (int)(percentDone * icon.getIconHeight()) - 1;
-		
-		
+
+
 		overlap.setSize(icon.getIconWidth(), newHeight);
 		overlap.setLocation(0, icon.getIconHeight()-newHeight);
 		overlap.setBackground(FurmanOfficial.officialAlpha);
 		if(sch.isComplete()){
-			if(sch.checkAllErrors().isEmpty()){
+			if(!alreadyComplete){
+				alreadyComplete=true;
+				if(sch.checkAllErrors().isEmpty()){
 
-				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else{
+		
+
+					sch.d.GUICheckAllErrors(true);
+				}
 			}
-			else{
-				sch.d.GUICheckAllErrors(true);
-			}
+		}
+		else{
+			alreadyComplete=false;
 		}
 	}
 }
