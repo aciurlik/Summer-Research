@@ -850,11 +850,6 @@ public class Driver implements java.io.Serializable{
 		//Reqs
 		if(userOptions.get(0).isSelected()){
 
-			for(Semester s: sch.getAllSemestersSorted()){
-				sch.setReqScheduledSemester(s);
-
-			}
-
 			finalPrint = finalPrint + sch.printRequirementString() + "\n";
 		}
 
