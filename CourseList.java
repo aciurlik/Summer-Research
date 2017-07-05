@@ -481,6 +481,7 @@ public class CourseList implements java.io.Serializable  {
 		m.addRequirement(wc);
 		m.addRequirement(ne);
 
+		m.setChosenDegree(majorType);
 		return m;
 	}
 
@@ -628,8 +629,6 @@ public class CourseList implements java.io.Serializable  {
 
 			r.addRequirement(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
 		}
-
-		System.out.println(r.saveString());
 		return r;
 	}
 

@@ -30,9 +30,6 @@ public class Major implements java.io.Serializable{
 
 	String majorType;
 
-
-	int degreeType;
-
 	public static final int MajorDDNRange = 100;
 
 	public Major(String name){

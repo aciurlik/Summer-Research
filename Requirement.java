@@ -463,6 +463,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				return false;
 			}
 		}
+		//check for names being equal
+		if(this.name != null && !this.name.equals(r.name)){
+			return false;
+		}
+		if(r.name != null && !r.name.equals(this.name)){
+			return false;
+		}
 		return true;
 	}
 
