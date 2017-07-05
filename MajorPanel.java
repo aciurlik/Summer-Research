@@ -57,10 +57,10 @@ public class MajorPanel extends JPanel {
 		top.setBorder(new CompoundBorder(new EmptyBorder(4, 4, 4, 4), new MatteBorder(0, 0, 1, 0, Color.BLACK)));
 
 
-		//Holds the things at the top left (currently major name and # unscheduled)
+		//Holds the things at the top left (currently major name, BS/BA, and # unscheduled)
 		JPanel topLeftPanel = new JPanel(); 
 		topLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		JLabel topLeftLabel =new JLabel(m.name + "         " + Math.max(0, reqsLeft)  + " Unscheduled"); 
+		JLabel topLeftLabel =new JLabel(m.name + " (" + CourseList.getDegreeTypeString(m.chosenDegree) + ")         " + Math.max(0, reqsLeft)  + " Unscheduled"); 
 		topLeftLabel.setFont(FurmanOfficial.smallHeaderFont);
 		topLeftPanel.add(topLeftLabel);
 

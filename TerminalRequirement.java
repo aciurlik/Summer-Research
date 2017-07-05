@@ -520,10 +520,24 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		//after recursion, r is a terminal.
 		TerminalRequirement other = (TerminalRequirement)r;
-		if(this.completedBy(other) && other.completedBy(this)){
-			return this.numToChoose == other.numToChoose;
+		
+		//check if they complete each other
+		if(! (this.completedBy(other) && other.completedBy(this) )){
+			return false;
 		}
-		return false;
+		//check that numToChoose is the same for both
+		if(! (this.numToChoose == other.numToChoose)){
+			return false;
+		}
+		//check name equality
+		if(this.name!=null && !this.name.equals(other.name)){
+			return false;
+		}
+		if(other.name != null && !other.name.equals(this.name)){
+			return false;
+		}
+		//We're good!
+		return true;
 	}
 
 	//INFINITELOOPHAZARD
