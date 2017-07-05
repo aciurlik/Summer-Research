@@ -1178,7 +1178,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"2 ch of (MTH-110, MTH-120, MTH-130)",
 				"2 chof (MTH-110, MTH-120, MTH-130)",
 				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
-				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)"
+				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)"
 
 		};
 
@@ -1223,7 +1225,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			if(needsToBeShown){
 				//System.out.println("ReadingFrom \"" +toRead + "\"");
 				System.out.println("    got \"" + r.saveString() + "\"");
-				//System.out.println("Equal to last?" + equalToLast);
+				System.out.println("Equal to last?" + equalToLast);
 				//System.out.println("Uses CH? " + r.usesCreditHours);
 				System.out.println("Complete?" + complete );
 				//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());

@@ -228,13 +228,13 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
-		
-		
+
+
 		if(this.checkErrorsWhenAdding(element, sem)){
 			System.out.println("add didn't work");
 			return false;
 		}
-		
+
 		if(sem.add(element)){
 			//updateRequirementsSatisfied(element);
 			updatePrereqs();
@@ -242,8 +242,8 @@ public class Schedule implements java.io.Serializable {
 			return true;
 		}
 		System.out.println("add didn't work");
-	
-		
+
+
 		return false;
 	}
 
@@ -469,7 +469,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		return result;
 	}
-	
+
 
 	/**
 	 * Find the list of all requirements in any major of this schedule.
@@ -508,7 +508,7 @@ public class Schedule implements java.io.Serializable {
 		allSemesters.addAll(this.semesters);
 		return allSemesters;
 	}
-	
+
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		String[] Language = {"110", "120", "201"};
@@ -973,7 +973,7 @@ public class Schedule implements java.io.Serializable {
 		for(Requirement r : reqList){
 			updateRequirement(r, reqList, allTakenElements);
 		}
-		
+
 		updatePrereqs();
 	}
 
@@ -997,7 +997,7 @@ public class Schedule implements java.io.Serializable {
 
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
-		
+
 		for(ScheduleElement e : allTakenElements){
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
@@ -1078,7 +1078,7 @@ public class Schedule implements java.io.Serializable {
 			}
 		}
 	}
-	*/
+	 */
 
 	public boolean dontPlayNice(Requirement r1, Requirement r2){
 		return !RequirementGraph.doesPlayNice(r1, r2);
@@ -1124,13 +1124,13 @@ public class Schedule implements java.io.Serializable {
 				prereqs.add(newPrereq);
 			}
 		}
-		
+
 		//Actually update the prereqs.
 		for(Prereq p : prereqs){
 			updatePrereq(p);
 		}
 	}
-	
+
 	public void updatePrereq(Prereq p){
 		ArrayList<ScheduleElement> elementsBefore = this.elementsBefore(p.getPrefix(), prereqsCanBeSatisfiedInSameSemester);
 		p.updateOn(elementsBefore);
@@ -1323,11 +1323,23 @@ public class Schedule implements java.io.Serializable {
 			result.append("\n");
 			result.append(m.name);
 			for(Requirement r: m.reqList){
+				String rDisplay = r.getDisplayString() + "-";
+				if(rDisplay.length()<=30){
+					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
+					rDisplay = rDisplay + spaces;
 
-				result.append("\n" + r.getDisplayString() + "-  ");
+				}
+				result.append("\n" + rDisplay);
+
 				boolean isComplete = r.storedIsComplete();
 				if(!isComplete){
-					result.append( r.minMoreNeeded(getAllElementsSorted(), false) + " Course(s) Needed	\n");
+					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
+					if(coursesNeeded == 1){
+						result.append(coursesNeeded + "  Course Needed	\n");
+					}
+					if(coursesNeeded >1){
+						result.append(coursesNeeded + "  Courses Needed \n");
+					}
 				}
 				int counter = 0;
 
@@ -1335,89 +1347,92 @@ public class Schedule implements java.io.Serializable {
 				for(int i=0; i<this.getAllElementsSorted().size(); i++){
 					ScheduleElement se = allOrderedElements.get(i);
 
-				
+
 					if(elementsSatisfy.get(se).contains(r)){
 						satisfiedSEPointers.add(i);
 					}
 				}
 
-					ArrayList<Integer> finalList = trimSEList(satisfiedSEPointers, allOrderedElements, r);
-					for(int p=0; p<finalList.size(); p++){
-						ScheduleElement se = allOrderedElements.get(finalList.get(p));
-						if(counter ==0 && !isComplete){
-							result.append("Partially Satisfied by: \n");
-						}
-						else if(counter == 0 && isComplete){
-							result.append("Satisfied by: \n");
-						}
-
-
-						StringJoiner joiner = new StringJoiner("\n");
-						StringBuilder part = new StringBuilder();
-
-							part.append("   "+ se.getDisplayString());
-							if(se instanceof ScheduleCourse){
-								part.append(", " +((ScheduleCourse) se).getSemester().toString() + "\n");
-							}
-							else if(se instanceof Requirement){
-								if(coorespondingDates.get(finalList.get(p)).equals(defaultPrior)){
-									part.append("," + "Taken before Furman \n");
-								}
-								else{
-									part.append(", " + coorespondingDates.get(finalList.get(p)).toString() + "\n");
-								}
-
-							
-							
-						}
-						joiner.add(part.toString());
-						counter++;
-						result.append(joiner.toString());
+				ArrayList<Integer> finalList = trimSEList(satisfiedSEPointers, allOrderedElements, r);
+				for(int p=0; p<finalList.size(); p++){
+					ScheduleElement se = allOrderedElements.get(finalList.get(p));
+					if(counter ==0 && !isComplete){
+						result.append("Partially Satisfied by: \n");
+					}
+					else if(counter == 0 && isComplete){
+						result.append("Satisfied by: \n");
 					}
 
+
+					StringJoiner joiner = new StringJoiner("\n");
+					StringBuilder part = new StringBuilder();
+
+					//Different strings for requirements
+					String priorIndent = "   ";
+					if(se instanceof Requirement){
+						part.append(priorIndent + "Scheduled  " + se.getDisplayString());
+						
+					}
+					else{
+						part.append(priorIndent + se.getDisplayString());
+						
+					}
 					
-
-
-
+					//When was this thing taken?
+					if(coorespondingDates.get(finalList.get(p)).equals(defaultPrior)){
+						part.append(", " + "Taken before Furman \n");
+					}
+					else{
+						part.append(", " + coorespondingDates.get(finalList.get(p)).toString() + "\n");
+					}
+					joiner.add(part.toString());
+					counter++;
+					result.append(joiner.toString());
 				}
-			
+
+
+
+
+
+			}
+
 		}
-	
-
-	return result.toString();
-
-}
 
 
-private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, ArrayList<ScheduleElement> allOrderedElements, Requirement r) {
-	ArrayList<ScheduleElement> toCompleteR = new ArrayList<ScheduleElement>();
-	for(int i: satisfiedSEPointers){
-		toCompleteR.add(allOrderedElements.get(i));
-	}
-	for(int i = 0; i<satisfiedSEPointers.size(); i++){
-		ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
-		toCompleteR.remove(i);
-		if(!r.isComplete(toCompleteR, false)){
-			toCompleteR.add(i, toRemove);
-		}
-		else{
-			
-			satisfiedSEPointers.remove(i);
-			i--;
-		}
+		return result.toString();
 
 	}
-	return satisfiedSEPointers;
+
+
+	private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, ArrayList<ScheduleElement> allOrderedElements, Requirement r) {
+		ArrayList<ScheduleElement> toCompleteR = new ArrayList<ScheduleElement>();
+		for(int i: satisfiedSEPointers){
+			toCompleteR.add(allOrderedElements.get(i));
+		}
+		for(int i = 0; i<satisfiedSEPointers.size(); i++){
+			ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
+			toCompleteR.remove(i);
+			if(!r.isComplete(toCompleteR, false)){
+				toCompleteR.add(i, toRemove);
+			}
+			else{
+
+				satisfiedSEPointers.remove(i);
+				i--;
+			}
+
+		}
+		return satisfiedSEPointers;
 
 
 
-}
+	}
 
 
 
 
 
-	
+
 	public int getCLP() {
 		return CLP;
 	}
@@ -1427,7 +1442,7 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 	public Prefix getLanguagePrefix() {
 		return languagePrefix;
 	}
-	
+
 
 
 
@@ -1446,9 +1461,9 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 	public ArrayList<Semester> getSemesters(){
 		return this.semesters;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * find the first (temporal first) scheduled instance of this prefix,
 	 * and return the list of all elements before it.
@@ -1483,11 +1498,36 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 		}
 		return result;
 	}
+
+
+	public void reloadMajors() {
+		ListOfMajors m = FileHandler.getMajorsList();
+		ArrayList<Major> newMajorsList = new ArrayList<Major>();
+		for(Major major: this.majorsList){
+			newMajorsList.add(m.getMajor(major.name));
+			
+		}
+		
+		setMajorsList(newMajorsList);
+		
+	}
+
+
+	
+
+
+
+	public void setMajorsList(ArrayList<Major> majors){
+		this.majorsList= majors;
+		this.recalcGERMajor();
+		this.updatePrereqs();
+		this.updateReqs();
+		this.updateTotalCoursesNeeded();
+		
+	}
+//Collect all the elemtns before that semester date.
+
+
+
 }
-		
-		//Collect all the elemtns before that semester date.
-		
-		
-
-
 

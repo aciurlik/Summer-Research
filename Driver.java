@@ -44,12 +44,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
 
-public class Driver implements java.io.Serializable{ 
+public class Driver{ 
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	
 	Schedule sch;
 	static Schedule testSchedule;
 	SchedulePanel schP;
@@ -134,7 +134,7 @@ public class Driver implements java.io.Serializable{
 		//CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
 		Schedule current = new Schedule();
-	
+
 		//TODO make sure nothing else needs to be set
 		setSchedule(current);
 		this.update();
@@ -155,6 +155,7 @@ public class Driver implements java.io.Serializable{
 	 * @return
 	 */
 	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
+
 		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>();
 		HashSet<Requirement> result = new HashSet<Requirement>();
 
@@ -162,9 +163,9 @@ public class Driver implements java.io.Serializable{
 		problems.setLayout(new BorderLayout());
 
 		JLabel instruct = new JLabel(
-		    "The course "+ c.getPrefix() + " might satisfy the following requirements,"
-		+ "\n   but it is not allowed to satisfy all of them at once. "
-		+ "\nWhich requirements do you want it to satisfy?");
+				"The course "+ c.getPrefix() + " might satisfy the following requirements,"
+						+ "\n   but it is not allowed to satisfy all of them at once. "
+						+ "\nWhich requirements do you want it to satisfy?");
 
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
@@ -188,6 +189,8 @@ public class Driver implements java.io.Serializable{
 
 		return result;
 	}
+
+
 
 
 	/**
@@ -680,7 +683,7 @@ public class Driver implements java.io.Serializable{
 		String instruct= null; 
 		if(s.error.equals(ScheduleError.overloadError)){
 			header = "Overload Error";
-			instruct="Adding " + s.offendingCourse.getDisplayString() + " exceeds this semester's overload limit of " + s.overloadLimit;
+			instruct="Adding " + s.offendingCourse.getDisplayString() + " exceeds this semester's overload limit of " + s.overloadLimit + " credit hours ";
 		}
 		if(s.error.equals(ScheduleError.overlapError)){
 			header = "Overlap Error";
@@ -855,12 +858,16 @@ public class Driver implements java.io.Serializable{
 
 
 		if(userOptions.get(1).isSelected() || userOptions.get(0).isSelected()){
-			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 50);
+			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 70);
 			schedulePrint.setWrapStyleWord(true);
+			Printable p = schedulePrint.getPrintable(null, null);
+
 			schedulePrint.setLineWrap(true);
 			schedulePrint.setEditable(false);
-			schedulePrint.setFont(FurmanOfficial.getFont(10));
+			schedulePrint.setFont(FurmanOfficial.monospaced);
 			JScrollPane scrollPane = new JScrollPane(schedulePrint);
+			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			String[] choices= {"Print", "Cancel"};
 
 			int userChoice = (int) JOptionPane.showOptionDialog(popUP, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
@@ -886,15 +893,20 @@ public class Driver implements java.io.Serializable{
 
 
 	public void openSchedule() {
-				Schedule result = FileHandler.openSchedule();
-				if(result!=null){
-				//TODO make sure nothing else needs to be set
-				setSchedule(result);
-				this.update();
-				}
+
+		Schedule result = FileHandler.openSchedule();
+		if(result!=null){
+			//TODO make sure nothing else needs to be set
+			if(!FurmanOfficial.masterIsNotAround){
+				result.reloadMajors();
+			}
+			setSchedule(result);
+			this.update();
+
+		}
 
 	}
-	
+
 	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
@@ -905,7 +917,7 @@ public class Driver implements java.io.Serializable{
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
 		return GUIChooseStartTime(supportedSemesters);
-		
+
 	}
 
 
@@ -914,9 +926,9 @@ public class Driver implements java.io.Serializable{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		
+
 		SemesterDate start = tryPickStartDate();
-		
+
 		if(start == null){
 			//this will close any running code, including the JOptionPanes which don't get collected by 
 			// the garbage collector for some reason.
