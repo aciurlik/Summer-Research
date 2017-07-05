@@ -83,6 +83,7 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	 */
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded) {
+
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
 			if(r.isSatisfiedBy(this.getPrefix())){
@@ -91,6 +92,10 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		}
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
 		result.removeAll(enemies);
+		if(this.c.professor.equals("Dr. Tom Allen")){
+			System.out.println(enemies);
+			System.out.println("OLD ENEMY" + this.oldEnemyList);
+		}
 		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
 			if(enemies.isEmpty()){
 				this.userSpecifiedReqs = new HashSet<Requirement>();
@@ -99,45 +104,42 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 			else{
 				//the enemies changed. 
 				//If some of the enemies are already scheduled, just use those. 
+				/*
 				HashSet<Requirement> scheduledRequirements = new HashSet<Requirement>(); 
 				for(ScheduleElement e : s.getAllElementsSorted()){ 
 					if(e instanceof Requirement){ 
 						scheduledRequirements.add((Requirement)e); 
-
 					} 
-
 				} 
 
 				scheduledRequirements.retainAll(enemies); 
 
 				if(!scheduledRequirements.isEmpty()){ 
-
 					this.userSpecifiedReqs = scheduledRequirements; 
-
 					this.oldEnemyList = enemies; 
 
 				} 
 
-				else{ 
-					//If none of the enemies are scheduled,  
-					//ask the user which requirements should now be satisfied by this course.
-					//sch.conflictingRequirements(this 
-					/**
-					 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n" 
+				else{ */
+				//If none of the enemies are scheduled,  
+				//ask the user which requirements should now be satisfied by this course.
+				//sch.conflictingRequirements(this 
+				/**
+				 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n" 
 				 	+ enemies.toString() + "\n" 
 				 	" Which one should get the credit hours?"); 
-					 */
-					HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c); 
-					this.userSpecifiedReqs = kept; 
-					this.oldEnemyList = enemies; 
+				 */
+				HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c); 
+				this.userSpecifiedReqs = kept; 
+				this.oldEnemyList = enemies; 
 
-				}
 			}
 		}
 		result.addAll(this.userSpecifiedReqs);
 		return result;
-	}
 
+
+	} 
 	public Interval<Time> examTime() {
 		return c.examTime();
 	}

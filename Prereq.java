@@ -1,8 +1,12 @@
 import java.util.ArrayList;
 
 
-public class Prereq {
+public class Prereq implements java.io.Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Requirement r;
 	private Prefix p;
 	

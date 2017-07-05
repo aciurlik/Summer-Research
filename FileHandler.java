@@ -33,13 +33,20 @@ public class FileHandler {
 			instruct = "Choose a schedule to open";
 			header = "Open Schedule";
 		}
+		
 		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder);
+		if(!scheduleNames.isEmpty()){
 		String[] finalSchedNames = new String[scheduleNames.size()];
 		for(int i=0; i<finalSchedNames.length; i++){
 			finalSchedNames[i]=scheduleNames.get(i);
 		}
 		String chosenSched = (String) JOptionPane.showInputDialog(popUP, instruct, header, JOptionPane.PLAIN_MESSAGE, null, finalSchedNames, finalSchedNames[0]);	
 		return chosenSched;
+	}
+		else{
+			JOptionPane.showMessageDialog(popUP, "You have no saved schedules");
+			return null; 
+		}
 	}
 
 
@@ -159,7 +166,7 @@ public class FileHandler {
 
 
 
-	public static ListOfMajors testList(){
+	public static ListOfMajors getMajorsList(){
 		ListOfMajors result = readMajorsFrom(new File(majorsFile));
 		return result;
 	}

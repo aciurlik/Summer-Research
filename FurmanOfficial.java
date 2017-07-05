@@ -25,6 +25,8 @@ public class FurmanOfficial implements java.io.Serializable{
 	public static Color official;
 	public static Color officialAlpha;
 	
+	public static final boolean masterIsNotAround = false;
+	
 	
 	public static final Color bouzarthDarkPurple = darkPurple(230);
 	
@@ -33,11 +35,11 @@ public class FurmanOfficial implements java.io.Serializable{
 	public static final Font bigHeaderFont = getFont(18);
 	public static final Font smallHeaderFont = getFont(14);
 	public static final Font normalFont = getFont(12);
-	
+	public static final Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
 	
 	static{
 
-		final Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
+		
 		UIManager.put("OptionPane.messageFont", getFont(12));
 		UIManager.put("OptionPane.font", getFont(12));
 		UIManager.put("OptionPane.buttonFont", getFont(12));

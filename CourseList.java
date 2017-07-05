@@ -37,9 +37,9 @@ public class CourseList implements java.io.Serializable  {
 	public static final int None = 4;
 	public static final int defaultCreditHours =4;
 
-	public static final boolean masterIsNotAround = true;
 
-	
+
+
 
 	private static ArrayList<Course> listOfCourses;
 	private static Hashtable<Prefix, String> rawPrereqs;
@@ -166,7 +166,7 @@ public class CourseList implements java.io.Serializable  {
 				+ originalRequirementString 
 				+"\"\n What does that requirement mean?\n>>>");
 		Requirement result = null;
-		if(masterIsNotAround){
+		if(FurmanOfficial.masterIsNotAround){
 			return null;
 			//result = new Requirement();
 			//result.setName("Unknown:" + originalRequirementString);
@@ -207,7 +207,7 @@ public class CourseList implements java.io.Serializable  {
 	}
 
 
-	
+
 
 
 
@@ -292,7 +292,7 @@ public class CourseList implements java.io.Serializable  {
 	 * @return
 	 */
 	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
-		
+
 		ArrayList<Course> result = new ArrayList<Course>();
 		for(Course c: input){
 
@@ -319,8 +319,8 @@ public class CourseList implements java.io.Serializable  {
 		}
 		return getCoursesSatisfying(p).get(0).creditHours;
 	}
-	
-	
+
+
 
 
 
@@ -407,56 +407,19 @@ public class CourseList implements java.io.Serializable  {
 						// For BM, there is no MR requirement.
 						continue outerloop;
 					case CourseList.BA:
-
-
 					default:
 						//For BA and any unknown majorType, 
 						// you can take any of the MR courses.
 						includeDefaultPrefixes = true;
-
-
-					}
-
+					} //end switch
 					break;
+					//The following cases are handled explicitly at the end.
+				case"FL":
+					continue outerloop;
 				case "NW":
-					/* From the Furman GER checklist, NW requires:
-					 * 		"Two courses, at least one with a 
-					 * 		separate labratory component."
-					 * 
-					 * To handle this, we make 2 requirements, one of which
-					 * 		is NW and the other is NWL. You need one course from
-					 * 		each requirement, and they aren't allowed to double dip.
-					 * 		Every prefix in the NWL requirement also satisfies 
-					 * 		the NW requirement.
-					 * 
-					 * In addition, "Students seeking the Bachelor of Music degree 
-					 * must complete only one course to meet this requirement, 
-					 * while Bachelor of Science degree candidates must complete 
-					 * this requirement in courses appropriate for majors in 
-					 * the natural science disciplines. "
-					 * 
-					 */
 					switch(majorType){
 					case CourseList.BS:
-						// only courses "appropriate for majors in the 
-						// natural science disciplines," which currently (6/11/2017) means
-						//
-						// "courses numbered 110 or greater in Biology, Chemistry, 
-						//  Earth and Environmental Science, Neuroscience, Physics, 
-						//  "Sustainability Science."
-						/*
-            	r.choices.clear();
-				      r.choices.add(new Prefix("CHM", 110));
-				      r.choices.add(new Prefix("CHM", 115));
-				      r.choices.add(new Prefix("CHM", 120));
-				      r.choices.add(new Prefix("EES", 112));
-				      r.choices.add(new Prefix("EES", 113));
-				      r.choices.add(new Prefix("EES", 115));
-				      r.choices.add(new Prefix("PHY", 111));
-				      r.choices.add(new Prefix("PHY", 112));
-				      r.choices.add(new Prefix("PSY", 320));
-				      r.choices.add(new Prefix("SUS", 120));   
-						 */
+						//only courses numbered 110 or greater
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
 								r.addRequirement(new TerminalRequirement(p));
@@ -469,8 +432,9 @@ public class CourseList implements java.io.Serializable  {
 						}
 						includeDefaultPrefixes = false;
 						break;
+					//Add the NWL requirements to the NW requirements.
 					case CourseList.BA:
-					case CourseList.BM:
+					case BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
 							r.addRequirement(new TerminalRequirement(p));
@@ -478,9 +442,8 @@ public class CourseList implements java.io.Serializable  {
 					}
 					break;
 				case "NWL":
-					//Music majors don't need this requirement.
-					// they only need the NW requirement.
-					if(majorType== CourseList.BM){
+					//Music majors don't need this requirement TODO check if it's NW or NWL that they don't need.
+					if(majorType == CourseList.BM){
 						continue outerloop;
 					}
 					break;
@@ -491,32 +454,21 @@ public class CourseList implements java.io.Serializable  {
 				case "WC":
 				case "NE":
 
-				}
+				} //end switch
 				if(includeDefaultPrefixes){
 					for(Prefix p : GERRequirements.get(key)){
 						r.addRequirement(new TerminalRequirement(p));
 					}
 				}
-
 				r.setNumToChoose(newNumToChoose);
-
-				if(!r.name.equals("FL")){
-					m.addRequirement(r);
-				}
-
-
-
+				m.addRequirement(r);
 			}
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
-
-		//make NW and NWL enemies
-		if(majorType!= CourseList.BM){
-			Requirement nwl = m.getRequirement("NWL");
-			Requirement nw = m.getRequirement("NW");
-			RequirementGraph.putEdge(nwl, nw);
-		}
+		
+		//Make NW and NWL enemies
+		
 
 		// Make WC and NE enemies 
 		Requirement wc = m.getRequirement("WC");
@@ -531,6 +483,78 @@ public class CourseList implements java.io.Serializable  {
 
 		return m;
 	}
+
+	
+	/*
+	 * When this method is used, the user can't see which courses
+	 * satisfy the NW requirement and which courses satisfy the NWL requirement.
+	 * 
+	 * 
+	public static Requirement NWRequirement(int majorType){
+		//From the Furman GER checklist, NW requires:
+		// 		"Two courses, at least one with a 
+		// 		separate labratory component.
+		// 
+		// In addition, "Students seeking the Bachelor of Music degree 
+		// must complete only one course to meet this requirement, 
+		// while Bachelor of Science degree candidates must complete 
+		// this requirement in courses appropriate for majors in 
+		// the natural science disciplines. "
+		Requirement nw = new Requirement();
+		Requirement nwl = new Requirement();
+		Requirement result = new Requirement();
+		result.setName("NW/NWL");
+		switch(majorType){
+		case CourseList.BS:
+			// only courses "appropriate for majors in the 
+			// natural science disciplines," which currently (6/11/2017) means
+			//
+			// "courses numbered 110 or greater in Biology, Chemistry, 
+			//  Earth and Environmental Science, Neuroscience, Physics, 
+			//  "Sustainability Science."
+			// We represent this by r = 2 of (2 NWs, 1 NWL).
+			for(Prefix p : GERRequirements.get("NWL")){
+				if(p.getNumber().compareTo("110") >= 0){
+					nw.addRequirement(new TerminalRequirement(p));
+					nwl.addRequirement(new TerminalRequirement(p));
+				}
+			}
+			for(Prefix p : GERRequirements.get("NW")){
+				if(p.getNumber().compareTo("110") >= 0){
+					nw.addRequirement(new TerminalRequirement(p));
+				}
+			}
+			nw.setNumToChoose(2);
+			nwl.setNumToChoose(1);
+			result.addRequirement(nw);
+			result.addRequirement(nwl);
+			result.setNumToChoose(2);
+			return result;
+		case CourseList.BA:
+			//Handled like a normal GER requirement, just have to mix the
+			// NWL and NW requirements into the result.
+			for(Prefix p : GERRequirements.get("NWL")){
+					nw.addRequirement(new TerminalRequirement(p));
+					nwl.addRequirement(new TerminalRequirement(p));
+			}
+			for(Prefix p : GERRequirements.get("NW")){
+					nw.addRequirement(new TerminalRequirement(p));
+			}
+			result.addRequirement(nw);
+			result.addRequirement(nwl);
+			result.setNumToChoose(2);
+			return result;
+		case CourseList.BM:
+			//Only need one course for this requirement, check if it has to be a lab?
+			for(Prefix p : GERRequirements.get("NW")){
+				result.addRequirement(new TerminalRequirement(p));
+			}
+			return result;
+		default:
+			throw new RuntimeException("Tried to get a NW requirement for major type " + majorType);
+		}
+	}
+	*/
 
 	public static Requirement FYWRequirement(){
 		Requirement result = new Requirement();
@@ -605,7 +629,7 @@ public class CourseList implements java.io.Serializable  {
 			r.addRequirement(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
 		}
 
-
+		System.out.println(r.saveString());
 		return r;
 	}
 
@@ -619,7 +643,7 @@ public class CourseList implements java.io.Serializable  {
 
 	public static void readAll(){
 		FileHandler.readAllCourses();
-	
+
 	}
 
 
@@ -627,79 +651,79 @@ public class CourseList implements java.io.Serializable  {
 		String lastSectionNumber = "";
 		Course lastCourse = null;
 		Course duplicateCourse =null;
-	
-			//skip the first line of field names
-		
-			
-		
-			int index = 1;
-			//Read in each course
-			while(index < fileLines.size()){
-				ArrayList<String> data = SaverLoader.parseCSVLine(fileLines.get(index));
-				String sectionNumber = data.get(1);
-				//Check if we've found a new course
-				if(! sectionNumber.equals( lastSectionNumber)){
-					//If it's a new course, make a new one.
-					lastSectionNumber = sectionNumber;
-					if(lastCourse != null){
-						add(lastCourse);
-					}
-					lastCourse = Course.readFromFurmanData(data);
-					if(data.get(0).contains("Summer")){
-						if(lastCourse.meetingTime==null || lastCourse.meetingTime[0].isAllUnused()  ){
-							Course newDuplicateCourse = Course.readFromFurmanData(data);
-							if( newDuplicateCourse != duplicateCourse){
-								if(duplicateCourse != null){
+
+		//skip the first line of field names
 
 
 
-									add(duplicateCourse);	
-								}
-								duplicateCourse=newDuplicateCourse;
+		int index = 1;
+		//Read in each course
+		while(index < fileLines.size()){
+			ArrayList<String> data = SaverLoader.parseCSVLine(fileLines.get(index));
+			String sectionNumber = data.get(1);
+			//Check if we've found a new course
+			if(! sectionNumber.equals( lastSectionNumber)){
+				//If it's a new course, make a new one.
+				lastSectionNumber = sectionNumber;
+				if(lastCourse != null){
+					add(lastCourse);
+				}
+				lastCourse = Course.readFromFurmanData(data);
+				if(data.get(0).contains("Summer")){
+					if(lastCourse.meetingTime==null || lastCourse.meetingTime[0].isAllUnused()  ){
+						Course newDuplicateCourse = Course.readFromFurmanData(data);
+						if( newDuplicateCourse != duplicateCourse){
+							if(duplicateCourse != null){
+
+
+
+								add(duplicateCourse);	
 							}
-							duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
-
+							duplicateCourse=newDuplicateCourse;
 						}
-					}
-					//Also, see if this course satisfies any GERs.
-					String GERs = data.get(14);
-					if(!GERs.equals("")){
-						setCourseSatisfiesGER(data.get(14), lastCourse);
-					}
-					String prerequsitesString = data.get(16);
-					if(!prerequsitesString.equals("")){
-						addRawPrereq(lastCourse, prerequsitesString.trim());
+						duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+
 					}
 				}
-				//If this isn't a new course, then it's either a lab or an exam.
+				//Also, see if this course satisfies any GERs.
+				String GERs = data.get(14);
+				if(!GERs.equals("")){
+					setCourseSatisfiesGER(data.get(14), lastCourse);
+				}
+				String prerequsitesString = data.get(16);
+				if(!prerequsitesString.equals("")){
+					addRawPrereq(lastCourse, prerequsitesString.trim());
+				}
+			}
+			//If this isn't a new course, then it's either a lab or an exam.
+			else{
+				String InstructionalMethod = data.get(5);
+				Time[] times = Course.readTimesFrom(data);
+				Time totalStart = Time.combine(times[0], times[1]);
+				if(InstructionalMethod.equals("EXAM")){
+					//set examTime = startTime thru endTime, no dates.
+					Time totalEnd = Time.combine(times[2], times[3]);
+					lastCourse.setExamTime(new Time[]{totalStart, totalEnd});
+				}
 				else{
-					String InstructionalMethod = data.get(5);
-					Time[] times = Course.readTimesFrom(data);
-					Time totalStart = Time.combine(times[0], times[1]);
-					if(InstructionalMethod.equals("EXAM")){
-						//set examTime = startTime thru endTime, no dates.
-						Time totalEnd = Time.combine(times[2], times[3]);
-						lastCourse.setExamTime(new Time[]{totalStart, totalEnd});
-					}
-					else{
-						//Set labTime = startTime thru endTime, no dates.
-						lastCourse.setLabTime(new Time[]{times[1], times[3]});
-						String meetingTimesString = data.get(9);
-						if(!meetingTimesString.equals("")){
-							lastCourse.setLabDay(Time.meetingDaysFrom(meetingTimesString)[0]);
-						}
+					//Set labTime = startTime thru endTime, no dates.
+					lastCourse.setLabTime(new Time[]{times[1], times[3]});
+					String meetingTimesString = data.get(9);
+					if(!meetingTimesString.equals("")){
+						lastCourse.setLabDay(Time.meetingDaysFrom(meetingTimesString)[0]);
 					}
 				}
-				index++;
 			}
-			if(lastCourse != null){
-				add(lastCourse);
+			index++;
+		}
+		if(lastCourse != null){
+			add(lastCourse);
 
-			}
-			if(duplicateCourse != null){
-				add(duplicateCourse);
-			}
-		
+		}
+		if(duplicateCourse != null){
+			add(duplicateCourse);
+		}
+
 
 	}
 
