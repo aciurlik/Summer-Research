@@ -1495,7 +1495,11 @@ public class Schedule implements java.io.Serializable {
 		ListOfMajors m = FileHandler.getMajorsList();
 		ArrayList<Major> newMajorsList = new ArrayList<Major>();
 		for(Major major: this.majorsList){
-			newMajorsList.add(m.getMajor(major.name));
+			System.out.println(major.name +"  " + major.chosenDegree);
+			Major refreshed = m.getMajor(major.name);
+			refreshed.setChosenDegree(major.chosenDegree);
+			newMajorsList.add(refreshed);
+			
 			
 		}
 		

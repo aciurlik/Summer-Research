@@ -20,7 +20,9 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	Image fireWork;
 	ImageIcon fires;
 	JLabel almost;
+
 	boolean wasComplete;
+
 
 
 	public BellTower(Schedule sch) {
@@ -33,7 +35,9 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		fireWork = firework.getImage();
 		fires = new ImageIcon(fireWork);
 		almost = new JLabel(fires);
+
 		wasComplete = false;
+
 
 		fire.add(almost);
 		this.sch= sch;
@@ -52,7 +56,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 	}
 
-	
+
 	public void setSchedule(Schedule s){
 		this.sch=s;
 	}
@@ -62,11 +66,12 @@ public class BellTower extends JPanel implements java.io.Serializable{
 
 		double percentDone= sch.getPercentDone();
 		int newHeight = (int)(percentDone * icon.getIconHeight()) - 1;
-		
-		
+
+
 		overlap.setSize(icon.getIconWidth(), newHeight);
 		overlap.setLocation(0, icon.getIconHeight()-newHeight);
 		overlap.setBackground(FurmanOfficial.officialAlpha);
+
 		boolean nowComplete = sch.isComplete();
 		if(!nowComplete){
 			wasComplete = false;
@@ -78,10 +83,12 @@ public class BellTower extends JPanel implements java.io.Serializable{
 				}
 				else{
 					JOptionPane.showMessageDialog(sch.d.popUP, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.d.icon);
+
 					sch.d.GUICheckAllErrors(true);
 				}
 			}
 		}
+		
 	}
 }
 

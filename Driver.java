@@ -923,7 +923,6 @@ public class Driver{
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-
 		SemesterDate start = tryPickStartDate();
 
 		if(start == null){
@@ -940,9 +939,6 @@ public class Driver{
 
 
 	}
-
-
-
 
 }
 
