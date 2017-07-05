@@ -1396,12 +1396,14 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 	}
 	for(int i = 0; i<satisfiedSEPointers.size(); i++){
 		ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
-		toCompleteR.remove(toRemove);
+		toCompleteR.remove(i);
 		if(!r.isComplete(toCompleteR, false)){
 			toCompleteR.add(i, toRemove);
 		}
 		else{
+			
 			satisfiedSEPointers.remove(i);
+			i--;
 		}
 
 	}
