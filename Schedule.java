@@ -1298,7 +1298,7 @@ public class Schedule implements java.io.Serializable {
 		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
 		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
 		ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
-		for(Semester s: this.getAllSemesters()){
+		for(Semester s: this.getAllSemestersSorted()){
 			for(ScheduleElement se: s.elements){
 				allOrderedElements.add(se);
 				if(s.isAP){
@@ -1315,7 +1315,7 @@ public class Schedule implements java.io.Serializable {
 		result.append("General Education Requirements");
 
 		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
-		for(ScheduleElement e : this.getAllElements()){
+		for(ScheduleElement e : this.getAllElementsSorted()){
 			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
 		}
 		for(Major m: this.getMajors()){
@@ -1327,12 +1327,12 @@ public class Schedule implements java.io.Serializable {
 				result.append("\n" + r.getDisplayString() + "-  ");
 				boolean isComplete = r.storedIsComplete();
 				if(!isComplete){
-					result.append( r.minMoreNeeded(getAllElements(), false) + " Course(s) Needed	\n");
+					result.append( r.minMoreNeeded(getAllElementsSorted(), false) + " Course(s) Needed	\n");
 				}
 				int counter = 0;
 
 				ArrayList<Integer> satisfiedSEPointers = new ArrayList<Integer>();
-				for(int i=0; i<this.getAllElements().size(); i++){
+				for(int i=0; i<this.getAllElementsSorted().size(); i++){
 					ScheduleElement se = allOrderedElements.get(i);
 
 				
@@ -1410,17 +1410,12 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 
 
 }
-}
 
 
 
 
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
+	
 	public int getCLP() {
 		return CLP;
 	}
@@ -1485,6 +1480,8 @@ private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, Ar
 			result.addAll(this.elementsTakenIn(firstScheduledTime));
 		}
 		return result;
+	}
+}
 		
 		//Collect all the elemtns before that semester date.
 		
