@@ -1088,6 +1088,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(prereqs.size() > 0){
 			Major prereqsM = new Major("Prereqs");
+			prereqsM.chosenDegree = -1;
 			boolean unfulfilledPrereq = false;
 			for(Prereq p : prereqs){
 				if(!p.getRequirement().storedIsComplete()){

@@ -20,19 +20,21 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	Image fireWork;
 	ImageIcon fires;
 	JLabel almost;
+	boolean wasComplete;
 
 
 	public BellTower(Schedule sch) {
 		super();
-		
-		 overlap = new JPanel();
-		 icon = new ImageIcon(MenuOptions.resourcesFolder + "bellTower.jpg");
-		 firework = new ImageIcon(MenuOptions.resourcesFolder + "fireworks.jpg");
-		 fire  = new JPanel();
-		 fireWork = firework.getImage();
-		 fires = new ImageIcon(fireWork);
-		 almost = new JLabel(fires);
-		
+
+		overlap = new JPanel();
+		icon = new ImageIcon(MenuOptions.resourcesFolder + "bellTower.jpg");
+		firework = new ImageIcon(MenuOptions.resourcesFolder + "fireworks.jpg");
+		fire  = new JPanel();
+		fireWork = firework.getImage();
+		fires = new ImageIcon(fireWork);
+		almost = new JLabel(fires);
+		wasComplete = false;
+
 		fire.add(almost);
 		this.sch= sch;
 		int givenHeight = 300;
@@ -65,13 +67,19 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		overlap.setSize(icon.getIconWidth(), newHeight);
 		overlap.setLocation(0, icon.getIconHeight()-newHeight);
 		overlap.setBackground(FurmanOfficial.officialAlpha);
-		if(sch.isComplete()){
-			if(sch.checkAllErrors().isEmpty()){
-
-				JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
-			}
-			else{
-				sch.d.GUICheckAllErrors(true);
+		boolean nowComplete = sch.isComplete();
+		if(!nowComplete){
+			wasComplete = false;
+		}
+		else{
+			if(!wasComplete){
+				if(sch.checkAllErrors().isEmpty()){
+					JOptionPane.showMessageDialog(sch.d.popUP, fire , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else{
+					JOptionPane.showMessageDialog(sch.d.popUP, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.d.icon);
+					sch.d.GUICheckAllErrors(true);
+				}
 			}
 		}
 	}

@@ -796,11 +796,9 @@ public class Driver{
 	}
 
 	public void updateAll(){
-
-		b.update();
 		schP.update(sch);
 		reqs.update(sch);
-
+		b.update();
 	}
 
 	public void repaintAll(){
@@ -902,7 +900,6 @@ public class Driver{
 			}
 			setSchedule(result);
 			this.update();
-
 		}
 
 	}
