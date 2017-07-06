@@ -1254,7 +1254,11 @@ public class Schedule implements java.io.Serializable {
 				result.append("STUDY AWAY SEMESTER \n");
 			}
 			for(ScheduleElement se : s.elements){
-				result.append("  " + se.getDisplayString() + "\n");
+				String prefix = "  ";
+				if(se instanceof Requirement){
+					prefix = "  Scheduled one course of: ";
+				}
+				result.append(prefix + se.getDisplayString() + "\n");
 			}
 			if(s.elements.isEmpty()){
 				result.append("  Nothing scheduled for this semester \n");
