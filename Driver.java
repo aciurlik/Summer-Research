@@ -838,24 +838,30 @@ public class Driver{
 
 
 
-		JLabel instruct = new JLabel("Which format would you like to print out your schedule?");
+		JLabel instruct = new JLabel("Which format(s) would you like to use?           ");
 		options.add(instruct, BorderLayout.NORTH);
 		options.add(ReqLayout, BorderLayout.EAST);
 		options.add(ScheduleLayout, BorderLayout.WEST);
 		String finalPrint = new String();
 		JOptionPane.showMessageDialog(popUP, options);
+		boolean selectedScheduleLayout = userOptions.get(1).isSelected();
+		boolean selectedReqLayout = userOptions.get(0).isSelected();
+		
+		//If they didn't select anything, the default is schedule layout.
+		if( (!selectedScheduleLayout) && (!selectedReqLayout)){
+			selectedScheduleLayout = true;
+		}
+		
 		//Schedule
-		if(userOptions.get(1).isSelected()){
+		if(selectedScheduleLayout){
 			finalPrint = finalPrint+ sch.printScheduleString() + "\n";
 		}
 		//Reqs
-		if(userOptions.get(0).isSelected()){
-
+		if(selectedReqLayout){
 			finalPrint = finalPrint + sch.printRequirementString() + "\n";
 		}
 
-
-		if(userOptions.get(1).isSelected() || userOptions.get(0).isSelected()){
+		if(selectedScheduleLayout || selectedReqLayout){
 			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 70);
 			schedulePrint.setWrapStyleWord(true);
 			Printable p = schedulePrint.getPrintable(null, null);
@@ -864,6 +870,7 @@ public class Driver{
 			schedulePrint.setEditable(false);
 			schedulePrint.setFont(FurmanOfficial.monospaced);
 			JScrollPane scrollPane = new JScrollPane(schedulePrint);
+			scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width,500));
 			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			String[] choices= {"Print", "Cancel"};
