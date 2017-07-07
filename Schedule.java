@@ -21,6 +21,12 @@ public class Schedule implements java.io.Serializable {
 	private ArrayList<Semester> semesters;
 	public HashSet<Prereq> prereqs;
 	private Major GER;
+
+
+
+
+
+
 	//transient is for Serializable purposes.
 	public transient Driver d;
 	CourseList masterList;
@@ -1527,6 +1533,14 @@ public class Schedule implements java.io.Serializable {
 //Collect all the elemtns before that semester date.
 
 
+	public Major getGER() {
+		return GER;
+	}
+
+
+	public void setGER(Major gER) {
+		GER = gER;
+	}
 
 }
 

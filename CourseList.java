@@ -1,25 +1,14 @@
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
 /**
  * 
  * @author drivers, aciurlik
- * This will read in a file and call the course constructor to create a course object for one listed in the file
- * these courses will then be placed in an array list. Modeled after Maze.java
+ * This is a static class that will hold and filter an ArrayList of courses. 
  *
  */
 
@@ -189,6 +178,7 @@ public class CourseList implements java.io.Serializable  {
 					//If the user said to skip, do this:
 					result = new Requirement();
 					result.setName(originalRequirementString);
+					scan.close();
 					return result;
 				}
 				System.out.print(e.getMessage() + "\n" + originalRequirementString + "\n>>>");
@@ -197,6 +187,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 		}
 		addPrereqMeaning(originalRequirementString, userInput);
+		scan.close();
 		return result;
 
 	}

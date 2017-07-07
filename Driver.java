@@ -47,6 +47,8 @@ import javax.swing.text.BadLocationException;
 public class Driver{ 
 
 	/**
+	 * This is in charge of handling all of the GUI. It is the only 
+	 * aspect of the GUI that sends information to the schedule. 
 	 * 
 	 */
 	
@@ -54,22 +56,27 @@ public class Driver{
 	static Schedule testSchedule;
 	SchedulePanel schP;
 	RequirementListPanel reqs;
+	
 	int season;
 	JFrame popUP;
 	JList<Integer> pickYears;
 	String seasonName;
 	Integer[] yearsDialog;
 	static ImageIcon icon;
+	
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
 	String instructCourse = "Please pick the course you would like to add to your ";
 	String headInstructCourse = "Pick a course";
-	Course[] coursesDialog;
 	String summerOverload = "You need to delete a course before you can add another";
+	
+	Course[] coursesDialog;
+	
 	ScheduleElement beingDragged;
+	
 	ListOfMajors l;
 	BellTower b;
-	PrintWriter pW;
+	//PrintWriter pW;
 
 	public static Driver testDriver(){
 		testSchedule = Schedule.testSchedule();
@@ -568,7 +575,7 @@ public class Driver{
 
 
 	public void GUISupriseWindow(Semester s) {
-		new SupriseMe(sch, s, this);
+		new SupriseMe(sch, s, this, null);
 	}
 
 	public void GUIChallengeExcepted(Semester s, Course c){
@@ -655,7 +662,7 @@ public class Driver{
 			semesterStrings.add(d.getUserString());
 			semesterObjects.add(d);
 		}
-		int index = GUIChooseAmong(semesterObjects, semesterStrings, "Which was your first semester at furman? ", "Pick a semester");
+		int index = GUIChooseAmong(semesterObjects, semesterStrings, "Which was your first semester at Furman? ", "Pick a semester");
 		if(index != -1){
 			return semesters.get(index);
 		}

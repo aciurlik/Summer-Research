@@ -53,7 +53,7 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String Want = "I want it";
 	public static final  String Challenge = "Take the Challenge";
 	public static final  String tryAgain = "Try Again";
-
+	public static final  String Cancel = "Cancel";
 	//Only Menu Bar 
 	public static final  String openSchedule = "Open Schedule";
 	public static final  String newSchedule = "New Schedule";
