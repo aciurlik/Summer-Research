@@ -38,6 +38,8 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 	private static final long serialVersionUID = 1L;
 
+	String gerChoice;
+
 	Driver d;
 
 	Course c;
@@ -69,6 +71,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 	JButton tryAgain = new JButton("Try Again");
 
 	Schedule sch;
+	JButton cancel;
 
 	ArrayList<Course> almostReady;
 	ArrayList<Course>  getReady;
@@ -77,9 +80,11 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 
 
-	public SupriseMe(Schedule sch, Semester s, Driver d){
+	public SupriseMe(Schedule sch, Semester s, Driver d, String gerChoice){
 
 		super();
+		this.gerChoice=gerChoice;
+
 		this.d=d;
 		this.s=s;
 		this.sch=sch;
@@ -94,7 +99,8 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 			return;
 		}
 
-		else{
+
+		if(gerChoice == null){
 			ArrayList<String> gerNames = new ArrayList<String>();
 			///Add these to the array. 
 			for(Requirement r: sch.getGER().reqList){
@@ -104,7 +110,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 			for(int i=0; i<toShow.length; i++){
 				toShow[i]=gerNames.get(i);
 			}
-			String gerChoice = (String)JOptionPane.showInputDialog(
+			gerChoice = (String)JOptionPane.showInputDialog(
 					frame,
 					"Which GER would you like to satisfy?",
 					"How can I suprise you?",
@@ -112,7 +118,17 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 					null,
 					toShow,
 					null);
+			this.gerChoice= gerChoice;
 
+			if(gerChoice == null){
+				frame.dispose();
+				return;
+
+			}
+
+
+		}
+		if(gerChoice != null){
 			almostReady = CourseList.getCoursesIn(s);
 			getReady = CourseList.onlyThoseSatisfying(almostReady, sch.getGER().getRequirement(gerChoice));
 
@@ -128,17 +144,20 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 				String string = cc.supriseString();
 
-				System.out.println(string);
-
+	
 				tokens = string.split(delims);
+
 			}
 			else{
 				ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 
-				JOptionPane.showMessageDialog(frame, "There are no classes in this semester that satisfy the " + gerChoice + " requirement "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
-				
+				JOptionPane.showMessageDialog(frame, "There are no classes in this semester that satisfy the " + gerChoice + " requirement ", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+
 				return;
 			}
+
+		}
+
 
 
 
@@ -187,7 +206,9 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 			takeIt.add(doIt);
 
 
-
+			cancel = new JButton("Cancel");
+			cancel.setActionCommand(MenuOptions.Cancel);
+			cancel.addActionListener(this);
 
 
 			tryAgain.setActionCommand(MenuOptions.tryAgain);
@@ -228,7 +249,8 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 
 
-	}
+
+	
 
 
 
@@ -312,7 +334,10 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 			want.addActionListener(this);
 
-			takeIt.add(want);
+
+
+
+
 
 			frame.pack();
 
@@ -338,12 +363,13 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 		if(e.getActionCommand().equals(MenuOptions.tryAgain)){
 
-			SupriseMe s = new SupriseMe(this.sch, this.s, this.d);
+			SupriseMe s = new SupriseMe(this.sch, this.s, this.d, gerChoice);
 
 			frame.dispose();
+		}
 
-
-
+		if(e.getActionCommand().equals(MenuOptions.Cancel)){
+			frame.dispose();
 		}
 
 
@@ -441,8 +467,9 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 			catch (InterruptedException e) { }
 
 		}
-
+		takeIt.add(cancel);
 		takeIt.add(tryAgain);
+		takeIt.add(want);
 
 		frame.repaint();
 

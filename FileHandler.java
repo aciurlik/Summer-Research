@@ -54,16 +54,7 @@ public class FileHandler {
 		String chosenSched = chooseSchedule("open");
 		if(chosenSched !=null){
 
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ObjectInputStream ois = null;
-			try {
-				ois = new ObjectInputStream(fis);
+			try(FileInputStream fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched); ObjectInputStream ois = new ObjectInputStream(fis);) {
 				Schedule result = (Schedule) ois.readObject();
 				ois.close();
 				return result;
@@ -73,14 +64,8 @@ public class FileHandler {
 				e.printStackTrace();
 
 			}
-			finally{
-				try {
-					ois.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+			
+			
 		}
 		return null;
 
@@ -106,27 +91,24 @@ public class FileHandler {
 
 		}
 		if(fileName != null){
-			ObjectOutputStream save = null;
-			FileOutputStream saveFile = null;
-			try {
-				saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser");
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
+			
+		
+			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser");
+			ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
 
-				save = new ObjectOutputStream(saveFile);
+			
 				save.writeObject(sch);	
 				save.close();
+				saveFile.close();
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(popUP, "This schedule was not able to be saved. ");
 				e.printStackTrace();
 
 				System.out.println(e.getLocalizedMessage());
 			}
-
+			
 		}
 
 
@@ -157,7 +139,8 @@ public class FileHandler {
 
 
 		}
-
+		
+		
 		return scheduleNames;
 	}
 
@@ -213,10 +196,9 @@ public class FileHandler {
 	 * @return
 	 */
 	public static ArrayList<String> fileToStrings(File f){
-		BufferedReader br = null;
+	
 		ArrayList<String> result = new ArrayList<String>();
-		try {
-			br = new BufferedReader(new FileReader(f));
+		try(BufferedReader br = new BufferedReader(new FileReader(f));) {
 			String nextLine = br.readLine();
 			while (nextLine!=null){
 				result.add(nextLine);
@@ -228,6 +210,8 @@ public class FileHandler {
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
+		
+		
 		return result;
 	}
 	
@@ -237,10 +221,9 @@ public class FileHandler {
 	 * @return
 	 */
 	public static String fileToString(File f){
-		BufferedReader br = null;
 		StringBuilder result = new StringBuilder();
-		try {
-			br = new BufferedReader(new FileReader(f));
+		try(BufferedReader br = new BufferedReader(new FileReader(f));) {
+			
 			String nextLine = br.readLine();
 			while (nextLine!=null){
 				result.append(nextLine);
@@ -253,6 +236,7 @@ public class FileHandler {
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
+		
 		return result.toString();
 	}
 
@@ -286,29 +270,33 @@ public class FileHandler {
 			savePrereqMeanings();
 			return;
 		}
-		try{
-			FileInputStream fis = new FileInputStream(fileName);
-			ObjectInputStream in = new ObjectInputStream(fis);
+		try(FileInputStream fis = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fis);){
+			
 			CourseList.savedPrereqMeanings = (Hashtable<String, String>) in.readObject();
 			in.close();
+			fis.close();
 		}catch(Exception e){
 			System.out.println("There was an error loading the saved meanings");
 			e.printStackTrace();
 		}
+		
 	}
 
 
 	public static void savePrereqMeanings(){
-		try{
-			FileOutputStream fos = new FileOutputStream(prereqMeaningsFile, false); //overwrite, don't append.
-			ObjectOutputStream out = new ObjectOutputStream(fos);
+		try (FileOutputStream fos = new FileOutputStream(prereqMeaningsFile, false); //overwrite, don't append.
+				ObjectOutputStream out = new ObjectOutputStream(fos);){
+			
 			out.writeObject(CourseList.savedPrereqMeanings);
 			out.close();
+			fos.close();
 		}
 		catch(Exception e){
 			System.out.println("There was an error saving the meanings of your prereq strings");
 			e.printStackTrace();
 		}
+		
 	}
 
 
@@ -320,6 +308,7 @@ public class FileHandler {
 			if(n==0){
 				File toDelete = new File (MenuOptions.savedScheduleFolder + chosen);
 				toDelete.delete();
+				
 
 			}
 		}
