@@ -133,6 +133,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 	/**
 	 * This should only be called if the schedule element is a requirement.
+	 * It makes the button that either says "Add a course" or "No courses available."
 	 */
 	public void updateDropDown(){
 		ArrayList<ScheduleCourse> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
@@ -142,7 +143,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					ScheduleCourse c = container.d.GUIChooseCourse(allPossibleCourses, e.getActionCommand());
+					ScheduleCourse c = container.d.GUIChooseCourse(allPossibleCourses);
 					if(c != null){
 						container.d.GUIElementChanged(container, reference , c);
 					}

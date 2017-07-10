@@ -246,6 +246,16 @@ public class Time implements Comparable<Time>, java.io.Serializable{
 		}
 		return result;
 	}
+	
+	/**
+	 * Return the day code for this day, one of
+	 * U, M, T, W, R, F, S
+	 * @param day
+	 * @return
+	 */
+	public static String dayCode(int day){
+		return "" + dayCodes[day];
+	}
 	/**
 	 * Given an integer day of week, return the normal name of that day.
 	 * For example, given 0 return "Sunday."
