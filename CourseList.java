@@ -462,6 +462,9 @@ public class CourseList implements java.io.Serializable  {
 		m.addRequirement(FYWRequirement());
 		
 		//Make NW and NWL enemies
+		Requirement nw = m.getRequirement("NW");
+		Requirement nwl = m.getRequirement("NWL");
+		RequirementGraph.putEdge(nw, nwl);
 		
 
 		// Make WC and NE enemies 

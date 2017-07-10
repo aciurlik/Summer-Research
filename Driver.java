@@ -493,9 +493,8 @@ public class Driver{
 		for(int i = 0; i<toFinal.size(); i++){
 			finalCourseList[i] = toFinal.get(i);
 		}
-
-
-		ScheduleCourse c = GUIChooseCourse(finalCourseList, "Choose a course" );
+		
+		ScheduleCourse c = GUIChooseCourse(finalCourseList);
 
 		if(c != null){
 			//Removes all courses that have already been added in case of MayX 
@@ -509,7 +508,7 @@ public class Driver{
 
 
 
-	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
+	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses) {
 		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 			JOptionPane.showMessageDialog(popUP, 
@@ -518,6 +517,16 @@ public class Driver{
 							+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
 			return null;
 		}
+		try{
+			ScheduleCourse c = CourseChooser.chooseCourse(finalListOfCourses, sch.getAllRequirements());
+			return c;
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
+		/*
+		
 		String reqsString = "";
 		String[] displayed = new String[finalListOfCourses.length];
 		ArrayList<Requirement> allReqs = sch.getAllRequirements();
@@ -553,8 +562,6 @@ public class Driver{
 					c.getPrefix().toString() + " " +c.c.professor,
 					reqsFulfilled,
 					reqsString);
-
-
 			displayed[i] = displayedString;
 		}
 
@@ -569,8 +576,10 @@ public class Driver{
 			return null;
 		}
 		return finalListOfCourses[chosenIndex];
-
+		*/
 	}
+	
+	
 
 
 
