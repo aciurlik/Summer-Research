@@ -1100,6 +1100,57 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		result.append(")");
 		return result.toString();
 	}
+	
+	/**
+	 * Turn the save string of this requirement into something you might
+	 * see from eclipse, with nice spacing and a limit on line length.
+	 * @return
+	 */
+	public String coderString(){
+		StringBuilder result = new StringBuilder();
+		String tab = "  ";
+		int depth = 0;
+		int lineLength = 0;
+		int maxLineLength = 40;
+		for(char c : this.saveString().toCharArray()){
+			lineLength ++;
+			if(c == '('){
+				depth ++;
+				result.append('(');
+				result.append("\n");
+				lineLength = depth * tab.length();
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+			}
+			else if(c == ')'){
+				depth --;
+				result.append("\n");
+				for(int i = 0; i < depth; i ++){
+					result.append(tab);
+				}
+				result.append(")");
+				result.append("\n");
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+				lineLength = depth * tab.length();
+			}
+			else{
+				if(lineLength > maxLineLength && c == ' '){
+					result.append("\n");
+					for(int i = 0; i < depth ; i ++){
+						result.append(tab);
+					}
+					lineLength = depth * tab.length();
+				}
+				else{
+					result.append(c);
+				}
+			}
+		}
+		return result.toString();
+	}
 
 
 	//INFINITELOOPHAZARD
