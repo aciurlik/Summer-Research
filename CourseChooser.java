@@ -206,12 +206,36 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	
 	public ArrayList<Object> dataFor(ScheduleCourse c){
 		ArrayList<Object> results = new ArrayList<Object>();
-		ArrayList<Requirement> reqsFulfilled = new ArrayList<Requirement>();
-		for(Requirement r : reqs){
-			if(r.isSatisfiedBy(c.getPrefix())){
-				reqsFulfilled.add(r);
+		
+		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs);
+		
+		//Filter out reqs that are already complete
+		for(int i = 0; i < reqsFulfilled.size() ; i ++){
+			Requirement r = reqsFulfilled.get(i);
+			if(r.storedIsComplete()){
+				reqsFulfilled.remove(i);
+				i--;
 			}
 		}
+		
+		//Special case for NW and NWL
+		for(int i = 0; i < reqsFulfilled.size() ; i ++){
+			Requirement r = reqsFulfilled.get(i);
+			if("NW/NWL".equals(r.name)){
+				Prefix p = c.getPrefix();
+				Requirement newReq = new Requirement();
+				
+				if(CourseList.isNWL(p)){
+					newReq.setName("NWL");
+					reqsFulfilled.set(i,newReq);
+				}
+				else{
+					newReq.setName("NW");
+					reqsFulfilled.set(i,newReq);
+				}
+			}
+		}
+		
 		
 		Time startTime = null;
 		if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
@@ -366,7 +390,6 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			JPanel timesPanel = new JPanel();
 			String[] timeStrings = new String[timesToChooseFromWhenFiltering.length];
 			for(int i = 0; i < timesToChooseFromWhenFiltering.length ; i ++){
-				System.out.println(timesToChooseFromWhenFiltering[i].clockTime());
 				timeStrings[i] = timesToChooseFromWhenFiltering[i].clockTime();
 			}
 			startTimeRange = new JComboBox<String>(timeStrings);

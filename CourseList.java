@@ -28,6 +28,7 @@ public class CourseList implements java.io.Serializable  {
 
 
 
+	public static final boolean nwAndNwlAreOne = true; //for Dr. Bouzarth
 
 
 	private static ArrayList<Course> listOfCourses;
@@ -413,6 +414,7 @@ public class CourseList implements java.io.Serializable  {
 				case "NW":
 					switch(majorType){
 					case CourseList.BS:
+						newNumToChoose = 2;
 						//only courses numbered 110 or greater
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
@@ -428,6 +430,7 @@ public class CourseList implements java.io.Serializable  {
 						break;
 					//Add the NWL requirements to the NW requirements.
 					case CourseList.BA:
+						newNumToChoose = 2;
 					case BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
@@ -461,11 +464,23 @@ public class CourseList implements java.io.Serializable  {
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
 		
-		//Make NW and NWL enemies
-		Requirement nw = m.getRequirement("NW");
+		//Put NW and NWL at the end (will be before WC and NW).
 		Requirement nwl = m.getRequirement("NWL");
-		RequirementGraph.putEdge(nw, nwl);
-		
+		Requirement nw = m.getRequirement("NW");
+		m.removeRequirement(nw);
+		m.removeRequirement(nwl);
+		if(nwAndNwlAreOne){
+			Requirement nwnwl = new Requirement();
+			nwnwl.addRequirement(nw);
+			nwnwl.addRequirement(nwl);
+			nwnwl.setNumToChoose(2);
+			nwnwl.setName("NW/NWL");
+			m.addRequirement(nwnwl);
+		}
+		else{
+			m.addRequirement(nw);
+			m.addRequirement(nwl);
+		}
 
 		// Make WC and NE enemies 
 		Requirement wc = m.getRequirement("WC");
@@ -480,6 +495,13 @@ public class CourseList implements java.io.Serializable  {
 
 		m.setChosenDegree(majorType);
 		return m;
+	}
+	
+	public static boolean isNW(Prefix p){
+		return GERRequirements.get("NW").contains(p);
+	}
+	public static boolean isNWL(Prefix p){
+		return GERRequirements.get("NWL").contains(p);
 	}
 
 	
