@@ -1,18 +1,19 @@
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import javax.swing.border.BevelBorder;
 
 
 /**
@@ -46,7 +47,25 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 
 		//Make sure any click on the requirementPanel 
 		// will begin a dragEvent.
-		MouseListener listener = ComponentDragHandler.getDragListener();
+		MouseListener listener =  new MouseAdapter(){
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if(e.isPopupTrigger()){
+					showPopup(e);
+					return;
+				}
+				JComponent c = (JComponent) e.getSource();
+				TransferHandler handler = c.getTransferHandler();
+				handler.exportAsDrag(c, e, TransferHandler.MOVE);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e){
+				if(e.isPopupTrigger()){
+					showPopup(e);
+				}
+			}
+		};
 		this.addMouseListener(listener);
 
 		this.setBackground(FurmanOfficial.official);
@@ -128,6 +147,13 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	}
 
 
+	
+	
+	////////////////////////////
+	////////////////////////////
+	////////////////////////////
+	////////////////////////////
+	////////////////////////////
 
 	/**
 	 * This class specifies the actions that should happen when 
@@ -155,6 +181,41 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 
 
 
+	}
+	
+	
+	////////////////////////////
+	////////////////////////////
+	////// Popups when user right clicks
+	////////////////////////////
+	////////////////////////////
+
+	
+	public void examineRequirementPopup(){
+		d.GUIExamineRequirement(this.req);
+	}
+	
+	public void showPopup(MouseEvent e){
+		JPopupMenu reqMenu = new RequirementPopupMenu();
+		reqMenu.show(e.getComponent(), e.getX(), e.getY());
+	}
+	
+	private class RequirementPopupMenu extends JPopupMenu{
+		private static final long serialVersionUID = 1L;
+		public RequirementPopupMenu(){
+			
+			JMenuItem item = new JMenuItem("Examine Requirement");
+			item.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					examineRequirementPopup();
+				}
+			});
+			add(item);
+			
+			
+		}
+		
 	}
 
 

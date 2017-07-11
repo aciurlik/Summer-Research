@@ -158,6 +158,14 @@ public class Time implements Comparable<Time>, java.io.Serializable{
 		return daysInMonth[month - 1];
 	}
 
+	/**
+	 * Return a time with the same hour, min, and sec as this time, with
+	 * year, month, and day unused.
+	 * @return
+	 */
+	public Time dateless(){
+		return new Time(UNUSED, UNUSED, UNUSED, this.hours, this.minutes, this.seconds);
+	}
 
 	/**
 	 * Return a new time that is the specified number
@@ -617,6 +625,12 @@ public class Time implements Comparable<Time>, java.io.Serializable{
 		return v1;
 	}
 
+	/**
+	 * Read from a string of the form
+	 * "year/month/day hour:min:sec"
+	 * @param s
+	 * @return
+	 */
 	public static Time readFrom(String s){
 		String[] split = s.split(" ");
 		String[] larges = split[0].split("/");

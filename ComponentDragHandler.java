@@ -64,6 +64,9 @@ public abstract class ComponentDragHandler extends TransferHandler {
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
+				if(SwingUtilities.isRightMouseButton(e)){
+					return;
+				}
 				JComponent c = (JComponent) e.getSource();
 				TransferHandler handler = c.getTransferHandler();
 				handler.exportAsDrag(c, e, TransferHandler.MOVE);

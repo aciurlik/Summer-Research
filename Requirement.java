@@ -316,10 +316,15 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	//INFINITELOOPHAZARD
 	/**
+	 * WARNING
+	 * This method should not be called by outside classes.
+	 * Use minMoreNeeded(taken, boolean storeValue) instead.
 	 * 
+	 * Only Requirement and Terminal requirement should use it.
 	 * @param taken
 	 * @return
 	 */
+	
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
 		if(this.usesCreditHours){
 			int result = numToChoose;
@@ -353,12 +358,71 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return result;
 		}
 		else{ //this doesn't use credit hours.
+			//Look at each of your sub requirements, figure out how
+			// many each of them needs.
+			// Find the best numToChoose that you could pick, and
+			// use the minMoreNeeded from those numToChoose.
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
 
 			for(Requirement r : choices){
 				otherNums.add(r.minMoreNeeded(taken));
 			}
 			Collections.sort(otherNums);
+			
+			//Special case for requirements of the form
+			// "5 of these, at least 3 like this"
+			// These will always have 2 to choose, and
+			// one of the two will be a subset of the other.
+			if(this.numToChoose == 2 && this.choices.size() == 2){
+				ArrayList<Requirement> choices = new ArrayList<Requirement>();
+				for(Requirement r : this.choices){
+					choices.add(r);
+				}
+				Requirement subset = null;
+				Requirement superset = null;
+				boolean isAtLeastRequirement = false;
+				if(choices.get(0).isSubset(choices.get(1))){
+					subset = choices.get(0);
+					superset = choices.get(1);
+					isAtLeastRequirement = true;
+				}
+				else if(choices.get(1).isSubset(choices.get(0))){
+					subset = choices.get(1);
+					superset = choices.get(0);
+					isAtLeastRequirement = true;
+				}
+				
+				//In we're looking at a requirement of the form
+				// "5 of these, at least 3 like this,"
+				// we'll use the following algorithm
+				if(isAtLeastRequirement){
+					//Split your requirement into 2 pieces, the one with 5 needed (superset)
+					//		and the one with 3 needed (subset).
+					// Imagine taking 6 courses from superset, 2 of which counted for subset. 
+					// We can infer that you took 4 superset-only and 2 subset-only courses.
+					//   Because 5-3 is 2, we can use at most 2 of those 4 superset-only courses
+					// So we get to count 2 courses from subset and min(4, 2) courses from superset.
+					// We need 5 total courses (comes from superset's originalNeeded).
+					// So min more needed should be 5-4 = 1.
+					
+					//I'll put the numbers from the example next to 
+					// each of the variables below so that you can
+					// follow along with the algorithm.
+					int moreNeededSuperset = superset.minMoreNeeded(taken); //0
+					int originalNeededSuperset = superset.originalNumberNeeded; //5
+					int moreNeededSubset = subset.minMoreNeeded(taken); //1
+					int originalNeededSubset = subset.originalNumberNeeded; //3
+					int supersetTaken = originalNeededSuperset - moreNeededSuperset; //6 in the example 
+						//(here supersetTaken would be 5 instead, but there is no difference in the algorithm.)
+					int subsetTaken = originalNeededSubset - moreNeededSubset;//2
+					int supersetOnly = supersetTaken - subsetTaken; //4 in example
+					int maxFromSupersetOnly = originalNeededSuperset - originalNeededSubset;// 5-3 = 2 in example
+					int actualFromSupersetOnly = Math.min(supersetOnly, maxFromSupersetOnly);// max(4, 2) in example
+					int totalTaken = subsetTaken + actualFromSupersetOnly; //4 total taken
+					int result = originalNeededSuperset - totalTaken; //5 - 4 = 1 more needed
+					return result;
+				}
+			}
 			int result = 0;
 			for(int i = 0; i < numToChoose ; i ++){
 				result += otherNums.get(i);
@@ -367,8 +431,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return result;
 		}
 	}
-
-
 
 
 
@@ -508,8 +570,42 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	//////////////////////////////////////
 	//////////////////////////////////////
 
-
-
+	
+	/**
+	 * Check (while avoiding large computation times)
+	 * whether this requirement is obviously a subset of 
+	 * the other requirement. Only handles the case where
+	 * this is a list of terminals and other is also a list of
+	 * terminals
+	 * @param other
+	 * @return
+	 */
+	public boolean isSubset(Requirement other){
+		HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
+		for(Requirement r : other.choices){
+			if(!r.isTerminal()){
+				return false;
+			}
+			else{
+				othersSubreqs.add(r.getTerminal());
+			}
+		}
+		HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
+		if(this.isTerminal()){
+			thisSubreqs.add(this.getTerminal());
+		}
+		else{
+			for(Requirement r : this.choices){
+				if(!r.isTerminal()){
+					return false;
+				}
+				else{
+					othersSubreqs.add(r.getTerminal());
+				}
+			}
+		}
+		return othersSubreqs.containsAll(thisSubreqs);
+	}
 
 
 	//INFINITELOOPHAZARD
@@ -839,9 +935,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		for(Requirement otherReq : reqList){
 			//Remove enemies as you go
 			if(RequirementGraph.doesPlayNice(otherReq, this)){
+				//Figure out if this satisfies otherReq
 				if(otherReq.equals(this)){
 					result.add(otherReq);
 				}
+				
+				/* Doesn't work - might not actually be used to complete a new
+				 * piece of otherReq, might instead be a subset of the part that is
+				 * already done.
+				if(this.isSubset(otherReq)){
+					result.add(otherReq);
+				}
+				*/
 			}
 		}
 		
@@ -993,6 +1098,57 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return "()";
 		}
 		result.append(")");
+		return result.toString();
+	}
+	
+	/**
+	 * Turn the save string of this requirement into something you might
+	 * see from eclipse, with nice spacing and a limit on line length.
+	 * @return
+	 */
+	public String coderString(){
+		StringBuilder result = new StringBuilder();
+		String tab = "  ";
+		int depth = 0;
+		int lineLength = 0;
+		int maxLineLength = 40;
+		for(char c : this.saveString().toCharArray()){
+			lineLength ++;
+			if(c == '('){
+				depth ++;
+				result.append('(');
+				result.append("\n");
+				lineLength = depth * tab.length();
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+			}
+			else if(c == ')'){
+				depth --;
+				result.append("\n");
+				for(int i = 0; i < depth; i ++){
+					result.append(tab);
+				}
+				result.append(")");
+				result.append("\n");
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+				lineLength = depth * tab.length();
+			}
+			else{
+				if(lineLength > maxLineLength && c == ' '){
+					result.append("\n");
+					for(int i = 0; i < depth ; i ++){
+						result.append(tab);
+					}
+					lineLength = depth * tab.length();
+				}
+				else{
+					result.append(c);
+				}
+			}
+		}
 		return result.toString();
 	}
 

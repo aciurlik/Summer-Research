@@ -462,6 +462,13 @@ public class Driver{
 
 
 	}
+	
+	public void GUIExamineRequirement(Requirement r){
+		//Make a new JFrame with info about this requirement.
+		//Include the full definition as written in our code.
+		String toShow = r.coderString();
+		JOptionPane.showMessageDialog(null, toShow, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION);
+	}
 
 
 	/**

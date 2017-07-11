@@ -1,29 +1,16 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,6 +22,7 @@ import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
 
 
 /**
@@ -61,6 +49,23 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	JTable visibleCoursesTable;
 	
 	boolean finishedChoosing;
+	
+	
+	//Used in filterPanel
+	public static final Time[] timesToChooseFromWhenFiltering;
+	static{
+		ArrayList<Time> times = new ArrayList<Time>();
+		int minBetweenChoices = 15;
+		int numChoices = 4 * 18;//18 hours
+		Time currentTime = Time.tryRead("5:00AM");
+		for(int i = 0; i < numChoices ; i ++ ){
+			times.add(currentTime);
+			currentTime = currentTime.addMinutes(minBetweenChoices);
+		}
+		timesToChooseFromWhenFiltering = times.toArray(new Time[times.size()]);
+	}
+	
+	
 
 	public static ScheduleCourse chooseCourse(ScheduleCourse[] courses, ArrayList<Requirement> reqs){
 		CourseChooser c = new CourseChooser(courses, reqs);
@@ -177,7 +182,6 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		if(show){
 			advancedSettingsPanel.add(filtersPanel, BorderLayout.CENTER);
 		}
-		//Add column descriptors to advancesSettingsPanel.south.
 	}
 	
 	
@@ -202,12 +206,36 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	
 	public ArrayList<Object> dataFor(ScheduleCourse c){
 		ArrayList<Object> results = new ArrayList<Object>();
-		ArrayList<Requirement> reqsFulfilled = new ArrayList<Requirement>();
-		for(Requirement r : reqs){
-			if(r.isSatisfiedBy(c.getPrefix())){
-				reqsFulfilled.add(r);
+		
+		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs);
+		
+		//Filter out reqs that are already complete
+		for(int i = 0; i < reqsFulfilled.size() ; i ++){
+			Requirement r = reqsFulfilled.get(i);
+			if(r.storedIsComplete()){
+				reqsFulfilled.remove(i);
+				i--;
 			}
 		}
+		
+		//Special case for NW and NWL
+		for(int i = 0; i < reqsFulfilled.size() ; i ++){
+			Requirement r = reqsFulfilled.get(i);
+			if("NW/NWL".equals(r.name)){
+				Prefix p = c.getPrefix();
+				Requirement newReq = new Requirement();
+				
+				if(CourseList.isNWL(p)){
+					newReq.setName("NWL");
+					reqsFulfilled.set(i,newReq);
+				}
+				else{
+					newReq.setName("NW");
+					reqsFulfilled.set(i,newReq);
+				}
+			}
+		}
+		
 		
 		Time startTime = null;
 		if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
@@ -321,6 +349,10 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		JToggleButton[] meetingDaysButtons;
 		JButton applyButton;
 		JTextField profNameField;
+		JComboBox<String> startTimeRange;
+		JComboBox<String> endTimeRange;
+		
+	
 		
 		
 		
@@ -354,8 +386,25 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			professorNamePanel.add(profNameField);
 			this.add(professorNamePanel);
 			
-			//TODO Work on a rangeSlider for times
+			//Times
+			JPanel timesPanel = new JPanel();
+			String[] timeStrings = new String[timesToChooseFromWhenFiltering.length];
+			for(int i = 0; i < timesToChooseFromWhenFiltering.length ; i ++){
+				timeStrings[i] = timesToChooseFromWhenFiltering[i].clockTime();
+			}
+			startTimeRange = new JComboBox<String>(timeStrings);
+			endTimeRange = new JComboBox<String>(timeStrings);
 			
+			int last = timeStrings.length - 1;
+			endTimeRange.setSelectedIndex(last);
+			
+			startTimeRange.addActionListener(this);
+			endTimeRange.addActionListener(this);
+			timesPanel.add(new JLabel("Starts after:"));
+			timesPanel.add(startTimeRange);
+			timesPanel.add(new JLabel("Starts before:"));
+			timesPanel.add(endTimeRange);
+			this.add(timesPanel);
 			
 			
 			//Not sure why, but wrapping the button in a panel helped the
@@ -398,11 +447,18 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			}
 			
 			
-			//Professor names
+			//Professor name filter
 			String profText = profNameField.getText();
 			if(!profText.equals("")){
 				result.add(c -> c.professor.contains(profText));
 			}
+			
+			
+			//Times filter
+			Time startTime = timesToChooseFromWhenFiltering[startTimeRange.getSelectedIndex()];
+			Time endTime = timesToChooseFromWhenFiltering[endTimeRange.getSelectedIndex()];
+			final Interval<Time> validStartInterval = new Interval<Time>(startTime, endTime);
+			result.add(c -> validStartInterval.contains(c.meetingTime[0].dateless(), true));
 			
 			
 			return result;
