@@ -58,7 +58,7 @@ public class StartUpMenu implements ActionListener {
 	public void actionPerformed(ActionEvent a) {
 		if(a.getActionCommand().equals(MenuOptions.finish)){
 			if(noMore.isSelected()){
-				
+				FileHandler.propertySet(MenuOptions.startUp, "false");
 			}
 			frame.dispose();
 		}
