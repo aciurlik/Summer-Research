@@ -158,6 +158,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.originalNumberNeeded = result;
 	}
 	
+	/**
+	 * Return an estimate of the number of courses originally needed,
+	 * assuming each course is 4 credit hours.
+	 * @return
+	 */
 	public int getOriginalCoursesNeeded(){
 		if(this.usesCreditHours){
 			return this.originalNumberNeeded / 4;
@@ -165,6 +170,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		else{
 			return this.originalNumberNeeded;
 		}
+	}
+	/**
+	 * Return the number needed, may represent courses or credit hours.
+	 * @return
+	 */
+	public int getOriginalNumberNeeded(){
+		return this.originalNumberNeeded;
 	}
 
 
@@ -373,7 +385,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			// "5 of these, at least 3 like this"
 			// These will always have 2 to choose, and
 			// one of the two will be a subset of the other.
-			ArrayList<Requirement> isAtLeastRequirementPairs = isAtLeastRequirementPairs();
+			ArrayList<Requirement> isAtLeastRequirementPairs = atLeastRequirementPairs();
 			if(isAtLeastRequirementPairs.size() != 0){
 				Requirement superset = isAtLeastRequirementPairs.get(0);
 				Requirement subset = isAtLeastRequirementPairs.get(1);
@@ -417,7 +429,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	
 	
 	public boolean isAtLeastRequirement(){
-		return !isAtLeastRequirementPairs().isEmpty();
+		return !atLeastRequirementPairs().isEmpty();
 	}
 	/**
 	 * Check if this requirement looks like
@@ -427,7 +439,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * Otherwise return an empty array list.
 	 * @return
 	 */
-	private ArrayList<Requirement> isAtLeastRequirementPairs(){
+	public ArrayList<Requirement> atLeastRequirementPairs(){
 		if(this.numToChoose == 2 && this.choices.size() == 2){
 			ArrayList<Requirement> choices = new ArrayList<Requirement>();
 			for(Requirement r : this.choices){
@@ -1131,7 +1143,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				+ "\n\n");
 		if(this.numToChoose != 1 && this.numToChoose == this.choices.size()){
 			//And requirement
-			ArrayList<Requirement> possiblePairs = this.isAtLeastRequirementPairs();
+			ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
 			if(possiblePairs.size() != 0){
 				Requirement superset = possiblePairs.get(0);
 				Requirement subset = possiblePairs.get(1);
@@ -1160,12 +1172,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		else{
 			result.append(saveString());
 		}
-		
-		HashSet<Character> openParens = new HashSet<Character>();
-		openParens.add('(');
-		HashSet<Character> closeParens = new HashSet<Character>();
-		closeParens.add(')');
-		return indent(result.toString(), 80, "   ",openParens, closeParens );
+		return indent(result.toString(), 80, "   ");
 	}
 	
 	/**
@@ -1175,14 +1182,25 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 */
 	public String coderString(){
 		String tab = "  ";
+		int maxLineLength = 40;
+		return indent(this.saveString(), maxLineLength, tab);
+	}
+	
+	
+	/**
+	 * Indents using default ( and ) as open and closing parens.
+	 * @param s
+	 * @param maxLineLength
+	 * @param tab
+	 * @return
+	 */
+	public String indent(String s, int maxLineLength, String tab){
 		HashSet<Character> openParens = new HashSet<Character>();
 		openParens.add('(');
 		HashSet<Character> closeParens = new HashSet<Character>();
 		closeParens.add(')');
-		int maxLineLength = 40;
-		return indent(this.saveString(), maxLineLength, tab, openParens, closeParens);
+		return indent(s, maxLineLength, tab, openParens, closeParens);
 	}
-	
 	/**
 	 * Indent this string as if it were written by a coder or eclipse,
 	 * based on parenthesis.
@@ -1234,7 +1252,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return result.toString();
 	}
-
 
 	//INFINITELOOPHAZARD
 	/**

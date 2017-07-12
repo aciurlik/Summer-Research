@@ -72,6 +72,19 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public int getCreditHours(){
 		return creditHours;
 	}
+	
+	public Time getStartTime(){
+		if(meetingTime == null){
+			return null;
+		}
+		else if(meetingTime.length == 0){
+			return null;
+		}
+		else if(meetingTime[0] == null){
+			return null;
+		}
+		return meetingTime[0].dateless();
+	}
 
 	public SemesterDate getSemester() {
 		return this.semester;

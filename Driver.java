@@ -721,7 +721,7 @@ public class Driver{
 			try{
 
 				header = "Prerequisites Error";
-				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
+				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.req.toString();
 
 
 			}catch(Exception e){
@@ -735,6 +735,15 @@ public class Driver{
 		if(s.error.equals(ScheduleError.duplicateError)){
 			header = "Duplicate Error";
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
+		}
+		if(s.error.equals(ScheduleError.optimisticSchedulerError)){
+			Requirement r = s.getOptimisticRequirement();
+			header = "Optimistic planning";
+			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
+			Requirement subset = pair.get(0);
+			instruct = "The requirement " + r + " must include at least " + r.indent(subset.saveString(), 40, "   ");
+			instruct += "Until you change this requirment into a course, "
+					+ "\nwe will assume that it represents one of these.";
 		}
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(null, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
@@ -758,7 +767,7 @@ public class Driver{
 					result = result + "  " +s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
 				}
 				if(s.error.equals(ScheduleError.preReqError)){
-					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.req.toString() + "\n";
 				}
 				if(s.error.equals(ScheduleError.duplicateError)){
 					result = result + "  "+ s.offendingCourse.shortString() + " is a duplicate course \n";
