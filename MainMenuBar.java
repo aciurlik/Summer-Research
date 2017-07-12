@@ -194,19 +194,29 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		menu.add(submenu);
+		
+		
 
-		/**
-		 * //Add Help
-		menu = new JMenu("Help");
-		JPopupMenu helpMePopup = new JPopupMenu(MenuOptions.help);
-		menu.addActionListener(this);
-		helpMePopup.add(menu);
+		menu = new JMenu("Settings");
+		
+		menuItem = new JMenuItem("Change Settings");
+		menuItem.setActionCommand(MenuOptions.settings);
+		JPopupMenu settings =new JPopupMenu();
+		settings.add(menuItem);
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
 		this.add(menu);
 
-		 * 
-		 * 
-		 * 
-		 */
+		
+	
+		menu = new JMenu("Help");
+		menuItem = new JMenuItem(MenuOptions.viewStartUp);
+		menuItem.setActionCommand(MenuOptions.viewStartUp);
+		JPopupMenu viewStartUp = new JPopupMenu(MenuOptions.viewStartUp);
+		menuItem.addActionListener(this);
+		viewStartUp.add(menuItem);
+		menu.add(menuItem);
+		this.add(menu);
 
 
 
@@ -258,14 +268,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			d.GUIPrintSchedule();
 		}
 
-		if(e.getActionCommand().equals(MenuOptions.help)){
-			System.out.println("Help yourself");
+		if(e.getActionCommand().equals(MenuOptions.viewStartUp)){
+			d.startUpMessage();
 		}
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
 			d.GUICheckAllErrors(true);
 		}
 		if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();
+		}
+		if(e.getActionCommand().equals(MenuOptions.settings)){
+			FileHandler.showSetting();
 		}
 	}
 
