@@ -156,7 +156,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(visibleCoursesTable.getModel());
 		visibleCoursesTable.setRowSorter(sorter);
 		ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+		sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
 		sorter.setSortKeys(sortKeys);
 		
 		
@@ -237,10 +237,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		}
 		
 		
-		Time startTime = null;
-		if(c.c.meetingTime != null && c.c.meetingTime[0]!= null){
-			startTime = c.c.meetingTime[0];
-		}
+		Time startTime = c.c.getStartTime();
 		
 		Prefix prefix = c.getPrefix();
 		String professor = c.c.professor;
@@ -248,6 +245,8 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		
 		if(startTime != null) 
 			results.add(startTime.clockTime());
+		else
+			results.add(null);
 		results.add(prefix);
 		results.add(professor);
 		results.add(reqsFulfilled.size());
@@ -458,7 +457,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			Time startTime = timesToChooseFromWhenFiltering[startTimeRange.getSelectedIndex()];
 			Time endTime = timesToChooseFromWhenFiltering[endTimeRange.getSelectedIndex()];
 			final Interval<Time> validStartInterval = new Interval<Time>(startTime, endTime);
-			result.add(c -> c.getStartTime()==null || validStartInterval.contains(c.meetingTime[0].dateless(), true));
+			result.add(c -> c.getStartTime() == null || validStartInterval.contains(c.getStartTime(), true));
 			
 			
 			return result;

@@ -399,6 +399,12 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
+	/**
+	 * Return true if an error is found.
+	 * @param e
+	 * @param s
+	 * @return
+	 */
 	public boolean checkErrorsWhenAdding(ScheduleElement e, Semester s){
 		if(checkPrerequsitesAdding(e, s.semesterDate)){
 			return true;
@@ -408,6 +414,11 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(checkDuplicates(e,false, false)){
 			return true;
+		}
+		if(e instanceof Requirement){
+			if(checkOptimismError((Requirement)e)){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -908,6 +919,57 @@ public class Schedule implements java.io.Serializable {
 			}
 		}
 		return false;
+	}
+	
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Optimism error
+	///////////////////////////////
+	///////////////////////////////
+
+
+	
+	/**
+	 * Assumes that you will add r, but that this particular drag of r
+	 * is not yet in allElements.
+	 * @param r
+	 * @return
+	 */
+	public boolean checkOptimismError(Requirement r){
+		//If adding this requirement to the schedule would entail a leap of faith
+		ArrayList<Requirement> pairs = r.atLeastRequirementPairs();
+		if(pairs.isEmpty()){
+			return false;
+		}
+		ArrayList<ScheduleElement> allCurrentElements = this.getAllElementsSorted();
+		Requirement superset = pairs.get(0);
+		Requirement subset = pairs.get(1);
+		System.out.println("1");
+		if(superset.minMoreNeeded(allCurrentElements, false) > subset.getOriginalNumberNeeded()){
+			//We still need more classes to fill out superset-only, so we can 
+			// pretend that this requirement stands for a member of superset
+			// rather than standing for a member of subset-only.
+			return false;
+		}
+		System.out.println("2");
+		if(subset.isComplete(allCurrentElements, false)){
+			//We've already completed subset, so r isn't making the schedule
+			// assume any optimal behavior. 
+			return false;
+		}
+		System.out.println("3");
+
+		//We are now left with only one possibility:
+		// The only class that this requirement could count for is
+		// one of the classes in subset - if we say nothing, then
+		// this requirement will act as a planned member of subset.
+		// So we should alert the user to this and ask them what they think.
+		ScheduleError optimismError = new ScheduleError(ScheduleError.optimisticSchedulerError);
+		optimismError.setOptimisticRequirement(r);
+		return (! d.userOverrideError(optimismError));
+
 	}
 
 

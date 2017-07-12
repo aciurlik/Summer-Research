@@ -376,7 +376,10 @@ public class CourseList implements java.io.Serializable  {
 				// default behavior is to add every prefix in the 
 				// list to each requirement, and to do nothing to 
 				// double dip numbers (if double dip numbers exist).
+				// and to set the name of the requirement based on the key.
 
+				
+				//Default stuff:
 				Requirement r = new Requirement();
 				r.setName(key);
 				int newNumToChoose = 1;
