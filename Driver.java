@@ -2,37 +2,27 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.print.PageFormat;
-import java.awt.print.Paper;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -44,6 +34,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 
 
+
 public class Driver{ 
 
 	/**
@@ -51,29 +42,29 @@ public class Driver{
 	 * aspect of the GUI that sends information to the schedule. 
 	 * 
 	 */
-	
+
 	Schedule sch;
 	static Schedule testSchedule;
 	SchedulePanel schP;
 	RequirementListPanel reqs;
-	
+
 	int season;
-	JFrame popUP;
+
 	JList<Integer> pickYears;
 	String seasonName;
 	Integer[] yearsDialog;
 	static ImageIcon icon;
-	
+
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
 	String instructCourse = "Please pick the course you would like to add to your ";
 	String headInstructCourse = "Pick a course";
 	String summerOverload = "You need to delete a course before you can add another";
-	
+
 	Course[] coursesDialog;
-	
+
 	ScheduleElement beingDragged;
-	
+
 	ListOfMajors l;
 	BellTower b;
 	//PrintWriter pW;
@@ -90,8 +81,7 @@ public class Driver{
 
 	public Driver(Schedule sch) {
 
-
-		popUP = new JFrame();
+		//popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 		l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
 
@@ -185,7 +175,7 @@ public class Driver{
 
 
 		problems.add(stack);
-		JOptionPane.showMessageDialog(popUP,  problems, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
+		JOptionPane.showMessageDialog(null,  problems, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
 
 		for(int i=0; i<userOptions.size(); i++){
 			if(userOptions.get(i).isSelected()){
@@ -290,7 +280,7 @@ public class Driver{
 			// these notes.
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
-			JOptionPane.showMessageDialog(popUP, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
 		this.sch.addMajor(m);
@@ -337,7 +327,7 @@ public class Driver{
 				header = "Degree Type";
 			}
 
-			String GERNeeded = (String)JOptionPane.showInputDialog(popUP, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+			String GERNeeded = (String)JOptionPane.showInputDialog(null, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 
 			int MajorType = CourseList.BA;
 			if(GERNeeded == null){
@@ -413,7 +403,7 @@ public class Driver{
 
 	public void GUIChooseSummerSession() {
 		String[] summerChoice = {MenuOptions.summerSessionOne, MenuOptions.summerSessionTwo};
-		String c = (String)JOptionPane.showInputDialog(popUP, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
+		String c = (String)JOptionPane.showInputDialog(null, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
 		GUIYearsPopUP(c);
 	}
 
@@ -471,7 +461,7 @@ public class Driver{
 	 * @param s
 	 */
 	public void createYearDialogBox(String s){
-		Integer y = (Integer)JOptionPane.showInputDialog(popUP, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
+		Integer y = (Integer)JOptionPane.showInputDialog(null, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
 		if((y != null) && (y !=0)){
 			Semester addedSemester = sch.addNewSemesterInsideSch(y,season);
 			this.update();
@@ -512,7 +502,7 @@ public class Driver{
 	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses, String message) {
 		if(finalListOfCourses.length <= 0){
 			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-			JOptionPane.showMessageDialog(popUP, 
+			JOptionPane.showMessageDialog(null, 
 					"There were no courses to choose from. \n"
 							+"If you have a course in mind, you can add a note to the semester,\n"
 							+"or you can drag a requirement up to act as a place holder.", "No courses",JOptionPane.INFORMATION_MESSAGE,  icon  );
@@ -558,7 +548,7 @@ public class Driver{
 			displayed[i] = displayedString;
 		}
 
-		String chosenString = (String)JOptionPane.showInputDialog(popUP, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
+		String chosenString = (String)JOptionPane.showInputDialog(null, message , message , JOptionPane.PLAIN_MESSAGE, icon, displayed, "Dr. Fray");
 		int chosenIndex = 0;
 		for(; chosenIndex < displayed.length ; chosenIndex ++){
 			if(displayed[chosenIndex] == chosenString){
@@ -599,7 +589,7 @@ public class Driver{
 	public void GUImakeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(true);
 		this.update();
-		JOptionPane.showMessageDialog(popUP, "This semester is marked as Study Away, please drag in any requirements you will fulfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
+		JOptionPane.showMessageDialog(null, "This semester is marked as Study Away, please drag in any requirements you will fulfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
 
 	}
 
@@ -727,7 +717,7 @@ public class Driver{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(popUP, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -758,11 +748,11 @@ public class Driver{
 				result = "Your Schedule had no errors! You're a pretty savy scheduler";
 			}
 			if(displayPopUp)
-				JOptionPane.showMessageDialog(popUP,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+				JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
 		else{
 			if(displayPopUp)
-				JOptionPane.showMessageDialog(popUP, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+				JOptionPane.showMessageDialog(null, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
 		String majorNotes = "";
 		boolean hasNotes = false;
@@ -775,7 +765,7 @@ public class Driver{
 		}
 
 		if(hasNotes && displayPopUp){
-			JOptionPane.showMessageDialog(popUP, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if(hasErrors){
 			return result;
@@ -850,15 +840,15 @@ public class Driver{
 		options.add(ReqLayout, BorderLayout.EAST);
 		options.add(ScheduleLayout, BorderLayout.WEST);
 		String finalPrint = new String();
-		JOptionPane.showMessageDialog(popUP, options);
+		JOptionPane.showMessageDialog(null, options);
 		boolean selectedScheduleLayout = userOptions.get(1).isSelected();
 		boolean selectedReqLayout = userOptions.get(0).isSelected();
-		
+
 		//If they didn't select anything, the default is schedule layout.
 		if( (!selectedScheduleLayout) && (!selectedReqLayout)){
 			selectedScheduleLayout = true;
 		}
-		
+
 		//Schedule
 		if(selectedScheduleLayout){
 			finalPrint = finalPrint+ sch.printScheduleString() + "\n";
@@ -882,7 +872,7 @@ public class Driver{
 			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			String[] choices= {"Print", "Cancel"};
 
-			int userChoice = (int) JOptionPane.showOptionDialog(popUP, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+			int userChoice = (int) JOptionPane.showOptionDialog(null, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
 
 			if(userChoice == 0){
 				try {
@@ -933,7 +923,6 @@ public class Driver{
 
 
 	public static void main(String[] args){
-
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
@@ -949,8 +938,34 @@ public class Driver{
 			Schedule.defaultFirstSemester = start;
 			//new Driver();
 			testDriver();
+			establishSettings();
+
+
 		}
 
+
+
+
+
+	}
+
+
+
+
+
+	private static void establishSettings() {
+		//if(){ startup is true
+		startUpmessage();
+
+
+	}
+
+
+
+
+
+	private static void startUpmessage() {
+		StartUpMenu start = new StartUpMenu();
 
 	}
 

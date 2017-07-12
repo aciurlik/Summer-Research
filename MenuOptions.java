@@ -41,7 +41,8 @@ public class MenuOptions implements java.io.Serializable{
 	
 	public static final String resourcesFolder = "Resources" + File.separator;
 	public static final String savedScheduleFolder = MenuOptions.resourcesFolder + "SavedSchedule" + File.separator;
-	
+	public static final String startUpFolder = MenuOptions.resourcesFolder + "StartUpSlides" + File.separator;
+	public static final String settingsDoc = "Resources" + File.separator + "Settings";
 	
 	
 	
@@ -69,6 +70,9 @@ public class MenuOptions implements java.io.Serializable{
 	
 	
 	public static boolean UIType;
+	public static String previous = "Previous";
+	public static String next = "Next";
+	public static String finish = "Finish";
 	
 
 

@@ -1,10 +1,14 @@
+import java.awt.Frame;
+import java.awt.Image;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,13 +17,33 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class FileHandler {
 	static JFrame popUP = new JFrame();
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
+
+
+	static{
+		File file = new File(MenuOptions.settingsDoc);
+		boolean exists = file.exists();
+		if(!exists){
+			
+
+		}
+		else{
+			System.out.println("File exists");
+		}
+
+	}
+
+
+
+
 
 	public static String chooseSchedule(String s){
 		String header = "";
@@ -33,16 +57,16 @@ public class FileHandler {
 			instruct = "Choose a schedule to open";
 			header = "Open Schedule";
 		}
-		
+
 		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder);
 		if(!scheduleNames.isEmpty()){
-		String[] finalSchedNames = new String[scheduleNames.size()];
-		for(int i=0; i<finalSchedNames.length; i++){
-			finalSchedNames[i]=scheduleNames.get(i);
+			String[] finalSchedNames = new String[scheduleNames.size()];
+			for(int i=0; i<finalSchedNames.length; i++){
+				finalSchedNames[i]=scheduleNames.get(i);
+			}
+			String chosenSched = (String) JOptionPane.showInputDialog(popUP, instruct, header, JOptionPane.PLAIN_MESSAGE, null, finalSchedNames, finalSchedNames[0]);	
+			return chosenSched;
 		}
-		String chosenSched = (String) JOptionPane.showInputDialog(popUP, instruct, header, JOptionPane.PLAIN_MESSAGE, null, finalSchedNames, finalSchedNames[0]);	
-		return chosenSched;
-	}
 		else{
 			JOptionPane.showMessageDialog(popUP, "You have no saved schedules");
 			return null; 
@@ -64,8 +88,8 @@ public class FileHandler {
 				e.printStackTrace();
 
 			}
-			
-			
+
+
 		}
 		return null;
 
@@ -91,12 +115,12 @@ public class FileHandler {
 
 		}
 		if(fileName != null){
-			
-		
-			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser");
-			ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
 
-			
+
+			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser");
+					ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
+
+
 				save.writeObject(sch);	
 				save.close();
 				saveFile.close();
@@ -108,7 +132,7 @@ public class FileHandler {
 
 				System.out.println(e.getLocalizedMessage());
 			}
-			
+
 		}
 
 
@@ -139,8 +163,8 @@ public class FileHandler {
 
 
 		}
-		
-		
+
+
 		return scheduleNames;
 	}
 
@@ -196,7 +220,7 @@ public class FileHandler {
 	 * @return
 	 */
 	public static ArrayList<String> fileToStrings(File f){
-	
+
 		ArrayList<String> result = new ArrayList<String>();
 		try(BufferedReader br = new BufferedReader(new FileReader(f));) {
 			String nextLine = br.readLine();
@@ -210,11 +234,11 @@ public class FileHandler {
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return result;
 	}
-	
+
 	/**
 	 * Return the contents of this file as one large string.
 	 * @param f
@@ -223,7 +247,7 @@ public class FileHandler {
 	public static String fileToString(File f){
 		StringBuilder result = new StringBuilder();
 		try(BufferedReader br = new BufferedReader(new FileReader(f));) {
-			
+
 			String nextLine = br.readLine();
 			while (nextLine!=null){
 				result.append(nextLine);
@@ -236,7 +260,7 @@ public class FileHandler {
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
-		
+
 		return result.toString();
 	}
 
@@ -271,8 +295,8 @@ public class FileHandler {
 			return;
 		}
 		try(FileInputStream fis = new FileInputStream(fileName);
-			ObjectInputStream in = new ObjectInputStream(fis);){
-			
+				ObjectInputStream in = new ObjectInputStream(fis);){
+
 			CourseList.savedPrereqMeanings = (Hashtable<String, String>) in.readObject();
 			in.close();
 			fis.close();
@@ -280,14 +304,14 @@ public class FileHandler {
 			System.out.println("There was an error loading the saved meanings");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
 	public static void savePrereqMeanings(){
 		try (FileOutputStream fos = new FileOutputStream(prereqMeaningsFile, false); //overwrite, don't append.
 				ObjectOutputStream out = new ObjectOutputStream(fos);){
-			
+
 			out.writeObject(CourseList.savedPrereqMeanings);
 			out.close();
 			fos.close();
@@ -296,7 +320,7 @@ public class FileHandler {
 			System.out.println("There was an error saving the meanings of your prereq strings");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -308,10 +332,51 @@ public class FileHandler {
 			if(n==0){
 				File toDelete = new File (MenuOptions.savedScheduleFolder + chosen);
 				toDelete.delete();
-				
+
 
 			}
 		}
 	}
 
+
+	public static ArrayList<ImageIcon> getInstructions(File folder) {
+		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
+
+		for (File f: folder.listFiles(
+
+				new FileFilter(){
+
+					@Override
+
+					public boolean accept(File pathname) {
+
+						String fullName = pathname.getAbsolutePath();
+						int i = fullName.lastIndexOf('.');
+						if(i <= 0){
+							return false;
+						}
+						String extension = fullName.substring(i+1);
+						return pathname.isFile();
+					}
+
+				}
+				)){
+
+			try{
+
+				ImageIcon image = new ImageIcon(f.toString());
+				result.add(image);
+
+			}
+			catch(Exception e){
+				e.printStackTrace();
+				System.out.println("I'm skipping  " + f.getName());
+			}
+
+
+		}
+
+
+		return result;
+	}
 }
