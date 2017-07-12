@@ -456,8 +456,12 @@ public class Driver{
 	public void GUIExamineRequirement(Requirement r){
 		//Make a new JFrame with info about this requirement.
 		//Include the full definition as written in our code.
-		String toShow = r.coderString();
-		JOptionPane.showMessageDialog(null, toShow, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION);
+		String showText = r.examineRequirementString();
+		JTextArea toShow = new JTextArea(showText);
+		toShow.setEditable(false);
+		JScrollPane pane = new JScrollPane(toShow);
+		pane.setPreferredSize(new Dimension(toShow.getPreferredSize().width + 20,300));
+		JOptionPane.showMessageDialog(null, pane, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION, icon);
 	}
 
 
