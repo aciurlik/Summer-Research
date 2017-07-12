@@ -73,7 +73,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	 */
 	public void update(){
 
-		//Fills in the puruple based on the % done the schedule is 
+		//Fills in the purple based on the % done the schedule is 
 		double percentDone= sch.getPercentDone();
 		int newHeight = (int)(percentDone * icon.getIconHeight()) - 1;
 		overlap.setSize(icon.getIconWidth(), newHeight);
@@ -90,10 +90,10 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		else{
 			if(!wasComplete){
 				if(sch.checkAllErrors().isEmpty()){
-					JOptionPane.showMessageDialog(sch.d.popUP, endPicturePanel , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, endPicturePanel , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else{
-					JOptionPane.showMessageDialog(sch.d.popUP, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.d.icon);
+					JOptionPane.showMessageDialog(null, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.d.icon);
 
 					sch.d.GUICheckAllErrors(true);
 				}
