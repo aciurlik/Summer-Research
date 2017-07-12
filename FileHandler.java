@@ -1,5 +1,11 @@
+import java.awt.Color;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints.Key;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,35 +19,94 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
-public class FileHandler {
+public class FileHandler implements ActionListener{
 	static JFrame popUP = new JFrame();
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
-
+	private static Properties p;
 
 	static{
+		p = new Properties();
+		FileOutputStream output = null;
 		File file = new File(MenuOptions.settingsDoc);
 		boolean exists = file.exists();
 		if(!exists){
-			
-
+			restoreDefaultSettings();
+			try {
+				output = new FileOutputStream(MenuOptions.settingsDoc);
+				p.store(output, "New Settings");
+				output.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else{
-			System.out.println("File exists");
+			FileInputStream input = null;
+			try {
+				input = new FileInputStream(MenuOptions.settingsDoc);
+				p.load(input);
+				input.close();
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
 
 
+	public static void propertySet(String setting, String value){
+		p.setProperty(setting, value);
+		FileOutputStream output;
+		try {
+			output = new FileOutputStream(MenuOptions.settingsDoc);
+			p.store(output, "Edited Settings");
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void GUICalledRestoreDefaultSettings(){
+		int n = JOptionPane.showConfirmDialog(popUP, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
+		if(n==0){
+			FileHandler.restoreDefaultSettings();
+		}
+	}
+	
+	
+	private static void restoreDefaultSettings() {
+		p.setProperty(MenuOptions.startUp, "true");
+		
+	}
+
+	
+	
+	
+	public static String propertyGet(String setting){
+		String value = p.getProperty(setting);
+		return value;
+	}
 
 
 
@@ -378,5 +443,16 @@ public class FileHandler {
 
 
 		return result;
+	}
+
+	public static void showSetting() {
+		SettingsPanel sp = new SettingsPanel();
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

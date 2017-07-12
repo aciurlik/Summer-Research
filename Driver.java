@@ -452,7 +452,7 @@ public class Driver{
 
 
 	}
-	
+
 	public void GUIExamineRequirement(Requirement r){
 		//Make a new JFrame with info about this requirement.
 		//Include the full definition as written in our code.
@@ -494,7 +494,7 @@ public class Driver{
 		for(int i = 0; i<toFinal.size(); i++){
 			finalCourseList[i] = toFinal.get(i);
 		}
-		
+
 		ScheduleCourse c = GUIChooseCourse(finalCourseList);
 
 		if(c != null){
@@ -527,7 +527,7 @@ public class Driver{
 			return null;
 		}
 		/*
-		
+
 		String reqsString = "";
 		String[] displayed = new String[finalListOfCourses.length];
 		ArrayList<Requirement> allReqs = sch.getAllRequirements();
@@ -577,10 +577,10 @@ public class Driver{
 			return null;
 		}
 		return finalListOfCourses[chosenIndex];
-		*/
+		 */
 	}
-	
-	
+
+
 
 
 
@@ -937,6 +937,8 @@ public class Driver{
 
 	}
 
+	
+	
 	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
@@ -947,6 +949,24 @@ public class Driver{
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
 		return GUIChooseStartTime(supportedSemesters);
+
+	}
+	
+	
+	
+	private static void establishSettings() {
+		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){
+			startUpMessage();
+		}
+
+	}
+
+
+
+
+
+	public static void startUpMessage() {
+		StartUpMenu start = new StartUpMenu();
 
 	}
 
@@ -982,21 +1002,7 @@ public class Driver{
 
 
 
-	private static void establishSettings() {
-		//if(){ startup is true
-		startUpmessage();
 
-
-	}
-
-
-
-
-
-	private static void startUpmessage() {
-		StartUpMenu start = new StartUpMenu();
-
-	}
 
 }
 
