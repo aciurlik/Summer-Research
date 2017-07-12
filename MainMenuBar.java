@@ -206,6 +206,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		this.add(menu);
+		
+		menuItem = new JMenuItem("Restore Default Settings");
+		menuItem.setActionCommand(MenuOptions.restoreDefault);
+		JPopupMenu restoreDefault = new JPopupMenu();
+		restoreDefault.add(menuItem);
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		
 
 		
 	
@@ -269,7 +277,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		}
 
 		if(e.getActionCommand().equals(MenuOptions.viewStartUp)){
-			d.startUpMessage();
+			Driver.startUpMessage();
 		}
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
 			d.GUICheckAllErrors(true);
@@ -279,6 +287,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		}
 		if(e.getActionCommand().equals(MenuOptions.settings)){
 			FileHandler.showSetting();
+		}
+		if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
+			FileHandler.GUICalledRestoreDefaultSettings();
 		}
 	}
 

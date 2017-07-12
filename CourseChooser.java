@@ -458,7 +458,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			Time startTime = timesToChooseFromWhenFiltering[startTimeRange.getSelectedIndex()];
 			Time endTime = timesToChooseFromWhenFiltering[endTimeRange.getSelectedIndex()];
 			final Interval<Time> validStartInterval = new Interval<Time>(startTime, endTime);
-			result.add(c -> validStartInterval.contains(c.meetingTime[0].dateless(), true));
+			result.add(c -> c.getStartTime()==null || validStartInterval.contains(c.meetingTime[0].dateless(), true));
 			
 			
 			return result;

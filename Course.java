@@ -48,7 +48,7 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
-	
+
 	}
 
 	/**
@@ -71,6 +71,20 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 	public int getCreditHours(){
 		return creditHours;
+	}
+
+	public Object getStartTime() {
+		if(meetingTime==null){
+			return null;
+		}
+		if(meetingTime.length == 0){
+			return null;
+		}
+		if(meetingTime[0] == null){
+			return null;
+
+		}
+		return meetingTime[0].dateless();
 	}
 
 	public SemesterDate getSemester() {
@@ -456,9 +470,11 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		System.out.println(c.saveString());
 		Course d = Course.readFrom(c.saveString());
 		System.out.println(d.saveString());
-		
+
 
 	}
+
+
 
 
 }

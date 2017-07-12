@@ -78,8 +78,10 @@ public class MenuOptions implements java.io.Serializable{
 	//Settings
 	public static String startUp = "Show Start Up";
 	public static String settings = "Settings";
-	public static String saveChanges = "SaveChanges";
+	public static String saveChanges = "Save Changes";
 	public static String viewStartUp = "View Start Up Guide";
+	public static String restoreDefault = "Restore Default Settings";
+	
 
 	public boolean isUIType() {
 		return UIType;
