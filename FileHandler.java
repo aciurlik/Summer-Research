@@ -86,12 +86,23 @@ public class FileHandler implements ActionListener{
 		}
 
 	}
-
+	
+	public static void GUICalledRestoreDefaultSettings(){
+		int n = JOptionPane.showConfirmDialog(popUP, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
+		if(n==0){
+			FileHandler.restoreDefaultSettings();
+		}
+	}
+	
+	
 	private static void restoreDefaultSettings() {
 		p.setProperty(MenuOptions.startUp, "true");
 		
 	}
 
+	
+	
+	
 	public static String propertyGet(String setting){
 		String value = p.getProperty(setting);
 		return value;
