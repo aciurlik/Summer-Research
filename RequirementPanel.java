@@ -32,6 +32,8 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	int percentComplete;
 	JLabel shown;
 	MajorPanel m;
+	
+	public static int shortStringLength = 20;
 
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
@@ -118,21 +120,21 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 			fullText += req.storedCoursesLeft + "left\n";
 		}
 		*/
-		fullText += req.shortString();
-
-
-		int numChars = 20;
+		
+		
+		fullText += req.shortString(shortStringLength);
 		String labelText = fullText;
-		if(labelText.length() > numChars){
-			labelText = labelText.substring(0,numChars-3) + "...";
+		if(labelText.length() > shortStringLength){
+			labelText = labelText.substring(0,shortStringLength-3) + "...";
 		}
 		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
-		if(!m.major.name.equals("GER")){
-			String toolTipText = req.getDisplayString();
-			shown.setToolTipText(toolTipText);
-		}
+		//if(!m.major.name.equals("GER")){
+		String toolTipText = req.getDisplayString();
+		// 
+		shown.setToolTipText(toolTipText);
+		//}
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 

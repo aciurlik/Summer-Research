@@ -29,16 +29,23 @@ public interface ScheduleElement {
 	/**
 	 * 
 	 * @return String of the ScheduleElement 
-	 * that should be displayed in GUI
+	 * Should include all the information about this element
+	 * in a user-friendly way. Can use as many characters
+	 * as necessary. Used when the user wants to examine an 
+	 * element in full. 
 	 */
 	public String getDisplayString();
 	
 	
 	/**
-	 * If course return Semester Date, Prefix and Section number, requirement returns and empty String
+	 * Should contain only the vital information to identify this element, 
+	 * while attempting to use less than preferredLength characters.
+	 * However, this method should not truncate 
+	 * if it goes over perferredLength characters.
+	 * Acts as a default name if no name is provided.
 	 * @return String that has less information than display string
 	 */
-	public String shortString();
+	public String shortString(int preferredLength);
 	
 	
 	/**

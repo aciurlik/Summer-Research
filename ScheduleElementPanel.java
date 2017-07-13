@@ -87,7 +87,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	public void updatePanel(){ //This can be taken out later
 		String display = s.getDisplayString();
 		if(display.length() > 100){
-			display = s.shortString();
+			display = s.shortString(100);
 		}
 		JLabel elementLabel = new JLabel(display);
 		elementLabel.setFont(FurmanOfficial.normalFont);
@@ -97,7 +97,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 		}
 
 
-		//Adds remove Button
+		//Adds the remove Button
 		
 		remove.setOpaque(false);
 		JButton toRemove = new JButton(removeButtonText);

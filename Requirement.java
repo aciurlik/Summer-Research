@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours,  java.io.Serializable{
@@ -27,7 +29,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// There are a number of methods that modify it, and it is up to other classes (like schedule) to ensure that
 	// the correct value is stored and is not overwritten at the wrong time.
 	public static int defaultCreditHours =4;
-	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
 
 
 
@@ -39,7 +40,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public Requirement(){
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
 		this.originalNumberNeeded = 1;
@@ -49,13 +49,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	/**
 	 * An old constructor for backwards compatability.
-	 * Can be removed.
+	 * Can be removed (will just require a bunch of other edits)
 	 * @param choices
 	 * @param numToChoose
 	 */
 	public Requirement(Prefix[] choices, int numToChoose){
 		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 
 	public Requirement(HashSet<Prefix> choices, int numToChoose){
@@ -65,7 +64,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			this.choices.add(r);
 		}
 		this.numToChoose = numToChoose;
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 	
 	
@@ -74,28 +72,21 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	////Getters and setters
 	/////////////////////////
 	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________GettersAndSetters_________;
 
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
 		this.recalcOriginalNumberNeeded();
 		this.storedNumberLeft = this.originalNumberNeeded;
 	}
-	public void setNumToChoose(int n){
-		if(n > choices.size()){
-			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
-		}
-		this.numToChoose = n;
-		recalcOriginalNumberNeeded();
-		this.storedNumberLeft = this.originalNumberNeeded;
-	}
-
 	/**
 	 * Return an estimate of the number of courses this requirement still
 	 * needs in order to be complete. Automatically takes creditHours requirements
 	 * into account.
 	 * @return
 	 */
-	public int storedCoursesLeft(){
+	public int getStoredCoursesLeft(){
 		if(this.usesCreditHours()){
 			return storedNumberLeft / 4;
 		}
@@ -107,10 +98,20 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * credit hours.
 	 * @return
 	 */
-	public int storedNumberLeft(){
+	public int getStoredNumberLeft(){
 		return this.storedNumberLeft;
 	}
 	
+	public void setNumToChoose(int n){
+		if(n > choices.size()){
+			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
+		}
+		this.numToChoose = n;
+		recalcOriginalNumberNeeded();
+		this.storedNumberLeft = this.originalNumberNeeded;
+	}
+
+
 	public boolean usesCreditHours(){
 		return usesCreditHours;
 	}
@@ -121,14 +122,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
-	public void setName(String name){
-		this.name = name;
-	}
-	public String getName() {
-		return this.name;
-	}
-	
-
 	public int getCreditHours() {
 		if(this.isTerminal()){
 			return this.getTerminal().getCreditHours();
@@ -137,26 +130,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return defaultCreditHours;
 		}
 	}
-	
-	public ArrayList<SemesterDate> getScheduledSemester() {
-		return scheduledSemester;
-	}
 
 
-	public void addScheduledSemester(SemesterDate toAdd) {
-		scheduledSemester.add(toAdd);
+	public void setName(String name){
+		this.name = name;
+	}
+	public String getName() {
+		return this.name;
 	}
 	
 	
-	
-	/**
-	 * recalculate how many courses it would take to complete this requirement
-	 * if you started over from scratch.
-	 */
-	public void recalcOriginalNumberNeeded(){
-		int result = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
-		this.originalNumberNeeded = result;
-	}
 	
 	/**
 	 * Return an estimate of the number of courses originally needed,
@@ -196,7 +179,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
-
+	@SuppressWarnings("unused")
+	private boolean _________RecursiveMethods_________;
 	/////////////////////
 	/////////////////////
 	///// Recursive methods
@@ -235,6 +219,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
+
+
+	/**
+	 * recalculate how many courses it would take to complete this requirement
+	 * if you started over from scratch.
+	 */
+	public void recalcOriginalNumberNeeded(){
+		int result = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		this.originalNumberNeeded = result;
+	}
 
 
 	/**
@@ -533,6 +527,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	//INFINITELOOPHAZARD
 	public boolean equals(Requirement r){
+		if(r == null){
+			return false;
+		}
 		if(r instanceof TerminalRequirement){
 			if(this.isTerminal()){
 				return this.getTerminal().equals(r);
@@ -597,6 +594,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////alsoCompletes methods
 	//////////////////////////////////////
 	//////////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________alsoCompletesMethods_________;
 
 	
 	/**
@@ -845,6 +844,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
+	@SuppressWarnings("unused")
+	private boolean _________CompareTo_________;
 
 	/////////////////////////////////
 	/////////////////////////////////
@@ -913,6 +914,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////Methods from ScheduleElement
 	/////////////////////////////////
 	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________MethodsFromScheduleElement_________;
 
 	@Override
 	public Prefix getPrefix() {
@@ -923,30 +926,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
 		return false;
-	}
-
-	@Override
-	public String getDisplayString() {
-		if(this.name != null){
-			return this.name;
-		}
-		String result = this.saveString();
-		if(this.numToChoose == 1 && this.choices.size() == 1){
-			result = result.substring(6, result.length() - 1);
-		}
-		return result;
-	}
-
-	@Override
-	public String shortString() {
-		String result = this.getDisplayString();
-		if(result.length () > 20 && this.name == null){
-			result = result.replaceAll(" ", "");
-			if(result.length() > 40){
-				result = result.substring(0, 40);
-			}
-		}
-		return result;
 	}
 
 
@@ -984,156 +963,156 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return result;
 	}
 
+
+
+
+
+	/////////////////////////
+	/////////////////////////
+	////String methods 
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________StringMethods_________;
+
+
+	
+	//////
+	////// String methods from Schedule Element
+	//////
+	@Override
+	public String getDisplayString() {
+		StringBuilder result = new StringBuilder();
+		if(this.name != null){
+			//Special case for lab - "5 () with at least 1 lab from ()"
+			if((!this.name.equals("NW/NWL"))){
+				if(this.name.equals("NWL")){
+					recursePrintOn(s -> result.append(s), r ->r.getDisplayString(),
+							"1 lab from (",
+							", ",
+							")");
+					return result.toString();
+				}
+				return this.name;
+			}
+		}
+		
+		//if you've got an atLeast requirement, the order matters,
+		// so we can't just use recursePrintOn.
+		if(this.isAtLeastRequirement()){
+			ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
+			Requirement superset = possiblePairs.get(0);
+			Requirement subset = possiblePairs.get(1);
+			result.append(superset.getDisplayString());
+			result.append(" with at least ");
+			result.append(subset.getDisplayString());
+		}
+		
+		String[] startMidEnd = syntaxSugars();
+		recursePrintOn(s -> result.append(s), r -> r.getDisplayString(), 
+				startMidEnd[0], 
+				startMidEnd[1], 
+				startMidEnd[2]);
+		return result.toString();
+	}
+	
+	/**
+	 * Return a list of the start, divider, and end strings for
+	 * special cases of requirements.
+	 * For example, if this is a requirement for 1 of 2 choices,
+	 *    this method returns {"either (", " or ", ")"}
+	 * @return
+	 */
+	private String[] syntaxSugars(){
+		if(this.numToChoose == 1 && this.choices.size() == 2){
+			return new String[]{"either " , " or " , ""};
+		}
+		if(this.isTerminal()){
+			return new String[]{"", ", ",""};
+		}
+		if(this.numToChoose == 1 && this.choices.size() == 1){
+			return new String[]{"", ", ", ""};
+		}
+		if(this.usesCreditHours){
+			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
+		}
+		if(this.numToChoose != 1 && 
+				this.numToChoose == this.choices.size()){
+			if(this.numToChoose == 2){
+				return new String[]{"Both of (", " and ",  ")"};
+			}
+			else{
+				return new String[]{"All of (", ", ", ")"};
+			}
+		}
+		
+		//TODO remove this to speed things up, its an expensive debug check.
+		if(this.isAtLeastRequirement()){
+			throw new RuntimeException("Should not use syntax sugar method for atLeast "
+					+ "requirements - need to know subchoice order");
+		}
+		
+		//default case
+		return new String[]{numToChoose + " of (" ,", ",")"};
+	}
+	
+
+	@Override
+	public String shortString(int preferredLength) {
+		String result = this.getDisplayString();
+		if(result.length() <= preferredLength){
+			return result;
+		}
+		else{
+			ArrayList<Requirement> reqPairs = atLeastRequirementPairs();
+			if(reqPairs.isEmpty()){
+				StringBuilder builtResult = new StringBuilder();
+				String[] sugars = syntaxSugars();
+				String replacementFirst = numToChoose + " of(";
+				String replacementMid = ",";
+				String replacementEnd = ")";
+				int totalReplacementLength = 
+						replacementFirst.length()
+						+ replacementMid.length()
+						+ replacementEnd.length();
+				int totalInitialLength = 
+						sugars[0].length()
+						+ sugars[1].length()
+						+ sugars[2].length();
+				
+				if(totalInitialLength > totalReplacementLength){
+					sugars[0] = replacementFirst;
+					sugars[1] = replacementMid;
+					sugars[2] = replacementEnd;
+ 				}
+				
+				preferredLength = preferredLength 
+						- sugars[0].length() 
+						- sugars[2].length() 
+						- (this.numToChoose - 1) * sugars[1].length();
+				int recursivePreferredLength = preferredLength / choices.size();
+				recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
+						sugars[0],
+						sugars[1],
+						sugars[2]);
+				return builtResult.toString();
+			}
+			else{
+				return reqPairs.get(1).shortString(preferredLength);
+			}
+		}
+	}
+	
+	///
+	/// Other string methods
+	///
+	
+	
 	@Override
 	public String toString(){
 		return this.getDisplayString();
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/////////////////////////////////
-	/////////////////////////////////
-	///// Saving and Reading methods
-	/////////////////////////////////
-	/////////////////////////////////
-
-
-
-	/** REQUIREMENT SAVING AND READING TUTORIAL
-	 * 
-	 * The language of requirements.
-	 * 
-	 * All requirements are made of 2 parts:
-	 * 		a number to choose
-	 * 		a list of choices (some of which may themselves be requirements)
-	 * 
-	 * For example, the requirement 
-	 * 		2 of (MTH 145, MTH 220)
-	 *  	is a valid requirement. It has 2 to choose, and 
-	 *  	has 2 choices, either MTH 145 or MTH 220.
-	 *  	This requirement might be interpreted as
-	 * 			"Take MTH 145 and MTH 220."
-	 * 
-	 * In general, to differentiate between 'or' and 'and', just change 
-	 * 		the number to choose.
-	 * 		2 of (MTH 145, MTH 220) --> means MTH 145 and MTH 220
-	 * 		1 of (MTH 145, MTH 220) --> means MTH 145 or MTH 220
-	 * 
-	 * Requirements may be nested, for example
-	 * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
-	 * 		Commas and parenthesis differentiate between different levels of requirements
-	 * 
-	 * Notice that impossible requirements may be written down, for example
-	 * 		2 of (MTH 110)
-	 * 		cannot logically be satisfied.
-	 * 
-	 * We may omit the number to choose if desired. In this case, it defaults to one. 
-	 * 		(MTH 140, MTH 110)
-	 * 			is the same as
-	 * 		1 of (MTH 140, MTH 110)
-	 * 			Which might be interpreted as
-	 * 		MTH 140 or MTH 110
-	 * 
-	 * All whitespace is ignored.
-	 * 
-	 * A list of choices must be enclosed in parenthesis, and
-	 * must be separated by commas. The following are INVALID.
-	 * 		NOT GOOD     MTH 140, MTH 110 
-	 * 		Correction   (MTH 140, MTH 110)
-	 * 
-	 * 		NOT GOOD     1 of MTH 220
-	 * 		Correction   1 of ( MTH 220      )
-	 * 
-	 * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
-	 * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
-	 * 			Which is equivalent to
-	 * 				2 of (MTH 140, MTH 220, MTH 110, MTH 213)
-	 * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
-	 * 			Which is not equivalent to the simpler requirement.
-	 * 
-	 * 		NOT GOOD     1 of (MTH 140 MTH 220)
-	 * 		Correction	 1 of (MTH 140, MTH 220)
-	 * 			
-	 * 
-	 * Additionally, though it is not recommended, you may include the text
-	 *   'or' before the last choice in a list of choices. This must immediately follow the comma.
-	 * 		2 of (MTH 110, MTH 220,  or   MTH 330)
-	 * 		This is a valid requirement.
-	 * 		Saying 'or' may cause confusion for cases like this:
-	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
-	 * 
-	 */
-
-
-
-
-	//INFINITELOOPHAZARD
-	/**
-	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
-	 * Make a save string for this requirement.
-	 * It should be unambiguous for any reader to see what this requirement is.
-	 * @return
-	 */
-	public String saveString(){
-
-		//Add the prefix
-		StringBuilder result = new StringBuilder();
-		result.append(numToChoose);
-		if(this.usesCreditHours){
-			result.append(" ch");
-		}
-		result.append(" of (");
-		//Add the guts of this requirement - each sub-requirement
-
-
-		//handle the first n-2 requirements
-		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
-		Collections.sort(choiceList);
-		for(int i = 0; i < choiceList.size() - 2 ; i ++){
-			result.append(choiceList.get(i).saveString());
-			result.append(", ");
-		}
-		//handle the last 2 requirements (may have 0, 1, or 2 last ones
-		//  depending on the number of choices.)
-		if(choiceList.size() > 2){
-			result.append(choiceList.get(choiceList.size() - 2).saveString());
-			//result.append(", or ");
-			result.append(", ");
-			result.append(choiceList.get(choiceList.size() - 1).saveString());
-		}
-		else if (choiceList.size() == 2){
-			result.append(choiceList.get(choiceList.size() - 2).saveString());
-			result.append(", ");
-			result.append(choiceList.get(choiceList.size() - 1).saveString());
-		}
-		else if(choiceList.size() == 1){
-			result.append(choiceList.get(0).saveString());
-		}
-		else{ //choiceList.size() == 0
-			return "()";
-		}
-		result.append(")");
-		return result.toString();
-	}
-	
-	
 	public String examineRequirementString(){
 		StringBuilder result = new StringBuilder();
 		result.append(
@@ -1141,39 +1120,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
 				+ "\nwebsite for another explanation of the requirement."
 				+ "\n\n");
-		if(this.numToChoose != 1 && this.numToChoose == this.choices.size()){
-			//And requirement
-			ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
-			if(possiblePairs.size() != 0){
-				Requirement superset = possiblePairs.get(0);
-				Requirement subset = possiblePairs.get(1);
-				result.append(superset.saveString());
-				result.append("with at least ");
-				if(this.name.equals("NW/NWL")){
-					//Special case for lab - "At least 1 lab from ()"
-					String normal = subset.saveString();
-					result.append("1 lab from " + normal.substring(normal.indexOf("(")));
-				}
-				else{
-					result.append(subset.saveString());
-				}
-			}
-			else{
-				String normalString = saveString();
-				String humanFriendly = "All of " + normalString.substring(
-						normalString.indexOf("("));
-				if(this.numToChoose == 2){
-					humanFriendly = "Both of " + normalString.substring(
-							normalString.indexOf("("));
-				}
-				result.append(humanFriendly);
-			}
-		}
-		else{
-			result.append(saveString());
-		}
+		
 		return indent(result.toString(), 80, "   ");
 	}
+
+
+	
 	
 	/**
 	 * Turn the save string of this requirement into something you might
@@ -1252,6 +1204,150 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return result.toString();
 	}
+	
+	
+	
+	///
+	/// String methods for saving / reading
+	///
+
+
+
+
+
+
+
+
+
+
+	/////////////////////////////////
+	/////////////////////////////////
+	///// Saving and Reading methods
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________SavingAndReadingMethods_________;
+
+
+
+	/** REQUIREMENT SAVING AND READING TUTORIAL
+	 * 
+	 * The language of requirements.
+	 * 
+	 * All requirements are made of 2 parts:
+	 * 		a number to choose
+	 * 		a list of choices (some of which may themselves be requirements)
+	 * 
+	 * For example, the requirement 
+	 * 		2 of (MTH 145, MTH 220)
+	 *  	is a valid requirement. It has 2 to choose, and 
+	 *  	has 2 choices, either MTH 145 or MTH 220.
+	 *  	This requirement might be interpreted as
+	 * 			"Take MTH 145 and MTH 220."
+	 * 
+	 * In general, to differentiate between 'or' and 'and', just change 
+	 * 		the number to choose.
+	 * 		2 of (MTH 145, MTH 220) --> means MTH 145 and MTH 220
+	 * 		1 of (MTH 145, MTH 220) --> means MTH 145 or MTH 220
+	 * 
+	 * Requirements may be nested, for example
+	 * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
+	 * 		Commas and parenthesis differentiate between different levels of requirements
+	 * 
+	 * Notice that impossible requirements may be written down, for example
+	 * 		2 of (MTH 110)
+	 * 		cannot logically be satisfied.
+	 * 
+	 * We may omit the number to choose if desired. In this case, it defaults to one. 
+	 * 		(MTH 140, MTH 110)
+	 * 			is the same as
+	 * 		1 of (MTH 140, MTH 110)
+	 * 			Which might be interpreted as
+	 * 		MTH 140 or MTH 110
+	 * 
+	 * All whitespace is ignored.
+	 * 
+	 * A list of choices must be enclosed in parenthesis, and
+	 * must be separated by commas. The following are INVALID.
+	 * 		NOT GOOD     MTH 140, MTH 110 
+	 * 		Correction   (MTH 140, MTH 110)
+	 * 
+	 * 		NOT GOOD     1 of MTH 220
+	 * 		Correction   1 of ( MTH 220      )
+	 * 
+	 * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
+	 * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
+	 * 			Which is equivalent to
+	 * 				2 of (MTH 140, MTH 220, MTH 110, MTH 213)
+	 * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
+	 * 			Which is not equivalent to the simpler requirement.
+	 * 
+	 * 		NOT GOOD     1 of (MTH 140 MTH 220)
+	 * 		Correction	 1 of (MTH 140, MTH 220)
+	 * 			
+	 * 
+	 * Additionally, though it is not recommended, you may include the text
+	 *   'or' before the last choice in a list of choices. This must immediately follow the comma.
+	 * 		2 of (MTH 110, MTH 220,  or   MTH 330)
+	 * 		This is a valid requirement.
+	 * 		Saying 'or' may cause confusion for cases like this:
+	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
+	 * 
+	 */
+
+
+
+
+	//INFINITELOOPHAZARD
+	/**
+	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
+	 * Make a save string for this requirement.
+	 * It should be unambiguous and easy for a computer to read
+	 *  (so it follows a standard format with no special cases).
+	 * special cases).
+	 * @return
+	 */
+	public String saveString(){
+
+		//Add the prefix
+		StringBuilder result = new StringBuilder();
+		result.append(numToChoose);
+		if(this.usesCreditHours()){
+			result.append(" ch");
+		}
+		result.append(" of (");
+		//Add the guts of this requirement - each sub-requirement
+
+		recursePrintOn(s -> result.append(s), r -> r.saveString(), "(", ", ", ")");
+		return result.toString();
+	}
+	
+	
+	//INFINITELOOPHAZARD
+	/**
+	 * Recursively applies func to each of choices, and appends to out as 
+	 * it goes, producing a string of the form
+	 * "("+func(c1)+", "+func(c2)+", "+func(c3)+", "... ", " + func(cn)+")"
+	 * where start, end, and divider specify the strings in quotes.
+	 * @param out
+	 * @param func
+	 */
+	public void recursePrintOn(Consumer<String> printFunction, Function<Requirement, String> func, String start, String divider, String end){
+		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
+		Collections.sort(choiceList);
+		printFunction.accept(start);
+		//Add all but the last, each addition followed by a comma.
+		for(int i = 0; i < choiceList.size() - 1 ; i ++){
+			printFunction.accept(func.apply(choiceList.get(i)));
+			printFunction.accept(divider);
+		}
+		//Add the last if it exists, else there are no choices so the result is ().
+		if(choiceList.size() >= 1){
+			printFunction.accept(func.apply(choiceList.get(choiceList.size() - 1)));
+		}
+		printFunction.accept(end);
+	}
+	
 
 	//INFINITELOOPHAZARD
 	/**
@@ -1378,8 +1474,57 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	@SuppressWarnings("unused")
+	private boolean _________Testing_________;
 
 
+	
+	public static void testStringDisplays(){
+		String[] tests = new String[]{
+				"(MTH 110)",
+				"MTH110",
+				"((MTH 110))",
+				"(((MTH 110)))",
+				"2 of (MTH-110, MTH 120, MTH 130)",
+				"2 of (MTH 110, (MTH 120), (MTH 130))",
+				"2 of (MTH 110, (MTH 120, MTH 130))",
+				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+				"1 of (MTH-110)",
+				"2 of (MTH 110, MTH 120)",
+				"3 of (MTH 110, MTH 120, MTH 130)",
+				"1 of (MTH 110, MTH 120)",
+				
+				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, MTH 160)",
+				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+
+				"2 ch of (MTH-110, MTH-120, MTH-130)",
+				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
+				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"(1 of MTH>100)",
+				"1 of MTH>100",
+				"4 of MTH>100",
+				"1 of MTH > 300"
+		};
+		
+		for(String s : tests){
+			System.out.println(s);
+			Requirement r = Requirement.readFrom(s);
+			System.out.println("Save string:\t" + r.saveString());
+			System.out.println("Display string:\t" + r.getDisplayString());
+			System.out.println("Short string 30:\t" + r.shortString(30));
+			System.out.println("Short string 10:\t" + r.shortString(10));
+		}
+	}
 
 	public static void testAlsoCompletes(){
 		String[] tests = new String[]{
@@ -1418,7 +1563,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	}
 
-	public static void testReading(){
+	public static void generalTest(){
 		String[] tests = new String[]{
 				"(MTH 110)",
 				//"(MTH-110)",
@@ -1443,8 +1588,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
 				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
 				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
-				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)"
-
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"(1 of MTH>100)",
+				"1 of MTH>100",
+				"4 of MTH>100",
+				"1 of MTH > 300"
 		};
 
 		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
@@ -1506,7 +1654,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public static void main(String[] args){
-		testReading();
+		generalTest();
 	}
 
 

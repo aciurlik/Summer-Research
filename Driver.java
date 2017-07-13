@@ -168,7 +168,7 @@ public class Driver{
 		JPanel stack = new JPanel();
 
 		for(int i = 0; i<enemies.size(); i++){
-			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString() + " (" +  majors.get(i).name + ")" );
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(40) + " (" +  majors.get(i).name + ")" );
 			stack.add(combattingReqs);
 			userOptions.add(combattingReqs);
 		}
@@ -461,7 +461,9 @@ public class Driver{
 		toShow.setEditable(false);
 		JScrollPane pane = new JScrollPane(toShow);
 		pane.setPreferredSize(new Dimension(toShow.getPreferredSize().width + 20,300));
-		JOptionPane.showMessageDialog(null, pane, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION, icon);
+		JOptionPane.showMessageDialog(null, pane, 
+				"Details of requirement " + r.shortString(RequirementPanel.shortStringLength),
+				JOptionPane.OK_OPTION, icon);
 	}
 
 
@@ -695,83 +697,100 @@ public class Driver{
 	 * @return
 	 */
 	public boolean userOverrideError(ScheduleError s){
-		String header=null;
+		String header=headerFor(s);
+		int maxElementStringLength = 100;//Use as many characters as necessary
+				// for each of the schedule elements in the string.
+		
 		//instruct will be displayed as the main warning message
-		String instruct= null; 
+		String instruct= errorString(s, maxElementStringLength); 
+		
+		//Special cases for overload and duplicate - they get different strings here than when they're 
+		// found in the checkAllErrors button
 		if(s.error.equals(ScheduleError.overloadError)){
-			header = "Overload Error";
-			instruct="Adding " + s.offendingCourse.getDisplayString() + " exceeds this semester's overload limit of " + s.overloadLimit + " credit hours ";
+			instruct="Adding " + s.offendingCourse.shortString(maxElementStringLength) + " exceeds this semester's overload limit of " + s.overloadLimit + " credit hours ";
 		}
-		if(s.error.equals(ScheduleError.overlapError)){
-			header = "Overlap Error";
-			instruct = (s.elementList[0].getDisplayString() + "\n    overlaps \n" + s.elementList[1].getDisplayString());
-			ArrayList<String> issueStrings = new ArrayList<String>();
-			if(s.meetingOverlap){
-				issueStrings.add("meeting times");
-			}
-			if(s.examOverlap){
-				issueStrings.add( "exams");
-			}
-			if(s.labOverlap){
-				issueStrings.add("labs");
-			}
-			instruct += "\nIsses in :" + issueStrings.toString();
-		}
-		if(s.error.equals(ScheduleError.preReqError)){
-			try{
-
-				header = "Prerequisites Error";
-				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.req.toString();
-
-
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		//if(s.error.equals(ScheduleError.preReqErrorPrefix)){
-		//	header = "Prerequisites Error";
-		//instruct = s.offendingCourse.getDisplayString() + " had prerequisite " + s.missingCourse.toString();
-		//}
 		if(s.error.equals(ScheduleError.duplicateError)){
-			header = "Duplicate Error";
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
-		}
-		if(s.error.equals(ScheduleError.optimisticSchedulerError)){
-			Requirement r = s.getOptimisticRequirement();
-			header = "Optimistic planning";
-			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
-			Requirement subset = pair.get(0);
-			instruct = "The requirement " + r + " must include at least " + r.indent(subset.saveString(), 40, "   ");
-			instruct += "Until you change this requirment into a course, "
-					+ "\nwe will assume that it represents one of these.";
 		}
 		Object[] options = {"Ignore", "Cancel"};
 		int n = JOptionPane.showOptionDialog(null, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
+	
+	/**
+	 * Given a schedule error, return the string 
+	 * @param e
+	 * @return
+	 */
+	private String errorString(ScheduleError e, int preferredMaxLength){
+		String result = "";
+		if(e.error.equals(ScheduleError.overlapError)){
+			result = (e.elementList[0].shortString(preferredMaxLength) + "\n    overlaps " + e.elementList[1].shortString(preferredMaxLength));
+			ArrayList<String> issueStrings = new ArrayList<String>();
+			if(e.meetingOverlap){
+				issueStrings.add("meeting times");
+			}
+			if(e.examOverlap){
+				issueStrings.add( "exams");
+			}
+			if(e.labOverlap){
+				issueStrings.add("labs");
+			}
+			result += "\nOverlaps in :" + issueStrings.toString();
+		}
+		else if(e.error.equals(ScheduleError.overloadError)){
+			result = e.offendingSemester.semesterDate.getUserString() + "  exceeds its overload limit of " 
+		      + e.offendingSemester.getOverloadLimit()  + " credit hours";
+		}
+		else if(e.error.equals(ScheduleError.preReqError)){
+			result =  e.offendingCourse.shortString(preferredMaxLength) + " needs prerequsite(s) " + e.req.toString();
+		}
+		else if(e.error.equals(ScheduleError.duplicateError)){
+			result = e.offendingCourse.shortString(preferredMaxLength) + " is a duplicate course";
+		}
+		else if(e.error.equals(ScheduleError.optimisticSchedulerError)){
+			Requirement r = e.getOptimisticRequirement();
+			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
+			Requirement subset = pair.get(0);
+			result = "The requirement " + r + " must include at least " + r.indent(subset.saveString(), 40, "   ")
+			 + "Until you change this requirment into a course, "
+			 + "\nwe will assume that it represents one of these.";
+		}
+		result = parseIntoReadable(result);
+		return result;
+	}
+	public String parseIntoReadable(String s){
+		return s;
+	}
+	
+	private String headerFor(ScheduleError e){
+		switch(e.error){
+		case ScheduleError.overlapError:
+			return "Overlap Error";
+		case ScheduleError.duplicateError:
+			return "Duplicate Error";
+		case ScheduleError.overloadError:
+			return "Overload Error";
+		case ScheduleError.optimisticSchedulerError:
+			return "Optimistic Planning";
+		case ScheduleError.preReqError:
+			return "Prereq Error";
+		}
+		return null;
+	}
 
 
 
 	public String GUICheckAllErrors(boolean displayPopUp) {
 		boolean hasErrors = false;
+		int elementPreferredMaxLength = 30;
 		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
 		String result = new String();
 		if(!allErrors.isEmpty()){
 			hasErrors=true;
 			for(ScheduleError s : allErrors){
-				if(s.error.equals(ScheduleError.overlapError)){
-					result = result + "  " +s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
-				}
-				if(s.error.equals(ScheduleError.overloadError)){
-					result = result + "  " +s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
-				}
-				if(s.error.equals(ScheduleError.preReqError)){
-					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.req.toString() + "\n";
-				}
-				if(s.error.equals(ScheduleError.duplicateError)){
-					result = result + "  "+ s.offendingCourse.shortString() + " is a duplicate course \n";
-				}
+				result += errorString(s, elementPreferredMaxLength) + "\n";
 			}
 			if(result.length() < 2){
 				result = "Your Schedule had no errors! You're a pretty savy scheduler";

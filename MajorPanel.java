@@ -44,7 +44,7 @@ public class MajorPanel extends JPanel {
 		//Calculate the requirements left in this major
 		int reqsLeft = 0;
 		for(Requirement r : reqList){
-			reqsLeft += r.storedCoursesLeft();
+			reqsLeft += r.getStoredCoursesLeft();
 		}
 
 
