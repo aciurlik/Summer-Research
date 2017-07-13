@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.List;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -17,6 +18,8 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -738,6 +741,7 @@ public class Driver{
 				issueStrings.add("labs");
 			}
 			result += "\nOverlaps in :" + issueStrings.toString();
+
 		}
 		else if(e.error.equals(ScheduleError.overloadError)){
 			result = e.offendingSemester.semesterDate.getUserString() + "  exceeds its overload limit of " 
@@ -748,6 +752,7 @@ public class Driver{
 		}
 		else if(e.error.equals(ScheduleError.duplicateError)){
 			result = e.offendingCourse.shortString(preferredMaxLength) + " is a duplicate course";
+
 		}
 		else if(e.error.equals(ScheduleError.optimisticSchedulerError)){
 			Requirement r = e.getOptimisticRequirement();
@@ -759,10 +764,7 @@ public class Driver{
 		}
 		result = parseIntoReadable(result);
 		return result;
-	}
-	public String parseIntoReadable(String s){
-		return s;
-	}
+    }
 	
 	private String headerFor(ScheduleError e){
 		switch(e.error){
@@ -786,6 +788,7 @@ public class Driver{
 		boolean hasErrors = false;
 		int elementPreferredMaxLength = 30;
 		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
+		
 		String result = new String();
 		if(!allErrors.isEmpty()){
 			hasErrors=true;
@@ -795,6 +798,8 @@ public class Driver{
 			if(result.length() < 2){
 				result = "Your Schedule had no errors! You're a pretty savy scheduler";
 			}
+			
+			
 			if(displayPopUp)
 				JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
@@ -845,6 +850,21 @@ public class Driver{
 	}
 
 
+	
+	public String parseIntoReadable(String s){
+		String instruct = "";
+		ArrayList<String> matchList = new ArrayList<String>();
+		Pattern regex = Pattern.compile("(.{1,70}(?:\\s|$))|(.{0,70})", Pattern.DOTALL);
+		Matcher regexMatcher = regex.matcher(s);
+		while(regexMatcher.find()){
+			matchList.add(regexMatcher.group());
+		}
+		instruct = "";
+		for(int i = 0; i<matchList.size(); i++){
+			instruct = instruct + matchList.get(i) + "\n";
+		}
+		return instruct;
+	}
 
 
 
@@ -976,8 +996,8 @@ public class Driver{
 
 	}
 
-	
-	
+
+
 	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
@@ -990,9 +1010,9 @@ public class Driver{
 		return GUIChooseStartTime(supportedSemesters);
 
 	}
-	
-	
-	
+
+
+
 	private static void establishSettings() {
 		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){
 			startUpMessage();

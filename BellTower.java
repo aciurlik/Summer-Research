@@ -89,6 +89,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		}
 		else{
 			if(!wasComplete){
+				wasComplete=true;
 				if(sch.checkAllErrors().isEmpty()){
 					JOptionPane.showMessageDialog(null, endPicturePanel , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
 				}
