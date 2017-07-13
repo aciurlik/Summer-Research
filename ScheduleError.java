@@ -9,7 +9,7 @@ public class ScheduleError implements java.io.Serializable {
 	ScheduleElement[] elementList;
 	Prefix offendingPrefix;
 	ScheduleElement offendingCourse;
-	Requirement neededCourses;
+	Requirement req;
 	int overloadLimit = 0;
 	String instructions;
 	Semester offendingSemester;
@@ -21,6 +21,7 @@ public class ScheduleError implements java.io.Serializable {
 	public static final String overlapError = "Overlap Error";
 	public static final String overloadError = "Overload Error";
 	public static final String preReqErrorPrefix = "Prerequisite Error";
+	public static final String optimisticSchedulerError = "Optimisim error";
 	
 	boolean meetingOverlap = false;
 	boolean examOverlap = false;
@@ -82,12 +83,19 @@ public class ScheduleError implements java.io.Serializable {
 
 
 	public Requirement getNeededCourses() {
-		return neededCourses;
+		return req;
 	}
 
 
 	public void setNeededCourses(Requirement neededCourses) {
-		this.neededCourses = neededCourses;
+		this.req = neededCourses;
+	}
+	
+	public Requirement getOptimisticRequirement(){
+		return req;
+	}
+	public void setOptimisticRequirement(Requirement r){
+		this.req = r;
 	}
 
 

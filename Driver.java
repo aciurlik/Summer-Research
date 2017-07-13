@@ -459,8 +459,12 @@ public class Driver{
 	public void GUIExamineRequirement(Requirement r){
 		//Make a new JFrame with info about this requirement.
 		//Include the full definition as written in our code.
-		String toShow = r.coderString();
-		JOptionPane.showMessageDialog(null, toShow, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION);
+		String showText = r.examineRequirementString();
+		JTextArea toShow = new JTextArea(showText);
+		toShow.setEditable(false);
+		JScrollPane pane = new JScrollPane(toShow);
+		pane.setPreferredSize(new Dimension(toShow.getPreferredSize().width + 20,300));
+		JOptionPane.showMessageDialog(null, pane, "Details of requirement " + r.shortString(), JOptionPane.OK_OPTION, icon);
 	}
 
 
@@ -722,7 +726,7 @@ public class Driver{
 			try{
 
 				header = "Prerequisites Error";
-				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.neededCourses.toString();
+				instruct = s.offendingCourse.getDisplayString() + " needs prerequisite(s) " + s.req.toString();
 
 
 			}catch(Exception e){
@@ -734,8 +738,16 @@ public class Driver{
 		//instruct = s.offendingCourse.getDisplayString() + " had prerequisite " + s.missingCourse.toString();
 		//}
 		if(s.error.equals(ScheduleError.duplicateError)){
-			header = "Duplicate Error";
-			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
+			header = "Duplicate Error";			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
+		}
+		if(s.error.equals(ScheduleError.optimisticSchedulerError)){
+			Requirement r = s.getOptimisticRequirement();
+			header = "Optimistic planning";
+			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
+			Requirement subset = pair.get(0);
+			instruct = "The requirement " + r + " must include at least " + r.indent(subset.saveString(), 40, "   ");
+			instruct += "Until you change this requirment into a course, "
+					+ "\nwe will assume that it represents one of these.";
 		}
 		Object[] options = {"Ignore", "Cancel"};
 
@@ -764,8 +776,9 @@ public class Driver{
 					
 				}
 				if(s.error.equals(ScheduleError.preReqError)){
-					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
-			
+
+					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.req.toString() + "\n";
+
 				}
 				if(s.error.equals(ScheduleError.duplicateError)){
 					result = result + "  "+ s.offendingCourse.shortString() + " is a duplicate course \n";
