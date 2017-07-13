@@ -30,7 +30,7 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String addInstruct = "Add a Course";
 	public static final  String supriseMe = "Surprise Me!";
 	public static final  String changeInstruct = "Change Course";
-	public static final  String addStudyAway = "Add Study Away";
+	public static final  String addStudyAway = "Mark as Study Away";
 	public static final  String addNotes = "Add Note";
 	public static final  String removeStudyAway = "Remove Study Away";
 	public static final  String removeNotes = "Remove Note";
@@ -49,6 +49,8 @@ public class MenuOptions implements java.io.Serializable{
 	//Schedule Element Panel
 	public static final  String addCourseWithRequirement = "Choose a course";
 
+	//Requirement panel
+	public static final String examineRequirementRightClick = "Examine Requirement";
 
 	//Suprise Me 
 	public static final  String Want = "I want it";
@@ -56,6 +58,7 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String tryAgain = "Try Again";
 	public static final  String Cancel = "Cancel";
 	//Only Menu Bar 
+	  //File submenu
 	public static final  String openSchedule = "Open Schedule";
 	public static final  String newSchedule = "New Schedule";
 	public static final  String saveSchedule = "Save Schedule";
@@ -64,9 +67,13 @@ public class MenuOptions implements java.io.Serializable{
 	public static final  String removeTrack = "Remove Track";
 	public static final  String removeMinor = "Remove Minor";
 	public static final  String exploreMayX = "Explore MayX Opportunities";
-	public static final  String help ="Help";
 	public static String checkAllErrors = "Check all Errors";
 	public static String deleteSchedule = "Delete Schedule";
+	//Help and submenu
+	public static final  String help ="Help";
+	public static String viewStartUp = "View Start Up Guide";
+	public static String examineRequirementHelp = "Requirement help";
+	public static String findACourse = "Find a course";
 	
 	
 	public static boolean UIType;
@@ -74,12 +81,10 @@ public class MenuOptions implements java.io.Serializable{
 	public static String next = "Next";
 	public static String finish = "Finish";
 	
-	
 	//Settings
 	public static String startUp = "Show Start Up";
 	public static String settings = "Settings";
 	public static String saveChanges = "Save Changes";
-	public static String viewStartUp = "View Start Up Guide";
 	public static String restoreDefault = "Restore Default Settings";
 	
 

@@ -20,6 +20,7 @@ import javax.swing.JToggleButton;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -66,6 +67,14 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public static ScheduleCourse chooseCourse(ScheduleCourse[] courses, ArrayList<Requirement> reqs){
 		CourseChooser c = new CourseChooser(courses, reqs);
@@ -91,6 +100,16 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		//Data fields
 		this.choices = courses;
 		this.reqs = reqs;
+		//We only care about unfulfilled requirements
+		// However, if we're choosing a course for a requirement that is fulfilled,
+		// we still want to see that the courses all satisfy that requirement, 
+		// so I'm taking this code out.
+				/*new ArrayList<Requirement>();
+		for(Requirement r : reqs){
+			if(!r.storedIsComplete()){
+				this.reqs.add(r);
+			}
+		}*/
 		finishedChoosing = false;
 		maxNumColumns = 0;
 		for(ScheduleCourse c : courses){
@@ -100,6 +119,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		//GUI fields
 		advancedSettingsVisible = false;
 		filtersPanel = new FiltersPanel();
+		//this.setPreferredSize(new Dimension(700,200));
 		
 		
 		//Construction of the GUI
@@ -143,6 +163,12 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		
 		visibleCoursesTable = new JTable(data, columnNames(maxNumColumns));
 		
+		//set table's column width
+		CourseChooser.setJTableColumnsWidth(visibleCoursesTable, 
+				visibleCoursesTable.getPreferredSize().width,
+				columnSizes(maxNumColumns));
+		
+		
 		//This section of code ensures that the table's values are not editable
 		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames(maxNumColumns)) {
 		    @Override
@@ -160,12 +186,13 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		sorter.setSortKeys(sortKeys);
 		
 		
-		//TODO set column widths so you can see the titles
-		
 		
 		JScrollPane scrollPane = new JScrollPane(visibleCoursesTable);
 		visibleCoursesTable.setFillsViewportHeight(true);
 		this.add(scrollPane, BorderLayout.CENTER);
+		scrollPane.setPreferredSize(new Dimension(
+				visibleCoursesTable.getPreferredSize().width,
+				300));
 		
 		
 		
@@ -207,16 +234,21 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	public ArrayList<Object> dataFor(ScheduleCourse c){
 		ArrayList<Object> results = new ArrayList<Object>();
 		
-		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs);
+		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs, false);
 		
 		//Filter out reqs that are already complete
+		// This code made it so that if you pick "choose a course"
+		// from a req that is complete, it won't show you which courses
+		// fulfill that req (meaning you can't see which ones are NW and
+		// NWL for that particular requirement.)
+		/*
 		for(int i = 0; i < reqsFulfilled.size() ; i ++){
 			Requirement r = reqsFulfilled.get(i);
 			if(r.storedIsComplete()){
 				reqsFulfilled.remove(i);
 				i--;
 			}
-		}
+		}*/
 		
 		//Special case for NW and NWL
 		for(int i = 0; i < reqsFulfilled.size() ; i ++){
@@ -248,6 +280,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		else
 			results.add(null);
 		results.add(prefix);
+		results.add(c.c.getName());
 		results.add(professor);
 		results.add(reqsFulfilled.size());
 		results.addAll(reqsFulfilled);
@@ -256,14 +289,64 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	}
 	public String[] columnNames(int numberColumns){
 		String[] result = new String[numberColumns];
-		result[0] = "Start Time";
-		result[1] = "Subj-Num";
-		result[2] = "Professor";
-		result[3] = "Num new Reqs";
-		for(int i = 4; i < numberColumns ; i ++){
+		String[] known = new String[]{
+				"Start Time","Course","Title","Professor","Num new Reqs"};
+		for(int i = 0; i < known.length ; i ++){
+			result[i] = known[i];
+		}
+		for(int i = known.length; i < numberColumns ; i ++){
 			result[i] = "";
 		}
 		return result;
+	}
+	
+	/**
+	 * Find column sizes as percent of total
+	 */
+	public double[] columnSizes(int numColumns){
+		double[] result = new double[numColumns];
+		double[] known = new double[]{5,5,20,10,2};
+		for(int i = 0; i < known.length ; i ++){
+			result[i] = known[i];
+		}
+		for(int i = known.length ; i < numColumns ; i ++){
+			result[i] = 5;
+		}
+		return rescale(result);
+	}
+	public double[] rescale(double[] input){
+		double sum = 0;
+		for(double d : input){
+			sum += d;
+		}
+		double[] result = new double[input.length];
+		for(int i =0 ; i < result.length ; i ++){
+			result[i] = input[i] / sum * 100;
+		}
+		return result;
+	}
+	
+	
+	/**
+	 * Sets a JTable's column widths 
+	 * Found on 
+	 * http://www.codejava.net/java-se/swing/setting-column-width-and-row-height-for-jtable
+	 * @param table
+	 * @param tablePreferredWidth
+	 * @param percentages
+	 */
+	public static void setJTableColumnsWidth(JTable table, int tablePreferredWidth,
+	        double[] percentages) {
+	    double total = 0;
+	    for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+	        total += percentages[i];
+	    }
+	 
+	    for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+	        TableColumn column = table.getColumnModel().getColumn(i);
+	        column.setPreferredWidth((int)
+	                (tablePreferredWidth * (percentages[i] / total)));
+	    }
 	}
 
 	

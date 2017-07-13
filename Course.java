@@ -64,6 +64,9 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public void setName(String name){
 		this.name = name;
 	}
+	public String getName(){
+		return this.name;
+	}
 
 	public Prefix getPrefix(){
 		return coursePrefix;

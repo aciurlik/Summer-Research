@@ -804,6 +804,26 @@ public class Driver{
 		}
 
 	}
+	
+	public void showExamineRequirementHelp(){
+		JOptionPane.showMessageDialog(null, 
+				    "To see details about a requirement,"
+				+ "\n  1) Right-click the requirement you want to examine"
+				+ "\n  2) select \"" + MenuOptions.examineRequirementRightClick + "\" ");
+	}
+	public void showFindACourseHelp(){
+		JOptionPane.showMessageDialog(null, 
+				    "To find a particular course, you can do one of the following:"
+				+ "\n  1) If you know which semester(s) that course is offered, "
+				+ "\n        click \"Options,\""
+				+ "\n        and choose \"" + MenuOptions.addInstruct + "\""
+				+ "\n  2) If you know of a requirement the course satisfies, you can"
+				+ "\n        drag that requirement into a semester and click "
+				+ "\n        \"" + MenuOptions.addCourseWithRequirement + "\""
+				+ "\n  3) If the course is not in our database yet, you can"
+				+ "\n        add a note to the semester where it is offered"
+				+ "\n        by clicking \"Options\" and then \"" +MenuOptions.addNotes+"\"");
+	}
 
 
 

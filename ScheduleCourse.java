@@ -75,14 +75,22 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		return result;
 
 	}
-
+	
+	/**
+	 * Return an unsorted list of the requirements satisfied by this course.
+	 */
+	@Override
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded){
+		//get the reqs fulfilled while having the user resolve conflicts.
+		return getRequirementsFulfilled(loaded, true);
+	}
 
 	/**
 	 * Return an unsorted list of the requirements satisfied by this course.
+	 * If haveUserResolveConflicts is false, all requirement-enemies will be included in the list.
 	 * @return
 	 */
-	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded, boolean haveUserResolveConflicts) {
 
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
@@ -98,34 +106,13 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 				this.oldEnemyList = enemies;
 			}
 			else{
-				//the enemies changed. 
-				//If some of the enemies are already scheduled, just use those. 
-				/*
-				HashSet<Requirement> scheduledRequirements = new HashSet<Requirement>(); 
-				for(ScheduleElement e : s.getAllElementsSorted()){ 
-					if(e instanceof Requirement){ 
-						scheduledRequirements.add((Requirement)e); 
-					} 
-				} 
-
-				scheduledRequirements.retainAll(enemies); 
-
-				if(!scheduledRequirements.isEmpty()){ 
-					this.userSpecifiedReqs = scheduledRequirements; 
-					this.oldEnemyList = enemies; 
-
-				} 
-
-				else{ */
-				//If none of the enemies are scheduled,  
-				//ask the user which requirements should now be satisfied by this course.
-				//sch.conflictingRequirements(this 
-				/**
-				 * System.out.println("The course " + this.getDisplayString() + " satisfies clashing requirements,\n" 
-				 	+ enemies.toString() + "\n" 
-				 	" Which one should get the credit hours?"); 
-				 */
-				HashSet<Requirement> kept = this.s.resolveConflictingRequirements(enemies, this.c); 
+				//the enemies changed.  
+				//ask the user which requirements should now be satisfied by this course. 
+				
+				HashSet<Requirement> kept = enemies;
+				if(haveUserResolveConflicts){
+					kept = this.s.resolveConflictingRequirements(enemies, this.c); 
+				}
 				this.userSpecifiedReqs = kept; 
 				this.oldEnemyList = enemies; 
 
