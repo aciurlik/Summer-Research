@@ -41,18 +41,49 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	}
 
 	@Override
-	public String shortString(){
-		String result = new String();
-		result = result + this.c.semester.getSeason(this.c.semester.sNumber)+ " "+ this.c.semester.year + " ";
-
-		result = result + this.c.coursePrefix.toString() + " "; 
-
+	public String shortString(int preferredLength){
+		
+		ArrayList<String> data = new ArrayList<String>();
+		int size = 0;
+		
+		
+		String prefixSectionString = this.c.coursePrefix.toString() + " "; 
 		if(this.c.sectionNumber !=(null)){
-			result = result + this.c.sectionNumber+ " ";
+			prefixSectionString = prefixSectionString + this.c.sectionNumber+ " ";
 		}
-
-		return result;
-
+		data.add(prefixSectionString);
+		size += prefixSectionString.length() + 1;
+		
+		
+		String semesterString =  SemesterDate.getSeason(this.c.semester.sNumber)+
+				" "+ this.c.semester.year + " ";
+		size += semesterString.length() + 1;
+		if(size < preferredLength){
+			data.add(0, semesterString);
+		}
+		
+		String title = c.name;
+		size += title.length() + 1;
+		if(size < preferredLength){
+			data.add(title);
+		}
+		
+		String professor = c.professor;
+		size += professor.length() + 1;
+		if(size < preferredLength){
+			data.add(professor);
+		}
+		//Fall 2017, ACC-101-01 Accounting with ... Dr. Hansworth
+		
+		StringBuilder result = new StringBuilder();
+		for(int i = 0; i < data.size() - 1 ; i ++){
+			result.append(data.get(i) + " ");
+		}
+		if(!data.isEmpty()){
+			result.append(data.get(data.size() - 1));
+		}
+		
+		return result.toString();
 	}
 
 	public String supriseString(){

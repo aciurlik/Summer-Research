@@ -1074,7 +1074,7 @@ public class Schedule implements java.io.Serializable {
 	public int estimatedCoursesLeft(){
 		int counter = 0;
 		for(Requirement r: this.getAllRequirements()){
-			counter += r.storedCoursesLeft();
+			counter += r.getStoredCoursesLeft();
 		}
 		return counter;
 	}
