@@ -190,9 +190,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		trackPopup.add(menuItem);
 		submenu.add(menuItem);
-
-
-
 		menu.add(submenu);
 		
 		
@@ -206,6 +203,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		this.add(menu);
+		
+		
 		
 		menuItem = new JMenuItem("Restore Default Settings");
 		menuItem.setActionCommand(MenuOptions.restoreDefault);

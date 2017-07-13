@@ -505,6 +505,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	//INFINITELOOPHAZARD
 	public boolean equals(Requirement r){
+		if(r==null){
+			return false;
+		}
 		if(r instanceof TerminalRequirement){
 			if(this.isTerminal()){
 				return this.getTerminal().equals(r);

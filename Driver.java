@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.List;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -17,6 +18,8 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -697,6 +700,7 @@ public class Driver{
 		if(s.error.equals(ScheduleError.overloadError)){
 			header = "Overload Error";
 			instruct="Adding " + s.offendingCourse.getDisplayString() + " exceeds this semester's overload limit of " + s.overloadLimit + " credit hours ";
+
 		}
 		if(s.error.equals(ScheduleError.overlapError)){
 			header = "Overlap Error";
@@ -712,6 +716,7 @@ public class Driver{
 				issueStrings.add("labs");
 			}
 			instruct += "\nIsses in :" + issueStrings.toString();
+
 		}
 		if(s.error.equals(ScheduleError.preReqError)){
 			try{
@@ -733,6 +738,8 @@ public class Driver{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
+
+		instruct = this.parseIntoReadable(instruct);
 		int n = JOptionPane.showOptionDialog(null, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
@@ -743,26 +750,33 @@ public class Driver{
 	public String GUICheckAllErrors(boolean displayPopUp) {
 		boolean hasErrors = false;
 		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
+		
 		String result = new String();
 		if(!allErrors.isEmpty()){
 			hasErrors=true;
 			for(ScheduleError s : allErrors){
 				if(s.error.equals(ScheduleError.overlapError)){
-					result = result + "  " +s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
+					result = "  " +s.elementList[0].shortString()+ " overlaps " + s.elementList[1].shortString() + "\n";
+				
 				}
 				if(s.error.equals(ScheduleError.overloadError)){
 					result = result + "  " +s.offendingSemester.semesterDate.getSeason(s.offendingSemester.semesterDate.sNumber)+ "  " + s.offendingSemester.semesterDate.year + "  exceeds its overload limit of " + s.offendingSemester.getOverloadLimit() + " \n";
+					
 				}
 				if(s.error.equals(ScheduleError.preReqError)){
 					result = result + "  "+ s.offendingCourse.shortString() + " needs " + s.neededCourses.toString() + "\n";
+			
 				}
 				if(s.error.equals(ScheduleError.duplicateError)){
 					result = result + "  "+ s.offendingCourse.shortString() + " is a duplicate course \n";
+				
 				}
 			}
 			if(result.length() < 2){
 				result = "Your Schedule had no errors! You're a pretty savy scheduler";
 			}
+			
+			
 			if(displayPopUp)
 				JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 		}
@@ -793,6 +807,21 @@ public class Driver{
 	}
 
 
+	
+	public String parseIntoReadable(String s){
+		String instruct = "";
+		ArrayList<String> matchList = new ArrayList<String>();
+		Pattern regex = Pattern.compile("(.{1,70}(?:\\s|$))|(.{0,70})", Pattern.DOTALL);
+		Matcher regexMatcher = regex.matcher(s);
+		while(regexMatcher.find()){
+			matchList.add(regexMatcher.group());
+		}
+		instruct = "";
+		for(int i = 0; i<matchList.size(); i++){
+			instruct = instruct + matchList.get(i) + "\n";
+		}
+		return instruct;
+	}
 
 
 
@@ -924,8 +953,8 @@ public class Driver{
 
 	}
 
-	
-	
+
+
 	public static SemesterDate tryPickStartDate(){
 		ArrayList<SemesterDate> supportedSemesters = new ArrayList<SemesterDate>();
 		//supportedSemesters.add( new SemesterDate(2012, SemesterDate.FALL ));
@@ -938,9 +967,9 @@ public class Driver{
 		return GUIChooseStartTime(supportedSemesters);
 
 	}
-	
-	
-	
+
+
+
 	private static void establishSettings() {
 		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){
 			startUpMessage();

@@ -1,9 +1,13 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,30 +26,57 @@ public class StartUpMenu implements ActionListener {
 	JButton previous;
 	JButton finish;
 	JCheckBox noMore;
+
 	public StartUpMenu(){
 		layer = new JPanel();
 		layer.setLayout(new BorderLayout());
+		
 		instructions = FileHandler.getInstructions(new File(MenuOptions.resourcesFolder + "StartUpSlides"));
-		JLabel label = new JLabel(instructions.get(0));
-		frame = new JFrame("Getting Started");
+		
+		label = new JLabel(instructions.get(0));
+		/**
+		 * {
+		 * Image myImage;
+			
+			  public void setIcon(Icon icon) {
+			        super.setIcon(icon);
+			        if (icon instanceof ImageIcon)
+			        {
+			            myImage = ((ImageIcon) icon).getImage();
+			        }
+			    }
 
+			    @Override
+			    public void paint(Graphics g){
+			        g.drawImage(myImage, 0, 0, this.getWidth(), this.getHeight(), null);
+			    }
+		};
+		 */
+			
+		frame = new JFrame("Getting Started");
 		layer.add(label, BorderLayout.NORTH);
 
 		buttonPanel = new JPanel();
-
+		buttonPanel.setLayout(new BorderLayout());
+		
+		
+		JPanel previousNextPanel = new JPanel();
+		previousNextPanel.setLayout(new BorderLayout());
+		
 		previous = new JButton(MenuOptions.previous);
 		previous.setActionCommand(MenuOptions.previous);
 		previous.addActionListener(this);
+		previousNextPanel.add(previous, BorderLayout.WEST);
+		previous.setVisible(false);
 
 		next = new JButton(MenuOptions.next);
 		next.setActionCommand(MenuOptions.next);
 		next.addActionListener(this);
-		buttonPanel.add(next);
+		previousNextPanel.add(next, BorderLayout.EAST);
+		next.setVisible(true);
+	
 		
-		finish = new JButton(MenuOptions.finish);
-		finish.setActionCommand(MenuOptions.finish);
-		finish.addActionListener(this);
-
+		buttonPanel.add(previousNextPanel, BorderLayout.EAST);
 		layer.add(buttonPanel, BorderLayout.SOUTH);
 		frame.add(layer);
 		frame.pack();
@@ -80,24 +111,40 @@ public class StartUpMenu implements ActionListener {
 	}
 
 	public void update(int n){
+		next.setText("Next");
+		next.setActionCommand(MenuOptions.next);
 		
-		layer.removeAll();
-		layer.add(new JLabel(instructions.get(n)), BorderLayout.NORTH);
-		buttonPanel.removeAll();
+		next.setVisible(false);
+		previous.setVisible(false);;
+		if(noMore!=null){
+		buttonPanel.remove(noMore);
+		}
+		
+		
+		layer.removeAll(); 
+		label.setIcon(instructions.get(n));
+		layer.add(label, BorderLayout.NORTH);
 		if(n==0){
-			buttonPanel.add(next);
+			next.setVisible(true);
 		}
-		if(n>0 && n<instructions.size()-2){
-			buttonPanel.add(previous);
-			buttonPanel.add(next);
+		if(n>0 && n<instructions.size()-1){
+			next.setVisible(true);
+			previous.setVisible(true);
 		}
-		if(n==instructions.size()-2){
-			buttonPanel.add(previous);
-			buttonPanel.add(finish);
+		if(n==instructions.size()-1){
+			previous.setVisible(true);
+			next.setText("Finish");
+			next.setActionCommand(MenuOptions.finish);
+			next.setVisible(true);
 			noMore=new JCheckBox("Don't show this again");
-			buttonPanel.add(noMore);
+			buttonPanel.add(noMore, BorderLayout.WEST);
 		}
+
+		buttonPanel.revalidate();
+		buttonPanel.repaint();
+		
 		layer.add(buttonPanel, BorderLayout.CENTER);
+		
 		layer.revalidate();
 		layer.repaint();
 		

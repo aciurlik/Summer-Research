@@ -420,7 +420,7 @@ public class FileHandler implements ActionListener{
 						if(i <= 0){
 							return false;
 						}
-						String extension = fullName.substring(i+1);
+					
 						return pathname.isFile();
 					}
 
@@ -428,8 +428,16 @@ public class FileHandler implements ActionListener{
 				)){
 
 			try{
-
+				
+				
 				ImageIcon image = new ImageIcon(f.toString());
+				Image img = image.getImage();
+				
+								double scalar = 2;
+				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
+				image = new ImageIcon(newimg);
+			
+				
 				result.add(image);
 
 			}
