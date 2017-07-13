@@ -153,10 +153,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 		//Build Edit menu in the menu bar.
 		menu = new JMenu("Edit");
+		this.add(menu);
 		menu.setMnemonic(KeyEvent.VK_N);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"This allows edits to schedule");
-		this.add(menu);
 
 
 		submenu = new JMenu("Major");
@@ -195,6 +195,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		
 
 		menu = new JMenu("Settings");
+		this.add(menu);
 		
 		menuItem = new JMenuItem("Change Settings");
 		menuItem.setActionCommand(MenuOptions.settings);
@@ -202,7 +203,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		settings.add(menuItem);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-		this.add(menu);
 		
 		
 		
@@ -219,10 +219,23 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menu = new JMenu("Help");
 		menuItem = new JMenuItem(MenuOptions.viewStartUp);
 		menuItem.setActionCommand(MenuOptions.viewStartUp);
-		JPopupMenu viewStartUp = new JPopupMenu(MenuOptions.viewStartUp);
+		//JPopupMenu viewStartUp = new JPopupMenu(MenuOptions.viewStartUp);
 		menuItem.addActionListener(this);
-		viewStartUp.add(menuItem);
+		//viewStartUp.add(menuItem);
 		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(MenuOptions.examineRequirementHelp);
+		menuItem.setActionCommand(MenuOptions.examineRequirementHelp);
+		//new JPopupMenu().add(menuItem);
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(MenuOptions.findACourse);
+		menuItem.setActionCommand(MenuOptions.findACourse);
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		
+		
 		this.add(menu);
 
 
@@ -289,6 +302,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		}
 		if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
 			FileHandler.GUICalledRestoreDefaultSettings();
+		}
+		if(e.getActionCommand().equals(MenuOptions.examineRequirementHelp)){
+			d.showExamineRequirementHelp();
+		}
+		if(e.getActionCommand().equals(MenuOptions.findACourse)){
+			d.showFindACourseHelp();
 		}
 	}
 

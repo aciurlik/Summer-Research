@@ -204,7 +204,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		private static final long serialVersionUID = 1L;
 		public RequirementPopupMenu(){
 			
-			JMenuItem item = new JMenuItem("Examine Requirement");
+			JMenuItem item = new JMenuItem(MenuOptions.examineRequirementRightClick);
 			item.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {

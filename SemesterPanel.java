@@ -6,28 +6,16 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -45,7 +33,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
 	private String addAClass = "Drop a requirement here";
-	private String classTitle;
 	JPanel defaultPanel = new JPanel();
 	JPanel topPanel;
 	JPanel hidePanel;
@@ -53,7 +40,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	JButton deleteSemesterButton;
 	Driver d;
 	Semester sem;
-	private JButton changeCourse;
 	final static int height=300;
 	JTextArea notes;
 	JPanel menuPanel;
