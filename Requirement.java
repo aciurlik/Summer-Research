@@ -980,21 +980,19 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	//////
 	////// String methods from Schedule Element
 	//////
+	
+	
 	@Override
 	public String getDisplayString() {
 		StringBuilder result = new StringBuilder();
-		if(this.name != null){
-			//Special case for lab - "5 () with at least 1 lab from ()"
-			if((!this.name.equals("NW/NWL"))){
-				if(this.name.equals("NWL")){
-					recursePrintOn(s -> result.append(s), r ->r.getDisplayString(),
-							"1 lab from (",
-							", ",
-							")");
-					return result.toString();
-				}
-				return this.name;
-			}
+
+		//Special case for lab - "5 () with at least 1 lab from ()"
+		if("NWL".equals(this.name)){
+			recursePrintOn(s -> result.append(s), r ->r.getDisplayString(),
+					"1 lab from (",
+					", ",
+					")");
+			return result.toString();
 		}
 		
 		//if you've got an atLeast requirement, the order matters,
@@ -1006,6 +1004,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			result.append(superset.getDisplayString());
 			result.append(" with at least ");
 			result.append(subset.getDisplayString());
+			return result.toString();
 		}
 		
 		String[] startMidEnd = syntaxSugars();
@@ -1024,9 +1023,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @return
 	 */
 	private String[] syntaxSugars(){
-		if(this.numToChoose == 1 && this.choices.size() == 2){
-			return new String[]{"either " , " or " , ""};
-		}
 		if(this.isTerminal()){
 			return new String[]{"", ", ",""};
 		}
@@ -1036,71 +1032,123 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(this.usesCreditHours){
 			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
 		}
+		
+		//The next few cases use englishResult
+		// because they all have similar behavior with inner parenthesis.
+		// If you need to make a string like 
+		// "either of (X) or (Y)", then you use the dividers
+		// "either of (",  ") or (", ")"
+		// rather than the dividers
+		// "either of (", " or ", ")".
+		String[] englishResult = {};
+		if(this.numToChoose == 1 && this.choices.size() == 2){
+			englishResult = new String[]{"either of " , " or " , ""};
+		}
 		if(this.numToChoose != 1 && 
 				this.numToChoose == this.choices.size()){
 			if(this.numToChoose == 2){
-				return new String[]{"Both of (", " and ",  ")"};
+				englishResult =  new String[]{"both of ", " and ", ""};
 			}
 			else{
-				return new String[]{"All of (", ", ", ")"};
+				englishResult = new String[]{"all of ", ", ", ""};
 			}
 		}
+		if(englishResult.length != 0){
+			if(syntaxSugarNeedsInnerParenthesis()){
+				englishResult[0] = englishResult[0] + "(";
+				englishResult[1] = ")" + englishResult[1] + "(";
+				englishResult[2] = englishResult[2] + ")";
+			}
+			else{
+				//Not sure if these should be included in the final version
+				//englishResult[0] = englishResult[0] + "(";
+				//englishResult[2] = englishResult[2] + ")";
+			}
+			return englishResult;
+		}
+		
 		
 		//TODO remove this to speed things up, its an expensive debug check.
 		if(this.isAtLeastRequirement()){
 			throw new RuntimeException("Should not use syntax sugar method for atLeast "
-					+ "requirements - need to know subchoice order");
+					+ "requirements - they need to know subchoice order");
 		}
 		
 		//default case
 		return new String[]{numToChoose + " of (" ,", ",")"};
 	}
 	
+	private boolean syntaxSugarNeedsInnerParenthesis(){
+		for(Requirement r : choices){
+			if(!r.isTerminal()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 
 	@Override
 	public String shortString(int preferredLength) {
+		//Return name, if you have one
+		if(this.name != null){
+			return this.name;
+		}
+		// If display string is small enough, return it.
 		String result = this.getDisplayString();
 		if(result.length() <= preferredLength){
 			return result;
 		}
-		else{
-			ArrayList<Requirement> reqPairs = atLeastRequirementPairs();
-			if(reqPairs.isEmpty()){
-				StringBuilder builtResult = new StringBuilder();
-				String[] sugars = syntaxSugars();
-				String replacementFirst = numToChoose + " of(";
-				String replacementMid = ",";
-				String replacementEnd = ")";
-				int totalReplacementLength = 
-						replacementFirst.length()
-						+ replacementMid.length()
-						+ replacementEnd.length();
-				int totalInitialLength = 
-						sugars[0].length()
-						+ sugars[1].length()
-						+ sugars[2].length();
-				
-				if(totalInitialLength > totalReplacementLength){
-					sugars[0] = replacementFirst;
-					sugars[1] = replacementMid;
-					sugars[2] = replacementEnd;
- 				}
-				
-				preferredLength = preferredLength 
-						- sugars[0].length() 
-						- sugars[2].length() 
-						- (this.numToChoose - 1) * sugars[1].length();
-				int recursivePreferredLength = preferredLength / choices.size();
-				recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
-						sugars[0],
-						sugars[1],
-						sugars[2]);
-				return builtResult.toString();
-			}
-			else{
-				return reqPairs.get(1).shortString(preferredLength);
-			}
+		//If you're an at least, just show them superset
+		// They'll have to know about subset on their own
+		// or from popups.
+		ArrayList<Requirement> reqPairs = atLeastRequirementPairs();
+		if(!reqPairs.isEmpty()){
+			return reqPairs.get(1).shortString(preferredLength);
 		}
+		
+		//Now comes the actual attempt to reduce characters.
+		StringBuilder builtResult = new StringBuilder();
+		String[] sugars = syntaxSugars();
+		
+		
+		//Reduce the length of the given sugars
+		// then check if you're short enough.
+		String replacementFirst = sugars[0];
+		if(replacementFirst.contains("credit hours")){
+			replacementFirst = replacementFirst.replace("credit hours", "credits");
+		}
+		String replacementMid = ",";
+		String replacementEnd = sugars[2];
+		
+		sugars[0] = replacementFirst;
+		sugars[1] = replacementMid;
+		sugars[2] = replacementEnd;
+
+		final int recursivePreferredLength = 
+				( 
+				  preferredLength 
+				  - sugars[0].length() 
+				  - sugars[2].length() 
+				  - (this.choices.size() - 1) * sugars[1].length()
+				) / choices.size();
+		recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
+				sugars[0],
+				sugars[1],
+				sugars[2]);
+		//Here's where we check if the replacements made us short enough.
+		// If we're still too long, then we can use the last resort,
+		// which doesn't write out subreqs and instead writes out
+		// 1 of (2 choices).
+		if(builtResult.length() > preferredLength){
+			String choicesPluralOrNot = " choice";
+			if(choices.size() != 1){
+				choicesPluralOrNot += "s";
+			}
+			String lastResort = sugars[0] + choices.size() + choicesPluralOrNot + sugars[2];
+			return lastResort;
+		}
+		return builtResult.toString();
 	}
 	
 	///
@@ -1115,12 +1163,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	public String examineRequirementString(){
 		StringBuilder result = new StringBuilder();
+		//http://www.furman.edu/academics/academics/majorsandminors/Pages/default.aspx
 		result.append(
 				    "This text shows, in as much detail as possible, how this requirement works. "
 				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
 				+ "\nwebsite for another explanation of the requirement."
 				+ "\n\n");
-		
+		result.append(this.getDisplayString());
 		return indent(result.toString(), 80, "   ");
 	}
 
@@ -1315,7 +1364,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(this.usesCreditHours()){
 			result.append(" ch");
 		}
-		result.append(" of (");
+		result.append(" of ");
 		//Add the guts of this requirement - each sub-requirement
 
 		recursePrintOn(s -> result.append(s), r -> r.saveString(), "(", ", ", ")");
@@ -1494,8 +1543,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"(((MTH 110)))",
 				"2 of (MTH-110, MTH 120, MTH 130)",
 				"2 of (MTH 110, (MTH 120), (MTH 130))",
+				"1 of (2 of (MTH-110, MTH-120), MTH-130)",
 				"2 of (MTH 110, (MTH 120, MTH 130))",
 				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+				"1 of (MTH 110, (1 of (MTH 120, MTH 130)))",
 				"1 of (MTH-110)",
 				"2 of (MTH 110, MTH 120)",
 				"3 of (MTH 110, MTH 120, MTH 130)",
@@ -1516,13 +1567,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"1 of MTH > 300"
 		};
 		
+		int testNum = 0;
 		for(String s : tests){
+			System.out.println("Test number " + testNum);
+			testNum ++;
 			System.out.println(s);
 			Requirement r = Requirement.readFrom(s);
-			System.out.println("Save string:\t" + r.saveString());
-			System.out.println("Display string:\t" + r.getDisplayString());
-			System.out.println("Short string 30:\t" + r.shortString(30));
+			System.out.println("Save string:\t\t" + r.saveString());
+			System.out.println("Display string:\t\t" + r.getDisplayString());
+			System.out.println("Short string 50:\t" + r.shortString(50));
 			System.out.println("Short string 10:\t" + r.shortString(10));
+			System.out.println("\n\n");
 		}
 	}
 
@@ -1565,17 +1620,20 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	public static void generalTest(){
 		String[] tests = new String[]{
+				"MTH-110",
 				"(MTH 110)",
 				//"(MTH-110)",
-				"MTH110",
+				"((MTH110))",
+				"(((MTH-110)))",
 				//"MTH-110",
 				//"MTH 110",
 				"2 of (MTH 110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, MTH 130)",
 				"2 of (ACC-110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, or MTH 130)",
-				"2 of (MTH 110, (MTH 120), (MTH 130))",
+				"1 of (2 of (MTH-110, MTH-120), MTH-130)",
 				"2 of (MTH 110, (MTH 120, MTH 130))",
+				"1 of (MTH 110, (1 of (MTH 120, MTH 130)))",
 				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
 				"3 of (MTH 110, MTH 120, MTH 130)",
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
@@ -1654,7 +1712,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public static void main(String[] args){
-		generalTest();
+		testStringDisplays();
 	}
 
 

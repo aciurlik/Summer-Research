@@ -692,7 +692,7 @@ public class Driver{
 
 	/**
 	 * A highly used method.
-	 * Whenever there is a scheudling error, like classes overlapping,
+	 * Whenever there is a scheduling error, like classes overlapping,
 	 * this method is called. The user is asked whether we should ignore
 	 * the error. If the user overrides the error,
 	 *  this method returns true, otherwise false.
@@ -851,7 +851,7 @@ public class Driver{
 
 
 	
-	public String parseIntoReadable(String s){
+	public static String parseIntoReadable(String s){
 		String instruct = "";
 		ArrayList<String> matchList = new ArrayList<String>();
 		Pattern regex = Pattern.compile("(.{1,70}(?:\\s|$))|(.{0,70})", Pattern.DOTALL);
