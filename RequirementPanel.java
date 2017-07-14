@@ -131,8 +131,10 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
 		//if(!m.major.name.equals("GER")){
-		String toolTipText = req.getDisplayString();
-		// 
+		String toolTipText = req.getDisplayString(); 
+		if(toolTipText.length() > 60){
+			toolTipText = req.shortString(60);
+		}
 		shown.setToolTipText(toolTipText);
 		//}
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
