@@ -930,34 +930,59 @@ public class Schedule implements java.io.Serializable {
 
 	
 	/**
-	 * Assumes that you will add r, but that this particular drag of r
-	 * is not yet in allElements.
+	 * Check if adding r to the schedule would implicitly assume
+	 * some kind of optimal future behavior on the user's part.
+	 * 
+	 * In this particular method, it checks if r is an 'at least' requirement,
+	 * like "5 of A-Z with at least 3 of A-K." If, when we drag r into the schedule,
+	 * the only course that could be taken to further the completion of r is in the
+	 * subset (A-K is a subset of A-Z), then we're subtly requiring the user to
+	 * take an A-K class when they're seeing a different requirement in the schedule.
+	 * 
+	 * This method assumes that r
+	 * is not yet in getAllElementsSorted().
 	 * @param r
 	 * @return
 	 */
 	public boolean checkOptimismError(Requirement r){
+		if(r.storedIsComplete()){
+			return false;
+		}
 		//If adding this requirement to the schedule would entail a leap of faith
 		ArrayList<Requirement> pairs = r.atLeastRequirementPairs();
 		if(pairs.isEmpty()){
 			return false;
 		}
-		ArrayList<ScheduleElement> allCurrentElements = this.getAllElementsSorted();
 		Requirement superset = pairs.get(0);
 		Requirement subset = pairs.get(1);
-		System.out.println("1");
+		ArrayList<ScheduleElement> allCurrentElements = this.getAllElementsSorted();
+		
+		//First, if subset is already complete then we're not
+		// assuming any optimal behavior - we're just scheduling a
+		// superset-only course.
+		if(subset.isComplete(allCurrentElements, false)){
+			//We've already completed subset, so r isn't making the schedule
+			// assume any optimal behavior. 
+			return false;
+		}
+		
+		
+		//At this point, we know that r has at least one subsetOnly course to schedule.
+		//The next test checks if adding r would force us take a subset-only course,
+		// or if we might get away by just taking a superset-only course.
+		//replace instances of r with instances of superset so that the call to 
+		//minMoreNeeded will work.
+		for(int i = 0; i < allCurrentElements.size() ; i ++){
+			if(r.equals(allCurrentElements.get(i))){
+				allCurrentElements.set(i,  superset);
+			}
+		}
 		if(superset.minMoreNeeded(allCurrentElements, false) > subset.getOriginalNumberNeeded()){
 			//We still need more classes to fill out superset-only, so we can 
 			// pretend that this requirement stands for a member of superset
 			// rather than standing for a member of subset-only.
 			return false;
 		}
-		System.out.println("2");
-		if(subset.isComplete(allCurrentElements, false)){
-			//We've already completed subset, so r isn't making the schedule
-			// assume any optimal behavior. 
-			return false;
-		}
-		System.out.println("3");
 
 		//We are now left with only one possibility:
 		// The only class that this requirement could count for is
@@ -1058,7 +1083,6 @@ public class Schedule implements java.io.Serializable {
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
 			}
-
 		}
 		r.updateAllStoredValues(satisficers);
 	}
@@ -1155,14 +1179,16 @@ public class Schedule implements java.io.Serializable {
 		if(prereqs.size() > 0){
 			Major prereqsM = new Major("Prereqs");
 			prereqsM.chosenDegree = -1;
-			boolean unfulfilledPrereq = false;
+			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
 			for(Prereq p : prereqs){
 				if(!p.getRequirement().storedIsComplete()){
-					prereqsM.addRequirement(p.getRequirement());
-					unfulfilledPrereq = true;
+					uniquePrereqs.add(p.getRequirement());
 				}
 			}
-			if(unfulfilledPrereq){
+			for(Requirement r : uniquePrereqs){
+				prereqsM.addRequirement(r);
+			}
+			if(uniquePrereqs.size() > 0){
 				result.add(prereqsM);
 			}
 		}
