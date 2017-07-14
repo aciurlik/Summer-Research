@@ -6,16 +6,11 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
 /**
- * 
- * @author drivers, aciurlik
  * This is a static class that will hold and filter an ArrayList of courses. 
  *
  */
 
 public class CourseList implements java.io.Serializable  {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	//Numbering is dependent on the difficulty of completing the GERs associated with this degree type
 	//The higher the number the more classes are needed and therefore if there are two majors of different degree types
@@ -24,10 +19,9 @@ public class CourseList implements java.io.Serializable  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
-	public static final int defaultCreditHours =4;
-
-
-
+	
+	
+	public static final int defaultCreditHours = 4;
 	public static final boolean nwAndNwlAreOne = true; //for Dr. Bouzarth
 
 
@@ -47,15 +41,6 @@ public class CourseList implements java.io.Serializable  {
 
 	public static void testList(){
 	}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -378,7 +363,7 @@ public class CourseList implements java.io.Serializable  {
 				// double dip numbers (if double dip numbers exist).
 				// and to set the name of the requirement based on the key.
 
-				
+
 				//Default stuff:
 				Requirement r = new Requirement();
 				r.setName(key);
@@ -431,7 +416,7 @@ public class CourseList implements java.io.Serializable  {
 						}
 						includeDefaultPrefixes = false;
 						break;
-					//Add the NWL requirements to the NW requirements.
+						//Add the NWL requirements to the NW requirements.
 					case CourseList.BA:
 						newNumToChoose = 2;
 					case BM:
@@ -466,19 +451,24 @@ public class CourseList implements java.io.Serializable  {
 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
-		
+
 		//Put NW and NWL at the end (will be before WC and NW).
 		Requirement nwl = m.getRequirement("NWL");
 		Requirement nw = m.getRequirement("NW");
 		m.removeRequirement(nw);
 		m.removeRequirement(nwl);
 		if(nwAndNwlAreOne){
-			Requirement nwnwl = new Requirement();
-			nwnwl.addRequirement(nw);
-			nwnwl.addRequirement(nwl);
-			nwnwl.setNumToChoose(2);
-			nwnwl.setName("NW/NWL");
-			m.addRequirement(nwnwl);
+			if(majorType == BM){
+				m.addRequirement(nw);
+			}
+			else{
+				Requirement nwnwl = new Requirement();
+				nwnwl.addRequirement(nw);
+				nwnwl.addRequirement(nwl);
+				nwnwl.setNumToChoose(2);
+				nwnwl.setName("NW/NWL");
+				m.addRequirement(nwnwl);
+			}
 		}
 		else{
 			m.addRequirement(nw);
@@ -499,7 +489,7 @@ public class CourseList implements java.io.Serializable  {
 		m.setChosenDegree(majorType);
 		return m;
 	}
-	
+
 	public static boolean isNW(Prefix p){
 		return GERRequirements.get("NW").contains(p);
 	}
@@ -507,7 +497,7 @@ public class CourseList implements java.io.Serializable  {
 		return GERRequirements.get("NWL").contains(p);
 	}
 
-	
+
 	/*
 	 * When this method is used, the user can't see which courses
 	 * satisfy the NW requirement and which courses satisfy the NWL requirement.
@@ -577,7 +567,7 @@ public class CourseList implements java.io.Serializable  {
 			throw new RuntimeException("Tried to get a NW requirement for major type " + majorType);
 		}
 	}
-	*/
+	 */
 
 	public static Requirement FYWRequirement(){
 		Requirement result = new Requirement();
@@ -787,7 +777,7 @@ public class CourseList implements java.io.Serializable  {
 		}
 		return result;
 	}
-	
+
 	public static void setPrereqMeaning(String theirString, String ourString){
 		savedPrereqMeanings.put(theirString, ourString);
 		FileHandler.savePrereqMeanings();

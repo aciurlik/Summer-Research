@@ -67,8 +67,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.numToChoose = numToChoose;
 		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
-	
-	
+
+
 	/////////////////////////
 	/////////////////////////
 	////Getters and setters
@@ -101,7 +101,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return storedNumberLeft;
 	}
-	
+
 	/**
 	 * Return the number needed - may be a number of courses or a number of
 	 * credit hours.
@@ -110,7 +110,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public int storedNumberLeft(){
 		return this.storedNumberLeft;
 	}
-	
+
 	public boolean usesCreditHours(){
 		return usesCreditHours;
 	}
@@ -127,7 +127,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public String getName() {
 		return this.name;
 	}
-	
+
 
 	public int getCreditHours() {
 		if(this.isTerminal()){
@@ -137,7 +137,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return defaultCreditHours;
 		}
 	}
-	
+
 	public ArrayList<SemesterDate> getScheduledSemester() {
 		return scheduledSemester;
 	}
@@ -146,9 +146,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public void addScheduledSemester(SemesterDate toAdd) {
 		scheduledSemester.add(toAdd);
 	}
-	
-	
-	
+
+
+
 	/**
 	 * recalculate how many courses it would take to complete this requirement
 	 * if you started over from scratch.
@@ -157,7 +157,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		int result = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
 		this.originalNumberNeeded = result;
 	}
-	
+
 	/**
 	 * Return an estimate of the number of courses originally needed,
 	 * assuming each course is 4 credit hours.
@@ -336,7 +336,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @param taken
 	 * @return
 	 */
-	
+
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
 		if(this.usesCreditHours){
 			int result = numToChoose;
@@ -377,10 +377,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			ArrayList<Integer> otherNums = new ArrayList<Integer>();
 
 			for(Requirement r : choices){
-				otherNums.add(r.minMoreNeeded(taken));
+				
+					otherNums.add(r.minMoreNeeded(taken));
+				
 			}
+
 			Collections.sort(otherNums);
-			
+
 			//Special case for requirements of the form
 			// "5 of these, at least 3 like this"
 			// These will always have 2 to choose, and
@@ -420,31 +423,35 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			int result = 0;
 			for(int i = 0; i < numToChoose ; i ++){
-				result += otherNums.get(i);
-			}
-
-			return result;
+			
+					result += otherNums.get(i);
+				
 		}
+
+		return result;
 	}
-	
-	
-	public boolean isAtLeastRequirement(){
-		return !atLeastRequirementPairs().isEmpty();
-	}
-	/**
-	 * Check if this requirement looks like
-	 * "5 of A-Z, at least 3 of A-K". 
-	 * If it is, put the superset in result.get(0)
-	 * and put the subset in result.get(1)
-	 * Otherwise return an empty array list.
-	 * @return
-	 */
-	public ArrayList<Requirement> atLeastRequirementPairs(){
-		if(this.numToChoose == 2 && this.choices.size() == 2){
-			ArrayList<Requirement> choices = new ArrayList<Requirement>();
-			for(Requirement r : this.choices){
-				choices.add(r);
-			}
+}
+
+
+public boolean isAtLeastRequirement(){
+	return !atLeastRequirementPairs().isEmpty();
+}
+/**
+ * Check if this requirement looks like
+ * "5 of A-Z, at least 3 of A-K". 
+ * If it is, put the superset in result.get(0)
+ * and put the subset in result.get(1)
+ * Otherwise return an empty array list.
+ * @return
+ */
+public ArrayList<Requirement> atLeastRequirementPairs(){
+	if(this.numToChoose == 2 && this.choices.size() == 2){
+		ArrayList<Requirement> choices = new ArrayList<Requirement>();
+		for(Requirement r : this.choices){
+			choices.add(r);
+		}
+		
+
 			if(choices.get(0).isSubset(choices.get(1))){
 				// 0 is a subset of 1
 				Requirement holder = choices.get(0);
@@ -452,785 +459,799 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				choices.set(1, holder);
 				return choices;
 			}
+
 			else if(choices.get(1).isSubset(choices.get(0))){
 				//1 is a subset of 0
 				return choices;
 			}
 		}
-		return new ArrayList<Requirement>();
+	
+
+	return new ArrayList<Requirement>();
+}
+
+
+
+public boolean isTerminal(){
+	if(this.choices.size() != 1){
+		return false;
 	}
+	if(this.numToChoose != 1){
+		return false;
+	}
+	for(Requirement r : choices){
+		return r.isTerminal();
+	}
+	return false;
+}
+public TerminalRequirement getTerminal(){
+	for(Requirement r : choices){
+		return r.getTerminal();
+	}
+	return null;
+}
 
 
-
-	public boolean isTerminal(){
-		if(this.choices.size() != 1){
-			return false;
+/**
+ * Note - this method is used by TerminalRequirement.
+ * @param e
+ * @return
+ */
+public boolean isSatisfiedBy(ScheduleElement e) {
+	if(e instanceof Requirement){
+		Requirement r = (Requirement)e;
+		if (r.isTerminal()){
+			if (r.getTerminal().alsoCompletes(this)){
+				return true;
+			}
 		}
-		if(this.numToChoose != 1){
-			return false;
-		}
-		for(Requirement r : choices){
-			return r.isTerminal();
+		else if(r.equals(this)){
+			return true;
 		}
 		return false;
 	}
-	public TerminalRequirement getTerminal(){
-		for(Requirement r : choices){
-			return r.getTerminal();
-		}
-		return null;
+	else{
+		return isSatisfiedBy(e.getPrefix());
 	}
+}
 
-	
-	/**
-	 * Note - this method is used by TerminalRequirement.
-	 * @param e
-	 * @return
-	 */
-	public boolean isSatisfiedBy(ScheduleElement e) {
-		if(e instanceof Requirement){
-			Requirement r = (Requirement)e;
-			if (r.isTerminal()){
-				if (r.getTerminal().alsoCompletes(this)){
-					return true;
-				}
-			}
-			else if(r.equals(this)){
-				return true;
-			}
+//INFINITELOOPHAZARD
+/**
+ * See if this prefix could ever possibly help this 
+ * requirement become more satisfied.
+ * 
+ * Formally, this is equivalent to checking if
+ *   minMoreNeeded(emptyset) > minMoreNeeded({p})
+ * @param p
+ * @return
+ */
+public boolean isSatisfiedBy(Prefix p){
+	for(Requirement r : this.choices){
+		if(r.isSatisfiedBy(p)){
+			return true;
+		}
+	}
+	return false;
+}
+@Override
+public boolean equals(Object o){
+	if(!(o instanceof Requirement)){
+		return false;
+	}
+	return equals((Requirement)o);
+}
+
+//INFINITELOOPHAZARD
+public boolean equals(Requirement r){
+	if(r==null){
+		return false;
+	}
+	if(r instanceof TerminalRequirement){
+		if(this.isTerminal()){
+			return this.getTerminal().equals(r);
+		}
+		return false;
+	}
+	if(r.numToChoose != this.numToChoose){
+		return false;
+	}
+	//check that this contains that and that contains this.
+	for(Requirement choice : choices){
+		if(!r.choices.contains(choice)){
+			return false;
+		}
+	}
+	for(Requirement choice : r.choices){
+		if(!this.choices.contains(choice)){
+			return false;
+		}
+	}
+	//check for names being equal
+	if(this.name != null && !this.name.equals(r.name)){
+		return false;
+	}
+	if(r.name != null && !r.name.equals(this.name)){
+		return false;
+	}
+	return true;
+}
+
+//INFINITELOOPHAZARD
+@Override
+public int hashCode(){
+	int total = 0;
+	for(Requirement r : choices){
+		total += r.hashCode();
+	}
+	return total;
+}
+
+
+
+
+
+
+/**
+ * Ensure that all stored values (storedIsComplete(), storedPercentComplete(), storedMinMoreNeeded())
+ * reflect the values that would be returned based on this taken set
+ * i.e. unless overwritten storedIsComplete() will return the same value as isComplete(taken).
+ * @param taken
+ */
+public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
+	this.minMoreNeeded(taken, true);
+}
+
+
+
+
+
+//////////////////////////////////////
+//////////////////////////////////////
+/////alsoCompletes methods
+//////////////////////////////////////
+//////////////////////////////////////
+
+
+/**
+ * Check (while avoiding large computation times)
+ * whether this requirement is obviously a subset of 
+ * the other requirement. Only handles the case where
+ * this is a list of terminals and other is also a list of
+ * terminals
+ * @param other
+ * @return
+ */
+public boolean isSubset(Requirement other){
+
+	//build the set of the other's terminal requirements
+	HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
+	for(Requirement r : other.choices){
+		if(!r.isTerminal()){
 			return false;
 		}
 		else{
-			return isSatisfiedBy(e.getPrefix());
+			othersSubreqs.add(r.getTerminal());
 		}
 	}
-	
-	//INFINITELOOPHAZARD
-	/**
-	 * See if this prefix could ever possibly help this 
-	 * requirement become more satisfied.
-	 * 
-	 * Formally, this is equivalent to checking if
-	 *   minMoreNeeded(emptyset) > minMoreNeeded({p})
-	 * @param p
-	 * @return
-	 */
-	public boolean isSatisfiedBy(Prefix p){
+	//build the set of this's terminal requirements
+	HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
+	if(this.isTerminal()){
+		thisSubreqs.add(this.getTerminal());
+	}
+	else{
 		for(Requirement r : this.choices){
-			if(r.isSatisfiedBy(p)){
-				return true;
-			}
-		}
-		return false;
-	}
-	@Override
-	public boolean equals(Object o){
-		if(!(o instanceof Requirement)){
-			return false;
-		}
-		return equals((Requirement)o);
-	}
-
-	//INFINITELOOPHAZARD
-	public boolean equals(Requirement r){
-		if(r==null){
-			return false;
-		}
-		if(r instanceof TerminalRequirement){
-			if(this.isTerminal()){
-				return this.getTerminal().equals(r);
-			}
-			return false;
-		}
-		if(r.numToChoose != this.numToChoose){
-			return false;
-		}
-		//check that this contains that and that contains this.
-		for(Requirement choice : choices){
-			if(!r.choices.contains(choice)){
-				return false;
-			}
-		}
-		for(Requirement choice : r.choices){
-			if(!this.choices.contains(choice)){
-				return false;
-			}
-		}
-		//check for names being equal
-		if(this.name != null && !this.name.equals(r.name)){
-			return false;
-		}
-		if(r.name != null && !r.name.equals(this.name)){
-			return false;
-		}
-		return true;
-	}
-
-	//INFINITELOOPHAZARD
-	@Override
-	public int hashCode(){
-		int total = 0;
-		for(Requirement r : choices){
-			total += r.hashCode();
-		}
-		return total;
-	}
-	
-	
-	
-	
-
-
-	/**
-	 * Ensure that all stored values (storedIsComplete(), storedPercentComplete(), storedMinMoreNeeded())
-	 * reflect the values that would be returned based on this taken set
-	 * i.e. unless overwritten storedIsComplete() will return the same value as isComplete(taken).
-	 * @param taken
-	 */
-	public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
-		this.minMoreNeeded(taken, true);
-	}
-
-
-
-
-
-	//////////////////////////////////////
-	//////////////////////////////////////
-	/////alsoCompletes methods
-	//////////////////////////////////////
-	//////////////////////////////////////
-
-	
-	/**
-	 * Check (while avoiding large computation times)
-	 * whether this requirement is obviously a subset of 
-	 * the other requirement. Only handles the case where
-	 * this is a list of terminals and other is also a list of
-	 * terminals
-	 * @param other
-	 * @return
-	 */
-	public boolean isSubset(Requirement other){
-		
-		//build the set of the other's terminal requirements
-		HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
-		for(Requirement r : other.choices){
 			if(!r.isTerminal()){
 				return false;
 			}
 			else{
-				othersSubreqs.add(r.getTerminal());
+				thisSubreqs.add(r.getTerminal());
 			}
-		}
-		//build the set of this's terminal requirements
-		HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
-		if(this.isTerminal()){
-			thisSubreqs.add(this.getTerminal());
-		}
-		else{
-			for(Requirement r : this.choices){
-				if(!r.isTerminal()){
-					return false;
-				}
-				else{
-					thisSubreqs.add(r.getTerminal());
-				}
-			}
-		}
-		return othersSubreqs.containsAll(thisSubreqs);
-	}
-
-
-	//INFINITELOOPHAZARD
-			/**
-			 * Return true if each strategy for completing this requirement
-			 * will also complete r.
-			 * Currently does not handle credit hours requirements.
-			 * 
-			 * This method is a brute force method and takes 
-			 * extreme amounts of time - it is currently restricted to
-			 * take at most 50- 60 milliseconds and then quit 
-			 * 	(if it times out, it may give an incorrect response).
-			 * 
-			 * TODO WARNING - CompletionSetsIter has a bug. It should be
-			 * returning an ArrayList of terminal requirements rather than a
-			 * hash set (if a requirement has 2 instances of the same terminal requirement,
-			 *  then this method may display incorrect behavior). However, this
-			 *  bug makes the method much faster and the method is only incorrect in
-			 *  a few cases, so it may be worth leaving it as is...
-			 * @param r
-			 * @return
-			 */
-			public boolean alsoCompletes(Requirement r){
-				if(this.equals(r)){
-					return true;
-				}
-				if(!RequirementGraph.doesPlayNice(this, r)){
-					return false;
-				}
-				//This method can take a very long time due to
-				// the extreme number of ways to 
-				long start = System.currentTimeMillis();
-				CompletionSetsIter csi = new CompletionSetsIter(this);
-				while(csi.hasNext()){
-					HashSet<TerminalRequirement> nextCompletionSet = csi.next();
-					//System.out.println(nextCompletionSet);
-					if(!r.isCompletedBy(nextCompletionSet)){
-						return false;
-					}
-					if(System.currentTimeMillis() - start > 50){
-						return false;
-					}
-				}
-				return true;
-			}
-
-		//INFINITELOOPHAZARD
-		/**
-		 * Check if this set of terminal requirements fully completes this
-		 * requirement. 
-		 * 
-		 * formally, (with bad notation,) returns true if minMoreNeeded(s) <= 0.
-		 * 
-		 * This is contrasted from isSatisfiedBy(), which only
-		 * checks to see if one individual object might help this requirements
-		 * out. 
-		 * @param s
-		 * @return
-		 */
-		public boolean isCompletedBy(HashSet<TerminalRequirement> s){
-			int numSubComplete = 0;
-			for(Requirement r : choices){
-				if(r.isCompletedBy(s)){
-					numSubComplete ++;
-					if(numSubComplete >= numToChoose){
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
-	/**
-	 * This class iterates over a requirement's possible completion sets.
-	 * Each completion set is a set of terminal requirements.
-	 * @author dannyrivers
-	 *
-	 */
-	private class CompletionSetsIter implements Iterator<HashSet<TerminalRequirement>>{
-		SizedPowerSetsIter<Requirement> iter;
-		ArrayList<Requirement> workingSetOfRequirementsToChoose;
-		ArrayList<CompletionSetsIter> subIters;
-		boolean isTerminal;
-		boolean start;
-		public CompletionSetsIter(Requirement r){
-
-			if(r instanceof TerminalRequirement){
-				start = true;
-				isTerminal = true;
-				workingSetOfRequirementsToChoose = new ArrayList<Requirement>();
-				workingSetOfRequirementsToChoose.add(r);
-			}
-			else{
-				isTerminal = false;
-				this.iter = new SizedPowerSetsIter<Requirement> (r.choices, r.numToChoose);
-				subIters = new ArrayList<CompletionSetsIter>(r.numToChoose);
-				for(int i = 0; i < r.numToChoose ; i ++){
-					subIters.add(null);
-				}
-				refreshSubiters();
-				start = true;
-			}
-		}
-		@Override
-		public boolean hasNext() {
-			if(start){
-				return true;
-			}
-			if(isTerminal){
-				return false;
-			}
-			if(!iter.hasNext()){
-				return nextSubiterToIncrement() == -1;
-			}
-			else{
-				return true;
-			}
-		}
-		@Override
-		public HashSet<TerminalRequirement> next() {
-			if(start){
-				start = false;
-				return fullSet();
-			}
-			if(isTerminal){
-				HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
-				result.add((TerminalRequirement)workingSetOfRequirementsToChoose.get(0));
-				return result;
-			}
-			int nextToIncrement = nextSubiterToIncrement();
-			if(nextToIncrement == -1){
-				//We've finished this working set of requirements, time 
-				// to make a new one.
-				refreshSubiters();
-				return fullSet();
-
-			}
-			else{
-				//increment the next subiter, while restarting any
-				// subiter above it in the list
-				subIters.get(nextToIncrement).next();
-				for(int i = nextToIncrement - 1 ; i >= 0 ; i --){
-					subIters.set(i, new CompletionSetsIter(workingSetOfRequirementsToChoose.get(i)));
-				}
-				return fullSet();
-			}
-		}
-
-		private void refreshSubiters(){
-			workingSetOfRequirementsToChoose = new ArrayList<Requirement>(iter.next());
-			//System.out.println(workingSetOfRequirementsToChoose);
-			for(int i = 0; i < workingSetOfRequirementsToChoose.size() ; i ++){
-				Requirement chosenReq = workingSetOfRequirementsToChoose.get(i);
-				//System.out.println(chosenReq instanceof TerminalRequirement);
-				CompletionSetsIter newIter = new CompletionSetsIter(chosenReq);
-				subIters.set(i,newIter);
-			}
-		}
-		//If we think of each subiter as on its own row,
-		// with the first subiter on the top row,
-		// find the first subiter that does have a next.
-		private int nextSubiterToIncrement(){
-			for(int i = 0 ; i <subIters.size(); i ++){
-				if(subIters.get(i) == null){
-					return -1;
-				}
-				if(subIters.get(i).hasNext()){
-					return i;
-				}
-			}
-			return -1;
-		}
-		/**
-		 * Returns one full set of terminal requirements without changing
-		 * any state of the iter.
-		 * @return
-		 */
-		public HashSet<TerminalRequirement> fullSet(){
-			HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
-			if(isTerminal){
-				TerminalRequirement thisReq = (TerminalRequirement)workingSetOfRequirementsToChoose.get(0);
-				result.add(thisReq);
-				return result;
-			}
-			for(CompletionSetsIter csi : subIters){
-				result.addAll(csi.fullSet());
-			}
-			return result;
-		}
-		@Override
-		public void remove() {
 		}
 	}
+	return othersSubreqs.containsAll(thisSubreqs);
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/////////////////////////////////
-	/////////////////////////////////
-	///// CompareTo 
-	/////////////////////////////////
-	/////////////////////////////////
-
-
-
-
-	@Override
-	/**
-	 * This comparison method is used to sort a 
-	 * requirementList displayed to the user.
-	 */
-	public int compareTo(Requirement o) {
-		if(! (o instanceof Requirement)){
-			//Requirements are greater than terminalRequirements.
-			return 1;
-		}
-		Requirement other = (Requirement)o;
-		//first compare based on whether they're complete, completed coming later
-		if(this.storedNumberLeft <= 0 && !(other.storedNumberLeft <= 0)){
-			return 1;
-		}
-		if(!(this.storedNumberLeft <= 0) && other.storedNumberLeft <= 0){
-			return -1;
-		}
-
-		//Then compare based on % complete
-		double percentDifference = this.storedPercentComplete() - other.storedPercentComplete();
-		if(percentDifference < tolerance){
-			return -1;
-		}
-		if(percentDifference > tolerance){
-			return 1;
-		}
-
-		//Then compare based on number to choose
-		int numChooseDifference = this.numToChoose - other.numToChoose;
-		if(numChooseDifference != 0){
-			return numChooseDifference;
-		}
-
-
-		//then compare based on prefixes.
-		// first number of prefixes, then containment.
-		if(this.choices.size() != other.choices.size()){
-			return this.choices.size() - other.choices.size();
-		}
-
-		// check if this is contained in that.
-		// if not, return that it's greater. 
-		// Note that this ruins the total ordering property, 
-		// two requirements can be greater than each other.
-		//TODO add containment check
-
-
-		//TODO add check for exact equality
-		return 0;
-
+//INFINITELOOPHAZARD
+/**
+ * Return true if each strategy for completing this requirement
+ * will also complete r.
+ * Currently does not handle credit hours requirements.
+ * 
+ * This method is a brute force method and takes 
+ * extreme amounts of time - it is currently restricted to
+ * take at most 50- 60 milliseconds and then quit 
+ * 	(if it times out, it may give an incorrect response).
+ * 
+ * TODO WARNING - CompletionSetsIter has a bug. It should be
+ * returning an ArrayList of terminal requirements rather than a
+ * hash set (if a requirement has 2 instances of the same terminal requirement,
+ *  then this method may display incorrect behavior). However, this
+ *  bug makes the method much faster and the method is only incorrect in
+ *  a few cases, so it may be worth leaving it as is...
+ * @param r
+ * @return
+ */
+public boolean alsoCompletes(Requirement r){
+	if(this.equals(r)){
+		return true;
 	}
-
-	/////////////////////////////////
-	/////////////////////////////////
-	/////Methods from ScheduleElement
-	/////////////////////////////////
-	/////////////////////////////////
-
-	@Override
-	public Prefix getPrefix() {
-		return null;
-	}
-
-
-	@Override
-	public boolean isDuplicate(ScheduleElement other) {
+	if(!RequirementGraph.doesPlayNice(this, r)){
 		return false;
 	}
-
-	@Override
-	public String getDisplayString() {
-		if(this.name != null){
-			return this.name;
+	//This method can take a very long time due to
+	// the extreme number of ways to 
+	long start = System.currentTimeMillis();
+	CompletionSetsIter csi = new CompletionSetsIter(this);
+	while(csi.hasNext()){
+		HashSet<TerminalRequirement> nextCompletionSet = csi.next();
+		//System.out.println(nextCompletionSet);
+		if(!r.isCompletedBy(nextCompletionSet)){
+			return false;
 		}
-		String result = this.saveString();
-		if(this.numToChoose == 1 && this.choices.size() == 1){
-			result = result.substring(6, result.length() - 1);
+		if(System.currentTimeMillis() - start > 50){
+			return false;
+		}
+	}
+	return true;
+}
+
+//INFINITELOOPHAZARD
+/**
+ * Check if this set of terminal requirements fully completes this
+ * requirement. 
+ * 
+ * formally, (with bad notation,) returns true if minMoreNeeded(s) <= 0.
+ * 
+ * This is contrasted from isSatisfiedBy(), which only
+ * checks to see if one individual object might help this requirements
+ * out. 
+ * @param s
+ * @return
+ */
+public boolean isCompletedBy(HashSet<TerminalRequirement> s){
+	int numSubComplete = 0;
+	for(Requirement r : choices){
+		if(r.isCompletedBy(s)){
+			numSubComplete ++;
+			if(numSubComplete >= numToChoose){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * This class iterates over a requirement's possible completion sets.
+ * Each completion set is a set of terminal requirements.
+ * @author dannyrivers
+ *
+ */
+private class CompletionSetsIter implements Iterator<HashSet<TerminalRequirement>>{
+	SizedPowerSetsIter<Requirement> iter;
+	ArrayList<Requirement> workingSetOfRequirementsToChoose;
+	ArrayList<CompletionSetsIter> subIters;
+	boolean isTerminal;
+	boolean start;
+	public CompletionSetsIter(Requirement r){
+
+		if(r instanceof TerminalRequirement){
+			start = true;
+			isTerminal = true;
+			workingSetOfRequirementsToChoose = new ArrayList<Requirement>();
+			workingSetOfRequirementsToChoose.add(r);
+		}
+		else{
+			isTerminal = false;
+			this.iter = new SizedPowerSetsIter<Requirement> (r.choices, r.numToChoose);
+			subIters = new ArrayList<CompletionSetsIter>(r.numToChoose);
+			for(int i = 0; i < r.numToChoose ; i ++){
+				subIters.add(null);
+			}
+			refreshSubiters();
+			start = true;
+		}
+	}
+	@Override
+	public boolean hasNext() {
+		if(start){
+			return true;
+		}
+		if(isTerminal){
+			return false;
+		}
+		if(!iter.hasNext()){
+			return nextSubiterToIncrement() == -1;
+		}
+		else{
+			return true;
+		}
+	}
+	@Override
+	public HashSet<TerminalRequirement> next() {
+		if(start){
+			start = false;
+			return fullSet();
+		}
+		if(isTerminal){
+			HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
+			result.add((TerminalRequirement)workingSetOfRequirementsToChoose.get(0));
+			return result;
+		}
+		int nextToIncrement = nextSubiterToIncrement();
+		if(nextToIncrement == -1){
+			//We've finished this working set of requirements, time 
+			// to make a new one.
+			refreshSubiters();
+			return fullSet();
+
+		}
+		else{
+			//increment the next subiter, while restarting any
+			// subiter above it in the list
+			subIters.get(nextToIncrement).next();
+			for(int i = nextToIncrement - 1 ; i >= 0 ; i --){
+				subIters.set(i, new CompletionSetsIter(workingSetOfRequirementsToChoose.get(i)));
+			}
+			return fullSet();
+		}
+	}
+
+	private void refreshSubiters(){
+		workingSetOfRequirementsToChoose = new ArrayList<Requirement>(iter.next());
+		//System.out.println(workingSetOfRequirementsToChoose);
+		for(int i = 0; i < workingSetOfRequirementsToChoose.size() ; i ++){
+			Requirement chosenReq = workingSetOfRequirementsToChoose.get(i);
+			//System.out.println(chosenReq instanceof TerminalRequirement);
+			CompletionSetsIter newIter = new CompletionSetsIter(chosenReq);
+			subIters.set(i,newIter);
+		}
+	}
+	//If we think of each subiter as on its own row,
+	// with the first subiter on the top row,
+	// find the first subiter that does have a next.
+	private int nextSubiterToIncrement(){
+		for(int i = 0 ; i <subIters.size(); i ++){
+			if(subIters.get(i) == null){
+				return -1;
+			}
+			if(subIters.get(i).hasNext()){
+				return i;
+			}
+		}
+		return -1;
+	}
+	/**
+	 * Returns one full set of terminal requirements without changing
+	 * any state of the iter.
+	 * @return
+	 */
+	public HashSet<TerminalRequirement> fullSet(){
+		HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
+		if(isTerminal){
+			TerminalRequirement thisReq = (TerminalRequirement)workingSetOfRequirementsToChoose.get(0);
+			result.add(thisReq);
+			return result;
+		}
+		for(CompletionSetsIter csi : subIters){
+			result.addAll(csi.fullSet());
 		}
 		return result;
 	}
-
 	@Override
-	public String shortString() {
-		String result = this.getDisplayString();
-		if(result.length () > 20 && this.name == null){
-			result = result.replaceAll(" ", "");
-			if(result.length() > 40){
-				result = result.substring(0, 40);
-			}
-		}
-		return result;
+	public void remove() {
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////
+/////////////////////////////////
+///// CompareTo 
+/////////////////////////////////
+/////////////////////////////////
+
+
+
+
+@Override
+/**
+ * This comparison method is used to sort a 
+ * requirementList displayed to the user.
+ */
+public int compareTo(Requirement o) {
+	if(! (o instanceof Requirement)){
+		//Requirements are greater than terminalRequirements.
+		return 1;
+	}
+	Requirement other = (Requirement)o;
+	//first compare based on whether they're complete, completed coming later
+	if(this.storedNumberLeft <= 0 && !(other.storedNumberLeft <= 0)){
+		return 1;
+	}
+	if(!(this.storedNumberLeft <= 0) && other.storedNumberLeft <= 0){
+		return -1;
+	}
+
+	//Then compare based on % complete
+	double percentDifference = this.storedPercentComplete() - other.storedPercentComplete();
+	if(percentDifference < tolerance){
+		return -1;
+	}
+	if(percentDifference > tolerance){
+		return 1;
+	}
+
+	//Then compare based on number to choose
+	int numChooseDifference = this.numToChoose - other.numToChoose;
+	if(numChooseDifference != 0){
+		return numChooseDifference;
 	}
 
 
-	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
-		if(this.isTerminal()){
-			//remove all enemies
-			ArrayList<Requirement> enemyless = new ArrayList<Requirement>();
-			for(Requirement r : reqList){
-				if(RequirementGraph.doesPlayNice(this, r)){
-					enemyless.add(r);
-				}
-			}
-			return this.getTerminal().getRequirementsFulfilled(enemyless);
+	//then compare based on prefixes.
+	// first number of prefixes, then containment.
+	if(this.choices.size() != other.choices.size()){
+		return this.choices.size() - other.choices.size();
+	}
+
+	// check if this is contained in that.
+	// if not, return that it's greater. 
+	// Note that this ruins the total ordering property, 
+	// two requirements can be greater than each other.
+	//TODO add containment check
+
+
+	//TODO add check for exact equality
+	return 0;
+
+}
+
+/////////////////////////////////
+/////////////////////////////////
+/////Methods from ScheduleElement
+/////////////////////////////////
+/////////////////////////////////
+
+@Override
+public Prefix getPrefix() {
+	return null;
+}
+
+
+@Override
+public boolean isDuplicate(ScheduleElement other) {
+	return false;
+}
+
+@Override
+public String getDisplayString() {
+	if(this.name != null){
+		return this.name;
+	}
+	String result = this.saveString();
+	if(this.numToChoose == 1 && this.choices.size() == 1){
+		result = result.substring(6, result.length() - 1);
+	}
+	return result;
+}
+
+@Override
+public String shortString() {
+	String result = this.getDisplayString();
+	if(result.length () > 20 && this.name == null){
+		result = result.replaceAll(" ", "");
+		if(result.length() > 40){
+			result = result.substring(0, 40);
 		}
-		ArrayList<Requirement> result = new ArrayList<Requirement>();
-		for(Requirement otherReq : reqList){
-			//Remove enemies as you go
-			if(RequirementGraph.doesPlayNice(otherReq, this)){
-				//Figure out if this satisfies otherReq
-				if(otherReq.equals(this)){
-					result.add(otherReq);
-				}
-				
-				/* Doesn't work - might not actually be used to complete a new
-				 * piece of otherReq, might instead be a subset of the part that is
-				 * already done.
+	}
+	return result;
+}
+
+
+@Override
+public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
+	if(this.isTerminal()){
+		//remove all enemies
+		ArrayList<Requirement> enemyless = new ArrayList<Requirement>();
+		for(Requirement r : reqList){
+			if(RequirementGraph.doesPlayNice(this, r)){
+				enemyless.add(r);
+			}
+		}
+		return this.getTerminal().getRequirementsFulfilled(enemyless);
+	}
+	ArrayList<Requirement> result = new ArrayList<Requirement>();
+	for(Requirement otherReq : reqList){
+		//Remove enemies as you go
+		if(RequirementGraph.doesPlayNice(otherReq, this)){
+			//Figure out if this satisfies otherReq
+			if(otherReq.equals(this)){
+				result.add(otherReq);
+			}
+
+			/* Doesn't work - might not actually be used to complete a new
+			 * piece of otherReq, might instead be a subset of the part that is
+			 * already done.
 				if(this.isSubset(otherReq)){
 					result.add(otherReq);
 				}
-				*/
-			}
+			 */
 		}
-		
-		return result;
 	}
 
-	@Override
-	public String toString(){
-		return this.getDisplayString();
+	return result;
+}
+
+@Override
+public String toString(){
+	return this.getDisplayString();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////
+/////////////////////////////////
+///// Saving and Reading methods
+/////////////////////////////////
+/////////////////////////////////
+
+
+
+/** REQUIREMENT SAVING AND READING TUTORIAL
+ * 
+ * The language of requirements.
+ * 
+ * All requirements are made of 2 parts:
+ * 		a number to choose
+ * 		a list of choices (some of which may themselves be requirements)
+ * 
+ * For example, the requirement 
+ * 		2 of (MTH 145, MTH 220)
+ *  	is a valid requirement. It has 2 to choose, and 
+ *  	has 2 choices, either MTH 145 or MTH 220.
+ *  	This requirement might be interpreted as
+ * 			"Take MTH 145 and MTH 220."
+ * 
+ * In general, to differentiate between 'or' and 'and', just change 
+ * 		the number to choose.
+ * 		2 of (MTH 145, MTH 220) --> means MTH 145 and MTH 220
+ * 		1 of (MTH 145, MTH 220) --> means MTH 145 or MTH 220
+ * 
+ * Requirements may be nested, for example
+ * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
+ * 		Commas and parenthesis differentiate between different levels of requirements
+ * 
+ * Notice that impossible requirements may be written down, for example
+ * 		2 of (MTH 110)
+ * 		cannot logically be satisfied.
+ * 
+ * We may omit the number to choose if desired. In this case, it defaults to one. 
+ * 		(MTH 140, MTH 110)
+ * 			is the same as
+ * 		1 of (MTH 140, MTH 110)
+ * 			Which might be interpreted as
+ * 		MTH 140 or MTH 110
+ * 
+ * All whitespace is ignored.
+ * 
+ * A list of choices must be enclosed in parenthesis, and
+ * must be separated by commas. The following are INVALID.
+ * 		NOT GOOD     MTH 140, MTH 110 
+ * 		Correction   (MTH 140, MTH 110)
+ * 
+ * 		NOT GOOD     1 of MTH 220
+ * 		Correction   1 of ( MTH 220      )
+ * 
+ * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
+ * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
+ * 			Which is equivalent to
+ * 				2 of (MTH 140, MTH 220, MTH 110, MTH 213)
+ * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
+ * 			Which is not equivalent to the simpler requirement.
+ * 
+ * 		NOT GOOD     1 of (MTH 140 MTH 220)
+ * 		Correction	 1 of (MTH 140, MTH 220)
+ * 			
+ * 
+ * Additionally, though it is not recommended, you may include the text
+ *   'or' before the last choice in a list of choices. This must immediately follow the comma.
+ * 		2 of (MTH 110, MTH 220,  or   MTH 330)
+ * 		This is a valid requirement.
+ * 		Saying 'or' may cause confusion for cases like this:
+ * 		3 of (MTH 110, MTH 220,  or   MTH 330)
+ * 
+ */
+
+
+
+
+//INFINITELOOPHAZARD
+/**
+ * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
+ * Make a save string for this requirement.
+ * It should be unambiguous for any reader to see what this requirement is.
+ * @return
+ */
+public String saveString(){
+
+	//Add the prefix
+	StringBuilder result = new StringBuilder();
+	result.append(numToChoose);
+	if(this.usesCreditHours){
+		result.append(" ch");
 	}
+	result.append(" of (");
+	//Add the guts of this requirement - each sub-requirement
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/////////////////////////////////
-	/////////////////////////////////
-	///// Saving and Reading methods
-	/////////////////////////////////
-	/////////////////////////////////
-
-
-
-	/** REQUIREMENT SAVING AND READING TUTORIAL
-	 * 
-	 * The language of requirements.
-	 * 
-	 * All requirements are made of 2 parts:
-	 * 		a number to choose
-	 * 		a list of choices (some of which may themselves be requirements)
-	 * 
-	 * For example, the requirement 
-	 * 		2 of (MTH 145, MTH 220)
-	 *  	is a valid requirement. It has 2 to choose, and 
-	 *  	has 2 choices, either MTH 145 or MTH 220.
-	 *  	This requirement might be interpreted as
-	 * 			"Take MTH 145 and MTH 220."
-	 * 
-	 * In general, to differentiate between 'or' and 'and', just change 
-	 * 		the number to choose.
-	 * 		2 of (MTH 145, MTH 220) --> means MTH 145 and MTH 220
-	 * 		1 of (MTH 145, MTH 220) --> means MTH 145 or MTH 220
-	 * 
-	 * Requirements may be nested, for example
-	 * 		2 of (MTH 140, 1 of (MTH 110, MTH 220), 1 of (MTH 100))
-	 * 		Commas and parenthesis differentiate between different levels of requirements
-	 * 
-	 * Notice that impossible requirements may be written down, for example
-	 * 		2 of (MTH 110)
-	 * 		cannot logically be satisfied.
-	 * 
-	 * We may omit the number to choose if desired. In this case, it defaults to one. 
-	 * 		(MTH 140, MTH 110)
-	 * 			is the same as
-	 * 		1 of (MTH 140, MTH 110)
-	 * 			Which might be interpreted as
-	 * 		MTH 140 or MTH 110
-	 * 
-	 * All whitespace is ignored.
-	 * 
-	 * A list of choices must be enclosed in parenthesis, and
-	 * must be separated by commas. The following are INVALID.
-	 * 		NOT GOOD     MTH 140, MTH 110 
-	 * 		Correction   (MTH 140, MTH 110)
-	 * 
-	 * 		NOT GOOD     1 of MTH 220
-	 * 		Correction   1 of ( MTH 220      )
-	 * 
-	 * 		NOT GOOD     2 of (MTH 140, 1 of MTH 220, MTH 110, MTH 213)
-	 * 		Correction   2 of (MTH 140, 1 of (MTH 220), MTH 110, MTH 213)
-	 * 			Which is equivalent to
-	 * 				2 of (MTH 140, MTH 220, MTH 110, MTH 213)
-	 * 		Alternate    2 of (MTH 140, 1 of (MTH 220, MTH 110), MTH 213)
-	 * 			Which is not equivalent to the simpler requirement.
-	 * 
-	 * 		NOT GOOD     1 of (MTH 140 MTH 220)
-	 * 		Correction	 1 of (MTH 140, MTH 220)
-	 * 			
-	 * 
-	 * Additionally, though it is not recommended, you may include the text
-	 *   'or' before the last choice in a list of choices. This must immediately follow the comma.
-	 * 		2 of (MTH 110, MTH 220,  or   MTH 330)
-	 * 		This is a valid requirement.
-	 * 		Saying 'or' may cause confusion for cases like this:
-	 * 		3 of (MTH 110, MTH 220,  or   MTH 330)
-	 * 
-	 */
-
-
-
-
-	//INFINITELOOPHAZARD
-	/**
-	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
-	 * Make a save string for this requirement.
-	 * It should be unambiguous for any reader to see what this requirement is.
-	 * @return
-	 */
-	public String saveString(){
-
-		//Add the prefix
-		StringBuilder result = new StringBuilder();
-		result.append(numToChoose);
-		if(this.usesCreditHours){
-			result.append(" ch");
-		}
-		result.append(" of (");
-		//Add the guts of this requirement - each sub-requirement
-
-
-		//handle the first n-2 requirements
-		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
-		Collections.sort(choiceList);
-		for(int i = 0; i < choiceList.size() - 2 ; i ++){
-			result.append(choiceList.get(i).saveString());
-			result.append(", ");
-		}
-		//handle the last 2 requirements (may have 0, 1, or 2 last ones
-		//  depending on the number of choices.)
-		if(choiceList.size() > 2){
-			result.append(choiceList.get(choiceList.size() - 2).saveString());
-			//result.append(", or ");
-			result.append(", ");
-			result.append(choiceList.get(choiceList.size() - 1).saveString());
-		}
-		else if (choiceList.size() == 2){
-			result.append(choiceList.get(choiceList.size() - 2).saveString());
-			result.append(", ");
-			result.append(choiceList.get(choiceList.size() - 1).saveString());
-		}
-		else if(choiceList.size() == 1){
-			result.append(choiceList.get(0).saveString());
-		}
-		else{ //choiceList.size() == 0
-			return "()";
-		}
-		result.append(")");
-		return result.toString();
+	//handle the first n-2 requirements
+	ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
+	Collections.sort(choiceList);
+	for(int i = 0; i < choiceList.size() - 2 ; i ++){
+		result.append(choiceList.get(i).saveString());
+		result.append(", ");
 	}
-	
-	
-	public String examineRequirementString(){
-		StringBuilder result = new StringBuilder();
-		result.append(
-				    "This text shows, in as much detail as possible, how this requirement works. "
-				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
-				+ "\nwebsite for another explanation of the requirement."
-				+ "\n\n");
-		if(this.numToChoose != 1 && this.numToChoose == this.choices.size()){
-			//And requirement
-			ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
-			if(possiblePairs.size() != 0){
-				Requirement superset = possiblePairs.get(0);
-				Requirement subset = possiblePairs.get(1);
-				result.append(superset.saveString());
-				result.append("with at least ");
-				if(this.name.equals("NW/NWL")){
-					//Special case for lab - "At least 1 lab from ()"
-					String normal = subset.saveString();
-					result.append("1 lab from " + normal.substring(normal.indexOf("(")));
-				}
-				else{
-					result.append(subset.saveString());
-				}
+	//handle the last 2 requirements (may have 0, 1, or 2 last ones
+	//  depending on the number of choices.)
+	if(choiceList.size() > 2){
+		result.append(choiceList.get(choiceList.size() - 2).saveString());
+		//result.append(", or ");
+		result.append(", ");
+		result.append(choiceList.get(choiceList.size() - 1).saveString());
+	}
+	else if (choiceList.size() == 2){
+		result.append(choiceList.get(choiceList.size() - 2).saveString());
+		result.append(", ");
+		result.append(choiceList.get(choiceList.size() - 1).saveString());
+	}
+	else if(choiceList.size() == 1){
+		result.append(choiceList.get(0).saveString());
+	}
+	else{ //choiceList.size() == 0
+		return "()";
+	}
+	result.append(")");
+	return result.toString();
+}
+
+
+public String examineRequirementString(){
+	StringBuilder result = new StringBuilder();
+	result.append(
+			"This text shows, in as much detail as possible, how this requirement works. "
+					+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
+					+ "\nwebsite for another explanation of the requirement."
+					+ "\n\n");
+	if(this.numToChoose != 1 && this.numToChoose == this.choices.size()){
+		//And requirement
+		ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
+		if(possiblePairs.size() != 0){
+			Requirement superset = possiblePairs.get(0);
+			Requirement subset = possiblePairs.get(1);
+			result.append(superset.saveString());
+			result.append("with at least ");
+			if(this.name.equals("NW/NWL")){
+				//Special case for lab - "At least 1 lab from ()"
+				String normal = subset.saveString();
+				result.append("1 lab from " + normal.substring(normal.indexOf("(")));
 			}
 			else{
-				String normalString = saveString();
-				String humanFriendly = "All of " + normalString.substring(
-						normalString.indexOf("("));
-				if(this.numToChoose == 2){
-					humanFriendly = "Both of " + normalString.substring(
-							normalString.indexOf("("));
-				}
-				result.append(humanFriendly);
+				result.append(subset.saveString());
 			}
 		}
 		else{
-			result.append(saveString());
-		}
-		return indent(result.toString(), 80, "   ");
-	}
-	
-	/**
-	 * Turn the save string of this requirement into something you might
-	 * see from eclipse, with nice spacing and a limit on line length.
-	 * @return
-	 */
-	public String coderString(){
-		String tab = "  ";
-		int maxLineLength = 40;
-		return indent(this.saveString(), maxLineLength, tab);
-	}
-	
-	
-	/**
-	 * Indents using default ( and ) as open and closing parens.
-	 * @param s
-	 * @param maxLineLength
-	 * @param tab
-	 * @return
-	 */
-	public String indent(String s, int maxLineLength, String tab){
-		HashSet<Character> openParens = new HashSet<Character>();
-		openParens.add('(');
-		HashSet<Character> closeParens = new HashSet<Character>();
-		closeParens.add(')');
-		return indent(s, maxLineLength, tab, openParens, closeParens);
-	}
-	/**
-	 * Indent this string as if it were written by a coder or eclipse,
-	 * based on parenthesis.
-	 * @param s
-	 */
-	public String indent(String s, int maxLineLength, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
-		StringBuilder result = new StringBuilder();
-		int depth = 0;
-		int lineLength = 0;
-		for(char c : s.toCharArray()){
-			lineLength ++;
-			if(openParens.contains(c)){
-				depth ++;
-				result.append(c);
-				result.append("\n");
-				lineLength = depth * tab.length();
-				for(int i = 0; i < depth ; i ++){
-					result.append(tab);
-				}
+			String normalString = saveString();
+			String humanFriendly = "All of " + normalString.substring(
+					normalString.indexOf("("));
+			if(this.numToChoose == 2){
+				humanFriendly = "Both of " + normalString.substring(
+						normalString.indexOf("("));
 			}
-			else if(closeParens.contains(c)){
-				depth --;
-				result.append("\n");
-				for(int i = 0; i < depth; i ++){
-					result.append(tab);
-				}
-				result.append(c);
+			result.append(humanFriendly);
+		}
+	}
+	else{
+		result.append(saveString());
+	}
+	return indent(result.toString(), 80, "   ");
+}
+
+/**
+ * Turn the save string of this requirement into something you might
+ * see from eclipse, with nice spacing and a limit on line length.
+ * @return
+ */
+public String coderString(){
+	String tab = "  ";
+	int maxLineLength = 40;
+	return indent(this.saveString(), maxLineLength, tab);
+}
+
+
+/**
+ * Indents using default ( and ) as open and closing parens.
+ * @param s
+ * @param maxLineLength
+ * @param tab
+ * @return
+ */
+public String indent(String s, int maxLineLength, String tab){
+	HashSet<Character> openParens = new HashSet<Character>();
+	openParens.add('(');
+	HashSet<Character> closeParens = new HashSet<Character>();
+	closeParens.add(')');
+	return indent(s, maxLineLength, tab, openParens, closeParens);
+}
+/**
+ * Indent this string as if it were written by a coder or eclipse,
+ * based on parenthesis.
+ * @param s
+ */
+public String indent(String s, int maxLineLength, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
+	StringBuilder result = new StringBuilder();
+	int depth = 0;
+	int lineLength = 0;
+	for(char c : s.toCharArray()){
+		lineLength ++;
+		if(openParens.contains(c)){
+			depth ++;
+			result.append(c);
+			result.append("\n");
+			lineLength = depth * tab.length();
+			for(int i = 0; i < depth ; i ++){
+				result.append(tab);
+			}
+		}
+		else if(closeParens.contains(c)){
+			depth --;
+			result.append("\n");
+			for(int i = 0; i < depth; i ++){
+				result.append(tab);
+			}
+			result.append(c);
+			result.append("\n");
+			for(int i = 0; i < depth ; i ++){
+				result.append(tab);
+			}
+			lineLength = depth * tab.length();
+		}
+		else{
+			if(c == '\n'){
+				lineLength = 0;
+			}
+			if(lineLength > maxLineLength && c == ' '){
 				result.append("\n");
 				for(int i = 0; i < depth ; i ++){
 					result.append(tab);
@@ -1238,279 +1259,268 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				lineLength = depth * tab.length();
 			}
 			else{
-				if(c == '\n'){
-					lineLength = 0;
-				}
-				if(lineLength > maxLineLength && c == ' '){
-					result.append("\n");
-					for(int i = 0; i < depth ; i ++){
-						result.append(tab);
-					}
-					lineLength = depth * tab.length();
-				}
-				else{
-					result.append(c);
-				}
+				result.append(c);
 			}
 		}
-		return result.toString();
+	}
+	return result.toString();
+}
+
+//INFINITELOOPHAZARD
+/**
+ * see the REQUIREMENT SAVING AND READING TUTORIAL in the Requirement Class.
+ * Read this requirement from such a string.
+ * @param saveString
+ * @return
+ */
+public static Requirement readFrom(String saveString){
+	Stack<String> tokens = tokenize(saveString);
+	Requirement result = parse(tokens);
+	result.recalcOriginalNumberNeeded();
+	if(!tokens.isEmpty()){
+		throw new RuntimeException("End of string while parsing requirement");
+	}
+	return result;
+
+}
+
+public static Stack<String> tokenize(String s){
+	//Tokens are: 
+	// '(' 
+	// ')' 
+	// '[0-9]+of' 
+	// ',[or]*'
+	// a terminal requirement's save string
+
+	//remove all whitespace.
+	s = s.replaceAll("\\s", "");
+	//Add whitespace around tokens (we'll split on whitespace in a sec)
+	s = s.replaceAll("\\(", " ( ");
+	s = s.replaceAll("\\)", " ) ");
+	s = s.replaceAll(",[or]*", " , ");
+	// If you see the string "6of", replace it with "6of ".
+	// Hopefully all other replaces will handle the space before the
+	// first digit of the number (a parenthesis or comma should precede that digit).
+	s = s.replaceAll("(?<=[0-9])of", "of ");
+	s = s.replaceAll("(?<=[0-9])chof", "chof ");
+	s = s.trim();
+
+	Stack<String> reversed = new Stack<String>();
+	for(String token : s.split("\\s+")){
+		reversed.push(token);
 	}
 
-	//INFINITELOOPHAZARD
-	/**
-	 * see the REQUIREMENT SAVING AND READING TUTORIAL in the Requirement Class.
-	 * Read this requirement from such a string.
-	 * @param saveString
-	 * @return
-	 */
-	public static Requirement readFrom(String saveString){
-		Stack<String> tokens = tokenize(saveString);
-		Requirement result = parse(tokens);
-		result.recalcOriginalNumberNeeded();
-		if(!tokens.isEmpty()){
-			throw new RuntimeException("End of string while parsing requirement");
-		}
-		return result;
-
+	//Reverse the stack so that the first character comes out first.
+	Stack<String> result = new Stack<String>();
+	while(!reversed.isEmpty()){
+		String t = reversed.pop();
+		result.push(t);
 	}
 
-	public static Stack<String> tokenize(String s){
-		//Tokens are: 
-		// '(' 
-		// ')' 
-		// '[0-9]+of' 
-		// ',[or]*'
-		// a terminal requirement's save string
+	return result;
 
-		//remove all whitespace.
-		s = s.replaceAll("\\s", "");
-		//Add whitespace around tokens (we'll split on whitespace in a sec)
-		s = s.replaceAll("\\(", " ( ");
-		s = s.replaceAll("\\)", " ) ");
-		s = s.replaceAll(",[or]*", " , ");
-		// If you see the string "6of", replace it with "6of ".
-		// Hopefully all other replaces will handle the space before the
-		// first digit of the number (a parenthesis or comma should precede that digit).
-		s = s.replaceAll("(?<=[0-9])of", "of ");
-		s = s.replaceAll("(?<=[0-9])chof", "chof ");
-		s = s.trim();
+}
 
-		Stack<String> reversed = new Stack<String>();
-		for(String token : s.split("\\s+")){
-			reversed.push(token);
-		}
-
-		//Reverse the stack so that the first character comes out first.
-		Stack<String> result = new Stack<String>();
-		while(!reversed.isEmpty()){
-			String t = reversed.pop();
-			result.push(t);
-		}
-
-		return result;
-
-	}
-
-	public static Requirement parse(Stack<String> tokens){
-		String next = tokens.pop();
-		if(next.equals("(")){
-			Requirement result = new Requirement();
-			result.numToChoose = 1;
-			do{
-				result.addRequirement(parse(tokens));
-				if(tokens.isEmpty()){
-					throw new RuntimeException("Missing ) while parsing requirement");
-				}
-				next = tokens.pop();
-			}while(next.equals(","));
-			if(!next.equals(")")){
+public static Requirement parse(Stack<String> tokens){
+	String next = tokens.pop();
+	if(next.equals("(")){
+		Requirement result = new Requirement();
+		result.numToChoose = 1;
+		do{
+			result.addRequirement(parse(tokens));
+			if(tokens.isEmpty()){
 				throw new RuntimeException("Missing ) while parsing requirement");
 			}
-			return result;
+			next = tokens.pop();
+		}while(next.equals(","));
+		if(!next.equals(")")){
+			throw new RuntimeException("Missing ) while parsing requirement");
 		}
-		else if(next.matches("[0-9]+of")){
-			int numToChoose = Integer.parseInt(
-					next.substring(0, next.length() - 2));
-			Requirement temp = parse(tokens);
-			if(! (temp instanceof Requirement)){
-				throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
-			}
-			Requirement result = (Requirement)temp;
-			result.numToChoose = numToChoose;
-			return result;
-		}
-		else if(next.matches("[0-9]+chof")){
-			int numToChoose = Integer.parseInt(
-					next.substring(0, next.length() - 4));
-			Requirement temp = parse(tokens);
-			if(! (temp instanceof Requirement)){
-				throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
-			}
-			Requirement result = (Requirement)temp;
-			result.numToChoose = numToChoose;
-			result.usesCreditHours = true;
-			return result;
-		}
-		else{
-			return TerminalRequirement.readFrom(next);
-		}
+		return result;
 	}
-
-	/**
-	 * Example inputs:
-	 * 
-	 *  "ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340"
-	 *  "ACC-111, ECN-111 or 225, MTH-141 or 150"
-	 *  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
-	 *  
-	 *  This method has to be very careful because syntax might be
-	 *  department dependent. The above examples show a clear syntax,
-	 *  but it's not clear that all strings following that syntax are
-	 *  definitely what they seem. 
-	 *  
-	 *  
-	 *  
-	 * @param furmanString
-	 * @return
-	 */
-	public static Requirement readFromFurmanPrereqs(String furmanString){
-		if(furmanString.matches("\\w\\w\\w\\-\\w\\w\\w")){
-			return Requirement.readFrom("(" + furmanString + ")");
+	else if(next.matches("[0-9]+of")){
+		int numToChoose = Integer.parseInt(
+				next.substring(0, next.length() - 2));
+		Requirement temp = parse(tokens);
+		if(! (temp instanceof Requirement)){
+			throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
 		}
-		else{
-			throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
-		}
+		Requirement result = (Requirement)temp;
+		result.numToChoose = numToChoose;
+		return result;
 	}
+	else if(next.matches("[0-9]+chof")){
+		int numToChoose = Integer.parseInt(
+				next.substring(0, next.length() - 4));
+		Requirement temp = parse(tokens);
+		if(! (temp instanceof Requirement)){
+			throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
+		}
+		Requirement result = (Requirement)temp;
+		result.numToChoose = numToChoose;
+		result.usesCreditHours = true;
+		return result;
+	}
+	else{
+		return TerminalRequirement.readFrom(next);
+	}
+}
+
+/**
+ * Example inputs:
+ * 
+ *  "ECN-111 and MTH-141 or MTH-150 and ECN-225, MTH-241 or MTH-340"
+ *  "ACC-111, ECN-111 or 225, MTH-141 or 150"
+ *  "CSC-105, BIO-111, CHM-110, EES-110, EES-112, EES-113, MTH-141, MTH-150, or PHY-111"
+ *  
+ *  This method has to be very careful because syntax might be
+ *  department dependent. The above examples show a clear syntax,
+ *  but it's not clear that all strings following that syntax are
+ *  definitely what they seem. 
+ *  
+ *  
+ *  
+ * @param furmanString
+ * @return
+ */
+public static Requirement readFromFurmanPrereqs(String furmanString){
+	if(furmanString.matches("\\w\\w\\w\\-\\w\\w\\w")){
+		return Requirement.readFrom("(" + furmanString + ")");
+	}
+	else{
+		throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
+	}
+}
 
 
 
-	public static void testAlsoCompletes(){
-		String[] tests = new String[]{
-				"(MTH-110)", // 1, 2
-				"2 of (MTH-110, 2 of (MTH 120, MTH 130))",  //0, 2
-				"3 of (MTH-110, MTH 120, MTH 130)", //0, 1
-				"4 of (MTH-100, MTH-200, MTH-300, MTH-400, MTH-500)", //4
-				"3 of (MTH-100, MTH-200, MTH-300, MTH-400)", //3
-				"3 of (1 of (MTH-1, MTH-2, MTH-3, MTH-4), MTH-200, MTH-300, MTH-400)",//6, 7
-				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400)",//5, 7
-				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400, 1 of (MTH-1, MTH-4))"//5, 6
+public static void testAlsoCompletes(){
+	String[] tests = new String[]{
+			"(MTH-110)", // 1, 2
+			"2 of (MTH-110, 2 of (MTH 120, MTH 130))",  //0, 2
+			"3 of (MTH-110, MTH 120, MTH 130)", //0, 1
+			"4 of (MTH-100, MTH-200, MTH-300, MTH-400, MTH-500)", //4
+			"3 of (MTH-100, MTH-200, MTH-300, MTH-400)", //3
+			"3 of (1 of (MTH-1, MTH-2, MTH-3, MTH-4), MTH-200, MTH-300, MTH-400)",//6, 7
+			"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400)",//5, 7
+			"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400, 1 of (MTH-1, MTH-4))"//5, 6
 
-		};
-		int[][] matchups = new int[][]
-				{
-			{0,1, 2},
-			{0,1, 2},
-			{0,1, 2},
-			{4},
-			{3},
-			{6, 7},
-			{5, 7},
-			{5, 6}
-				};
+	};
+	int[][] matchups = new int[][]
+			{
+		{0,1, 2},
+		{0,1, 2},
+		{0,1, 2},
+		{4},
+		{3},
+		{6, 7},
+		{5, 7},
+		{5, 6}
+			};
 
 
-				for(int i = 0; i < matchups.length ; i ++){
-					Requirement r = Requirement.readFrom(tests[i]);
-					for(int j : matchups[i]){
-						Requirement t = Requirement.readFrom(tests[j]);
-						boolean forward = r.alsoCompletes(t);
-						//boolean backward = t.alsoCompletes(r);
-						System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
-					}
+			for(int i = 0; i < matchups.length ; i ++){
+				Requirement r = Requirement.readFrom(tests[i]);
+				for(int j : matchups[i]){
+					Requirement t = Requirement.readFrom(tests[j]);
+					boolean forward = r.alsoCompletes(t);
+					//boolean backward = t.alsoCompletes(r);
+					System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
 				}
+			}
 
+}
+
+public static void testReading(){
+	String[] tests = new String[]{
+			"(MTH 110)",
+			//"(MTH-110)",
+			"MTH110",
+			//"MTH-110",
+			//"MTH 110",
+			"2 of (MTH 110, MTH 120, MTH 130)",
+			"2 of (MTH-110, MTH 120, MTH 130)",
+			"2 of (ACC-110, MTH 120, MTH 130)",
+			"2 of (MTH-110, MTH 120, or MTH 130)",
+			"2 of (MTH 110, (MTH 120), (MTH 130))",
+			"2 of (MTH 110, (MTH 120, MTH 130))",
+			"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+			"3 of (MTH 110, MTH 120, MTH 130)",
+			"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
+			"2 of (BIO 110, BIO 112, BIO 120)",
+			"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
+			"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+
+			"2 ch of (MTH-110, MTH-120, MTH-130)",
+			"2 chof (MTH-110, MTH-120, MTH-130)",
+			"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
+			"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
+			"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+			"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)"
+
+	};
+
+	ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
+
+	//takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
+	//takens.add(TerminalRequirement.readFrom("MTH-110"));
+	takens.add(Requirement.readFrom("(MTH-110)"));
+	//takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
+	//takens.add(TerminalRequirement.readFrom("MTH-120"));
+	takens.add(Requirement.readFrom("(MTH-120)"));
+
+	System.out.print("Taken prefixes: ");
+	for(ScheduleElement p : takens){
+		System.out.print(p + " ");
 	}
+	System.out.println();
+	System.out.println();
 
-	public static void testReading(){
-		String[] tests = new String[]{
-				"(MTH 110)",
-				//"(MTH-110)",
-				"MTH110",
-				//"MTH-110",
-				//"MTH 110",
-				"2 of (MTH 110, MTH 120, MTH 130)",
-				"2 of (MTH-110, MTH 120, MTH 130)",
-				"2 of (ACC-110, MTH 120, MTH 130)",
-				"2 of (MTH-110, MTH 120, or MTH 130)",
-				"2 of (MTH 110, (MTH 120), (MTH 130))",
-				"2 of (MTH 110, (MTH 120, MTH 130))",
-				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
-				"3 of (MTH 110, MTH 120, MTH 130)",
-				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
-				"2 of (BIO 110, BIO 112, BIO 120)",
-				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
-				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+	Requirement previous = new Requirement();
 
-				"2 ch of (MTH-110, MTH-120, MTH-130)",
-				"2 chof (MTH-110, MTH-120, MTH-130)",
-				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
-				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
-				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
-				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)"
+	for(String toRead : tests){
+		boolean needsToBeShown = false;
+		Requirement r = Requirement.readFrom(toRead);
+		boolean equalToLast = r.equals(previous);
+		previous = r;
+		boolean complete = r.isComplete(takens, true);
+		double percentComplete = r.percentComplete(takens, true);
+		int minLeft = r.minMoreNeeded(takens, true);
 
-		};
-
-		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
-
-		//takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
-		//takens.add(TerminalRequirement.readFrom("MTH-110"));
-		takens.add(Requirement.readFrom("(MTH-110)"));
-		//takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
-		//takens.add(TerminalRequirement.readFrom("MTH-120"));
-		takens.add(Requirement.readFrom("(MTH-120)"));
-
-		System.out.print("Taken prefixes: ");
-		for(ScheduleElement p : takens){
-			System.out.print(p + " ");
-		}
-		System.out.println();
-		System.out.println();
-
-		Requirement previous = new Requirement();
-
-		for(String toRead : tests){
-			boolean needsToBeShown = false;
-			Requirement r = Requirement.readFrom(toRead);
-			boolean equalToLast = r.equals(previous);
-			previous = r;
-			boolean complete = r.isComplete(takens, true);
-			double percentComplete = r.percentComplete(takens, true);
-			int minLeft = r.minMoreNeeded(takens, true);
-
-			double tol = Double.MIN_VALUE * 10000;
-			if(r.storedIsComplete() != complete){
-				needsToBeShown = true;
-			}
-			if(r.storedPercentComplete() != percentComplete){
-				needsToBeShown = true;
-			}
-
+		double tol = Double.MIN_VALUE * 10000;
+		if(r.storedIsComplete() != complete){
 			needsToBeShown = true;
-
-
-			if(needsToBeShown){
-				//System.out.println("ReadingFrom \"" +toRead + "\"");
-				System.out.println("    got \"" + r.saveString() + "\"");
-				System.out.println("Equal to last?" + equalToLast);
-				//System.out.println("Uses CH? " + r.usesCreditHours);
-				System.out.println("Complete?" + complete );
-				//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());
-				//System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
-				System.out.println(r.numToChoose);
-				System.out.println();
-			}
-
 		}
-		System.out.println("Finished testing");
+		if(r.storedPercentComplete() != percentComplete){
+			needsToBeShown = true;
+		}
+
+		needsToBeShown = true;
+
+
+		if(needsToBeShown){
+			//System.out.println("ReadingFrom \"" +toRead + "\"");
+			System.out.println("    got \"" + r.saveString() + "\"");
+			System.out.println("Equal to last?" + equalToLast);
+			//System.out.println("Uses CH? " + r.usesCreditHours);
+			System.out.println("Complete?" + complete );
+			//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());
+			//System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
+			System.out.println(r.numToChoose);
+			System.out.println();
+		}
+
 	}
+	System.out.println("Finished testing");
+}
 
 
-	
 
 
-	public static void main(String[] args){
-		testReading();
-	}
+
+public static void main(String[] args){
+	testReading();
+}
 
 
 

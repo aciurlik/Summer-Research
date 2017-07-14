@@ -28,7 +28,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	public Requirement req;
-	public Driver d;
+	public ScheduleGUI d;
 	int percentComplete;
 	JLabel shown;
 	MajorPanel m;
@@ -36,7 +36,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
-	public RequirementPanel(Requirement req, Driver d, MajorPanel m){
+	public RequirementPanel(Requirement req, ScheduleGUI d, MajorPanel m){
 		super();
 		this.req = req;
 		this.d = d;
@@ -51,7 +51,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				if(e.isPopupTrigger()){
+				if(SwingUtilities.isRightMouseButton(e)){
 					showPopup(e);
 					return;
 				}

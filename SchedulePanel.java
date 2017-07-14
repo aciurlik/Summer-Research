@@ -43,14 +43,14 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	public String reqsText = "Requirements Left: ";
 	public ArrayList<SemesterPanel> allSemesterPanels;
 	int insetsWidth = 5;
-	Driver d;
+	ScheduleGUI d;
 	int Count=1;
 
 
 
 
 
-	public SchedulePanel(Schedule sch, Driver d) {
+	public SchedulePanel(Schedule sch, ScheduleGUI d) {
 
 		super();
 

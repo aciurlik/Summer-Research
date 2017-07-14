@@ -2,8 +2,6 @@ import java.awt.BorderLayout;
 
 import java.awt.Color;
 
-import java.awt.Dimension;
-
 import java.awt.event.ActionEvent;
 
 import java.awt.event.ActionListener;
@@ -40,7 +38,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 	String gerChoice;
 
-	Driver d;
+	ScheduleGUI d;
 
 	Course c;
 
@@ -80,7 +78,8 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 
 
-	public SupriseMe(Schedule sch, Semester s, Driver d, String gerChoice){
+	public SupriseMe(Schedule sch, Semester s, ScheduleGUI d, String gerChoice){
+
 
 		super();
 		this.gerChoice=gerChoice;
@@ -130,98 +129,71 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 		}
 		if(gerChoice != null){
 			almostReady = CourseList.getCoursesIn(s);
-			getReady = CourseList.onlyThoseSatisfying(almostReady, sch.getGER().getRequirement(gerChoice));
-
-			if(getReady.size()>0){
-
-				Random rand = new Random();
 
 
 
-				c = getReady.get(rand.nextInt(getReady.size()));
+			Random rand = new Random();
 
-				ScheduleCourse cc = new ScheduleCourse(c, sch);
+			if(s.semesterDate.sNumber != (SemesterDate.MAYX)){
 
-				String string = cc.supriseString();
+				getReady = CourseList.onlyThoseSatisfying(almostReady, sch.getGER().getRequirement(gerChoice));
+				if(getReady.size()>0){
+					c = getReady.get(rand.nextInt(getReady.size()));
+				}
+				else{
+					ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 
-	
-				tokens = string.split(delims);
+					JOptionPane.showMessageDialog(frame, "There are no classes in this semester that satisfy the " + gerChoice + " requirement ", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+
+					return;
+				}
+
 
 			}
 			else{
-				ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 
-				JOptionPane.showMessageDialog(frame, "There are no classes in this semester that satisfy the " + gerChoice + " requirement ", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+				c=almostReady.get(rand.nextInt(almostReady.size()));
 
-				return;
 			}
 
+			ScheduleCourse cc = new ScheduleCourse(c, sch);
+
+			String string = cc.supriseString();
+
+
+			tokens = string.split(delims);
 		}
 
 
 
 
-			this.setLayout(new BorderLayout());
-
-			//this.setPreferredSize(new Dimension(500, 500));
-
-			this.setBackground(FurmanOfficial.darkPurple);
-
-			JLabel suprise = new JLabel("FEELING LUCKY?", JLabel.CENTER);
 
 
+		this.setLayout(new BorderLayout());
 
-			suprise.setFont(FurmanOfficial.bigHeaderFont);
+		//this.setPreferredSize(new Dimension(500, 500));
 
-			suprise.setForeground(Color.white);
+		this.setBackground(FurmanOfficial.darkPurple);
 
-			this.add(suprise, BorderLayout.NORTH);
+		JLabel suprise = new JLabel("FEELING LUCKY?", JLabel.CENTER);
 
 
 
-			newCourse = new JPanel();
+		suprise.setFont(FurmanOfficial.bigHeaderFont);
 
-			newCourse.setBackground(FurmanOfficial.grey);
+		suprise.setForeground(Color.white);
 
-			//	newCourse.setPreferredSize(new Dimension(300, 300));
-
-			this.add(newCourse, BorderLayout.CENTER);
+		this.add(suprise, BorderLayout.NORTH);
 
 
 
+		newCourse = new JPanel();
 
+		newCourse.setBackground(FurmanOfficial.grey);
 
+		//	newCourse.setPreferredSize(new Dimension(300, 300));
 
-
-			takeIt = new JPanel();
-
-			takeIt.setBackground(this.getBackground());
-
-			doIt = new JButton("Take the Challenge!");
-
-			doIt.setActionCommand(MenuOptions.Challenge);
-
-			doIt.addActionListener(this);
-
-			takeIt.add(doIt);
-
-
-			cancel = new JButton("Cancel");
-			cancel.setActionCommand(MenuOptions.Cancel);
-			cancel.addActionListener(this);
-
-
-			tryAgain.setActionCommand(MenuOptions.tryAgain);
-
-			tryAgain.addActionListener(this);
-
-
-
-
-
-			this.add(takeIt, BorderLayout.SOUTH);
-
-			//sup = new JLabel(c.toString());
+		this.add(newCourse, BorderLayout.CENTER);
 
 
 
@@ -229,28 +201,64 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 
 
-			frame.add(this);
+		takeIt = new JPanel();
 
-			frame.pack();
+		takeIt.setBackground(this.getBackground());
 
-			this.revalidate();
+		doIt = new JButton("Take the Challenge!");
 
-			this.repaint();
+		doIt.setActionCommand(MenuOptions.Challenge);
 
-			frame.revalidate();
+		doIt.addActionListener(this);
 
-			frame.repaint();
-
-			frame.setVisible(true);
+		takeIt.add(doIt);
 
 
+		cancel = new JButton("Cancel");
+		cancel.setActionCommand(MenuOptions.Cancel);
+		cancel.addActionListener(this);
 
-		}
+
+		tryAgain.setActionCommand(MenuOptions.tryAgain);
+
+		tryAgain.addActionListener(this);
 
 
 
 
-	
+
+		this.add(takeIt, BorderLayout.SOUTH);
+
+		//sup = new JLabel(c.toString());
+
+
+
+
+
+
+
+		frame.add(this);
+
+		frame.pack();
+
+		this.revalidate();
+
+		this.repaint();
+
+		frame.revalidate();
+
+		frame.repaint();
+
+		frame.setVisible(true);
+
+
+
+	}
+
+
+
+
+
 
 
 

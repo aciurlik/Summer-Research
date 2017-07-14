@@ -93,7 +93,7 @@ public class SemesterDate implements java.io.Serializable {
 	}
 
 	
-	public String getSeason(int p){
+	public static String getSeason(int p){
 		String[] season = {null, "Spring", "MayX", "Summer Session One", "Summer Session Two", "Fall", "Other"};
 		return season[p];
 	}
