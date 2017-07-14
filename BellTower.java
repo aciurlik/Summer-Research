@@ -91,7 +91,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 			if(!wasComplete){
 				wasComplete=true;
 				if(sch.checkAllErrors().isEmpty()){
-					JOptionPane.showMessageDialog(null, endPicturePanel , "Congrats on having your life put together", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, endPicturePanel , "Congradulations on having a complete, error free schedule!", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else{
 					JOptionPane.showMessageDialog(null, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.d.icon);

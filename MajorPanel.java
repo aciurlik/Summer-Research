@@ -18,14 +18,14 @@ import javax.swing.border.MatteBorder;
 public class MajorPanel extends JPanel {
 	
 	public  Major major;
-	public Driver d;
+	public ScheduleGUI d;
 
 	JPanel top;
 	JPanel bottom;
 	int nimbusWidth = 40;
 	int nibusHeight = 20;
 
-	public MajorPanel(Major m, Driver d){
+	public MajorPanel(Major m, ScheduleGUI d){
 		super();
 		this.d=d;
 		this.major = m;

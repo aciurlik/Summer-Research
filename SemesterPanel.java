@@ -38,7 +38,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	JPanel hidePanel;
 	JLabel fallSpring;
 	JButton deleteSemesterButton;
-	Driver d;
+	ScheduleGUI d;
 	Semester sem;
 	final static int height=300;
 	JTextArea notes;
@@ -52,7 +52,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 
 
-	public SemesterPanel(Semester sem, Driver d){
+	public SemesterPanel(Semester sem, ScheduleGUI d){
 
 		//Sets up the panel that will hold one semester
 		super();

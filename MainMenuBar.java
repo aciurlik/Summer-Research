@@ -34,10 +34,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 	private static final long serialVersionUID = 1L;
 	JTextArea output;
 	JScrollPane scrollPane;
-	Driver d;
+	ScheduleGUI d;
 
 
-	public MainMenuBar(Driver d) {
+	public MainMenuBar(ScheduleGUI d) {
 		super();
 		this.d=d;
 		JMenu menu, submenu;
@@ -49,10 +49,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		//Create the menu bar.
 
 
-		menu = new JMenu("The Furman Advantage");
-		submenu = new JMenu("MayX");
-
-
+		menu = new JMenu(MenuOptions.FurmanAdvantage);
+		
+		
+		submenu = new JMenu(MenuOptions.MayX);
 		menuItem = new JMenuItem(MenuOptions.exploreMayX);
 		JPopupMenu exploreMayXPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
@@ -69,7 +69,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menu.add(submenu);
 
 
-		submenu = new JMenu("Study Abroad");
+		submenu = new JMenu(MenuOptions.StudyAbroad);
 
 		menuItem = new JMenuItem(MenuOptions.exploreStudyAway);
 		JPopupMenu exploreStudyAway = new JPopupMenu();
@@ -88,7 +88,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 
-		menuItem = new JMenuItem(MenuOptions.addInternship);
+		menuItem = new JMenuItem(MenuOptions.exploreInternship);
 		JPopupMenu exploreInternship = new JPopupMenu();
 		menuItem.addActionListener(this);
 		exploreInternship.add(menuItem);
@@ -101,11 +101,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		//Build the file menu-> Add/Save Schedule
-		menu = new JMenu("File");
+		menu = new JMenu(MenuOptions.file);
 		this.add(menu);
 
 
-		menuItem = new JMenuItem("New Schedule",
+		menuItem = new JMenuItem(MenuOptions.newSchedule,
 				KeyEvent.VK_T);
 		JPopupMenu newSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
@@ -121,7 +121,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 
-		menuItem = new JMenuItem("Save Schedule");
+		menuItem = new JMenuItem(MenuOptions.saveSchedule);
 		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
 		menuItem.addActionListener(this);
 		saveSched.add(menuItem);
@@ -129,20 +129,20 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 
-		menuItem = new JMenuItem("Print Schedule");
+		menuItem = new JMenuItem(MenuOptions.printSchedule);
 		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
 		menuItem.addActionListener(this);
 		printSched.add(menuItem);
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("Delete Schedule");
+		menuItem = new JMenuItem(MenuOptions.deleteSchedule);
 		JPopupMenu deleteSched = new JPopupMenu(MenuOptions.deleteSchedule);
 		menuItem.addActionListener(this);
 		deleteSched.add(menuItem);
 		menu.add(menuItem);
 
 
-		menuItem = new JMenuItem("Check all Errors");
+		menuItem = new JMenuItem(MenuOptions.checkAllErrors);
 		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
 		menuItem.addActionListener(this);
 		allErrors.add(menuItem);
@@ -152,14 +152,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		//Build Edit menu in the menu bar.
-		menu = new JMenu("Edit");
+		menu = new JMenu(MenuOptions.Edit);
 		this.add(menu);
 		menu.setMnemonic(KeyEvent.VK_N);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"This allows edits to schedule");
 
 
-		submenu = new JMenu("Major");
+		submenu = new JMenu(MenuOptions.Major);
 		submenu.setMnemonic(KeyEvent.VK_S);
 		menuItem = new JMenuItem(MenuOptions.addMajor);
 		JPopupMenu majorPopup = new JPopupMenu();
@@ -174,7 +174,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 
-		submenu = new JMenu("Minor");
+		submenu = new JMenu(MenuOptions.Minor);
 		menuItem = new JMenuItem(MenuOptions.addMinor);
 		JPopupMenu minorPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
@@ -184,7 +184,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 		menu.add(submenu);
 
-		submenu = new JMenu("Track");
+		submenu = new JMenu(MenuOptions.Track);
 		menuItem = new JMenuItem(MenuOptions.addTrack);
 		JPopupMenu trackPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
@@ -194,11 +194,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		
 		
 
-		menu = new JMenu("Settings");
+		menu = new JMenu(MenuOptions.settings);
 		this.add(menu);
 		
-		menuItem = new JMenuItem("Change Settings");
-		menuItem.setActionCommand(MenuOptions.settings);
+		menuItem = new JMenuItem(MenuOptions.changeSettings);
+		menuItem.setActionCommand(MenuOptions.changeSettings);
 		JPopupMenu settings =new JPopupMenu();
 		settings.add(menuItem);
 		menuItem.addActionListener(this);
@@ -206,7 +206,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		
 		
 		
-		menuItem = new JMenuItem("Restore Default Settings");
+		menuItem = new JMenuItem(MenuOptions.restoreDefault);
 		menuItem.setActionCommand(MenuOptions.restoreDefault);
 		JPopupMenu restoreDefault = new JPopupMenu();
 		restoreDefault.add(menuItem);
@@ -216,7 +216,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 		
 	
-		menu = new JMenu("Help");
+		menu = new JMenu(MenuOptions.help);
 		menuItem = new JMenuItem(MenuOptions.viewStartUp);
 		menuItem.setActionCommand(MenuOptions.viewStartUp);
 		//JPopupMenu viewStartUp = new JPopupMenu(MenuOptions.viewStartUp);
@@ -260,7 +260,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.addInternship)){
+		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.exploreInternship)){
 			d.GUIOutsideLink(e.getActionCommand());
 		}
 		if(e.getActionCommand().equals(MenuOptions.addMayX)){
@@ -278,7 +278,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			d.GUINewSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.openSchedule)){
-			d.openSchedule();
+			Driver.openSchedule();
 		}
 		if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
 			d.GUISaveSchedule();
@@ -297,7 +297,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();
 		}
-		if(e.getActionCommand().equals(MenuOptions.settings)){
+		if(e.getActionCommand().equals(MenuOptions.changeSettings)){
 			FileHandler.showSetting();
 		}
 		if(e.getActionCommand().equals(MenuOptions.restoreDefault)){

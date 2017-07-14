@@ -26,7 +26,7 @@ public class Schedule implements java.io.Serializable {
 
 
 	//transient is for Serializable purposes.
-	public transient Driver d;
+	public transient ScheduleGUI d;
 	CourseList masterList;
 	private int CLP;
 	private Prefix languagePrefix;
@@ -95,7 +95,7 @@ public class Schedule implements java.io.Serializable {
 
 	}
 
-	public void setDriver(Driver d){
+	public void setDriver(ScheduleGUI d){
 		this.d = d;
 	}
 
