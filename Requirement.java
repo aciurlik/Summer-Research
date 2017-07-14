@@ -1161,7 +1161,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				+ "\nwebsite for another explanation of the requirement."
 				+ "\n\n");
 		result.append(this.getDisplayString());
-		return indent(result.toString(), 80, "   ");
+		return indent(result.toString(), "   ");
 	}
 
 
@@ -1174,8 +1174,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 */
 	public String coderString(){
 		String tab = "  ";
-		int maxLineLength = 40;
-		return indent(this.saveString(), maxLineLength, tab);
+		return indent(this.saveString(), tab);
 	}
 	
 	
@@ -1186,29 +1185,26 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @param tab
 	 * @return
 	 */
-	public String indent(String s, int maxLineLength, String tab){
+	public String indent(String s, String tab){
 		HashSet<Character> openParens = new HashSet<Character>();
 		openParens.add('(');
 		HashSet<Character> closeParens = new HashSet<Character>();
 		closeParens.add(')');
-		return indent(s, maxLineLength, tab, openParens, closeParens);
+		return indent(s, tab, openParens, closeParens);
 	}
 	/**
 	 * Indent this string as if it were written by a coder or eclipse,
 	 * based on parenthesis.
 	 * @param s
 	 */
-	public String indent(String s, int maxLineLength, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
+	public String indent(String s, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
 		StringBuilder result = new StringBuilder();
 		int depth = 0;
-		int lineLength = 0;
 		for(char c : s.toCharArray()){
-			lineLength ++;
 			if(openParens.contains(c)){
 				depth ++;
 				result.append(c);
 				result.append("\n");
-				lineLength = depth * tab.length();
 				for(int i = 0; i < depth ; i ++){
 					result.append(tab);
 				}
@@ -1224,22 +1220,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				for(int i = 0; i < depth ; i ++){
 					result.append(tab);
 				}
-				lineLength = depth * tab.length();
 			}
 			else{
-				if(c == '\n'){
-					lineLength = 0;
-				}
-				if(lineLength > maxLineLength && c == ' '){
-					result.append("\n");
-					for(int i = 0; i < depth ; i ++){
-						result.append(tab);
-					}
-					lineLength = depth * tab.length();
-				}
-				else{
-					result.append(c);
-				}
+				result.append(c);
 			}
 		}
 		return result.toString();

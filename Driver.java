@@ -71,6 +71,8 @@ public class Driver{
 	ListOfMajors l;
 	BellTower b;
 	//PrintWriter pW;
+	
+	public static int defaultPixelWidth = 300;
 
 	public static Driver testDriver(){
 		testSchedule = Schedule.testSchedule();
@@ -716,7 +718,7 @@ public class Driver{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, instruct, header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadableHTML(instruct, defaultPixelWidth), header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -757,12 +759,13 @@ public class Driver{
 		else if(e.error.equals(ScheduleError.optimisticSchedulerError)){
 			Requirement r = e.getOptimisticRequirement();
 			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
-			Requirement subset = pair.get(0);
-			result = "The requirement " + r + " must include at least " + r.indent(subset.saveString(), 40, "   ")
+			Requirement subset = pair.get(1);
+			result = "The requirement " + r.shortString(70) + " must include at least " + 
+			r.indent(subset.getDisplayString(),  "   ")
 			 + "Until you change this requirment into a course, "
 			 + "\nwe will assume that it represents one of these.";
 		}
-		result = parseIntoReadable(result);
+		result = parseIntoReadableHTML(result, defaultPixelWidth);
 		return result;
     }
 	
@@ -851,19 +854,15 @@ public class Driver{
 
 
 	
-	public static String parseIntoReadable(String s){
-		String instruct = "";
-		ArrayList<String> matchList = new ArrayList<String>();
-		Pattern regex = Pattern.compile("(.{1,70}(?:\\s|$))|(.{0,70})", Pattern.DOTALL);
-		Matcher regexMatcher = regex.matcher(s);
-		while(regexMatcher.find()){
-			matchList.add(regexMatcher.group());
-		}
-		instruct = "";
-		for(int i = 0; i<matchList.size(); i++){
-			instruct = instruct + matchList.get(i) + "\n";
-		}
-		return instruct;
+	/**
+	 * given a string, add newlines if a line ever gets beyond
+	 * maxLineLength.
+	 * @param s
+	 * @return
+	 */
+	public static String parseIntoReadableHTML(String s, int pixels){
+		s = s.replaceAll("\n", "<br />");
+		return "<html><body><p style='width: " + pixels +  "px;'>"+s +"</p></body></html>";
 	}
 
 
