@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  */
 public class PopUpChooser implements java.io.Serializable {
 	JList <Major> addList;
-	Driver d;
+	ScheduleGUI d;
 	Schedule s;
 	JFrame frame = new JFrame();
 	ArrayList <Major> displayThings;
@@ -25,7 +25,7 @@ public class PopUpChooser implements java.io.Serializable {
 
 
 
-	public PopUpChooser(String type, Driver d, Schedule s){
+	public PopUpChooser(String type, ScheduleGUI d, Schedule s){
 		//Creates the PopUp Window
 		frame = new JFrame(type);
 		this.d=d;

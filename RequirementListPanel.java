@@ -35,7 +35,7 @@ import javax.swing.border.MatteBorder;
 public class RequirementListPanel extends JPanel implements ActionListener{
 	public JScrollPane scroll;
 	public JPanel inner;
-	public Driver d;
+	public ScheduleGUI d;
 	
 
 	JPanel scrollPanel = new JPanel();
@@ -54,7 +54,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	// the layout locations handle the first few requirementpanels.
 	// it may be safely changed, so long as the last entry is at the end of a column.
 
-	public RequirementListPanel(Schedule s, Driver d){
+	public RequirementListPanel(Schedule s, ScheduleGUI d){
 		
 		//this.schedule = s;
 		this.d = d;
@@ -63,6 +63,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
 		this.inner.setBackground(Color.white);
+		inner.setPreferredSize(new Dimension(700, 150));
 		this.scroll = new  JScrollPane(inner);
 
 		this.setLayout(new BorderLayout());
@@ -70,7 +71,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	
 		//put all the requirement panels into inner.
 
-
+		
 		//scroll.setPreferredSize(new Dimension(700,150));
 		this.add(scroll, BorderLayout.CENTER);
 
@@ -120,7 +121,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = gbc.CENTER;
+		//gbc.anchor = gbc.CENTER;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;

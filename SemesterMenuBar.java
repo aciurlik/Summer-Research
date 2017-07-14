@@ -35,10 +35,7 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 		//Create the menu bar.
 
 
-		menu = new JMenu("Options");
-
-
-
+		menu = new JMenu(MenuOptions.Options);
 		menuItem = new JMenuItem(MenuOptions.addInstruct);
 		JPopupMenu addACoursePopup = new JPopupMenu();
 		menuItem.addActionListener(this);
