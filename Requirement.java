@@ -1023,9 +1023,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @return
 	 */
 	private String[] syntaxSugars(){
-		if(this.numToChoose == 1 && this.choices.size() == 2){
-			return new String[]{"either of (" , ") or (" , ")"};
-		}
 		if(this.isTerminal()){
 			return new String[]{"", ", ",""};
 		}
@@ -1035,24 +1032,59 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(this.usesCreditHours){
 			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
 		}
+		
+		//The next few cases use englishResult
+		// because they all have similar behavior with inner parenthesis.
+		// If you need to make a string like 
+		// "either of (X) or (Y)", then you use the dividers
+		// "either of (",  ") or (", ")"
+		// rather than the dividers
+		// "either of (", " or ", ")".
+		String[] englishResult = {};
+		if(this.numToChoose == 1 && this.choices.size() == 2){
+			englishResult = new String[]{"either of " , " or " , ""};
+		}
 		if(this.numToChoose != 1 && 
 				this.numToChoose == this.choices.size()){
 			if(this.numToChoose == 2){
-				return new String[]{"both of (", ") and (",  ")"};
+				englishResult =  new String[]{"both of ", " and ", ""};
 			}
 			else{
-				return new String[]{"all of (", ", ", ")"};
+				englishResult = new String[]{"all of ", ", ", ""};
 			}
 		}
+		if(englishResult.length != 0){
+			if(syntaxSugarNeedsInnerParenthesis()){
+				englishResult[0] = englishResult[0] + "(";
+				englishResult[1] = ")" + englishResult[1] + "(";
+				englishResult[2] = englishResult[2] + ")";
+			}
+			else{
+				//Not sure if these should be included in the final version
+				//englishResult[0] = englishResult[0] + "(";
+				//englishResult[2] = englishResult[2] + ")";
+			}
+			return englishResult;
+		}
+		
 		
 		//TODO remove this to speed things up, its an expensive debug check.
 		if(this.isAtLeastRequirement()){
 			throw new RuntimeException("Should not use syntax sugar method for atLeast "
-					+ "requirements - need to know subchoice order");
+					+ "requirements - they need to know subchoice order");
 		}
 		
 		//default case
 		return new String[]{numToChoose + " of (" ,", ",")"};
+	}
+	
+	private boolean syntaxSugarNeedsInnerParenthesis(){
+		for(Requirement r : choices){
+			if(!r.isTerminal()){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 
@@ -1074,42 +1106,49 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(!reqPairs.isEmpty()){
 			return reqPairs.get(1).shortString(preferredLength);
 		}
+		
+		//Now comes the actual attempt to reduce characters.
 		StringBuilder builtResult = new StringBuilder();
 		String[] sugars = syntaxSugars();
 		
+		
+		//Reduce the length of the given sugars
+		// then check if you're short enough.
 		String replacementFirst = sugars[0];
-		String replacementMid = ",";
-		String replacementEnd = ")";
-		int totalReplacementLength = 
-				replacementFirst.length()
-				+ replacementMid.length()
-				+ replacementEnd.length();
-		int totalInitialLength = 
-				sugars[0].length()
-				+ sugars[1].length()
-				+ sugars[2].length();
-
-		if(totalInitialLength > totalReplacementLength){
-			sugars[0] = replacementFirst;
-			sugars[1] = replacementMid;
-			sugars[2] = replacementEnd;
+		if(replacementFirst.contains("credit hours")){
+			replacementFirst = replacementFirst.replace("credit hours", "credits");
 		}
+		String replacementMid = ",";
+		String replacementEnd = sugars[2];
+		
+		sugars[0] = replacementFirst;
+		sugars[1] = replacementMid;
+		sugars[2] = replacementEnd;
 
-		preferredLength = preferredLength 
-				- sugars[0].length() 
-				- sugars[2].length() 
-				- (this.numToChoose - 1) * sugars[1].length();
-		int recursivePreferredLength = preferredLength / choices.size();
+		final int recursivePreferredLength = 
+				( 
+				  preferredLength 
+				  - sugars[0].length() 
+				  - sugars[2].length() 
+				  - (this.choices.size() - 1) * sugars[1].length()
+				) / choices.size();
 		recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
 				sugars[0],
 				sugars[1],
 				sugars[2]);
+		//Here's where we check if the replacements made us short enough.
+		// If we're still too long, then we can use the last resort,
+		// which doesn't write out subreqs and instead writes out
+		// 1 of (2 choices).
 		if(builtResult.length() > preferredLength){
-			String lastResort = sugars[0] + numToChoose + " choices" + sugars[2];
+			String choicesPluralOrNot = " choice";
+			if(choices.size() != 1){
+				choicesPluralOrNot += "s";
+			}
+			String lastResort = sugars[0] + choices.size() + choicesPluralOrNot + sugars[2];
 			return lastResort;
 		}
 		return builtResult.toString();
-
 	}
 	
 	///
