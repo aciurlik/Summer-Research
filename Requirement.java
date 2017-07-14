@@ -1383,6 +1383,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		Stack<String> tokens = tokenize(saveString);
 		Requirement result = parse(tokens);
 		result.recalcOriginalNumberNeeded();
+		if(result.isAtLeastRequirement()){
+			for(Requirement r : result.choices){
+				r.recalcOriginalNumberNeeded();
+			}
+		}
 		if(!tokens.isEmpty()){
 			throw new RuntimeException("End of string while parsing requirement");
 		}
