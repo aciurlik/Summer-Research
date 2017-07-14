@@ -1163,6 +1163,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	public String examineRequirementString(){
 		StringBuilder result = new StringBuilder();
+		//http://www.furman.edu/academics/academics/majorsandminors/Pages/default.aspx
 		result.append(
 				    "This text shows, in as much detail as possible, how this requirement works. "
 				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
