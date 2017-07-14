@@ -232,25 +232,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	/**
-	 * Given this ordered list of schedule elements, calculate the number
-	 * of elements that are not courses but that satisfy this requirement.
-	 * @param taken
-	 * @return
-	 */
-	private int numPlannedLater(ArrayList<ScheduleElement> taken){
-		int numPlanned = 0;
-		for(ScheduleElement s : taken){
-			if(s instanceof Requirement){
-				if(s == this || s.equals(this)){
-					numPlanned ++;
-				}
-			}
-		}
-		return numPlanned;
-	}
-
-
-	/**
 	 * Check whether this set of schedule elements completes this requirements.
 	 * If storeValue is true, this requirement will store the value it calculates
 	 * from minMoreNeeded.
@@ -293,25 +274,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @return
 	 */
 	public int minMoreNeeded(ArrayList<ScheduleElement> taken, boolean storeValue){
-		int numPlanned = numPlannedLater(taken);
-		for(int i = 0 ; i < taken.size(); i ++){
-			if(taken.get(i) instanceof Requirement){
-				Requirement r = (Requirement) taken.get(i);
-				if(r.isTerminal()){
-					taken.set(i, r.getTerminal());
-				}
-			}
-		}
-		int result =  minMoreNeeded(taken, numPlanned, storeValue);
-		return result;
-	}
-	/**
-	 * Find the minimum number of courses or credits you would need to completely
-	 * satisfy this requirement, given this set of things you've already taken.
-	 */
-	private int minMoreNeeded(ArrayList<ScheduleElement> taken, int numPlannedLater, boolean storeValue){
-		int result = minMoreNeeded(taken);
-		result = result - numPlannedLater;
+		int result =  minMoreNeeded(taken);
 		result = Math.max(result, 0);
 		if(storeValue){
 			this.storedNumberLeft = result;
@@ -327,11 +290,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * Use minMoreNeeded(taken, boolean storeValue) instead.
 	 * 
 	 * Only Requirement and Terminal requirement should use it.
+	 * 
+	 * Figure out how complete this requirement is, while ignoring
+	 * any scheduled instances of this requirement. (pay attention
+	 * to scheduled subsets of this requirement though).
 	 * @param taken
 	 * @return
 	 */
 	
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
+		if(this.isTerminal()){
+			return this.getTerminal().minMoreNeeded(taken);
+		}
 		if(this.usesCreditHours){
 			int result = numToChoose;
 			ArrayList<Requirement> completedSubreqs = new ArrayList<Requirement>();
@@ -343,20 +313,26 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 
 			for(ScheduleElement e : taken){
-				//if any of your completed subrequirements uses it, you can add its credits.
-				if(e instanceof HasCreditHours){
-					int credits = ((HasCreditHours)e).getCreditHours();
-					boolean found = false;
-					for(Requirement r : completedSubreqs){
-						if(r.isSatisfiedBy(e)){
-							found = true;
-							break;
+				//Check if you planned any instances later out
+				if(this.equals(e)){
+					result -= Requirement.defaultCreditHours;
+				}
+				else{
+					//if any of your completed subrequirements uses it, you can add its credits.
+					if(e instanceof HasCreditHours){
+						int credits = ((HasCreditHours)e).getCreditHours();
+						boolean found = false;
+						for(Requirement r : completedSubreqs){
+							if(r.isSatisfiedBy(e)){
+								found = true;
+								break;
+							}
 						}
-					}
-					if(found){
-						result -= credits;
-						if(result <= 0){
-							return 0;
+						if(found){
+							result -= credits;
+							if(result <= 0){
+								return 0;
+							}
 						}
 					}
 				}
@@ -410,11 +386,24 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				int actualFromSupersetOnly = Math.min(supersetOnly, maxFromSupersetOnly);// max(4, 2) in example
 				int totalTaken = subsetTaken + actualFromSupersetOnly; //4 total taken
 				int result = originalNeededSuperset - totalTaken; //5 - 4 = 1 more needed
+				//Check if you planned any instances later out
+				for(ScheduleElement e : taken){
+					if(this.equals(e)){
+						result --;
+					}
+				}
 				return result;
 			}
 			int result = 0;
 			for(int i = 0; i < numToChoose ; i ++){
 				result += otherNums.get(i);
+			}
+			
+			//Check if you planned any instances later out
+			for(ScheduleElement e : taken){
+				if(this.equals(e)){
+					result --;
+				}
 			}
 
 			return result;
@@ -441,6 +430,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			if(choices.get(0).isSubset(choices.get(1))){
 				// 0 is a subset of 1
+				// so we put 0 second
 				Requirement holder = choices.get(0);
 				choices.set(0, choices.get(1));
 				choices.set(1, holder);
@@ -448,6 +438,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			else if(choices.get(1).isSubset(choices.get(0))){
 				//1 is a subset of 0
+				// so we put 1 second
 				return choices;
 			}
 		}
@@ -1573,11 +1564,44 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			testNum ++;
 			System.out.println(s);
 			Requirement r = Requirement.readFrom(s);
+			testStrings(r, true);
+			System.out.println("\n\n");
+		}
+		
+		String[][] namedTests = {
+				{"ART < 150 > 300", "Western art"},
+				{"ART > 150 < 300", "Western art"},
+				{"4 of ART > 150 < 300", "Western art"},
+				{"(4 of ART > 150 < 300)", "Western art"},
+				{"ART > 100", "Western art"},
+				{"ART < 100", "Western art"},
+				{"ART- 100", "Western art"},
+				{"(ART > 100)", "Western art"},
+				{"(ART < 100)", "Western art"},
+				{"(ART - 100)", "Western art"},
+				{"(ART-100)", "short"},
+				{"(ART-100)", "A very long name that aught to be shorter in practice"},
+				{"ART-100", "short"},
+				{"ART-100", "A very long name that aught to be shorter in practice"}
+		};
+		for(String[] s : namedTests){
+			System.out.println("Test number " + testNum);
+			testNum ++;
+			System.out.println(s[0] + ", named: \"" + s[1] + "\"");
+			Requirement r = Requirement.readFrom(s[0]);
+			r.setName(s[1]);
+			testStrings(r, true);
+			System.out.println("\n\n");
+		}
+		
+		
+	}
+	private static void testStrings(Requirement r, boolean autoPrint){
+		if(autoPrint){
 			System.out.println("Save string:\t\t" + r.saveString());
 			System.out.println("Display string:\t\t" + r.getDisplayString());
 			System.out.println("Short string 50:\t" + r.shortString(50));
 			System.out.println("Short string 10:\t" + r.shortString(10));
-			System.out.println("\n\n");
 		}
 	}
 

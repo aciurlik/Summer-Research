@@ -748,7 +748,7 @@ public class Driver{
 		      + e.offendingSemester.getOverloadLimit()  + " credit hours";
 		}
 		else if(e.error.equals(ScheduleError.preReqError)){
-			result =  e.offendingCourse.shortString(preferredMaxLength) + " needs prerequsite(s) " + e.req.toString();
+			result =  e.offendingCourse.shortString(preferredMaxLength) + " needs prerequsite(s): " + e.req.toString();
 		}
 		else if(e.error.equals(ScheduleError.duplicateError)){
 			result = e.offendingCourse.shortString(preferredMaxLength) + " is a duplicate course";

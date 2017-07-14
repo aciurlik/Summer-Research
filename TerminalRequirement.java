@@ -276,10 +276,12 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 					}
 				}
 			}
-			if(isSatisfiedBy(e.getPrefix())){
-				result --;
-				if(result <= 0){
-					return result;
+			else{
+				if(isSatisfiedBy(e.getPrefix())){
+					result --;
+					if(result <= 0){
+						return result;
+					}
 				}
 			}
 		}
@@ -365,7 +367,10 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 	@Override
 	public Prefix getPrefix() {
-		return p;
+		if(this.isExact()){
+			return p;
+		}
+		return null;
 	}
 	
 	@Override public String getDisplayString(){
@@ -396,6 +401,9 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	}
 	
 	@Override public String shortString(int preferredLength){
+		if(name != null){
+			return name;
+		}
 		String result = getDisplayString();
 		if(result.length() > preferredLength){
 			result = saveString();

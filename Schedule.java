@@ -1058,7 +1058,6 @@ public class Schedule implements java.io.Serializable {
 			if(e.getRequirementsFulfilled(reqList).contains(r)){
 				satisficers.add(e);
 			}
-
 		}
 		r.updateAllStoredValues(satisficers);
 	}
@@ -1155,14 +1154,16 @@ public class Schedule implements java.io.Serializable {
 		if(prereqs.size() > 0){
 			Major prereqsM = new Major("Prereqs");
 			prereqsM.chosenDegree = -1;
-			boolean unfulfilledPrereq = false;
+			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
 			for(Prereq p : prereqs){
 				if(!p.getRequirement().storedIsComplete()){
-					prereqsM.addRequirement(p.getRequirement());
-					unfulfilledPrereq = true;
+					uniquePrereqs.add(p.getRequirement());
 				}
 			}
-			if(unfulfilledPrereq){
+			for(Requirement r : uniquePrereqs){
+				prereqsM.addRequirement(r);
+			}
+			if(uniquePrereqs.size() > 0){
 				result.add(prereqsM);
 			}
 		}
