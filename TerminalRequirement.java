@@ -367,8 +367,42 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	public Prefix getPrefix() {
 		return p;
 	}
-
-	//Terminal requirement uses Requirement's getDisplayString.
+	
+	@Override public String getDisplayString(){
+		if(this.isExact()){
+			return this.saveString();
+		}
+		String result = "";
+		if(this.numToChoose!= 1){
+			result = numToChoose + " ";
+		}
+		if(this.usesMax && this.usesMin){
+			return result + this.p.getSubject() + " between " + min + " and " + max + " exclusive";
+		}
+		if(this.usesMax){
+			return result + this.p.getSubject() + " numbered less than " + max;
+		}
+		//this uses min.
+		if(this.min == 0){
+			String end = "any " + p.getSubject() + " course"; 
+			if(this.numToChoose!= 1){
+				return numToChoose + " of " + end;
+			}
+			else{
+				return end; 
+			}
+		}
+		return result + this.p.getSubject() + " numbered greater than " + min;
+	}
+	
+	@Override public String shortString(int preferredLength){
+		String result = getDisplayString();
+		if(result.length() > preferredLength){
+			result = saveString();
+		}
+		return result;
+	}
+	
 	
 	@Override
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {

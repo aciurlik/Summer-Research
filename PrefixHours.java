@@ -53,7 +53,7 @@ public class PrefixHours implements ScheduleElement, HasCreditHours, java.io.Ser
 
 
 	@Override
-	public String shortString() {
+	public String shortString(int preferredLength) {
 		return getDisplayString();
 	}
 

@@ -355,6 +355,7 @@ public class CourseList implements java.io.Serializable  {
 	 */
 	public static Major getGERMajor(Prefix forignLang,int majorType){
 		Major m = new Major("GER");
+		ArrayList<Requirement> allReqs = new ArrayList<Requirement>();
 		outerloop:
 			for(String key : GERRequirements.keySet()){
 				//Special cases first, then default behavior.
@@ -449,17 +450,22 @@ public class CourseList implements java.io.Serializable  {
 				m.addRequirement(r);
 			}
 
+		//Special behavior for foreign language and FYW 
 		m.addRequirement(FLRequirement(forignLang ,majorType));
 		m.addRequirement(FYWRequirement());
 
-		//Put NW and NWL at the end (will be before WC and NW).
+		//collect nw, nwl, or nw/nwl into the list naturalWorldReqs.
+
 		Requirement nwl = m.getRequirement("NWL");
 		Requirement nw = m.getRequirement("NW");
-		m.removeRequirement(nw);
 		m.removeRequirement(nwl);
+		m.removeRequirement(nw);
+		ArrayList<Requirement> naturalWorldReqs = new ArrayList<Requirement>();
 		if(nwAndNwlAreOne){
 			if(majorType == BM){
-				m.addRequirement(nw);
+
+				naturalWorldReqs.add(nw);
+
 			}
 			else{
 				Requirement nwnwl = new Requirement();
@@ -467,24 +473,39 @@ public class CourseList implements java.io.Serializable  {
 				nwnwl.addRequirement(nwl);
 				nwnwl.setNumToChoose(2);
 				nwnwl.setName("NW/NWL");
-				m.addRequirement(nwnwl);
+
+				naturalWorldReqs.add(nwnwl);
+
 			}
 		}
 		else{
-			m.addRequirement(nw);
-			m.addRequirement(nwl);
+			naturalWorldReqs.add(nw);
+			naturalWorldReqs.add(nwl);
 		}
 
 		// Make WC and NE enemies 
 		Requirement wc = m.getRequirement("WC");
 		Requirement ne = m.getRequirement("NE");
 		RequirementGraph.putEdge(wc, ne);
-
-		//put WC and NE at the end.
-		m.removeRequirement(wc);
-		m.removeRequirement(ne);
-		m.addRequirement(wc);
-		m.addRequirement(ne);
+		
+		//sort the GER list
+		String[] beforeNW = {"FYW", "WR"};
+		String[] afterNW = {"HB","HA","TA","VP","MR","FL","UQ","MB","NE", "WC"};
+		for(String s : beforeNW){
+			Requirement holder = m.getRequirement(s);
+			m.removeRequirement(holder);
+			m.addRequirement(holder);
+		}
+		for(Requirement r : naturalWorldReqs){
+			m.addRequirement(r);
+		}
+		for(String s : afterNW){
+			Requirement holder = m.getRequirement(s);
+			m.removeRequirement(holder);
+			m.addRequirement(holder);
+		}
+		
+		
 
 		m.setChosenDegree(majorType);
 		return m;

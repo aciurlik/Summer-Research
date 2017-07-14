@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours,  java.io.Serializable{
@@ -27,7 +29,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// There are a number of methods that modify it, and it is up to other classes (like schedule) to ensure that
 	// the correct value is stored and is not overwritten at the wrong time.
 	public static int defaultCreditHours =4;
-	public ArrayList<SemesterDate> scheduledSemester = new ArrayList<SemesterDate>();
 
 
 
@@ -39,7 +40,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public Requirement(){
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 		this.choices = new HashSet<Requirement>();
 		this.numToChoose = 1;
 		this.originalNumberNeeded = 1;
@@ -49,13 +49,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	/**
 	 * An old constructor for backwards compatability.
-	 * Can be removed.
+	 * Can be removed (will just require a bunch of other edits)
 	 * @param choices
 	 * @param numToChoose
 	 */
 	public Requirement(Prefix[] choices, int numToChoose){
 		this(new HashSet<Prefix>(Arrays.asList(choices)), numToChoose);
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 
 	public Requirement(HashSet<Prefix> choices, int numToChoose){
@@ -65,7 +64,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			this.choices.add(r);
 		}
 		this.numToChoose = numToChoose;
-		this.scheduledSemester = new ArrayList<SemesterDate>();
 	}
 
 
@@ -74,28 +72,21 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	////Getters and setters
 	/////////////////////////
 	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________GettersAndSetters_________;
 
 	public void addRequirement(Requirement r){
 		this.choices.add(r);
 		this.recalcOriginalNumberNeeded();
 		this.storedNumberLeft = this.originalNumberNeeded;
 	}
-	public void setNumToChoose(int n){
-		if(n > choices.size()){
-			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
-		}
-		this.numToChoose = n;
-		recalcOriginalNumberNeeded();
-		this.storedNumberLeft = this.originalNumberNeeded;
-	}
-
 	/**
 	 * Return an estimate of the number of courses this requirement still
 	 * needs in order to be complete. Automatically takes creditHours requirements
 	 * into account.
 	 * @return
 	 */
-	public int storedCoursesLeft(){
+	public int getStoredCoursesLeft(){
 		if(this.usesCreditHours()){
 			return storedNumberLeft / 4;
 		}
@@ -107,9 +98,20 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * credit hours.
 	 * @return
 	 */
-	public int storedNumberLeft(){
+	public int getStoredNumberLeft(){
 		return this.storedNumberLeft;
 	}
+
+	
+	public void setNumToChoose(int n){
+		if(n > choices.size()){
+			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
+		}
+		this.numToChoose = n;
+		recalcOriginalNumberNeeded();
+		this.storedNumberLeft = this.originalNumberNeeded;
+	}
+
 
 	public boolean usesCreditHours(){
 		return usesCreditHours;
@@ -119,6 +121,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.numToChoose = hours;
 		this.usesCreditHours = true;
 	}
+
 
 
 	public void setName(String name){
@@ -138,18 +141,24 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 	}
 
+
 	public ArrayList<SemesterDate> getScheduledSemester() {
 		return scheduledSemester;
 	}
 
 
-	public void addScheduledSemester(SemesterDate toAdd) {
-		scheduledSemester.add(toAdd);
+
+	public void setName(String name){
+		this.name = name;
+	}
+	public String getName() {
+		return this.name;
 	}
 
 
 
 	/**
+
 	 * recalculate how many courses it would take to complete this requirement
 	 * if you started over from scratch.
 	 */
@@ -159,6 +168,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 	/**
+
 	 * Return an estimate of the number of courses originally needed,
 	 * assuming each course is 4 credit hours.
 	 * @return
@@ -196,7 +206,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
-
+	@SuppressWarnings("unused")
+	private boolean _________RecursiveMethods_________;
 	/////////////////////
 	/////////////////////
 	///// Recursive methods
@@ -235,6 +246,16 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
+
+
+	/**
+	 * recalculate how many courses it would take to complete this requirement
+	 * if you started over from scratch.
+	 */
+	public void recalcOriginalNumberNeeded(){
+		int result = minMoreNeeded(new ArrayList<ScheduleElement>(), false);
+		this.originalNumberNeeded = result;
+	}
 
 
 	/**
@@ -541,6 +562,7 @@ public boolean equals(Object o){
 	return equals((Requirement)o);
 }
 
+
 //INFINITELOOPHAZARD
 public boolean equals(Requirement r){
 	if(r==null){
@@ -549,6 +571,7 @@ public boolean equals(Requirement r){
 	if(r instanceof TerminalRequirement){
 		if(this.isTerminal()){
 			return this.getTerminal().equals(r);
+
 		}
 		return false;
 	}
@@ -602,15 +625,13 @@ public void updateAllStoredValues(ArrayList<ScheduleElement> taken){
 }
 
 
-
-
-
-//////////////////////////////////////
-//////////////////////////////////////
-/////alsoCompletes methods
-//////////////////////////////////////
-//////////////////////////////////////
-
+	//////////////////////////////////////
+	//////////////////////////////////////
+	/////alsoCompletes methods
+	//////////////////////////////////////
+	//////////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________alsoCompletesMethods_________;
 
 /**
  * Check (while avoiding large computation times)
@@ -858,6 +879,8 @@ private class CompletionSetsIter implements Iterator<HashSet<TerminalRequirement
 
 
 
+	@SuppressWarnings("unused")
+	private boolean _________CompareTo_________;
 
 /////////////////////////////////
 /////////////////////////////////
@@ -921,11 +944,14 @@ public int compareTo(Requirement o) {
 
 }
 
-/////////////////////////////////
-/////////////////////////////////
-/////Methods from ScheduleElement
-/////////////////////////////////
-/////////////////////////////////
+
+	/////////////////////////////////
+	/////////////////////////////////
+	/////Methods from ScheduleElement
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________MethodsFromScheduleElement_________;
 
 @Override
 public Prefix getPrefix() {
@@ -949,6 +975,7 @@ public String getDisplayString() {
 	}
 	return result;
 }
+
 
 @Override
 public String shortString() {
@@ -982,6 +1009,7 @@ public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> re
 			//Figure out if this satisfies otherReq
 			if(otherReq.equals(this)){
 				result.add(otherReq);
+
 			}
 
 			/* Doesn't work - might not actually be used to complete a new
@@ -994,8 +1022,10 @@ public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> re
 		}
 	}
 
+
 	return result;
 }
+
 
 @Override
 public String toString(){
@@ -1004,6 +1034,298 @@ public String toString(){
 
 
 
+	/////////////////////////
+	/////////////////////////
+	////String methods 
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________StringMethods_________;
+
+
+	
+	//////
+	////// String methods from Schedule Element
+	//////
+	
+	
+	@Override
+	public String getDisplayString() {
+		StringBuilder result = new StringBuilder();
+
+		//Special case for lab - "5 () with at least 1 lab from ()"
+		if("NWL".equals(this.name)){
+			recursePrintOn(s -> result.append(s), r ->r.getDisplayString(),
+					"1 lab from (",
+					", ",
+					")");
+			return result.toString();
+		}
+		
+		//if you've got an atLeast requirement, the order matters,
+		// so we can't just use recursePrintOn.
+		if(this.isAtLeastRequirement()){
+			ArrayList<Requirement> possiblePairs = this.atLeastRequirementPairs();
+			Requirement superset = possiblePairs.get(0);
+			Requirement subset = possiblePairs.get(1);
+			result.append(superset.getDisplayString());
+			result.append(" with at least ");
+			result.append(subset.getDisplayString());
+			return result.toString();
+		}
+		
+		String[] startMidEnd = syntaxSugars();
+		recursePrintOn(s -> result.append(s), r -> r.getDisplayString(), 
+				startMidEnd[0], 
+				startMidEnd[1], 
+				startMidEnd[2]);
+		return result.toString();
+	}
+	
+	/**
+	 * Return a list of the start, divider, and end strings for
+	 * special cases of requirements.
+	 * For example, if this is a requirement for 1 of 2 choices,
+	 *    this method returns {"either (", " or ", ")"}
+	 * @return
+	 */
+	private String[] syntaxSugars(){
+		if(this.isTerminal()){
+			return new String[]{"", ", ",""};
+		}
+		if(this.numToChoose == 1 && this.choices.size() == 1){
+			return new String[]{"", ", ", ""};
+		}
+		if(this.usesCreditHours){
+			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
+		}
+		
+		//The next few cases use englishResult
+		// because they all have similar behavior with inner parenthesis.
+		// If you need to make a string like 
+		// "either of (X) or (Y)", then you use the dividers
+		// "either of (",  ") or (", ")"
+		// rather than the dividers
+		// "either of (", " or ", ")".
+		String[] englishResult = {};
+		if(this.numToChoose == 1 && this.choices.size() == 2){
+			englishResult = new String[]{"either of " , " or " , ""};
+		}
+		if(this.numToChoose != 1 && 
+				this.numToChoose == this.choices.size()){
+			if(this.numToChoose == 2){
+				englishResult =  new String[]{"both of ", " and ", ""};
+			}
+			else{
+				englishResult = new String[]{"all of ", ", ", ""};
+			}
+		}
+		if(englishResult.length != 0){
+			if(syntaxSugarNeedsInnerParenthesis()){
+				englishResult[0] = englishResult[0] + "(";
+				englishResult[1] = ")" + englishResult[1] + "(";
+				englishResult[2] = englishResult[2] + ")";
+			}
+			else{
+				//Not sure if these should be included in the final version
+				//englishResult[0] = englishResult[0] + "(";
+				//englishResult[2] = englishResult[2] + ")";
+			}
+			return englishResult;
+		}
+		
+		
+		//TODO remove this to speed things up, its an expensive debug check.
+		if(this.isAtLeastRequirement()){
+			throw new RuntimeException("Should not use syntax sugar method for atLeast "
+					+ "requirements - they need to know subchoice order");
+		}
+		
+		//default case
+		return new String[]{numToChoose + " of (" ,", ",")"};
+	}
+	
+	private boolean syntaxSugarNeedsInnerParenthesis(){
+		for(Requirement r : choices){
+			if(!r.isTerminal()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
+	@Override
+	public String shortString(int preferredLength) {
+		//Return name, if you have one
+		if(this.name != null){
+			return this.name;
+		}
+		// If display string is small enough, return it.
+		String result = this.getDisplayString();
+		if(result.length() <= preferredLength){
+			return result;
+		}
+		//If you're an at least, just show them superset
+		// They'll have to know about subset on their own
+		// or from popups.
+		ArrayList<Requirement> reqPairs = atLeastRequirementPairs();
+		if(!reqPairs.isEmpty()){
+			return reqPairs.get(1).shortString(preferredLength);
+		}
+		
+		//Now comes the actual attempt to reduce characters.
+		StringBuilder builtResult = new StringBuilder();
+		String[] sugars = syntaxSugars();
+		
+		
+		//Reduce the length of the given sugars
+		// then check if you're short enough.
+		String replacementFirst = sugars[0];
+		if(replacementFirst.contains("credit hours")){
+			replacementFirst = replacementFirst.replace("credit hours", "credits");
+		}
+		String replacementMid = ",";
+		String replacementEnd = sugars[2];
+		
+		sugars[0] = replacementFirst;
+		sugars[1] = replacementMid;
+		sugars[2] = replacementEnd;
+
+		final int recursivePreferredLength = 
+				( 
+				  preferredLength 
+				  - sugars[0].length() 
+				  - sugars[2].length() 
+				  - (this.choices.size() - 1) * sugars[1].length()
+				) / choices.size();
+		recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
+				sugars[0],
+				sugars[1],
+				sugars[2]);
+		//Here's where we check if the replacements made us short enough.
+		// If we're still too long, then we can use the last resort,
+		// which doesn't write out subreqs and instead writes out
+		// 1 of (2 choices).
+		if(builtResult.length() > preferredLength){
+			String choicesPluralOrNot = " choice";
+			if(choices.size() != 1){
+				choicesPluralOrNot += "s";
+			}
+			String lastResort = sugars[0] + choices.size() + choicesPluralOrNot + sugars[2];
+			return lastResort;
+		}
+		return builtResult.toString();
+	}
+	
+	///
+	/// Other string methods
+	///
+	
+	
+	@Override
+	public String toString(){
+		return this.getDisplayString();
+	}
+
+	public String examineRequirementString(){
+		StringBuilder result = new StringBuilder();
+		//http://www.furman.edu/academics/academics/majorsandminors/Pages/default.aspx
+		result.append(
+				    "This text shows, in as much detail as possible, how this requirement works. "
+				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
+				+ "\nwebsite for another explanation of the requirement."
+				+ "\n\n");
+		result.append(this.getDisplayString());
+		return indent(result.toString(), 80, "   ");
+	}
+
+
+	
+	
+	/**
+	 * Turn the save string of this requirement into something you might
+	 * see from eclipse, with nice spacing and a limit on line length.
+	 * @return
+	 */
+	public String coderString(){
+		String tab = "  ";
+		int maxLineLength = 40;
+		return indent(this.saveString(), maxLineLength, tab);
+	}
+	
+	
+	/**
+	 * Indents using default ( and ) as open and closing parens.
+	 * @param s
+	 * @param maxLineLength
+	 * @param tab
+	 * @return
+	 */
+	public String indent(String s, int maxLineLength, String tab){
+		HashSet<Character> openParens = new HashSet<Character>();
+		openParens.add('(');
+		HashSet<Character> closeParens = new HashSet<Character>();
+		closeParens.add(')');
+		return indent(s, maxLineLength, tab, openParens, closeParens);
+	}
+	/**
+	 * Indent this string as if it were written by a coder or eclipse,
+	 * based on parenthesis.
+	 * @param s
+	 */
+	public String indent(String s, int maxLineLength, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
+		StringBuilder result = new StringBuilder();
+		int depth = 0;
+		int lineLength = 0;
+		for(char c : s.toCharArray()){
+			lineLength ++;
+			if(openParens.contains(c)){
+				depth ++;
+				result.append(c);
+				result.append("\n");
+				lineLength = depth * tab.length();
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+			}
+			else if(closeParens.contains(c)){
+				depth --;
+				result.append("\n");
+				for(int i = 0; i < depth; i ++){
+					result.append(tab);
+				}
+				result.append(c);
+				result.append("\n");
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+				}
+				lineLength = depth * tab.length();
+			}
+			else{
+				if(c == '\n'){
+					lineLength = 0;
+				}
+				if(lineLength > maxLineLength && c == ' '){
+					result.append("\n");
+					for(int i = 0; i < depth ; i ++){
+						result.append(tab);
+					}
+					lineLength = depth * tab.length();
+				}
+				else{
+					result.append(c);
+				}
+			}
+		}
+		return result.toString();
+	}
+	
+	
+	
+	///
+	/// String methods for saving / reading
+	///
 
 
 
@@ -1016,17 +1338,13 @@ public String toString(){
 
 
 
-
-
-
-
-
-/////////////////////////////////
-/////////////////////////////////
-///// Saving and Reading methods
-/////////////////////////////////
-/////////////////////////////////
-
+	/////////////////////////////////
+	/////////////////////////////////
+	///// Saving and Reading methods
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean _________SavingAndReadingMethods_________;
 
 
 /** REQUIREMENT SAVING AND READING TUTORIAL
@@ -1093,6 +1411,7 @@ public String toString(){
  * 		3 of (MTH 110, MTH 220,  or   MTH 330)
  * 
  */
+
 
 
 
@@ -1308,7 +1627,58 @@ public static Stack<String> tokenize(String s){
 	Stack<String> reversed = new Stack<String>();
 	for(String token : s.split("\\s+")){
 		reversed.push(token);
+  }
+	//INFINITELOOPHAZARD
+	/**
+	 * see REQUIREMENT SAVING AND READING TUTORIAL in Requirement class.
+	 * Make a save string for this requirement.
+	 * It should be unambiguous and easy for a computer to read
+	 *  (so it follows a standard format with no special cases).
+	 * special cases).
+	 * @return
+	 */
+	public String saveString(){
+
+		//Add the prefix
+		StringBuilder result = new StringBuilder();
+		result.append(numToChoose);
+		if(this.usesCreditHours()){
+			result.append(" ch");
+		}
+		result.append(" of ");
+		//Add the guts of this requirement - each sub-requirement
+
+		recursePrintOn(s -> result.append(s), r -> r.saveString(), "(", ", ", ")");
+		return result.toString();
 	}
+	
+	
+	//INFINITELOOPHAZARD
+	/**
+	 * Recursively applies func to each of choices, and appends to out as 
+	 * it goes, producing a string of the form
+	 * "("+func(c1)+", "+func(c2)+", "+func(c3)+", "... ", " + func(cn)+")"
+	 * where start, end, and divider specify the strings in quotes.
+	 * @param out
+	 * @param func
+	 */
+	public void recursePrintOn(Consumer<String> printFunction, Function<Requirement, String> func, String start, String divider, String end){
+		ArrayList<Requirement> choiceList = new ArrayList<Requirement>(choices);
+		Collections.sort(choiceList);
+		printFunction.accept(start);
+		//Add all but the last, each addition followed by a comma.
+		for(int i = 0; i < choiceList.size() - 1 ; i ++){
+			printFunction.accept(func.apply(choiceList.get(i)));
+			printFunction.accept(divider);
+		}
+		//Add the last if it exists, else there are no choices so the result is ().
+		if(choiceList.size() >= 1){
+			printFunction.accept(func.apply(choiceList.get(choiceList.size() - 1)));
+		}
+		printFunction.accept(end);
+
+	}
+	
 
 	//Reverse the stack so that the first character comes out first.
 	Stack<String> result = new Stack<String>();
@@ -1349,22 +1719,8 @@ public static Requirement parse(Stack<String> tokens){
 		result.numToChoose = numToChoose;
 		return result;
 	}
-	else if(next.matches("[0-9]+chof")){
-		int numToChoose = Integer.parseInt(
-				next.substring(0, next.length() - 4));
-		Requirement temp = parse(tokens);
-		if(! (temp instanceof Requirement)){
-			throw new RuntimeException("Make sure to use parenthesis after saying \" n of \" ");
-		}
-		Requirement result = (Requirement)temp;
-		result.numToChoose = numToChoose;
-		result.usesCreditHours = true;
-		return result;
-	}
-	else{
-		return TerminalRequirement.readFrom(next);
-	}
 }
+
 
 /**
  * Example inputs:
@@ -1426,6 +1782,98 @@ public static void testAlsoCompletes(){
 					boolean forward = r.alsoCompletes(t);
 					//boolean backward = t.alsoCompletes(r);
 					System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
+
+	
+	
+	
+	
+	
+	
+	
+	@SuppressWarnings("unused")
+	private boolean _________Testing_________;
+
+
+	
+	public static void testStringDisplays(){
+		String[] tests = new String[]{
+				"(MTH 110)",
+				"MTH110",
+				"((MTH 110))",
+				"(((MTH 110)))",
+				"2 of (MTH-110, MTH 120, MTH 130)",
+				"2 of (MTH 110, (MTH 120), (MTH 130))",
+				"1 of (2 of (MTH-110, MTH-120), MTH-130)",
+				"2 of (MTH 110, (MTH 120, MTH 130))",
+				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+				"1 of (MTH 110, (1 of (MTH 120, MTH 130)))",
+				"1 of (MTH-110)",
+				"2 of (MTH 110, MTH 120)",
+				"3 of (MTH 110, MTH 120, MTH 130)",
+				"1 of (MTH 110, MTH 120)",
+				
+				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, MTH 160)",
+				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+
+				"2 ch of (MTH-110, MTH-120, MTH-130)",
+				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
+				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"(1 of MTH>100)",
+				"1 of MTH>100",
+				"4 of MTH>100",
+				"1 of MTH > 300"
+		};
+		
+		int testNum = 0;
+		for(String s : tests){
+			System.out.println("Test number " + testNum);
+			testNum ++;
+			System.out.println(s);
+			Requirement r = Requirement.readFrom(s);
+			System.out.println("Save string:\t\t" + r.saveString());
+			System.out.println("Display string:\t\t" + r.getDisplayString());
+			System.out.println("Short string 50:\t" + r.shortString(50));
+			System.out.println("Short string 10:\t" + r.shortString(10));
+			System.out.println("\n\n");
+		}
+	}
+
+	public static void testAlsoCompletes(){
+		String[] tests = new String[]{
+				"(MTH-110)", // 1, 2
+				"2 of (MTH-110, 2 of (MTH 120, MTH 130))",  //0, 2
+				"3 of (MTH-110, MTH 120, MTH 130)", //0, 1
+				"4 of (MTH-100, MTH-200, MTH-300, MTH-400, MTH-500)", //4
+				"3 of (MTH-100, MTH-200, MTH-300, MTH-400)", //3
+				"3 of (1 of (MTH-1, MTH-2, MTH-3, MTH-4), MTH-200, MTH-300, MTH-400)",//6, 7
+				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400)",//5, 7
+				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400, 1 of (MTH-1, MTH-4))"//5, 6
+
+		};
+		int[][] matchups = new int[][]
+				{
+			{0,1, 2},
+			{0,1, 2},
+			{0,1, 2},
+			{4},
+			{3},
+			{6, 7},
+			{5, 7},
+			{5, 6}
+				};
+
+
+				for(int i = 0; i < matchups.length ; i ++){
+					Requirement r = Requirement.readFrom(tests[i]);
+					for(int j : matchups[i]){
+						Requirement t = Requirement.readFrom(tests[j]);
+						boolean forward = r.alsoCompletes(t);
+						//boolean backward = t.alsoCompletes(r);
+						System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
+					}
 				}
 			}
 
@@ -1490,6 +1938,54 @@ public static void testReading(){
 		double tol = Double.MIN_VALUE * 10000;
 		if(r.storedIsComplete() != complete){
 			needsToBeShown = true;
+
+	public static void generalTest(){
+		String[] tests = new String[]{
+				"MTH-110",
+				"(MTH 110)",
+				//"(MTH-110)",
+				"((MTH110))",
+				"(((MTH-110)))",
+				//"MTH-110",
+				//"MTH 110",
+				"2 of (MTH 110, MTH 120, MTH 130)",
+				"2 of (MTH-110, MTH 120, MTH 130)",
+				"2 of (ACC-110, MTH 120, MTH 130)",
+				"2 of (MTH-110, MTH 120, or MTH 130)",
+				"1 of (2 of (MTH-110, MTH-120), MTH-130)",
+				"2 of (MTH 110, (MTH 120, MTH 130))",
+				"1 of (MTH 110, (1 of (MTH 120, MTH 130)))",
+				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
+				"3 of (MTH 110, MTH 120, MTH 130)",
+				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
+				"2 of (BIO 110, BIO 112, BIO 120)",
+				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+
+				"2 ch of (MTH-110, MTH-120, MTH-130)",
+				"2 chof (MTH-110, MTH-120, MTH-130)",
+				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
+				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"(1 of MTH>100)",
+				"1 of MTH>100",
+				"4 of MTH>100",
+				"1 of MTH > 300"
+		};
+
+		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
+
+		//takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
+		//takens.add(TerminalRequirement.readFrom("MTH-110"));
+		takens.add(Requirement.readFrom("(MTH-110)"));
+		//takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
+		//takens.add(TerminalRequirement.readFrom("MTH-120"));
+		takens.add(Requirement.readFrom("(MTH-120)"));
+
+		System.out.print("Taken prefixes: ");
+		for(ScheduleElement p : takens){
+			System.out.print(p + " ");
 		}
 		if(r.storedPercentComplete() != percentComplete){
 			needsToBeShown = true;
@@ -1518,9 +2014,10 @@ public static void testReading(){
 
 
 
-public static void main(String[] args){
-	testReading();
-}
+	public static void main(String[] args){
+		testStringDisplays();
+	}
+
 
 
 
