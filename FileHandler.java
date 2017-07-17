@@ -40,6 +40,7 @@ public class FileHandler implements ActionListener{
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 	private static Properties p;
+	static ListOfMajors listOfMajors = null;
 
 	static{
 		p = new Properties();
@@ -248,7 +249,13 @@ public class FileHandler implements ActionListener{
 
 
 	public static ListOfMajors getMajorsList(){
-		ListOfMajors result = readMajorsFrom(new File(majorsFile));
+		ListOfMajors result;
+		if(listOfMajors == null){
+			result = readMajorsFrom(new File(majorsFile));
+		}
+		else{
+			result= listOfMajors;
+		}
 		return result;
 	}
 
@@ -286,6 +293,7 @@ public class FileHandler implements ActionListener{
 		}
 		return result;
 	}
+
 
 	/**
 	 * Return the contents of this file as a list of strings, where

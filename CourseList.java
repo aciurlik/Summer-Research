@@ -30,7 +30,7 @@ public class CourseList implements java.io.Serializable  {
 	static Hashtable<String, String> savedPrereqMeanings;
 	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
 
-	static{
+	public static void loadAllCourses(){
 		listOfCourses = new ArrayList<Course>();
 		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 		rawPrereqs = new Hashtable<Prefix, String>();

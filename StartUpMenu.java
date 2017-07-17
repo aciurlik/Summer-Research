@@ -26,18 +26,58 @@ public class StartUpMenu implements ActionListener {
 	JButton previous;
 	JButton finish;
 	JCheckBox noMore;
+	JButton cancel;
+	boolean showStartUp = true;
+
 
 	public StartUpMenu(){
 		layer = new JPanel();
 		layer.setLayout(new BorderLayout());
-		
-		instructions = FileHandler.getInstructions(new File(MenuOptions.resourcesFolder + "StartUpSlides"));
-		
+
+		if(instructions == null){
+			instructions = FileHandler.getInstructions(new File(MenuOptions.resourcesFolder + "StartUpSlides"));
+		}
+		counter=0;
 		label = new JLabel(instructions.get(0));
+		frame = new JFrame("Getting Started");
+		layer.add(label, BorderLayout.NORTH);
+
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+
+
+		JPanel previousNextPanel = new JPanel();
+		previousNextPanel.setLayout(new BorderLayout());
+
+		previous = new JButton(MenuOptions.previous);
+		previous.setActionCommand(MenuOptions.previous);
+		previous.addActionListener(this);
+		previousNextPanel.add(previous, BorderLayout.WEST);
+		previous.setVisible(false);
+
+		cancel = new JButton(MenuOptions.Cancel);
+		cancel.setActionCommand(MenuOptions.Cancel);
+		cancel.addActionListener(this);
+		previousNextPanel.add(cancel, BorderLayout.WEST);
+		cancel.setVisible(true);
+
+		next = new JButton(MenuOptions.next);
+		next.setActionCommand(MenuOptions.next);
+		next.addActionListener(this);
+		previousNextPanel.add(next, BorderLayout.CENTER);
+		next.setVisible(true);
+
+
+		buttonPanel.add(previousNextPanel, BorderLayout.EAST);
+		layer.add(buttonPanel, BorderLayout.SOUTH);
+		frame.add(layer);
+		frame.pack();
+		frame.setVisible(false);
+
 		/**
 		 * {
 		 * Image myImage;
-			
+
 			  public void setIcon(Icon icon) {
 			        super.setIcon(icon);
 			        if (icon instanceof ImageIcon)
@@ -52,37 +92,18 @@ public class StartUpMenu implements ActionListener {
 			    }
 		};
 		 */
-			
-		frame = new JFrame("Getting Started");
-		layer.add(label, BorderLayout.NORTH);
 
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new BorderLayout());
-		
-		
-		JPanel previousNextPanel = new JPanel();
-		previousNextPanel.setLayout(new BorderLayout());
-		
-		previous = new JButton(MenuOptions.previous);
-		previous.setActionCommand(MenuOptions.previous);
-		previous.addActionListener(this);
-		previousNextPanel.add(previous, BorderLayout.WEST);
-		previous.setVisible(false);
 
-		next = new JButton(MenuOptions.next);
-		next.setActionCommand(MenuOptions.next);
-		next.addActionListener(this);
-		previousNextPanel.add(next, BorderLayout.EAST);
-		next.setVisible(true);
-	
-		
-		buttonPanel.add(previousNextPanel, BorderLayout.EAST);
-		layer.add(buttonPanel, BorderLayout.SOUTH);
-		frame.add(layer);
-		frame.pack();
+
+
+	}
+
+
+	public void showStartUp(boolean showStartUp){
+		counter = 0;
+		this.showStartUp = showStartUp;
+		update(counter);
 		frame.setVisible(true);
-
-
 	}
 
 	@Override
@@ -92,6 +113,9 @@ public class StartUpMenu implements ActionListener {
 				FileHandler.propertySet(MenuOptions.startUp, "false");
 			}
 			frame.dispose();
+			if(showStartUp){
+				Driver.addScheduleGUI(Schedule.testSchedule());
+			}
 		}
 
 		//Next
@@ -103,9 +127,15 @@ public class StartUpMenu implements ActionListener {
 
 		//Previous
 		if(a.getActionCommand().equals(MenuOptions.previous)){
-			
-				counter--;
-				update(counter);
+
+			counter--;
+			update(counter);
+		}
+		if(a.getActionCommand().equals(MenuOptions.Cancel)){
+			frame.dispose();
+			if(showStartUp){
+				Driver.addScheduleGUI(Schedule.testSchedule());
+			}
 		}
 
 	}
@@ -113,14 +143,14 @@ public class StartUpMenu implements ActionListener {
 	public void update(int n){
 		next.setText("Next");
 		next.setActionCommand(MenuOptions.next);
-		
+
 		next.setVisible(false);
 		previous.setVisible(false);;
 		if(noMore!=null){
-		buttonPanel.remove(noMore);
+			buttonPanel.remove(noMore);
 		}
-		
-		
+
+
 		layer.removeAll(); 
 		label.setIcon(instructions.get(n));
 		layer.add(label, BorderLayout.NORTH);
@@ -142,19 +172,19 @@ public class StartUpMenu implements ActionListener {
 
 		buttonPanel.revalidate();
 		buttonPanel.repaint();
-		
+
 		layer.add(buttonPanel, BorderLayout.CENTER);
-		
+
 		layer.revalidate();
 		layer.repaint();
-		
+
 		frame.revalidate();
 		frame.repaint();
-		
-		
-		
-		
-		
+
+
+
+
+
 
 	}
 }
