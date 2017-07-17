@@ -39,6 +39,7 @@ public class FileHandler implements ActionListener{
 	static JFrame popUP = new JFrame();
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
+	public static final String studentDataFile = MenuOptions.resourcesFolder + "SavedStudentData.txt";
 	private static Properties p;
 
 	static{
@@ -98,6 +99,25 @@ public class FileHandler implements ActionListener{
 	private static void restoreDefaultSettings() {
 		p.setProperty(MenuOptions.startUp, "true");
 		
+	}
+	
+	public static String getSavedStudentData(){
+		File f = new File(studentDataFile);
+		if(!f.exists()){
+			return null;
+		}
+		try{
+			return FileHandler.fileToString(new File(studentDataFile));
+		}
+		catch(Exception e){
+			JOptionPane.showMessageDialog(null, "There was an issue loading your saved student data");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static void writeStudentData(String s){
+		FileHandler.saveToFile(studentDataFile, s);
 	}
 
 	
@@ -199,8 +219,15 @@ public class FileHandler implements ActionListener{
 			}
 
 		}
-
-
+	}
+	private static void saveToFile(String fileName, String data){
+		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
+			b.write(data);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static ArrayList<String> getScheduleNames(String FolderName){
@@ -452,6 +479,7 @@ public class FileHandler implements ActionListener{
 
 		return result;
 	}
+	
 
 	public static void showSetting() {
 		SettingsPanel sp = new SettingsPanel();

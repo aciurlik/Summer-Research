@@ -3,28 +3,24 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-
 import java.io.File;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import javax.swing.ImageIcon;
-
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -947,6 +943,64 @@ public class ScheduleGUI{
 
 
 
+	
+	String importResult;
+	public void importPriorCourses(){
+		JTextArea importArea = new JTextArea("To import your prior courses, "
+				+ "\n  1) Go to MyFurman. "
+				+ "\n  2) Navigate to your unofficial transcript."
+				+ "\n  3) You should see your name and ID in the top left corner,"
+				+ "\n     and your cumulative GPA listed at the bottom."
+				+ "\n  4) Hilight all the data between your name and your GPA and"
+				+ "\n    drag it into this text box. "
+				+ "\n  5) Click 'validate' to make sure the process worked!");
+		JButton validate = new JButton("validate");
+		validate.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				boolean success = trySetStudentData(importArea.getText());
+				if(success){
+					importResult = importArea.getText();
+					importArea.setText("You're all set! The import went smoothly.");
+				}
+				else{
+					importArea.setText("Something went wrong with the import. \n"
+							+ "\nBe sure that you found your unofficial transcript on"
+							+ "\n  myFurman, and that you hilighted the data from your"
+							+ "\n  ID-Name to your GPA (and no more) ");
+				}
+			}
+		});
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+		p.add(new JScrollPane(importArea), BorderLayout.SOUTH);
+		p.add(validate, BorderLayout.WEST);
+		
+		int chosen = JOptionPane.showOptionDialog(null,p, "Import your schedule",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
+		if(chosen == JOptionPane.OK_OPTION){
+			try{
+				if(importResult == null){
+					importResult = importArea.getText();
+				}
+				this.sch.readPrior(importResult);
+				FileHandler.writeStudentData(importResult);
+				this.update();
+				
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static boolean trySetStudentData(String text){
+		try{
+			new Schedule(text);
+			return true;
+		}
+		catch(Exception e){
+			return false;
+		}
+	}
 
 
 

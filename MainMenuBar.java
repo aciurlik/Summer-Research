@@ -147,6 +147,12 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		allErrors.add(menuItem);
 		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(MenuOptions.loadPriorCourses);
+		JPopupMenu loadCourses = new JPopupMenu(MenuOptions.loadPriorCourses);
+		menuItem.addActionListener(this);
+		loadCourses.add(menuItem);
+		menu.add(menuItem);
 
 
 
@@ -293,6 +299,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		}
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
 			d.GUICheckAllErrors(true);
+		}
+		if(e.getActionCommand().equals(MenuOptions.loadPriorCourses)){
+			d.importPriorCourses();
 		}
 		if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();

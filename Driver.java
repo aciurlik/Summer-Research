@@ -1,12 +1,21 @@
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
@@ -87,7 +96,7 @@ public class Driver {
 		if(choices.length != displays.length){
 			throw new RuntimeException("Wrong sizes for choices and displays in GUICHooseAmong" + choices.length + "," + displays.length);
 		}
-		String chosenString = (String)JOptionPane.showInputDialog(new JFrame(), message , title , JOptionPane.PLAIN_MESSAGE, null, displays, "Cats");
+		String chosenString = (String)JOptionPane.showInputDialog(null, message , title , JOptionPane.PLAIN_MESSAGE, null, displays, "Cats");
 		int chosenIndex = 0;
 		for(; chosenIndex < displays.length ; chosenIndex ++){
 			if(displays[chosenIndex] == chosenString){
@@ -127,8 +136,11 @@ public class Driver {
 		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
-		return GUIChooseStartTime(supportedSemesters);
-
+		SemesterDate result = GUIChooseStartTime(supportedSemesters);
+		if(result == null){
+			result = supportedSemesters.get(0);
+		}
+		return result;
 	}
 	
 	
@@ -142,6 +154,7 @@ public class Driver {
 		}
 
 	}
+	
 
 
 
@@ -151,7 +164,6 @@ public class Driver {
  */
 	public static void startUpMessage() {
 		StartUpMenu start = new StartUpMenu();
-
 	}
 
 	
@@ -161,21 +173,24 @@ public class Driver {
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		SemesterDate start = tryPickStartDate();
+		
+		
+		
+		//SemesterDate start = tryPickStartDate();
 
+		/*
 		if(start == null){
 			//this will close any running code, including the JOptionPanes which don't get collected by 
 			// the garbage collector for some reason.
 			System.exit(0);
 			return;
-		}
-		else{
-			Schedule.defaultFirstSemester = start;
-			//new Driver();
-			Driver.addScheduleGUI(Schedule.testSchedule());
-			establishSettings();
+		}*/
 
-
-		}
+		//Schedule.defaultFirstSemester = start;
+		//new Driver();
+		//Driver.importPriorCourses();
+		Driver.addScheduleGUI(new Schedule());
+		establishSettings();
 	}
+
 }

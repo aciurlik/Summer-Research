@@ -63,15 +63,19 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		}
 		
 		String title = c.name;
-		size += title.length() + 1;
-		if(size < preferredLength){
-			data.add(title);
+		if(title != null){
+			size += title.length() + 1;
+			if(size < preferredLength){
+				data.add(title);
+			}
 		}
-		
+
 		String professor = c.professor;
-		size += professor.length() + 1;
-		if(size < preferredLength){
-			data.add(professor);
+		if(professor!=null){
+			size += professor.length() + 1;
+			if(size < preferredLength){
+				data.add(professor);
+			}
 		}
 		//Fall 2017, ACC-101-01 Accounting with ... Dr. Hansworth
 		
