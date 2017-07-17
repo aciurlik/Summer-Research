@@ -122,7 +122,15 @@ public class FileHandler implements ActionListener{
 			instruct = "Choose a schedule to open";
 			header = "Open Schedule";
 		}
-
+		if(s.equals("compareOne")){
+			instruct = "Choose your first schedule to compare";
+			header = "Compare Schedules";	
+		}
+		if(s.equals("compareTwo")){
+			instruct = "Choose your second schedule to compare";
+			header = "Compare Schedules";
+		}
+		
 		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder);
 		if(!scheduleNames.isEmpty()){
 			String[] finalSchedNames = new String[scheduleNames.size()];
@@ -137,6 +145,7 @@ public class FileHandler implements ActionListener{
 			return null; 
 		}
 	}
+
 
 
 	public static Schedule openSchedule(){

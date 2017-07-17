@@ -1350,7 +1350,7 @@ public class Schedule implements java.io.Serializable {
 				if(se instanceof Requirement){
 					prefix = "  Scheduled one course of: ";
 				}
-				result.append(prefix + se.getDisplayString() + "\n");
+				result.append(prefix + se.shortString(10000) + "\n");
 			}
 			if(s.elements.isEmpty()){
 				result.append("  Nothing scheduled for this semester \n");
@@ -1410,7 +1410,7 @@ public class Schedule implements java.io.Serializable {
 			result.append("\n");
 			result.append(m.name);
 			for(Requirement r: m.reqList){
-				String rDisplay = r.getDisplayString() + "-";
+				String rDisplay = r.shortString(10000) + "-";
 				if(rDisplay.length()<=30){
 					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
 					rDisplay = rDisplay + spaces;
@@ -1457,11 +1457,11 @@ public class Schedule implements java.io.Serializable {
 					//Different strings for requirements
 					String priorIndent = "   ";
 					if(se instanceof Requirement){
-						part.append(priorIndent + "Scheduled  " + se.getDisplayString());
+						part.append(priorIndent + "Scheduled  " + se.shortString(10000));
 						
 					}
 					else{
-						part.append(priorIndent + se.getDisplayString());
+						part.append(priorIndent + se.shortString(100000));
 						
 					}
 					
@@ -1514,10 +1514,6 @@ public class Schedule implements java.io.Serializable {
 
 
 	}
-
-
-
-
 
 
 	public int getCLP() {
