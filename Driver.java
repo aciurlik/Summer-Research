@@ -1,15 +1,26 @@
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
+	static StartUpMenu startUP = null;
 
 	public static void addScheduleGUI(Schedule s){
 		ScheduleGUI schGUI = new ScheduleGUI(s);
@@ -134,11 +145,13 @@ public class Driver {
 
 
 	/**
-	 * Reads settings from file and makes sure Schedule is matching those. 
+	 * Load anything that is needed before a schedule is made
 	 */
-	private static void establishSettings() {
+	private static void preScheduleLoading() {
 		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){
-			startUpMessage();
+			//This creates slides in the load. Waits to be displayed. 
+			StartUpMenu start = new StartUpMenu();
+			startUP = start;
 		}
 
 	}
@@ -150,34 +163,106 @@ public class Driver {
 	 * Opens up the StartUp help. 
 	 */
 	public static void startUpMessage() {
-		StartUpMenu start = new StartUpMenu();
+			if(startUP != null){
+				startUP.showStartUp(false);
+			}
+			else{
+			
+				StartUpMenu start = new StartUpMenu();
+				startUP =start;
+				startUP.showStartUp(false);
+				
+			}
+		
 
 	}
 
 
 
 	public static void main(String[] args){
-		listOfScheduleGUIs = new ArrayList<ScheduleGUI>();
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		SemesterDate start = tryPickStartDate();
 
-		if(start == null){
-			//this will close any running code, including the JOptionPanes which don't get collected by 
-			// the garbage collector for some reason.
-			System.exit(0);
-			return;
-		}
-		else{
-			Schedule.defaultFirstSemester = start;
-			//new Driver();
-			Driver.addScheduleGUI(Schedule.testSchedule());
-			establishSettings();
+		JPanel editorHolder = new JPanel();
+		JEditorPane editorPane = new JEditorPane();
+		editorPane.setPreferredSize(new Dimension(500, 250));
+		editorPane.setContentType("text/html");
+		String instruct = "This tool does not officially enroll you in any courses. " 
+				+ "It is not a guarantee that the courses you select will be available in the semester you select them. "
+				+ "It is your responsibility to ensure that you have met the graduation requirements. "
+				+ "To officially enroll in courses, you must meet with your advisor  "
+				+ " and go through the course registration process via MyFurman or Enrollment Services. "; 
+
+		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
+				+"<p style='width 100px;'>" + instruct + "</p></body></html>");
+		editorPane.setEditable(false);
+		editorHolder.add(editorPane);
+		JFrame frame = new JFrame();
+
+		frame.setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-		}
+		JButton confirm = new JButton(MenuOptions.confirm);
+		confirm.setActionCommand(MenuOptions.confirm);
+		confirm.setEnabled(false);
+		confirm.addActionListener(new ActionListener(){
+			@Override 
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals(MenuOptions.confirm)){
+					frame.dispose();
+					SemesterDate start = tryPickStartDate();
+					if(start == null){
+						//this will close any running code, including the JOptionPanes which don't get collected by 
+						// the garbage collector for some reason.
+						System.exit(0);
+						return;
+					}
+					else{
+						Schedule.defaultFirstSemester = start;
+						//new Driver();
+						if(startUP != null){
+							startUP.showStartUp(true);
+						}
+						else{
+							Driver.addScheduleGUI(Schedule.testSchedule());
+						}
+
+
+
+					}
+
+				}
+			}
+		});
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(confirm);
+		frame.add(buttonPanel, BorderLayout.SOUTH);
+
+		frame.add(editorHolder, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
+				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Establishing Settings <br />-           "+ "</p></body></html>");
+		preScheduleLoading();
+		listOfScheduleGUIs = new ArrayList<ScheduleGUI>();
+		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
+				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Courses Loading <br />---             "+ "</p></body></html>");
+		CourseList.loadAllCourses();
+		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
+				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Majors Loading <br />-----        "+ "</p></body></html>");
+		FileHandler.getMajorsList();
+		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
+				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Finished Loading <br />----------- 100%"+ "</p></body></html>");
+		confirm.setEnabled(true);
 	}
+
+
+
+
+
+
 
 	public static void chooseSchedulesToCompare() {
 
@@ -209,13 +294,13 @@ public class Driver {
 			String s = "";
 			if(allOrderedElementsOne.get(i) instanceof ScheduleCourse){
 				ScheduleCourse c =(ScheduleCourse) allOrderedElementsOne.get(i);
-				 s = c.toString() + coorespondingDatesOne.get(i).toString();
+				s = c.toString() + coorespondingDatesOne.get(i).toString();
 			}
 			else if(allOrderedElementsOne.get(i) instanceof Requirement){
 				Requirement c =(Requirement) allOrderedElementsOne.get(i);
-				 s = c.getDisplayString() + coorespondingDatesOne.get(i).toString();
+				s = c.getDisplayString() + coorespondingDatesOne.get(i).toString();
 			}
-			
+
 			oneTotalString.add(s);
 		}
 		ArrayList<ScheduleElement> allOrderedElementsTwo = new ArrayList<ScheduleElement>();
@@ -236,17 +321,17 @@ public class Driver {
 			String s = "";
 			if(allOrderedElementsTwo.get(i) instanceof ScheduleCourse){
 				ScheduleCourse c =(ScheduleCourse) allOrderedElementsTwo.get(i);
-				 s = c.toString() + coorespondingDatesTwo.get(i).toString();
+				s = c.toString() + coorespondingDatesTwo.get(i).toString();
 			}
 			else if(allOrderedElementsTwo.get(i) instanceof Requirement){
 				Requirement c =(Requirement) allOrderedElementsTwo.get(i);
-				 s = c.getDisplayString() + coorespondingDatesTwo.get(i).toString();
-			
+				s = c.getDisplayString() + coorespondingDatesTwo.get(i).toString();
+
 			}
-			
+
 			twoTotalString.add(s);
 		}
-		
+
 		for(String oneS: oneTotalString){
 			int counter = 0;
 			System.out.println(oneS);

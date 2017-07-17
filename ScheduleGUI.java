@@ -822,7 +822,7 @@ public class ScheduleGUI{
 
 
 
-	public String parseIntoReadableHTML(String s, int pixels){
+	public static String parseIntoReadableHTML(String s, int pixels){
 		s = s.replaceAll("\n", "<br />");
 		return  "<html><body><p style='width " + pixels + "px;'>" + s + "</p></body></html>";
 	}
