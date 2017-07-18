@@ -50,8 +50,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		menu = new JMenu(MenuOptions.FurmanAdvantage);
-		
-		
+
+
 		submenu = new JMenu(MenuOptions.MayX);
 		menuItem = new JMenuItem(MenuOptions.exploreMayX);
 		JPopupMenu exploreMayXPopup = new JPopupMenu();
@@ -154,9 +154,17 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		loadCourses.add(menuItem);
 		menu.add(menuItem);
 
-
-
-
+		
+		//Unimplemented method will come back to 
+		if(!FurmanOfficial.masterIsNotAround){
+			menuItem = new JMenuItem("Compare");
+			JPopupMenu compare = new JPopupMenu("Compare");
+			menuItem.addActionListener(this);
+			compare.add(menuItem);
+			menu.add(menuItem);
+		}
+		
+		
 		//Build Edit menu in the menu bar.
 		menu = new JMenu(MenuOptions.Edit);
 		this.add(menu);
@@ -197,31 +205,31 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		trackPopup.add(menuItem);
 		submenu.add(menuItem);
 		menu.add(submenu);
-		
-		
+
+
 
 		menu = new JMenu(MenuOptions.settings);
 		this.add(menu);
-		
+
 		menuItem = new JMenuItem(MenuOptions.changeSettings);
 		menuItem.setActionCommand(MenuOptions.changeSettings);
 		JPopupMenu settings =new JPopupMenu();
 		settings.add(menuItem);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-		
-		
-		
+
+
+
 		menuItem = new JMenuItem(MenuOptions.restoreDefault);
 		menuItem.setActionCommand(MenuOptions.restoreDefault);
 		JPopupMenu restoreDefault = new JPopupMenu();
 		restoreDefault.add(menuItem);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-		
 
-		
-	
+
+
+
 		menu = new JMenu(MenuOptions.help);
 		menuItem = new JMenuItem(MenuOptions.viewStartUp);
 		menuItem.setActionCommand(MenuOptions.viewStartUp);
@@ -229,19 +237,19 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		//viewStartUp.add(menuItem);
 		menu.add(menuItem);
-		
+
 		menuItem = new JMenuItem(MenuOptions.examineRequirementHelp);
 		menuItem.setActionCommand(MenuOptions.examineRequirementHelp);
 		//new JPopupMenu().add(menuItem);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-		
+
 		menuItem = new JMenuItem(MenuOptions.findACourse);
 		menuItem.setActionCommand(MenuOptions.findACourse);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-		
-		
+
+
 		this.add(menu);
 
 
@@ -317,6 +325,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		}
 		if(e.getActionCommand().equals(MenuOptions.findACourse)){
 			d.showFindACourseHelp();
+		}
+		if(e.getActionCommand().equals("Compare")){
+			Driver.chooseSchedulesToCompare();
 		}
 	}
 

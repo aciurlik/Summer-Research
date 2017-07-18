@@ -282,6 +282,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		results.add(prefix);
 		results.add(c.c.getName());
 		results.add(professor);
+		results.add(c.c.creditHours);
 		results.add(reqsFulfilled.size());
 		results.addAll(reqsFulfilled);
 		//results.add(Arrays.toString(c.c.meetingDays));
@@ -290,7 +291,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	public String[] columnNames(int numberColumns){
 		String[] result = new String[numberColumns];
 		String[] known = new String[]{
-				"Start Time","Course","Title","Professor","Num new Reqs"};
+				"Start Time","Course","Title","Professor","Credit Hours","Num new Reqs"};
 		for(int i = 0; i < known.length ; i ++){
 			result[i] = known[i];
 		}

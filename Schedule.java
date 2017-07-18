@@ -1065,9 +1065,9 @@ public class Schedule implements java.io.Serializable {
 		}
 		return false;
 	}
-	
-	
-	
+
+
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Optimism error
@@ -1075,7 +1075,7 @@ public class Schedule implements java.io.Serializable {
 	///////////////////////////////
 
 
-	
+
 	/**
 	 * Check if adding r to the schedule would implicitly assume
 	 * some kind of optimal future behavior on the user's part.
@@ -1103,7 +1103,7 @@ public class Schedule implements java.io.Serializable {
 		Requirement superset = pairs.get(0);
 		Requirement subset = pairs.get(1);
 		ArrayList<ScheduleElement> allCurrentElements = this.getAllElementsSorted();
-		
+
 		//First, if subset is already complete then we're not
 		// assuming any optimal behavior - we're just scheduling a
 		// superset-only course.
@@ -1112,8 +1112,8 @@ public class Schedule implements java.io.Serializable {
 			// assume any optimal behavior. 
 			return false;
 		}
-		
-		
+
+
 		//At this point, we know that r has at least one subsetOnly course to schedule.
 		//The next test checks if adding r would force us take a subset-only course,
 		// or if we might get away by just taking a superset-only course.
@@ -1475,235 +1475,238 @@ public class Schedule implements java.io.Serializable {
 	public String printScheduleString(){
 		StringBuilder result = new StringBuilder();
 		//Add Majors
+	
 		if(!this.majorsList.isEmpty()){
-			result.append("Majors: \n");
-		}
-		for(Major m: this.majorsList){
-			result.append(m.name + ":  ");
-			if(m.notes != null){
-				result.append(m.notes);
+			result.append("<table style = 'width: 100%'> <tr>");
+			result.append( "<th> Major:</th> " +
+					" <th>Notes:</th> " +
+					"</tr>");
+			for(Major m: this.majorsList){
+				result.append("<tr Align='left'> <td>" + m.name + "</td>  ");
+				if(m.notes != null){
+					result.append("<td>" + m.notes + "</td>");
+				}
+				result.append("</tr>");
+
 			}
-			result.append("\n");
+			result.append("</table>");
 		}
 
-		result.append("\n		Schedule");
+		result.append("<center> <h1> Schedule </h1> </center> ");
 		//Adds all the scheduleElements from each major
 		for(Semester s: this.getAllSemestersSorted()){
 			result.append("\n");
 			if(s.isAP){
-				result.append("Prior Courses:" + "\n");
+				result.append("<b>Prior Courses: </b>" + "\n");
 			}
 			else{
-				result.append(s.semesterDate.toString() + ": \n");
+				result.append("<b>" + s.semesterDate.toString() + ": </b> \n");
 			}
 			if(s.studyAway){
-				result.append("STUDY AWAY SEMESTER \n");
+				result.append("<b> STUDY AWAY SEMESTER </b>\n");
 			}
 			for(ScheduleElement se : s.elements){
 				String prefix = "  ";
 				if(se instanceof Requirement){
 					prefix = "  Scheduled one course of: ";
 				}
-				result.append(prefix + se.getDisplayString() + "\n");
+				result.append(prefix + se.shortString(10000) + "\n");
 			}
 			if(s.elements.isEmpty()){
-				result.append("  Nothing scheduled for this semester \n");
+				result.append("Nothing scheduled for this semester \n");
 			}
 			if(s.hasNotes){
-				result.append("Notes: " +  s.notes + "\n");
+				result.append("<b> Notes: </b>" +  s.notes + "\n");
 			}
 
 		}
 		result.append("\n");
 		//If any Errors Prints them 
 		if(!d.GUICheckAllErrors(false).equals("")){
-			result.append("Scheduling Errors: \n" + d.GUICheckAllErrors(false));
+			result.append("Scheduling Errors:"); // + d.GUICheckAllErrors(false));
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
-		result.append("\nThe Final Countdown:  \n");
-		result.append(" CLPs Left: " + Math.max(0, 32 - this.getCLP()) + "\n");
-		result.append(" Estimated Courses Left: " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
-		result.append(" Credit Hours Left: " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
-
-
-		return result.toString();
+		result.append("\n <h2>The Final Countdown: </h2>");
+		result.append("<b> CLPs Left: </b> " + Math.max(0, 32 - this.getCLP()) + "\n");
+		result.append("<b> Estimated Courses Left: </b> " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
+		result.append("<b> Credit Hours Left:</b> " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
 
 
 
+	
 
-	}
-
-
-
-	public String printRequirementString(){
-		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
-		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
-		ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
-		for(Semester s: this.getAllSemestersSorted()){
-			for(ScheduleElement se: s.elements){
-				allOrderedElements.add(se);
-				if(s.isAP){
-					coorespondingDates.add(defaultPrior);
-
-				}
-				else {
-					coorespondingDates.add(s.semesterDate);
-				}
-			}
-		}
-		StringBuilder result = new StringBuilder();
-		result.append("									Degree Checklist \n");
-		result.append("General Education Requirements");
-
-		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
-		for(ScheduleElement e : this.getAllElementsSorted()){
-			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
-		}
-		for(Major m: this.getMajors()){
-			result.append("\n");
-			result.append("\n");
-			result.append(m.name);
-			for(Requirement r: m.reqList){
-				String rDisplay = r.getDisplayString() + "-";
-				if(rDisplay.length()<=30){
-					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
-					rDisplay = rDisplay + spaces;
-
-				}
-				result.append("\n" + rDisplay);
-
-				boolean isComplete = r.storedIsComplete();
-				if(!isComplete){
-					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
-					if(coursesNeeded == 1){
-						result.append(coursesNeeded + "  Course Needed	\n");
-					}
-					if(coursesNeeded >1){
-						result.append(coursesNeeded + "  Courses Needed \n");
-					}
-				}
-				int counter = 0;
-
-				ArrayList<Integer> satisfiedSEPointers = new ArrayList<Integer>();
-				for(int i=0; i<this.getAllElementsSorted().size(); i++){
-					ScheduleElement se = allOrderedElements.get(i);
-
-
-					if(elementsSatisfy.get(se).contains(r)){
-						satisfiedSEPointers.add(i);
-					}
-				}
-
-				ArrayList<Integer> finalList = trimSEList(satisfiedSEPointers, allOrderedElements, r);
-				for(int p=0; p<finalList.size(); p++){
-					ScheduleElement se = allOrderedElements.get(finalList.get(p));
-					if(counter ==0 && !isComplete){
-						result.append("Partially Satisfied by: \n");
-					}
-					else if(counter == 0 && isComplete){
-						result.append("Satisfied by: \n");
-					}
-
-
-					StringJoiner joiner = new StringJoiner("\n");
-					StringBuilder part = new StringBuilder();
-
-					//Different strings for requirements
-					String priorIndent = "   ";
-					if(se instanceof Requirement){
-						part.append(priorIndent + "Scheduled  " + se.getDisplayString());
-						
-					}
-					else{
-						part.append(priorIndent + se.getDisplayString());
-						
-					}
-					
-					//When was this thing taken?
-					if(coorespondingDates.get(finalList.get(p)).equals(defaultPrior)){
-						part.append(", " + "Taken before Furman \n");
-					}
-					else{
-						part.append(", " + coorespondingDates.get(finalList.get(p)).toString() + "\n");
-					}
-					joiner.add(part.toString());
-					counter++;
-					result.append(joiner.toString());
-				}
+	return result.toString().replaceAll("\n", "<br>");
 
 
 
+}
 
+
+
+public String printRequirementString(){
+	SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
+	ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
+	ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
+	for(Semester s: this.getAllSemestersSorted()){
+		for(ScheduleElement se: s.elements){
+			allOrderedElements.add(se);
+			if(s.isAP){
+				coorespondingDates.add(defaultPrior);
 
 			}
-
-		}
-
-
-		return result.toString();
-
-	}
-
-
-	private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, ArrayList<ScheduleElement> allOrderedElements, Requirement r) {
-		ArrayList<ScheduleElement> toCompleteR = new ArrayList<ScheduleElement>();
-		for(int i: satisfiedSEPointers){
-			toCompleteR.add(allOrderedElements.get(i));
-		}
-		for(int i = 0; i<satisfiedSEPointers.size(); i++){
-			ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
-			toCompleteR.remove(i);
-			if(!r.isComplete(toCompleteR, false)){
-				toCompleteR.add(i, toRemove);
+			else {
+				coorespondingDates.add(s.semesterDate);
 			}
-			else{
+		}
+	}
+	StringBuilder result = new StringBuilder();
+	result.append("<h2><center> Degree Checklist \n </center></h2>");
+	result.append("<b> General Education Requirements </b>");
 
-				satisfiedSEPointers.remove(i);
-				i--;
+	Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
+	for(ScheduleElement e : this.getAllElementsSorted()){
+		elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
+	}
+	for(Major m: this.getMajors()){
+		result.append("\n");
+		result.append("<b>" + m.name + "</b>");
+		ArrayList<Requirement> sortedReq = new ArrayList<Requirement>(m.reqList);
+		Collections.sort(sortedReq);
+		for(Requirement r: sortedReq){
+			String rDisplay = r.shortString(10000) + "-";
+			if(rDisplay.length()<=30){
+				String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
+				rDisplay = rDisplay + spaces;
+
+			}
+			result.append("\n" + rDisplay);
+
+			boolean isComplete = r.storedIsComplete();
+			if(!isComplete){
+				int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
+				if(coursesNeeded == 1){
+					result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Course Needed </b></font>	\n");
+				}
+				if(coursesNeeded >1){
+					result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Courses Needed </b></font> \n");
+				}
+			}
+			int counter = 0;
+
+			ArrayList<Integer> satisfiedSEPointers = new ArrayList<Integer>();
+			for(int i=0; i<this.getAllElementsSorted().size(); i++){
+				ScheduleElement se = allOrderedElements.get(i);
+
+
+				if(elementsSatisfy.get(se).contains(r)){
+					satisfiedSEPointers.add(i);
+				}
 			}
 
+			ArrayList<Integer> finalList = trimSEList(satisfiedSEPointers, allOrderedElements, r);
+			for(int p=0; p<finalList.size(); p++){
+				ScheduleElement se = allOrderedElements.get(finalList.get(p));
+				if(counter ==0 && !isComplete){
+					result.append("Partially Satisfied by: \n");
+				}
+				else if(counter == 0 && isComplete){
+					result.append("Satisfied by: \n");
+				}
+
+
+				StringJoiner joiner = new StringJoiner("\n");
+				StringBuilder part = new StringBuilder();
+
+				//Different strings for requirements
+				String priorIndent = "   ";
+				if(se instanceof Requirement){
+					part.append(priorIndent + "Scheduled  " + se.shortString(10000));
+
+				}
+				else{
+					part.append(priorIndent + se.shortString(100000));
+
+				}
+
+				//When was this thing taken?
+				if(coorespondingDates.get(finalList.get(p)).equals(defaultPrior)){
+					part.append(", " + "Taken before Furman \n");
+				}
+				else{
+					part.append(", " + coorespondingDates.get(finalList.get(p)).toString() + "\n");
+				}
+				joiner.add(part.toString());
+				counter++;
+				result.append(joiner.toString());
+			}
+
+
+
+
+
 		}
-		return satisfiedSEPointers;
-
-
 
 	}
 
 
+	return result.toString().replaceAll("\n", "<br>");
+
+}
 
 
-
-
-	public int getCLP() {
-		return CLP;
+private ArrayList<Integer> trimSEList(ArrayList<Integer> satisfiedSEPointers, ArrayList<ScheduleElement> allOrderedElements, Requirement r) {
+	ArrayList<ScheduleElement> toCompleteR = new ArrayList<ScheduleElement>();
+	for(int i: satisfiedSEPointers){
+		toCompleteR.add(allOrderedElements.get(i));
 	}
-	public void setCLP(int cLP) {
-		CLP = cLP;
-	}
-	public Prefix getLanguagePrefix() {
-		return languagePrefix;
-	}
-
-
-
-
-
-	public int getCreditHoursComplete(){
-		int result = 0;
-		for (Semester s : this.getAllSemestersSorted()){
-			result = result + s.getCreditHours();
+	for(int i = 0; i<satisfiedSEPointers.size(); i++){
+		ScheduleElement toRemove = allOrderedElements.get(satisfiedSEPointers.get(i));
+		toCompleteR.remove(i);
+		if(!r.isComplete(toCompleteR, false)){
+			toCompleteR.add(i, toRemove);
 		}
-		return result;
-	}
+		else{
 
-	public SemesterDate getStartDate(){
-		return this.getStartSemester().semesterDate;
+			satisfiedSEPointers.remove(i);
+			i--;
+		}
+
 	}
-	public ArrayList<Semester> getSemesters(){
-		return this.semesters;
-	}
+	return satisfiedSEPointers;
 
 
+
+}
+
+
+public int getCLP() {
+	return CLP;
+}
+public void setCLP(int cLP) {
+	CLP = cLP;
+}
+public Prefix getLanguagePrefix() {
+	return languagePrefix;
+}
+
+
+
+
+
+public int getCreditHoursComplete(){
+	int result = 0;
+	for (Semester s : this.getAllSemestersSorted()){
+		result = result + s.getCreditHours();
+	}
+	return result;
+}
+
+public SemesterDate getStartDate(){
+	return this.getStartSemester().semesterDate;
+}
+public ArrayList<Semester> getSemesters(){
+	return this.semesters;
+}
 
 	/**
 	 * find the first (temporal first) scheduled instance of this prefix,
@@ -1746,46 +1749,39 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	public void reloadMajors() {
-		ListOfMajors m = FileHandler.getMajorsList();
-		ArrayList<Major> newMajorsList = new ArrayList<Major>();
-		for(Major major: this.majorsList){
-			System.out.println(major.name +"  " + major.chosenDegree);
-			Major refreshed = m.getMajor(major.name);
-			refreshed.setChosenDegree(major.chosenDegree);
-			newMajorsList.add(refreshed);
-			
-			
-		}
-		
-		setMajorsList(newMajorsList);
-		
 	}
 
+	setMajorsList(newMajorsList);
 
-	
-
-
-
-	public void setMajorsList(ArrayList<Major> majors){
-		this.majorsList= majors;
-		this.recalcGERMajor();
-		this.updatePrereqs();
-		this.updateReqs();
-		this.updateTotalCoursesNeeded();
-		
-	}
-//Collect all the elemtns before that semester date.
+}
 
 
-	public Major getGER() {
-		return GER;
-	}
 
 
-	public void setGER(Major gER) {
-		GER = gER;
-	}
+
+
+public void setMajorsList(ArrayList<Major> majors){
+	this.majorsList= majors;
+	this.recalcGERMajor();
+	this.updatePrereqs();
+	this.updateReqs();
+	this.updateTotalCoursesNeeded();
+
+}
+
+
+
+//Collect all the elements before that semester date.
+
+
+public Major getGER() {
+	return GER;
+}
+
+
+public void setGER(Major gER) {
+	GER = gER;
+}
 
 }
 

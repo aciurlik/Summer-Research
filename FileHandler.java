@@ -41,6 +41,7 @@ public class FileHandler implements ActionListener{
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = MenuOptions.resourcesFolder + "SavedStudentData.txt";
 	private static Properties p;
+	static ListOfMajors listOfMajors = null;
 
 	static{
 		p = new Properties();
@@ -142,7 +143,15 @@ public class FileHandler implements ActionListener{
 			instruct = "Choose a schedule to open";
 			header = "Open Schedule";
 		}
-
+		if(s.equals("compareOne")){
+			instruct = "Choose your first schedule to compare";
+			header = "Compare Schedules";	
+		}
+		if(s.equals("compareTwo")){
+			instruct = "Choose your second schedule to compare";
+			header = "Compare Schedules";
+		}
+		
 		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder);
 		if(!scheduleNames.isEmpty()){
 			String[] finalSchedNames = new String[scheduleNames.size()];
@@ -157,6 +166,7 @@ public class FileHandler implements ActionListener{
 			return null; 
 		}
 	}
+
 
 
 	public static Schedule openSchedule(){
@@ -266,7 +276,13 @@ public class FileHandler implements ActionListener{
 
 
 	public static ListOfMajors getMajorsList(){
-		ListOfMajors result = readMajorsFrom(new File(majorsFile));
+		ListOfMajors result;
+		if(listOfMajors == null){
+			result = readMajorsFrom(new File(majorsFile));
+		}
+		else{
+			result= listOfMajors;
+		}
 		return result;
 	}
 
@@ -304,6 +320,7 @@ public class FileHandler implements ActionListener{
 		}
 		return result;
 	}
+
 
 	/**
 	 * Return the contents of this file as a list of strings, where

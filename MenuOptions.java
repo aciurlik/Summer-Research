@@ -158,6 +158,9 @@ public class MenuOptions implements java.io.Serializable{
 	@SuppressWarnings("unused")
 	private int _____________Driver_________________;
 		public static boolean UIType;
+
+		public static String confirm = "Yes, I understand";
+		
 		public boolean isUIType() {
 			return UIType;
 		}

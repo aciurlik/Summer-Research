@@ -16,13 +16,9 @@ public class ListOfMajors {
 	 * 
 	 */
 	
-
+	static
 
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
-
-
-
-
 
 	public void saveMe(Major m, File f){
 		try {
