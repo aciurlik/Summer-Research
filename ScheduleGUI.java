@@ -11,6 +11,8 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -963,8 +965,26 @@ public class ScheduleGUI{
 	}
 	
 	public void askMasterPassword(){
-		JOptionPane.showInputDialog("Knock knock \n \n...\n \n ... \n \n Password?");
-		System.out.println("Back door still locked currently.");
+		String input = JOptionPane.showInputDialog("Knock knock \n \n...\n \n ... \n \n Password?");
+		if(input == null){
+			return;
+		}
+		if(input.toLowerCase().equals("a happy cat peers at you from its cloud")){
+			FurmanOfficial.masterIsAround = true;
+			JFrame debugScreen = new JFrame();
+			JTextArea out = new JTextArea();
+			System.setOut(new PrintStream(new OutputStream(){
+				public void write(int b) throws IOException{
+					out.append(String.valueOf( ( char )b ) );
+				}
+			}));
+			
+			debugScreen.setTitle("Debug area");
+			debugScreen.add(out);
+			debugScreen.pack();
+			debugScreen.setVisible(true);
+			debugScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
 	}
 
 
