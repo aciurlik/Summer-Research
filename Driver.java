@@ -241,9 +241,6 @@ public class Driver {
 					else{
 						Driver.addScheduleGUI(new Schedule());
 					}
-
-
-
 				}
 
 

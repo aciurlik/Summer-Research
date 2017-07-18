@@ -1061,6 +1061,7 @@ public class Schedule implements java.io.Serializable {
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+						duplicate.setOffendingCourse(results[0]);
 						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setElementList(results);
 						if(isAll == false){
@@ -1076,6 +1077,7 @@ public class Schedule implements java.io.Serializable {
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 				ScheduleElement[] result = {e, e1};
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+				duplicate.setOffendingCourse(result[0]);
 				duplicate.setElementList(result);
 				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
 				if(isAll == false){
@@ -1548,8 +1550,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!d.GUICheckAllErrors(false).equals("")){
-			result.append("Scheduling Errors:"); // + d.GUICheckAllErrors(false));
+		if(!d.getErrorString().equals(" ")){
+			result.append("Scheduling Errors:" + d.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h2>The Final Countdown: </h2>");
@@ -1605,7 +1607,7 @@ public class Schedule implements java.io.Serializable {
 					rDisplay = rDisplay + spaces;
 
 				}
-				result.append("\n" + rDisplay);
+				result.append("\n <b>" +  rDisplay + "</b>" );
 
 				boolean isComplete = r.storedIsComplete();
 				if(!isComplete){
@@ -1647,12 +1649,12 @@ public class Schedule implements java.io.Serializable {
 					String priorIndent = "   ";
 					part.append(priorIndent);
 					if(se instanceof Requirement){
-						part.append("Scheduled  " + se.shortString(10000));
+						part.append("Scheduled  " + se.shortString(10000).trim());
 
 
 					}
 					else{
-						part.append(se.getDisplayString());
+						part.append(se.getDisplayString().trim());
 					}
 
 					//When was this thing taken?
