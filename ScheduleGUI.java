@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
 import java.awt.event.WindowListener;
+import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 
 import javax.swing.JCheckBox;
-
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -32,8 +33,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.ImageView;
 
 
 
@@ -688,7 +695,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, parseIntoReadableHTML(instruct, defaultPixelWidth), header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, "<html><body>" + parseIntoReadableHTML(instruct, defaultPixelWidth) +"</body></html>", header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -735,7 +742,7 @@ public class ScheduleGUI{
 					+ "Until you change this requirment into a course, "
 					+ "\nwe will assume that it represents one of these.";
 		}
-		result = parseIntoReadableHTML(result, defaultPixelWidth);
+		result =  "<html><body>" + parseIntoReadableHTML(result, defaultPixelWidth)+  "</html></body>";
 		return result;
 	}
 
@@ -821,10 +828,15 @@ public class ScheduleGUI{
 	}
 
 
-
+/**
+ * 
+ * @param s
+ * @param pixels
+ * @return
+ */
 	public static String parseIntoReadableHTML(String s, int pixels){
 		s = s.replaceAll("\n", "<br />");
-		return  "<html><body><p style='width " + pixels + "px;'>" + s + "</p></body></html>";
+		return  "<p style='width " + pixels + "px;'>" + s + "</p>";
 	}
 
 
@@ -897,24 +909,32 @@ public class ScheduleGUI{
 		if( (!selectedScheduleLayout) && (!selectedReqLayout)){
 			selectedScheduleLayout = true;
 		}
-
+		
 		//Schedule
 		if(selectedScheduleLayout){
-			finalPrint = finalPrint+ sch.printScheduleString() + "\n";
+			finalPrint = finalPrint + sch.printScheduleString() + "<br>";
+			System.out.println(sch.printScheduleString().replaceAll(">", "> \n"));
 		}
 		//Reqs
 		if(selectedReqLayout){
-			finalPrint = finalPrint + sch.printRequirementString() + "\n";
+			finalPrint = finalPrint + sch.printRequirementString() + "<br>";
 		}
+		
 
 		if(selectedScheduleLayout || selectedReqLayout){
-			JTextArea schedulePrint = new JTextArea(finalPrint, 50, 70);
-			schedulePrint.setWrapStyleWord(true);
-			Printable p = schedulePrint.getPrintable(null, null);
-
-			schedulePrint.setLineWrap(true);
+			JTextPane schedulePrint = new JTextPane();
+			schedulePrint.setFont(FurmanOfficial.normalFont);
+			//schedulePrint.setWrapStyleWord(true);
+			//Printable p = schedulePrint.getPrintable(null, null);
+			Paper p = new Paper();
+			schedulePrint.setPreferredSize(new Dimension((int) p.getWidth(), (int) p.getHeight()));
+			//	schedulePrint.setLineWrap(true);
+			schedulePrint.setContentType("text/html");
+		//	System.out.println("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
+			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
+			
 			schedulePrint.setEditable(false);
-			schedulePrint.setFont(FurmanOfficial.monospaced);
+			//schedulePrint.setFont(FurmanOfficial.monospaced);
 			JScrollPane scrollPane = new JScrollPane(schedulePrint);
 			scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width,500));
 			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
