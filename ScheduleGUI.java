@@ -736,10 +736,14 @@ public class ScheduleGUI{
 			Requirement r = e.getOptimisticRequirement();
 			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
 			Requirement subset = pair.get(1);
-			result = "The requirement " + r.shortString(70) + " must include at least " + 
-					r.indent(subset.getDisplayString(),  "   ")
-			+ "Until you change this requirment into a course, "
-			+ "\nwe will assume that it represents one of these.";
+
+			result = "The requirement " 
+					+ r.shortString(70)
+					+ " must include at least " 
+					+ r.indent(subset.getDisplayString(),  "   ")
+					+ "Until you change this requirment into a course, "
+					+ "\nwe will assume that it represents one of these.";
+
 		}
 
 		result = parseIntoReadableHTML(result, defaultPixelWidth);
@@ -972,6 +976,9 @@ public class ScheduleGUI{
 			return;
 		}
 		if(input.toLowerCase().equals("a happy cat peers at you from its cloud")){
+			//Doesn't repaint Driver, and can't repaint mainMenuBar, so if
+			// there's a master-specific function in the menu bar then 
+			// you have to make a new schedule to see it.
 			FurmanOfficial.masterIsAround = true;
 			JFrame debugScreen = new JFrame();
 			JTextArea out = new JTextArea();

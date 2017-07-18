@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1200,34 +1201,82 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public String indent(String s, String tab, HashSet<Character> openParens, HashSet<Character> closeParens){
 		StringBuilder result = new StringBuilder();
 		int depth = 0;
+		int lineLength = 0;
+		LinkedList<Character> stack = new LinkedList<Character>();
 		for(char c : s.toCharArray()){
+			stack.addLast(c);
+		}
+		
+		while(!stack.isEmpty()){
+			char c = stack.pop();
 			if(openParens.contains(c)){
 				depth ++;
 				result.append(c);
+				//newline
 				result.append("\n");
+				lineLength = 0;
 				for(int i = 0; i < depth ; i ++){
 					result.append(tab);
+					lineLength += tab.length();
 				}
 			}
 			else if(closeParens.contains(c)){
 				depth --;
+				
+				//newline
 				result.append("\n");
-				for(int i = 0; i < depth; i ++){
-					result.append(tab);
-				}
-				result.append(c);
-				result.append("\n");
+				lineLength = 0;
 				for(int i = 0; i < depth ; i ++){
 					result.append(tab);
+					lineLength += tab.length();
+				}
+				
+				result.append(c);
+				
+				//newline
+				result.append("\n");
+				lineLength = 0;
+				for(int i = 0; i < depth ; i ++){
+					result.append(tab);
+					lineLength += tab.length();
 				}
 			}
 			else{
-				result.append(c);
+				if(c == '\n'){
+					//newline
+					result.append("\n");
+					lineLength = 0;
+					for(int i = 0; i < depth ; i ++){
+						result.append(tab);
+						lineLength += tab.length();
+					}
+				}
+				else{
+					lineLength ++;
+					if(lineLength > 70 && c == ' '){
+						//go to the last space in this chunk.
+						// if the character after it isn't a newline, then
+						// make this whole chunk of spaces into a newline.
+						while(stack.peek() == ' '){
+							c = stack.pop();
+						}
+						if(stack.peek() != '\n'){
+
+							//newline
+							result.append("\n");
+							lineLength = 0;
+							for(int i = 0; i < depth ; i ++){
+								result.append(tab);
+								lineLength += tab.length();
+							}
+						}
+					}
+					result.append(c);
+				}
 			}
 		}
 		return result.toString();
 	}
-	
 	
 	
 	///
