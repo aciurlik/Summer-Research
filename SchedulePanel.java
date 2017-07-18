@@ -123,58 +123,55 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.fill = gbc.VERTICAL;
+		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
 
-
-		for(Semester s: sch.getAllSemestersSorted()){
-			int reallyBigNumber = 100; //Makes it so you can have a lot of credit hours before it gives you an error
-			SemesterPanel foundp = this.findPanelFor(s);
-			s.setLastSemester(false);
+		ArrayList<Semester> schSemesters = sch.getAllSemestersSorted();
+		for(int i = 0; i < schSemesters.size() ; i ++){
+			Semester s =  schSemesters.get(i);
 			if(s.isTaken()){
-				s.setOverloadLimit(reallyBigNumber);
-				//s.setTaken(true);
-				
+				//Makes it so you don't get errors from taken semesters
+				//TODO find a better place to put this logic, or else
+				// explain why the best place to put it is in the 
+				// schedule panel update method.
+				s.setOverloadLimit(1000);
+
 			}
-			if(s.equals(sch.getAllSemestersSorted().get(sch.getAllSemestersSorted().size()-1))){
-				s.setLastSemester(true);
-			}
-			if(s.equals(sch.getAllSemestersSorted().get(1))){
-				s.setUndeletableSemester(true);
-			}
-			if(foundp != null){
-				foundp.updatePanel(s);
-				scrollPanel.add(foundp, gbc);
-				gbc.gridx++;
+			
+			
+			SemesterPanel semesterP = this.findPanelFor(s); //if you already have a panel for this semester,
+			// don't make a new one.
+			if(semesterP == null){
+				semesterP =new SemesterPanel(s, this.d);
 			}
 			else{
-				SemesterPanel semester = new SemesterPanel(s, this.d);
-				if(semester.equals(sch.getAllSemestersSorted().get(sch.getAllSemestersSorted().size()-1))){
-					s.setLastSemester(true);
-				}
-				else{
-					s.setLastSemester(false);
-				}
-				if(semester.equals(sch.getAllSemestersSorted().get(1))){
-					s.setUndeletableSemester(true);
-				}
-				else{
-					s.setUndeletableSemester(false);
-				}
-				allSemesterPanels.add(semester);
-				scrollPanel.add(semester, gbc);
-				gbc.gridx ++;
+				semesterP.updatePanel(s);
 			}
+			
+			
+			//If it's the last semester, you can always delete it (except in the next case)
+			if(i == schSemesters.size() - 1){
+				semesterP.setDeletable(true);
+			}
+			//If it's one of the first two semesters, you can never delete it.
+			// (even if it's the last semester)
+			if( i <= 1){
+				semesterP.setDeletable(false);
+			}
+			
+			allSemesterPanels.add(semesterP);
+			scrollPanel.add(semesterP, gbc);
+			gbc.gridx ++;
 		}
 
 
-		gbc.fill = gbc.NONE;
+		gbc.fill = GridBagConstraints.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
 		
 		
 
 		//This code opens the secret admin window
-		if(allSemesterPanels.size() > 11){
+		if(allSemesterPanels.size() == 15){
 			allSemesterPanels.get(10).addMouseListener(new MouseAdapter(){
 				@Override
 				public void mousePressed(MouseEvent e){

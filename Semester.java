@@ -18,11 +18,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	String notes = "";
 	boolean isAP = false;
 	public boolean studyAway = false;
-	protected boolean lastSemester = false;
-	//For the first semester 
-	protected boolean undeletableSemester = false;
-
-
+	 
 
 
 
@@ -334,20 +330,6 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		else{
 			return false;
 		}
-	}
-
-
-
-	public boolean isUndeletableSemester() {
-		return undeletableSemester;
-	}
-
-	public void setUndeletableSemester(boolean undeletableSemester) {
-		this.undeletableSemester = undeletableSemester;
-	}
-
-	public void setLastSemester(boolean lastSemester) {
-		this.lastSemester = lastSemester;
 	}
 
 	public boolean isTaken() {
