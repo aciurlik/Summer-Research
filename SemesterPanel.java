@@ -339,18 +339,18 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 			defaultPanel.remove(topPanel);
 
 		}
-		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO  || sem.lastSemester){
-			if(!sem.undeletableSemester){
-				deleteSemesterButton.setEnabled(true);
-			}
+		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO ){
+			deleteSemesterButton.setEnabled(true);
 		}
 
 		else{
 			deleteSemesterButton.setEnabled(false);
 		}
-
 	}
 
+	public void setDeletable(boolean canBeDeleted){
+		deleteSemesterButton.setEnabled(canBeDeleted);
+	}
 
 
 
