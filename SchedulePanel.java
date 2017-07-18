@@ -126,7 +126,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
 
-		
 		ArrayList<Semester> schSemesters = sch.getAllSemestersSorted();
 		for(int i = 0; i < schSemesters.size() ; i ++){
 			Semester s =  schSemesters.get(i);
@@ -136,6 +135,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 				// explain why the best place to put it is in the 
 				// schedule panel update method.
 				s.setOverloadLimit(1000);
+
 			}
 			
 			

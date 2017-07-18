@@ -8,7 +8,7 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	 */
 	private static final long serialVersionUID = 1L;
 	Course c;
-	public boolean taken;
+	//public boolean taken;
 	HashSet<Requirement> userSpecifiedReqs; //when enemy list is not empty, this list specifies which reqs the user chose to satisfy
 	private HashSet<Requirement> oldEnemyList;//this is a list of enemy requirements that this schedule course satisfied last time the schedule told this course to update.
 	// used to tell if we need to ask the user for userSpecifiedReqs again.
@@ -204,14 +204,6 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		return result;
 	}
 
-
-	public boolean isTaken() {
-		return taken;
-	}
-
-	public void setTaken(boolean taken) {
-		this.taken = taken;
-	}
 
 
 	/**

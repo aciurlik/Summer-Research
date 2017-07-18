@@ -284,7 +284,9 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		results.add(professor);
 		results.add(c.c.creditHours);
 		results.add(reqsFulfilled.size());
-		results.addAll(reqsFulfilled);
+		for(Requirement r: reqsFulfilled){
+			results.add(r.shortString(10));
+		}
 		//results.add(Arrays.toString(c.c.meetingDays));
 		return results;
 	}

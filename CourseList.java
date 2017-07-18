@@ -90,7 +90,7 @@ public class CourseList implements java.io.Serializable  {
 				//"appropriate placement" is common
 				if(originalRequirementString.toUpperCase().equals("APPROPRIATE PLACEMENT")){
 					Requirement result = new Requirement();
-					result.addRequirement(new TerminalRequirement(new Prefix("Placement", p.getSubject() + "-" + p.getNumber())));
+					result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 					return result;
 				}
 				//"audition required" is common

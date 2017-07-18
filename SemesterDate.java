@@ -36,8 +36,14 @@ public class SemesterDate implements java.io.Serializable {
 		String[] parsed = saveString.split("-");
 		return new SemesterDate(Integer.parseInt(parsed[0]), Integer.parseInt(parsed[1]));
 	}
+	/**
+	 * 
+	 * Reads from strings of the form 2017D1
+	 * these strings come from an import of prior courses from myFurman
+	 */
 	public static int[] fromDNumToSeason = {FALL, SPRING, MAYX, SUMMERONE, SUMMERTWO};
 	public static SemesterDate readFromFurman(String s){
+		s=s.trim();
 		if(s == null || s.length() < 4){
 			return null;
 		}
@@ -56,6 +62,12 @@ public class SemesterDate implements java.io.Serializable {
 		
 		
 	}
+	/**
+	 * Read from strings of the form Fall 2017 - Day
+	 * these strings come from courselist columns
+	 * @param semesterString
+	 * @return
+	 */
 	public static SemesterDate fromFurman(String semesterString){
 		//Examples:
 		// May Experience 2017 - Day

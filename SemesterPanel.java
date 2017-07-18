@@ -34,6 +34,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	private int normalNumberofClasses = 4;
 	private String addAClass = "Drop a requirement here";
 	JPanel defaultPanel = new JPanel();
+	JPanel PanelforButtons;
 	JPanel topPanel;
 	JPanel hidePanel;
 	JLabel fallSpring;
@@ -123,7 +124,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 
 
-		JPanel PanelforButtons = new JPanel();
+		PanelforButtons = new JPanel();
 		PanelforButtons.setBackground(defaultPanel.getBackground());
 		PanelforButtons.setOpaque(false);
 
@@ -212,7 +213,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		if(s.studyAway){
 			return FurmanOfficial.grey;
 		}
-		if(s.taken){
+		if(s.isTaken()){
 			return FurmanOfficial.grey(170);
 		}
 		int ColorNum = 0;
@@ -294,7 +295,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		int DropsNeeded = (normalNumberofClasses - sem.elements.size());
 
-		if(sem.semesterDate.sNumber != SemesterDate.MAYX && !sem.taken){
+		if(sem.semesterDate.sNumber != SemesterDate.MAYX && !sem.isTaken()){
 
 			defaultPanel.add(dropLabel);
 			for (int i= 0; i<DropsNeeded-1; i++){
@@ -310,7 +311,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 
 
-		if(sem.studyAway || sem.taken){
+		if(sem.studyAway || sem.isTaken()){
 
 
 			dropLabel.setForeground(Color.white);
@@ -336,8 +337,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 		if(this.sem.isAP){
 			fallSpring.setText("Prior Courses");
-			defaultPanel.remove(topPanel);
-
+			topPanel.remove(menuPanel);
 		}
 		if(sem.semesterDate.sNumber == SemesterDate.MAYX || sem.semesterDate.sNumber == SemesterDate.SUMMERONE || sem.semesterDate.sNumber==SemesterDate.SUMMERTWO ){
 			deleteSemesterButton.setEnabled(true);
@@ -413,6 +413,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	 * @return
 	 */
 	public boolean canTake(ScheduleElement e){
+		if(this.sem.isTaken()){
+			return false;
+		}
 		//Turn this into a requirement.
 		Requirement r;
 		if(e instanceof Requirement){
