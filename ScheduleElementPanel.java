@@ -85,10 +85,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 
 	public void updatePanel(){ //This can be taken out later
-		String display = s.getDisplayString();
-		if(display.length() > 100){
-			display = s.shortString(100);
-		}
+		String display = s.shortString(100);
 		JLabel elementLabel = new JLabel(display);
 		elementLabel.setFont(FurmanOfficial.normalFont);
 		this.add(elementLabel, BorderLayout.WEST);

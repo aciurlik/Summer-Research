@@ -413,6 +413,9 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	 * @return
 	 */
 	public boolean canTake(ScheduleElement e){
+		if(this.sem.isTaken()){
+			return false;
+		}
 		//Turn this into a requirement.
 		Requirement r;
 		if(e instanceof Requirement){

@@ -29,8 +29,8 @@ public class Schedule implements java.io.Serializable {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
-	
-	
+
+
 
 
 	public boolean skipOverrides = false;
@@ -201,8 +201,8 @@ public class Schedule implements java.io.Serializable {
 		currentSemester = latestDate;
 		setFirstSemester(earliestDate);
 
-		
-		
+
+
 
 
 		//Add each of the prior courses to the schedule
@@ -611,8 +611,8 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	
-	
+
+
 	public SemesterDate getCurrentSemester() {
 		return currentSemester;
 	}
@@ -621,7 +621,7 @@ public class Schedule implements java.io.Serializable {
 	public void setCurrentSemester(SemesterDate currentSemester) {
 		this.currentSemester = currentSemester;
 	}
-	
+
 
 
 	/**
@@ -713,7 +713,7 @@ public class Schedule implements java.io.Serializable {
 				Course c= new Course(new Prefix(languagePrefix.getSubject(), "PL."+ Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
-			//	cc.setTaken(true);
+				//	cc.setTaken(true);
 				priorSemester.add(cc);
 			}
 		}
@@ -1532,8 +1532,11 @@ public class Schedule implements java.io.Serializable {
 				String prefix = "  ";
 				if(se instanceof Requirement){
 					prefix = "  Scheduled one course of: ";
+					result.append(prefix + se.shortString(1000) + "\n");
 				}
-				result.append(prefix + se.shortString(10000) + "\n");
+				else{
+					result.append(se.getDisplayString() + "\n");
+				}
 			}
 			if(s.elements.isEmpty()){
 				result.append("Nothing scheduled for this semester \n");
@@ -1642,13 +1645,14 @@ public class Schedule implements java.io.Serializable {
 
 					//Different strings for requirements
 					String priorIndent = "   ";
+					part.append(priorIndent);
 					if(se instanceof Requirement){
-						part.append(priorIndent + "Scheduled  " + se.shortString(10000));
+						part.append("Scheduled  " + se.shortString(10000));
+
 
 					}
 					else{
-						part.append(priorIndent + se.shortString(100000));
-
+						part.append(se.getDisplayString());
 					}
 
 					//When was this thing taken?

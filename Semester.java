@@ -21,7 +21,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	protected boolean lastSemester = false;
 	//For the first semester 
 	protected boolean undeletableSemester = false;
-	
+
 
 
 
@@ -145,32 +145,30 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
 	 */
 	public boolean checkOverload(boolean forAll,ScheduleElement addition){
-		int totalHours = 0;
-		if(addition instanceof ScheduleCourse){
-			ScheduleCourse toAdd = (ScheduleCourse) addition;
-			totalHours= totalHours + toAdd.getCreditHours();
-		}
-		if(addition instanceof Requirement){
-			Requirement toAdd = (Requirement) addition;
-			totalHours = totalHours + toAdd.getCreditHours();
+			int totalHours = 0;
+			if(addition instanceof ScheduleCourse){
+				ScheduleCourse toAdd = (ScheduleCourse) addition;
+				totalHours= totalHours + toAdd.getCreditHours();
+			}
+			if(addition instanceof Requirement){
+				Requirement toAdd = (Requirement) addition;
+				totalHours = totalHours + toAdd.getCreditHours();
+			}
+			totalHours = totalHours + getCreditHours();
+			if(totalHours > OverloadLimit){
+				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
+				overload.setOverloadLimit(this.OverloadLimit);
+				overload.setOffendingCourse(addition);
+				overload.setOffendingSemester(this);
+				//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
+				if(forAll == false){
+					return (!this.schedule.userOverride(overload));
+				}
+				if(forAll == true){
+					return true;
+				}
+			}
 	
-		}
-		
-		
-		
-		totalHours = totalHours + getCreditHours();
-		if(totalHours > OverloadLimit){
-			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
-			overload.setOverloadLimit(this.OverloadLimit);
-			overload.setOffendingCourse(addition);
-			//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
-			if(forAll == false){
-				return (!this.schedule.userOverride(overload));
-			}
-			if(forAll == true){
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -360,7 +358,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 			return false;
 		}
 	}
-	
+
 
 
 
