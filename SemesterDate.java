@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 
 public class SemesterDate implements java.io.Serializable {
+	private static final long serialVersionUID = 1L;
 	public static final int SPRING = 1;
 	public static final int FALL = 5;
 	public static final int SUMMERONE = 3;
@@ -34,6 +35,26 @@ public class SemesterDate implements java.io.Serializable {
 	public static SemesterDate readFrom(String saveString){
 		String[] parsed = saveString.split("-");
 		return new SemesterDate(Integer.parseInt(parsed[0]), Integer.parseInt(parsed[1]));
+	}
+	public static int[] fromDNumToSeason = {FALL, SPRING, MAYX, SUMMERONE, SUMMERTWO};
+	public static SemesterDate readFromFurman(String s){
+		if(s == null || s.length() < 4){
+			return null;
+		}
+		int year = Integer.parseInt(s.substring(0, 4));
+		int dNumber = Integer.parseInt(s.substring(5));
+		//d1 = spring of the previous year
+		//d2 = fall
+		//d3 = mayX
+		//d4 = 
+		if(dNumber == 1){
+			year = year - 1;
+		}
+		int season = fromDNumToSeason[dNumber-  1];
+		return new SemesterDate(year, season);
+		
+		
+		
 	}
 	public static SemesterDate fromFurman(String semesterString){
 		//Examples:
@@ -75,12 +96,21 @@ public class SemesterDate implements java.io.Serializable {
 		if(this.sNumber == SemesterDate.FALL){
 			return new SemesterDate(this.year + 1, SemesterDate.SPRING);
 		}
+		//Automatically assumes that next is spring or fall, not summer, if you're already
+		// a spring/fall semester. TODO not good style.
 		if(this.sNumber == SemesterDate.SPRING){
 			return new SemesterDate(this.year, SemesterDate.FALL);
 		}
 		else{
-			return new SemesterDate(this.year,(this.sNumber + 1)%4 );
+			return new SemesterDate(this.year,(this.sNumber + 1) );
 		}
+	}
+	
+	public SemesterDate previous(){
+		if(this.sNumber == SPRING){
+			return new SemesterDate(this.year - 1, SemesterDate.SUMMERTWO);
+		}
+		return new SemesterDate(this.year, this.sNumber - 1);
 	}
 	
 	public String getUserString(){
@@ -116,6 +146,9 @@ public class SemesterDate implements java.io.Serializable {
 
 	//@Override
 	public int compareTo(SemesterDate o) {
+		if(o == null){
+			return -1;
+		}
 		if(this.year < o.year){
 			return - 1;
 		}

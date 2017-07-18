@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -98,7 +99,7 @@ public class Driver {
 		if(choices.length != displays.length){
 			throw new RuntimeException("Wrong sizes for choices and displays in GUICHooseAmong" + choices.length + "," + displays.length);
 		}
-		String chosenString = (String)JOptionPane.showInputDialog(new JFrame(), message , title , JOptionPane.PLAIN_MESSAGE, null, displays, "Cats");
+		String chosenString = (String)JOptionPane.showInputDialog(null, message , title , JOptionPane.PLAIN_MESSAGE, null, displays, "Cats");
 		int chosenIndex = 0;
 		for(; chosenIndex < displays.length ; chosenIndex ++){
 			if(displays[chosenIndex] == chosenString){
@@ -138,8 +139,11 @@ public class Driver {
 		supportedSemesters.add( new SemesterDate(2016, SemesterDate.FALL ));
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
-		return GUIChooseStartTime(supportedSemesters);
-
+		SemesterDate result = GUIChooseStartTime(supportedSemesters);
+		if(result == null){
+			result = supportedSemesters.get(0);
+		}
+		return result;
 	}
 
 
@@ -155,6 +159,7 @@ public class Driver {
 		}
 
 	}
+	
 
 
 
@@ -162,7 +167,7 @@ public class Driver {
 	/**
 	 * Opens up the StartUp help. 
 	 */
-	public static void startUpMessage() {
+	public static void startUpMessage() {=
 			if(startUP != null){
 				startUP.showStartUp(false);
 			}
@@ -173,8 +178,6 @@ public class Driver {
 				startUP.showStartUp(false);
 				
 			}
-		
-
 	}
 
 	public static String getDisclaimer(){
@@ -193,7 +196,22 @@ public class Driver {
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
+		
+		
+		
+		//SemesterDate start = tryPickStartDate();
 
+		/*
+		if(start == null){
+			//this will close any running code, including the JOptionPanes which don't get collected by 
+			// the garbage collector for some reason.
+			System.exit(0);
+			return;
+		}*/
+
+		//Schedule.defaultFirstSemester = start;
+		//new Driver();
+		//Driver.importPriorCourses();
 		JPanel editorHolder = new JPanel();
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setPreferredSize(new Dimension(500, 250));
@@ -231,7 +249,7 @@ public class Driver {
 							startUP.showStartUp(true);
 						}
 						else{
-							Driver.addScheduleGUI(Schedule.testSchedule());
+							Driver.addScheduleGUI(new Schedule());
 						}
 
 
@@ -370,9 +388,6 @@ public class Driver {
 
 
 		}
-
-
-
-
 	}
+
 }

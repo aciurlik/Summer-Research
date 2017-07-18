@@ -60,6 +60,7 @@ public class MenuOptions implements java.io.Serializable{
 			public static final  String printSchedule = "Print Schedule";
 			public static String deleteSchedule = "Delete Schedule";
 			public static String checkAllErrors = "Check all Errors";
+			public static String loadPriorCourses = "Import Prior Courses";
 		
 		
 		//Edit 

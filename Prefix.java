@@ -51,6 +51,9 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 		return this.equals((Prefix)o);
 	}
 	public boolean equals(Prefix other){
+		if(other== null){
+			return false;
+		}
 		return this.subject.equals(other.subject) && this.courseNumber.equals(other.courseNumber);
 	}
 

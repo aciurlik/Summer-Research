@@ -1,11 +1,8 @@
 
 import java.util.ArrayList;
-
 import java.util.Collections;
-
 import java.util.HashSet;
 import java.util.Hashtable;
-
 import java.util.StringJoiner;
 
 
@@ -32,6 +29,7 @@ public class Schedule implements java.io.Serializable {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
+	public boolean skipOverrides = false;
 
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	private SemesterDate currentSemester;
@@ -50,7 +48,7 @@ public class Schedule implements java.io.Serializable {
 	public static Schedule testSchedule(){
 		//	CourseList l = CourseList.testList();
 		Schedule result = new Schedule();
-		result.readFromPrior();
+		result.readBlankPrior();
 		return result;
 	}
 
@@ -64,59 +62,65 @@ public class Schedule implements java.io.Serializable {
 	 * @param currentSemester
 	 */
 	public Schedule(){
-
 		//Majors and requirements
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
 		//this.masterList = masterList;
 
-
-		readFromPrior(); //loads first semester and current semester, among others.
-
-		//Semesters
-		this.semesters = new ArrayList<Semester>();
-		//Sets prior semester as SummerTwo of the same year as the Fall of the First Year, First Semester.
-		Semester s = new Semester (new SemesterDate(firstSemester.year, firstSemester.sNumber-1), this);
-		//TODO Redo this logic by just changing the indices.
-		for(int i = 0;i < 9 ; i ++){
-			if(i==0){
-				s.isAP=true;
-				priorSemester =s;
-			}
-			else{
-				s = new Semester(firstSemester, this);
-				this.semesters.add(s);
-				firstSemester = firstSemester.next();
-			}
-
-
+		String past = FileHandler.getSavedStudentData();
+		if(past != null){
+			readPrior(past);
+		}
+		else{
+			readBlankPrior(); //loads prior courses, recalc firstSemester,
+			// and create default semesters.
 		}
 		this.recalcGERMajor();
-
 	}
+	
+	public Schedule(String priorCourses){
+		this.majorsList= new ArrayList<Major>();
+		this.prereqs = new HashSet<Prereq>();
+		readPrior(priorCourses);
+		recalcGERMajor();
+	}
+	
 
 	public void setDriver(ScheduleGUI d){
 		this.d = d;
 	}
 
 
-	public void readFromPrior(){
-		//readFromTestPrior();
-		readBlankTestPrior();
+	/**
+	 * May wipe all scheduleElements from the schedule!!!!
+	 * @param firstSemester
+	 */
+	public void setFirstSemester(SemesterDate firstSemester){
+		if(firstSemester.compareTo(this.firstSemester) == 0){
+			return;
+		}
+		//Semesters
+		this.semesters = new ArrayList<Semester>();
+		//Set prior semester 
+		priorSemester = new Semester (firstSemester.previous(), this);
+		priorSemester.isAP = true;
+		SemesterDate s = firstSemester;
+		for(int i = 0; i < 8 ; i ++){
+			this.semesters.add(new Semester(s, this));
+			s = s.next();
+		}
+		this.firstSemester = firstSemester;
 	}
 
-	public void readBlankTestPrior(){
-		if(defaultFirstSemester!= null){
-			firstSemester = defaultFirstSemester;
+	public void readBlankPrior(){
+		if(defaultFirstSemester == null){
+			defaultFirstSemester = Driver.tryPickStartDate();
 		}
-		else{
-			firstSemester =  new SemesterDate(2016, SemesterDate.FALL);
-		}
+		setFirstSemester(defaultFirstSemester);
 	}
 
-	public void readFromTestPrior(){
-		readBlankTestPrior();
-
+	public void readTestPrior(){
+		readBlankPrior();
 
 		this.setLanguagePrefix(new Prefix("SPN", "115"));
 
@@ -146,8 +150,128 @@ public class Schedule implements java.io.Serializable {
 
 		this.setCLP(10);
 	}
+	
+	/**
+	 * Read in the info from Furman's text string, copied from myFurman.
+	 * Sets language prefix, first semester and creates prior semester,
+	 * 
+	 * 
+	 * @param s
+	 */
+	public void readPrior(String s){
+		skipOverrides = true;
+		int index = s.indexOf("global awareness") + 17; // this is the last column from MyFurman.
+		int endIndex = s.indexOf("Total Earned");
+		
+		String[] lines = s.substring(index, endIndex).split("\n");
+		//every entry in lines should be in the form
+		/*
+		Course/Section and Title
+		midterm
+		Grade
+		Credits
+		CEUs
+		Repeat
+		term
+		FY seminar
+		core
+		global awareness
+		 */
+		
+		int row = 0;
+		int numCols = 10;
+		//find the earliest and latest dates.
+		SemesterDate earliestDate = new SemesterDate(100000,1);
+		SemesterDate latestDate = new SemesterDate(0, 1);
+		for(; (row+1) * numCols < lines.length ; row ++){
+			int startIndex = row * numCols;
+			String termString = lines[startIndex + 6];
+			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
+			if(takenDate != null){
+				if(takenDate.compareTo(earliestDate) < 0){
+					earliestDate = takenDate;
+				}
+				else if(takenDate.compareTo(latestDate) > 0){
+					latestDate = takenDate;
+				}
+			}
+		}
+		currentSemester = latestDate.next();
+		setFirstSemester(earliestDate);
+		
+		
+		
+		//Add each of the prior courses to the schedule
+		row = 0;
+		ArrayList<Course> priorCourses = new ArrayList<Course>();
+		for(; (row+1) * numCols < lines.length ; row ++){
+			
+			//Collect relevant string data
+			int startIndex = row * numCols;
+			String courseString = lines[startIndex];
+			String creditsString = lines[startIndex + 3];
+			String termString = lines[startIndex + 6];
+			
+			//Turn the strings into objects
+			
+			//Prefix, title, and section number
+			String title = null;
+			String section = null;
+			int firstSpace = courseString.indexOf(" ");
+			String prefixString = courseString.substring(0, firstSpace);
+			Prefix p = Prefix.readFrom(prefixString);
+			String numString = p.getNumber();
+			if(numString.contains("PL")){
+				String number = numString.substring(numString.indexOf(".") + 1);
+				if(numString.compareTo("PL.110") > 0){
+					p = new Prefix(p.getSubject(), number);//remove the  "PL."
+					this.setLanguagePrefix(p); 
+				}
+			}
+			int secondSpace = courseString.indexOf(" ", firstSpace + 1);
+			if(secondSpace == firstSpace + 2){
+				title = courseString.substring(secondSpace);
+				section = courseString.substring(firstSpace + 1, secondSpace);
+			}
+			else{
+				title = courseString.substring(firstSpace);
+			}
+			
+			//credits
+			int credits = (int)(Double.parseDouble(creditsString));
+			
+			//Semester / term
+			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
+			
+			Course c = null;
+			if(takenDate != null){
+				c = new Course(p, takenDate, null, null, credits, section);
+			}
+			else{
+				c = new Course(p, priorSemester.semesterDate, null, null, credits, section);
+			}
+			c.setName(title);
+			priorCourses.add(c);
+		}
+		
+		//Add the courses
+
+		for(Course c : priorCourses){
+			// Skip all the placement courses
+			//if(c.getPrefix().getNumber().contains("PL")){
+			//	continue;
+			//}
+			ScheduleCourse cc = new ScheduleCourse(c, this);
+			cc.setTaken(true);
+			this.addScheduleElement(cc, c.semester);
+		}
+		skipOverrides = false;
+	}
 
 
+	
+	
+	
 
 
 
@@ -221,6 +345,18 @@ public class Schedule implements java.io.Serializable {
 		return false;
 	}
 
+	public boolean addScheduleElement(ScheduleElement e, SemesterDate d){
+		for(Semester s : semesters){
+			if(s.semesterDate.compareTo(d) == 0){
+				addScheduleElement(e, s);
+				return true;
+			}
+		}
+		if(priorSemester.semesterDate.compareTo(d) == 0){
+			addScheduleElement(e, priorSemester);
+		}
+		return false;
+	}
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
 
 
@@ -361,6 +497,9 @@ public class Schedule implements java.io.Serializable {
 	///////////////////////////////
 	///////////////////////////////
 	public boolean userOverride(ScheduleError s){
+		if(skipOverrides){
+			return true;
+		}
 		if(this.d != null){
 			return(d.userOverrideError(s));
 		}
@@ -515,27 +654,38 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
+	
 	public void setLanguagePrefix(Prefix languagePrefix) {
+		//The language classes prereq diagram looks like this:
+		// arrows a --> b can be read as "a needs b"
+		//  201 --> 120 --> 110
+		// 					 
+		//           115
 		String[] Language = {"110", "120", "201"};
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
+		//Figure out the index of the given prefixe's number,
+		// so if you were given 120 savedLocation = 1.
 		int savedLocation = -1;
 		for(int i=0; i<Language.length; i++){
 			if(languagePrefix.getNumber().equals(Language[i])){
 				savedLocation=i;
 			}
 		}
+		//add all the things before it to your prior courses, so if you got
+		// placed in 120, we'll add 110 to your prior courses,
+		// and if you got placed in 201, we'll add 120 and 110 to your prior courses.
 		if(savedLocation != -1){
 			for(int p=0; p<savedLocation; p++){
-				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), priorSemester.semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
 				cc.setTaken(true);
-				priorSemester.add(cc);
+				addScheduleElement(cc,priorSemester);
 			}
-
 		}
-		if((savedLocation == -1) && (!languagePrefix.getNumber().equals("115"))){
+		//Assume that if the prefix isn't in Language, then it's higher than 201.
+		else if((!languagePrefix.getNumber().equals("115"))){
 			for(int p=0; p<Language.length; p++){
 				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
 						0, null);
@@ -544,9 +694,6 @@ public class Schedule implements java.io.Serializable {
 				priorSemester.add(cc);
 			}
 		}
-
-
-
 	}
 
 
@@ -1188,6 +1335,7 @@ public class Schedule implements java.io.Serializable {
 			for(Requirement r : uniquePrereqs){
 				prereqsM.addRequirement(r);
 			}
+			Collections.sort(prereqsM.reqList);
 			if(uniquePrereqs.size() > 0){
 				result.add(prereqsM);
 			}
@@ -1201,6 +1349,12 @@ public class Schedule implements java.io.Serializable {
 		//Make sure prereqs accurately reflect the currently scheduled elements.
 		prereqs = new HashSet<Prereq>();
 		for(ScheduleElement e : getAllElementsSorted()){
+			//Taken courses don't need prereqs loaded.
+			if(e instanceof ScheduleCourse){
+				if(((ScheduleCourse) e).isTaken()){
+					continue;
+				}
+			}
 			Requirement r = CourseList.getPrereqsShallow(e.getPrefix());
 			if(r != null){
 				Prereq newPrereq = new Prereq(r, e.getPrefix());
@@ -1554,52 +1708,45 @@ public ArrayList<Semester> getSemesters(){
 	return this.semesters;
 }
 
-
-
-/**
- * find the first (temporal first) scheduled instance of this prefix,
- * and return the list of all elements before it.
- * 
- * If includeElementsInSameSemester, then the element with prefix p will
- * also be included in the list.
- * 
- * returns empty array list if this prefix isn't scheduled.
- * 
- * @param e
- * @param includeElementsInSameSemester
- * @return
- */
-public ArrayList<ScheduleElement> elementsBefore(Prefix p, boolean includeElementsInSameSemester){
-	ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
-	SemesterDate firstScheduledTime = null;
-	//Find the first semesterdate when this element was scheduled
-	for(Semester s : this.getAllSemestersSorted()){
-		for(ScheduleElement e : s.getElements()){
-			if(e.getPrefix() != null && e.getPrefix().equals(p)){
-				firstScheduledTime = s.getDate();
-				break;
-			}
+	/**
+	 * find the first (temporal first) scheduled instance of this prefix,
+	 * and return the list of all elements before it.
+	 * 
+	 * If includeElementsInSameSemester, then the element with prefix p will
+	 * also be included in the list.
+	 * 
+	 * returns empty array list if this prefix isn't scheduled.
+	 * 
+	 * @param e
+	 * @param includeElementsInSameSemester
+	 * @return
+	 */
+	public ArrayList<ScheduleElement> elementsBefore(Prefix p, boolean includeElementsInSameSemester){
+		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
+		SemesterDate firstScheduledTime = earliestInstanceOf(p);
+		if(firstScheduledTime == null){
+			return result;
 		}
-	}
-	if(firstScheduledTime == null){
+		result.addAll(this.elementsTakenBefore(firstScheduledTime));
+		if(includeElementsInSameSemester){
+			result.addAll(this.elementsTakenIn(firstScheduledTime));
+		}
 		return result;
 	}
-	result.addAll(this.elementsTakenBefore(firstScheduledTime));
-	if(includeElementsInSameSemester){
-		result.addAll(this.elementsTakenIn(firstScheduledTime));
+	
+	public SemesterDate earliestInstanceOf(Prefix p){
+		if(p == null){
+			return null;
+		}
+		for(Semester s : this.getAllSemestersSorted()){
+			for(ScheduleElement e : s.getElements()){
+				if(p.equals(e.getPrefix())){
+					return s.getDate();
+				}
+			}
+		}
+		return null;
 	}
-	return result;
-}
-
-
-public void reloadMajors() {
-	ListOfMajors m = FileHandler.getMajorsList();
-	ArrayList<Major> newMajorsList = new ArrayList<Major>();
-	for(Major major: this.majorsList){
-		System.out.println(major.name +"  " + major.chosenDegree);
-		Major refreshed = m.getMajor(major.name);
-		refreshed.setChosenDegree(major.chosenDegree);
-		newMajorsList.add(refreshed);
 
 
 	}
