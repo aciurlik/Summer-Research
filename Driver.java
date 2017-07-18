@@ -177,6 +177,16 @@ public class Driver {
 
 	}
 
+	public static String getDisclaimer(){
+		String instruct = " <center> <h1> THIS IS FOR PLANNING PURPOSES ONLY </h1> </center>" 
+				+"<p style='width 100px;'>This tool does not officially enroll you in any courses. " 
+				+ "It is not a guarantee that the courses you select will be available in the semester you select them. "
+				+ "It is your responsibility to ensure that you have met the graduation requirements. "
+				+ "To officially enroll in courses, you must meet with your advisor  "
+				+ " and go through the course registration process via MyFurman or Enrollment Services. </p> " ;
+			
+		return instruct;
+	}
 
 
 	public static void main(String[] args){
@@ -188,14 +198,9 @@ public class Driver {
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setPreferredSize(new Dimension(500, 250));
 		editorPane.setContentType("text/html");
-		String instruct = "This tool does not officially enroll you in any courses. " 
-				+ "It is not a guarantee that the courses you select will be available in the semester you select them. "
-				+ "It is your responsibility to ensure that you have met the graduation requirements. "
-				+ "To officially enroll in courses, you must meet with your advisor  "
-				+ " and go through the course registration process via MyFurman or Enrollment Services. "; 
+		
 
-		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
-				+"<p style='width 100px;'>" + instruct + "</p></body></html>");
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "</body></html>");
 		editorPane.setEditable(false);
 		editorHolder.add(editorPane);
 		JFrame frame = new JFrame();
@@ -243,18 +248,14 @@ public class Driver {
 		frame.add(editorHolder, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
-		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
-				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Establishing Settings <br />-           "+ "</p></body></html>");
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Establishing Settings <br />-           "+ "</p></body></html>");
 		preScheduleLoading();
 		listOfScheduleGUIs = new ArrayList<ScheduleGUI>();
-		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
-				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Courses Loading <br />---             "+ "</p></body></html>");
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Courses Loading <br />---             "+ "</p></body></html>");
 		CourseList.loadAllCourses();
-		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
-				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Majors Loading <br />-----        "+ "</p></body></html>");
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Majors Loading <br />-----        "+ "</p></body></html>");
 		FileHandler.getMajorsList();
-		editorPane.setText("<html><body><h1> THIS IS FOR PLANNING PURPOSES ONLY </h1>" 
-				+"<p style='width 100px;'>" + instruct + "<br />  <br /> Finished Loading <br />----------- 100%"+ "</p></body></html>");
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() +  "<br />  <br /> Finished Loading <br />----------- 100%"+ "</p></body></html>");
 		confirm.setEnabled(true);
 	}
 
