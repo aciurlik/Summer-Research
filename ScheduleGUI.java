@@ -961,6 +961,11 @@ public class ScheduleGUI{
 	public void addWindowListener(WindowListener w){
 		frame.addWindowListener(w);
 	}
+	
+	public void askMasterPassword(){
+		JOptionPane.showInputDialog("Knock knock \n \n...\n \n ... \n \n Password?");
+		System.out.println("Back door still locked currently.");
+	}
 
 
 

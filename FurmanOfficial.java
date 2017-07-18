@@ -25,7 +25,7 @@ public class FurmanOfficial implements java.io.Serializable{
 	public static Color official;
 	public static Color officialAlpha;
 	
-	public static final boolean masterIsNotAround = true;
+	public static boolean masterIsAround = true;
 	
 	
 	public static final Color bouzarthDarkPurple = darkPurple(230);

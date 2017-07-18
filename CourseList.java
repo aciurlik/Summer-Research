@@ -141,7 +141,7 @@ public class CourseList implements java.io.Serializable  {
 				+ originalRequirementString 
 				+"\"\n What does that requirement mean?\n>>>");
 		Requirement result = null;
-		if(FurmanOfficial.masterIsNotAround){
+		if(!FurmanOfficial.masterIsAround){
 			return null;
 			//result = new Requirement();
 			//result.setName("Unknown:" + originalRequirementString);

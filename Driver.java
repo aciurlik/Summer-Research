@@ -73,7 +73,7 @@ public class Driver {
 		Schedule result = FileHandler.openSchedule();
 		if(result!=null){
 			//TODO make sure nothing else needs to be set
-			if(!FurmanOfficial.masterIsNotAround){
+			if(FurmanOfficial.masterIsAround){
 				result.reloadMajors();
 			}
 
@@ -167,7 +167,7 @@ public class Driver {
 	/**
 	 * Opens up the StartUp help. 
 	 */
-	public static void startUpMessage() {=
+	public static void startUpMessage() {
 			if(startUP != null){
 				startUP.showStartUp(false);
 			}
@@ -290,7 +290,7 @@ public class Driver {
 		compareSchedules(one, two);
 
 	}
-
+	
 	private static void compareSchedules(Schedule one, Schedule two) {
 		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
 		ArrayList<ScheduleElement> allOrderedElementsOne = new ArrayList<ScheduleElement>();
