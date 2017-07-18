@@ -21,7 +21,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	protected boolean lastSemester = false;
 	//For the first semester 
 	protected boolean undeletableSemester = false;
-	protected boolean taken = false;
+	
 
 
 
@@ -353,26 +353,15 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	}
 
 	public boolean isTaken() {
-		if(this.elements.size()==0){
+		if(this.semesterDate.compareTo(this.schedule.currentSemester)<0){
+			return true;
+		}
+		else{
 			return false;
 		}
-		for(ScheduleElement s: this.elements){
-			if(s instanceof ScheduleCourse){
-				ScheduleCourse c = (ScheduleCourse) s;
-				if(!c.taken){
-					return false;
-				}
-			}
-			else{
-				return false;
-			}
-		}
-		return true;
 	}
+	
 
-	public void setTaken(boolean taken) {
-		this.taken = taken;
-	}
 
 
 

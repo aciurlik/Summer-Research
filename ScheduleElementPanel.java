@@ -55,7 +55,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 
 		if(s instanceof ScheduleCourse){
-			if(((ScheduleCourse) s).isTaken()){
+			if(((ScheduleCourse) s).getSemester().compareTo(container.d.sch.currentSemester)<0){
 				return;
 			}
 
@@ -112,7 +112,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 		}
 		
 		if(s instanceof ScheduleCourse){
-			if (((ScheduleCourse) s).isTaken()){
+			if (((ScheduleCourse) s).getSemester().compareTo(container.d.sch.currentSemester)<0){
 				toRemove.setEnabled(false);
 				elementLabel.setForeground(FurmanOfficial.grey(170));
 			}

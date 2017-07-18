@@ -29,10 +29,14 @@ public class Schedule implements java.io.Serializable {
 	private Prefix languagePrefix;
 	private int totalCoursesNeeded;
 	private Semester priorSemester;
+	
+	
+
+
 	public boolean skipOverrides = false;
 
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
-	private SemesterDate currentSemester;
+	public SemesterDate currentSemester;
 	SemesterDate firstSemester;
 
 	public static final boolean prereqsCanBeSatisfiedInSameSemester = false;
@@ -72,7 +76,7 @@ public class Schedule implements java.io.Serializable {
 			readPrior(past);
 		}
 		else{
-			readBlankPrior(); //loads prior courses, recalc firstSemester,
+			readBlankPrior(); //loads prior courses, recalc firstSemester and sets as currentSemester as well,
 			// and create default semesters.
 		}
 		this.recalcGERMajor();
@@ -117,6 +121,7 @@ public class Schedule implements java.io.Serializable {
 			defaultFirstSemester = Driver.tryPickStartDate();
 		}
 		setFirstSemester(defaultFirstSemester);
+		setCurrentSemester(defaultFirstSemester);
 	}
 
 	public void readTestPrior(){
@@ -127,7 +132,6 @@ public class Schedule implements java.io.Serializable {
 		//Class One 
 		Course a = new Course(new Prefix("THA", 101), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "03");
 		ScheduleCourse aa = new ScheduleCourse(a, this);
-		aa.setTaken(true);
 		this.addScheduleElement(aa,this.semesters.get(0));
 
 
@@ -135,7 +139,6 @@ public class Schedule implements java.io.Serializable {
 		Course b = new Course(new Prefix("MTH", 120), new SemesterDate(2016, SemesterDate.FALL), null, null, 4, "01");
 
 		ScheduleCourse bb = new ScheduleCourse(b,this);
-		bb.setTaken(true);
 		this.addScheduleElement(bb , this.semesters.get(0));
 
 
@@ -143,7 +146,6 @@ public class Schedule implements java.io.Serializable {
 		//Class Three
 		Course d = new Course(new Prefix("PSY", 111), new SemesterDate(2016, SemesterDate.FALL), null, null,  4, "03");
 		ScheduleCourse dd = new ScheduleCourse(d, this);
-		dd.setTaken(true);
 		this.addScheduleElement(dd, this.semesters.get(0));
 		//result.semesters.add(b);
 
@@ -196,9 +198,11 @@ public class Schedule implements java.io.Serializable {
 				}
 			}
 		}
-		currentSemester = latestDate.next();
+		currentSemester = latestDate;
 		setFirstSemester(earliestDate);
 
+		
+		
 
 
 		//Add each of the prior courses to the schedule
@@ -208,9 +212,9 @@ public class Schedule implements java.io.Serializable {
 
 			//Collect relevant string data
 			int startIndex = row * numCols;
-			String courseString = lines[startIndex];
-			String creditsString = lines[startIndex + 3];
-			String termString = lines[startIndex + 6];
+			String courseString = lines[startIndex].trim();
+			String creditsString = lines[startIndex + 3].trim();
+			String termString = lines[startIndex + 6].trim();
 
 			//Turn the strings into objects
 
@@ -224,8 +228,8 @@ public class Schedule implements java.io.Serializable {
 			if(numString.contains("PL")){
 				String number = numString.substring(numString.indexOf(".") + 1);
 				if(numString.compareTo("PL.110") > 0){
-					p = new Prefix(p.getSubject(), number);//remove the  "PL."
-					this.setLanguagePrefix(p); 
+					Prefix prefixLP = new Prefix(p.getSubject(), number);//remove the  "PL."
+					this.setLanguagePrefix(prefixLP); 
 				}
 			}
 			int secondSpace = courseString.indexOf(" ", firstSpace + 1);
@@ -238,8 +242,12 @@ public class Schedule implements java.io.Serializable {
 			}
 
 			//credits
-			int credits = (int)(Double.parseDouble(creditsString));
-
+			System.out.println(title);
+			int credits= CourseList.getCoursesCreditHours(p);
+			//if(!" ".equals(creditsString)&&! "".equals(creditsString)&& !(creditsString==null)){
+			//	System.out.println((int)(Double.parseDouble(creditsString)));
+			//	credits = (int)(Double.parseDouble(creditsString));
+			//}
 			//Semester / term
 			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
 
@@ -262,13 +270,10 @@ public class Schedule implements java.io.Serializable {
 			//	continue;
 			//}
 			ScheduleCourse cc = new ScheduleCourse(c, this);
-			cc.setTaken(true);
 			this.addScheduleElement(cc, c.semester);
 		}
 		skipOverrides = false;
 	}
-
-
 
 
 
@@ -601,6 +606,24 @@ public class Schedule implements java.io.Serializable {
 
 
 
+	public Semester getPriorSemester() {
+		return priorSemester;
+	}
+
+
+	
+	
+	public SemesterDate getCurrentSemester() {
+		return currentSemester;
+	}
+
+
+	public void setCurrentSemester(SemesterDate currentSemester) {
+		this.currentSemester = currentSemester;
+	}
+	
+
+
 	/**
 	 * Find the list of all ScheduleElements in any semester of this Schedule.
 	 * Will be sorted based on the time the element was scheduled.
@@ -677,20 +700,20 @@ public class Schedule implements java.io.Serializable {
 		// and if you got placed in 201, we'll add 120 and 110 to your prior courses.
 		if(savedLocation != -1){
 			for(int p=0; p<savedLocation; p++){
-				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), priorSemester.semesterDate, null, null, 
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), "PL."+Language[p]), priorSemester.semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
-				cc.setTaken(true);
+				//cc.setTaken(true);
 				addScheduleElement(cc,priorSemester);
 			}
 		}
 		//Assume that if the prefix isn't in Language, then it's higher than 201.
 		else if((!languagePrefix.getNumber().equals("115"))){
 			for(int p=0; p<Language.length; p++){
-				Course c= new Course(new Prefix(languagePrefix.getSubject(), Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
+				Course c= new Course(new Prefix(languagePrefix.getSubject(), "PL."+ Language[p]), this.getAllSemestersSorted().get(0).semesterDate, null, null, 
 						0, null);
 				ScheduleCourse cc = new ScheduleCourse(c, this);
-				cc.setTaken(true);
+			//	cc.setTaken(true);
 				priorSemester.add(cc);
 			}
 		}
@@ -1351,7 +1374,7 @@ public class Schedule implements java.io.Serializable {
 		for(ScheduleElement e : getAllElementsSorted()){
 			//Taken courses don't need prereqs loaded.
 			if(e instanceof ScheduleCourse){
-				if(((ScheduleCourse) e).isTaken()){
+				if(((ScheduleCourse) e).getSemester().compareTo(currentSemester)<0){
 					continue;
 				}
 			}
@@ -1771,28 +1794,28 @@ public class Schedule implements java.io.Serializable {
 		return null;
 	}
 
-public void setMajorsList(ArrayList<Major> majors){
-	this.majorsList= majors;
-	this.recalcGERMajor();
-	this.updatePrereqs();
-	this.updateReqs();
-	this.updateTotalCoursesNeeded();
+	public void setMajorsList(ArrayList<Major> majors){
+		this.majorsList= majors;
+		this.recalcGERMajor();
+		this.updatePrereqs();
+		this.updateReqs();
+		this.updateTotalCoursesNeeded();
 
-}
-
-
-
-//Collect all the elements before that semester date.
+	}
 
 
-public Major getGER() {
-	return GER;
-}
+
+	//Collect all the elements before that semester date.
 
 
-public void setGER(Major gER) {
-	GER = gER;
-}
+	public Major getGER() {
+		return GER;
+	}
+
+
+	public void setGER(Major gER) {
+		GER = gER;
+	}
 
 }
 

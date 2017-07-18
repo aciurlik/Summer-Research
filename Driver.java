@@ -159,7 +159,7 @@ public class Driver {
 		}
 
 	}
-	
+
 
 
 
@@ -168,16 +168,16 @@ public class Driver {
 	 * Opens up the StartUp help. 
 	 */
 	public static void startUpMessage() {
-			if(startUP != null){
-				startUP.showStartUp(false);
-			}
-			else{
-			
-				StartUpMenu start = new StartUpMenu();
-				startUP =start;
-				startUP.showStartUp(false);
-				
-			}
+		if(startUP != null){
+			startUP.showStartUp(false);
+		}
+		else{
+
+			StartUpMenu start = new StartUpMenu();
+			startUP =start;
+			startUP.showStartUp(false);
+
+		}
 	}
 
 	public static String getDisclaimer(){
@@ -187,7 +187,7 @@ public class Driver {
 				+ "It is your responsibility to ensure that you have met the graduation requirements. "
 				+ "To officially enroll in courses, you must meet with your advisor  "
 				+ " and go through the course registration process via MyFurman or Enrollment Services. </p> " ;
-			
+
 		return instruct;
 	}
 
@@ -196,9 +196,9 @@ public class Driver {
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.
 		Color c = FurmanOfficial.grey;
-		
-		
-		
+
+
+
 		//SemesterDate start = tryPickStartDate();
 
 		/*
@@ -216,7 +216,7 @@ public class Driver {
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setPreferredSize(new Dimension(500, 250));
 		editorPane.setContentType("text/html");
-		
+
 
 		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "</body></html>");
 		editorPane.setEditable(false);
@@ -235,28 +235,18 @@ public class Driver {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals(MenuOptions.confirm)){
 					frame.dispose();
-					SemesterDate start = tryPickStartDate();
-					if(start == null){
-						//this will close any running code, including the JOptionPanes which don't get collected by 
-						// the garbage collector for some reason.
-						System.exit(0);
-						return;
+					if(startUP != null){
+						startUP.showStartUp(true);
 					}
 					else{
-						Schedule.defaultFirstSemester = start;
-						//new Driver();
-						if(startUP != null){
-							startUP.showStartUp(true);
-						}
-						else{
-							Driver.addScheduleGUI(new Schedule());
-						}
-
-
-
+						Driver.addScheduleGUI(new Schedule());
 					}
 
+
+
 				}
+
+
 			}
 		});
 		JPanel buttonPanel = new JPanel();
@@ -290,7 +280,7 @@ public class Driver {
 		compareSchedules(one, two);
 
 	}
-	
+
 	private static void compareSchedules(Schedule one, Schedule two) {
 		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
 		ArrayList<ScheduleElement> allOrderedElementsOne = new ArrayList<ScheduleElement>();

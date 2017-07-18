@@ -1024,6 +1024,7 @@ public class ScheduleGUI{
 			return true;
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			return false;
 		}
 	}

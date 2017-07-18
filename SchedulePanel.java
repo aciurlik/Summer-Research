@@ -131,9 +131,9 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 			int reallyBigNumber = 100; //Makes it so you can have a lot of credit hours before it gives you an error
 			SemesterPanel foundp = this.findPanelFor(s);
 			s.setLastSemester(false);
-			if(s.equals(sch.getAllSemestersSorted().get(0))|| s.isTaken()){
+			if(s.isTaken()){
 				s.setOverloadLimit(reallyBigNumber);
-				s.setTaken(true);
+				//s.setTaken(true);
 				
 			}
 			if(s.equals(sch.getAllSemestersSorted().get(sch.getAllSemestersSorted().size()-1))){
