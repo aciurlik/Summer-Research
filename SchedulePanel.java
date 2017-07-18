@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -17,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 
 
@@ -29,9 +32,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	 * 
 	 */
 	private Schedule sch;
-	private int numberOfRegularSemesters=12;
-	private int spaceConstant=5;
-	private int buttonPress=0;
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
@@ -165,15 +165,25 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 				scrollPanel.add(semester, gbc);
 				gbc.gridx ++;
 			}
-
-
-
 		}
 
 
 		gbc.fill = gbc.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
+		
+		
 
+		//This code opens the secret admin window
+		if(allSemesterPanels.size() > 11){
+			allSemesterPanels.get(10).addMouseListener(new MouseAdapter(){
+				@Override
+				public void mousePressed(MouseEvent e){
+					if(SwingUtilities.isRightMouseButton(e)){
+						d.askMasterPassword();
+					}
+				}
+			});
+		}
 
 	}
 

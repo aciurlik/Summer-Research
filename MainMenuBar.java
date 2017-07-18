@@ -156,7 +156,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 		
 		//Unimplemented method will come back to 
-		if(!FurmanOfficial.masterIsNotAround){
+		if(FurmanOfficial.masterIsAround){
 			menuItem = new JMenuItem("Compare");
 			JPopupMenu compare = new JPopupMenu("Compare");
 			menuItem.addActionListener(this);

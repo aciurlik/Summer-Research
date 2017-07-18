@@ -276,14 +276,10 @@ public class FileHandler implements ActionListener{
 
 
 	public static ListOfMajors getMajorsList(){
-		ListOfMajors result;
 		if(listOfMajors == null){
-			result = readMajorsFrom(new File(majorsFile));
+			listOfMajors = readMajorsFrom(new File(majorsFile));
 		}
-		else{
-			result= listOfMajors;
-		}
-		return result;
+		return listOfMajors;
 	}
 
 	public static ListOfMajors readMajorsFrom(File folder){
