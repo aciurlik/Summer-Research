@@ -40,28 +40,40 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 		return this.c.toString();
 	}
 
+	/**
+	 * uses priority order
+	 * Number/subject
+	 * Time
+	 * Title
+	 * Professor
+	 * 
+	 */
 	@Override
 	public String shortString(int preferredLength){
-		
+
 		ArrayList<String> data = new ArrayList<String>();
 		int size = 0;
-		
-		
-		String prefixSectionString = this.c.coursePrefix.toString() + " "; 
+
+
+		String prefixSectionString = this.c.coursePrefix.toString(); 
 		if(this.c.sectionNumber !=(null)){
-			prefixSectionString = prefixSectionString + this.c.sectionNumber+ " ";
+			prefixSectionString = prefixSectionString + "-" + this.c.sectionNumber+ " ";
+		}
+		else{
+			prefixSectionString += " ";
 		}
 		data.add(prefixSectionString);
 		size += prefixSectionString.length() + 1;
-		
-		
-		String semesterString =  SemesterDate.getSeason(this.c.semester.sNumber)+
-				" "+ this.c.semester.year + " ";
-		size += semesterString.length() + 1;
-		if(size < preferredLength){
-			data.add(0, semesterString);
+
+
+		if(c.meetingTime != null && c.meetingTime.length != 0){
+			String timeString =  c.meetingTime[0].clockTime();
+			size += timeString.length() + 1;
+			if(size < preferredLength){
+				data.add(0, timeString);
+			}
 		}
-		
+
 		String title = c.name;
 		if(title != null){
 			size += title.length() + 1;
