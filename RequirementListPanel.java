@@ -64,7 +64,8 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
 		this.inner.setBackground(Color.white);
-		inner.setPreferredSize(new Dimension(700, 150));
+		this.setPreferredSize(new Dimension(700, 150));
+		//inner.setPreferredSize(new Dimension(700, 150));
 		this.scroll = new  JScrollPane(inner);
 
 		this.setLayout(new BorderLayout());

@@ -22,6 +22,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	
 	public int optionsNumber = 8; //Number of Buttons
 	public int headerNumber = 2;  //Number of Headers (The Furman Advantage. Major/Minor)
+	public int spacingConstant = 3;
 	
 	ScheduleGUI d;
 	
@@ -37,11 +38,11 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	private JButton AddTrackButton;
 
 
-	public AdditionsPanel( ScheduleGUI d){
+	public AdditionsPanel(ScheduleGUI schGUI){
 		//Sets layout, and style of the Panel
 		super();
-		this.d=d;
-		this.setLayout((new GridLayout(optionsNumber+headerNumber, 1, 3, 3)));
+		this.d=schGUI;
+		this.setLayout((new GridLayout(optionsNumber+headerNumber, 1, spacingConstant, spacingConstant)));
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 		JLabel header = new JLabel(AdditionsHeader);
 		header.setHorizontalAlignment(JLabel.CENTER);
@@ -86,8 +87,14 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	}
 
 	
-	//This creates the buttons used in this panel
+	/**
+	 * 
+	 * @param What you want to display on the button
+	 * @return A button, that is uniform with the others on AdditionsPanel
+	 */
 	public JButton addButton(String s){
+		int buttonWidth = 153;
+		int buttonHeight =20; 
 		//Formats Button Panel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setOpaque(true);
@@ -100,7 +107,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		button.setHorizontalTextPosition(SwingConstants.LEFT);
 		button.setBorderPainted(false);
 		button.setBackground(FurmanOfficial.darkPurple);
-		button.setPreferredSize(new Dimension(153, 20));
+		button.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
 		button.setOpaque(false);
 		
 		
@@ -118,17 +125,14 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 		//For add Major, Minor, Track
 		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor)|| e.getActionCommand().equals(MenuOptions.addTrack)){
 			d.GUIPopUP(e.getActionCommand());
-
 		}
 		//Explore Buttons, goes to outside links
 		if((e.getActionCommand().equals(MenuOptions.exploreInternship)) || (e.getActionCommand().equals(MenuOptions.addResearch))||(e.getActionCommand().equals(MenuOptions.exploreStudyAway))){
 
 			d.GUIOutsideLink(e.getActionCommand());
-
 		}
 		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
 			d.GUIChooseSummerSession();
-
 		}
 		if(e.getActionCommand().equals(MenuOptions.addMayX)){
 			d.GUIYearsPopUP(e.getActionCommand());

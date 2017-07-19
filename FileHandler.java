@@ -37,6 +37,8 @@ import javax.swing.JTabbedPane;
 
 public class FileHandler{
 	static JFrame popUP = new JFrame();
+	public static final String bellTowerImageFile = MenuOptions.resourcesFolder + "bellTower.jpg";
+	public static final String fireworksImageFile = MenuOptions.resourcesFolder + "fireworks.jpg";
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = MenuOptions.resourcesFolder + "SavedStudentData.txt";
@@ -506,5 +508,14 @@ public class FileHandler{
 		}
 		
 		
+	}
+
+	public static ImageIcon makeBellTower() {
+		return new ImageIcon(bellTowerImageFile);
+	}
+
+	public static ImageIcon makeFireWorks() {
+		// TODO Auto-generated method stub
+		return  new ImageIcon(fireworksImageFile);
 	}
 }

@@ -78,6 +78,7 @@ public class ScheduleGUI{
 	ListOfMajors l;
 	BellTower b;
 	//PrintWriter pW;
+	private int defaultCharacterLength = 100;
 
 
 
@@ -300,6 +301,7 @@ public class ScheduleGUI{
 		if(m.majorType.equals(Major.TRACK) && m.degreeTypes.isEmpty()){
 			typeNeedsToBeChosen = false;
 		}
+		
 		if(m.degreeTypes.size()==1){
 			m.setChosenDegree(m.degreeTypes.get(0));
 			typeNeedsToBeChosen = false;
@@ -314,7 +316,9 @@ public class ScheduleGUI{
 			// these notes.
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
-			JOptionPane.showMessageDialog(null, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
+			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
+			System.out.println(toUser);
+			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
 		this.sch.addMajor(m);
@@ -714,7 +718,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, "<html><body>" + parseIntoReadableHTML(instruct, defaultPixelWidth) +"</body></html>", header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -766,10 +770,8 @@ public class ScheduleGUI{
 
 		}
 
-		result = parseIntoReadableHTML(result, defaultPixelWidth);
-		if(surroundHTML){
-			result = "<html><body> " + result + "</html></body>";
-		}
+		result = parseIntoReadable(result, defaultCharacterLength);
+		
 		
 		return result;
 	}
@@ -822,6 +824,7 @@ public class ScheduleGUI{
 			if(m.notes != null){
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
+				majorNotes = parseIntoReadable(majorNotes, defaultCharacterLength);
 				hasNotes = true;
 			
 			}
@@ -862,9 +865,26 @@ public class ScheduleGUI{
 	 * @param pixels
 	 * @return
 	 */
-	public static String parseIntoReadableHTML(String s, int pixels){
-		s = s.replaceAll("\n", "<br />");
-		return  "<p style='width " + pixels + "px;'>" + s + "</p>";
+	public static String parseIntoReadable(String s, int characterLength){
+		ArrayList<String> lines = new ArrayList<String>();
+		for(String line: s.split("\n")){
+			lines.add(line);
+		}
+		for(int i = 0; i<lines.size(); i++){
+			String line = lines.get(i);
+			if(line.length()>characterLength){
+				int splitIndex = line.substring(0, characterLength).lastIndexOf(" ");
+				lines.add(i+1, line.substring(splitIndex));
+				lines.set(i, line.substring(0, splitIndex));
+			}
+		}
+		StringBuilder result = new StringBuilder();
+		for(String element: lines){
+			result.append(element + "\n");
+		}
+		return result.toString();
+		
+		
 	}
 
 

@@ -1058,7 +1058,7 @@ public class Schedule implements java.io.Serializable {
 		return(result);
 	}
 
-	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded, boolean isAll){
+	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded, boolean hideUserOverride){
 		int exactDuplicateCount = 1;
 		if(alreadyAdded){
 			exactDuplicateCount = 0;
@@ -1075,7 +1075,7 @@ public class Schedule implements java.io.Serializable {
 						duplicate.setOffendingCourse(results[0]);
 						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setElementList(results);
-						if(isAll == false){
+						if(hideUserOverride == false){
 							return(!this.userOverride(duplicate));
 						}
 						else{
@@ -1091,7 +1091,7 @@ public class Schedule implements java.io.Serializable {
 				duplicate.setOffendingCourse(result[0]);
 				duplicate.setElementList(result);
 				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
-				if(isAll == false){
+				if(hideUserOverride == false){
 					return (!this.userOverride(duplicate));
 				}
 				else{
@@ -1102,7 +1102,8 @@ public class Schedule implements java.io.Serializable {
 		return false;
 	}
 
-
+	
+	
 
 	///////////////////////////////
 	///////////////////////////////
