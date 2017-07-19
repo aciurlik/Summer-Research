@@ -83,20 +83,20 @@ public class CourseList implements java.io.Serializable  {
 					Requirement result = new Requirement();
 					TerminalRequirement t = TerminalRequirement.readFrom("FYW>0");
 					t.setName("Any FYW");
-					result.addRequirement(t);
+					result.addChoice(t);
 					return result;
 				}
 
 				//"appropriate placement" is common
 				if(originalRequirementString.toUpperCase().equals("APPROPRIATE PLACEMENT")){
 					Requirement result = new Requirement();
-					result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
+					result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 					return result;
 				}
 				//"audition required" is common
 				if(originalRequirementString.equals("audition required")){
 					Requirement result = new Requirement();
-					result.addRequirement(new TerminalRequirement(new Prefix("Audition", p.getSubject() + "-" + p.getNumber())));
+					result.addChoice(new TerminalRequirement(new Prefix("Audition", p.getSubject() + "-" + p.getNumber())));
 					return result;
 				}
 				//If none of the special strings happened, we 
@@ -407,12 +407,12 @@ public class CourseList implements java.io.Serializable  {
 						//only courses numbered 110 or greater
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.addRequirement(new TerminalRequirement(p));
+								r.addChoice(new TerminalRequirement(p));
 							}
 						}
 						for(Prefix p : GERRequirements.get("NW")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.addRequirement(new TerminalRequirement(p));
+								r.addChoice(new TerminalRequirement(p));
 							}
 						}
 						includeDefaultPrefixes = false;
@@ -423,7 +423,7 @@ public class CourseList implements java.io.Serializable  {
 					case BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
-							r.addRequirement(new TerminalRequirement(p));
+							r.addChoice(new TerminalRequirement(p));
 						}
 					}
 					break;
@@ -443,7 +443,7 @@ public class CourseList implements java.io.Serializable  {
 				} //end switch
 				if(includeDefaultPrefixes){
 					for(Prefix p : GERRequirements.get(key)){
-						r.addRequirement(new TerminalRequirement(p));
+						r.addChoice(new TerminalRequirement(p));
 					}
 				}
 				r.setNumToChoose(newNumToChoose);
@@ -469,8 +469,8 @@ public class CourseList implements java.io.Serializable  {
 			}
 			else{
 				Requirement nwnwl = new Requirement();
-				nwnwl.addRequirement(nw);
-				nwnwl.addRequirement(nwl);
+				nwnwl.addChoice(nw);
+				nwnwl.addChoice(nwl);
 				nwnwl.setNumToChoose(2);
 				nwnwl.setName("NW/NWL");
 
@@ -592,7 +592,7 @@ public class CourseList implements java.io.Serializable  {
 
 	public static Requirement FYWRequirement(){
 		Requirement result = new Requirement();
-		result.addRequirement(TerminalRequirement.readFrom("FYW>0"));
+		result.addChoice(TerminalRequirement.readFrom("FYW>0"));
 		result.setName("FYW");
 		return result;
 	}
@@ -634,33 +634,33 @@ public class CourseList implements java.io.Serializable  {
 
 		if (p != null){
 
-			r.addRequirement(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
+			r.addChoice(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
 
 		}
 
 		if(p==null || !p.getSubject().equals("GRK") ) {
 
-			r.addRequirement(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("LTN")){
 
-			r.addRequirement(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("JPN")){
 
-			r.addRequirement(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("FRN")){
 
-			r.addRequirement(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("SPN")){
 
-			r.addRequirement(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		if(p==null || !p.getSubject().equals("CHN")){
 
-			r.addRequirement(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
+			r.addChoice(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
 		}
 		return r;
 	}

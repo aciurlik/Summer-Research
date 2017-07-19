@@ -10,10 +10,52 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
+/**
+ * 
+ * Blurb written 7/18/2017
+ * Last updated 7/18/2017
+ * 
+ * General use
+ * 
+ * The requirement class represents a requirement for some number of courses. Requirements
+ * are used in Majors and as prerequsites, so a major might be a list of requirements, and
+ * a prereq might be requirement for some particular course. Requirements are in 
+ * the DATA group of classes.
+ * 
+ * 
+ * There are 2 essential components of each requirement - the number to choose, and the choices.
+ * To make a requirement for "MTH-110 and MTH-220", you would make a requirement with numToChoose = 2
+ * and choices = [MTH-110, MTH-220]. If the requirement is for a certain number of credit hours, 
+ * numToChoose represents this number - the requirement "4 ch of (MTH > 100)" will have numToChoose = 4
+ * and choices = [MTH > 100].
+ * 
+ * Terminal Requirements VS Requirements
+ * 
+ * Every element of choices must itself be a requirement - there is a special subclass 
+ * TerminalRequirement that represents a requirement with no subchoices. When saving and reading,
+ * every set of parenthesis implies a requirement, and terminal requirements 
+ * never have a set of parenthesis. Thus, "MTH-110" is a TerminalRequirement 
+ * but 1 of (MTH-110) is a requirement (with the terminal MTH-110 as its only choice).
+ * This parenthesis rule does not apply for strings displayed to a user of the program.
+ * 
+ * Loop hazards
+ * 
+ * There are a number of recursive methods in requirement, and these work by calling the same method
+ * on each of the Requirements in choices. For example, the method isSatisfiedBy(ScheduleElement e)
+ * checks if e satisfies any of this requirement's choices, and if so returns true. These methods
+ * can easily cause errors or infinite loops if they are not carefully overwritten 
+ * in the class Terminal Requirement. Because of this hazard, for any method that recurses 
+ * in this way, please add the string //INFINITELOOPHAZARD just before the method.
+ * 
+ * To reduce the number of such hazardous methods, much of the recursive work in Requirement is done
+ * by the method minMoreNeeded(ListOfElements). This method appropriately subtracts from 
+ * numToChoose 
+ * 
+ * 
+ *  
+ *
+ */
 public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours,  java.io.Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
@@ -23,20 +65,20 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// of credit hours, and storedCoursesLeft stores the number of credit hours left.
 	private boolean usesCreditHours;
 	String name;
-	private int originalNumberNeeded; //This is one of the stored fields for requirement(used to make computation faster).
-	// It stores how many courses you'd need to schedule to satisfy this requirement if you had just started from scratch.
-	private int storedNumberLeft; //This is one of the stored fields for requirement(used to make computation faster and 
-	// to pass information between the data side and the GUI side).
-	// There are a number of methods that modify it, and it is up to other classes (like schedule) to ensure that
-	// the correct value is stored and is not overwritten at the wrong time.
+	
+	// These stored fields are used to reduce computation time for expensive recursive methods.
+	private int originalNumberNeeded; //stores minMoreNeeded(emptyList)
+	private int storedNumberLeft; // this field is essentially a holder for passing data between 
+	//the DATA side and the GUI side. Data classes, like schedule, will call
+	// an expensive recursive method, like minMoreNeeded, and tell this requirement to
+	// store the result to be used for display. When GUI classes display a requirement, 
+	// they use this field to determine how complete it is (using the getStoredXXXX methods).
+	
+	
 	public static int defaultCreditHours =4;
 
 
-
-	boolean allCompletionSetsCalculated=false;
-	HashSet<HashSet<TerminalRequirement>> allCompletionSets;
-
-	//Used to check if %complete is close to 0.
+	//Used to check if percentComplete is close to 0.
 	public static final double tolerance = 1000 * Double.MIN_VALUE;
 
 
@@ -74,15 +116,36 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////////////////////////
 	/////////////////////////
 	@SuppressWarnings("unused")
-	private boolean _________GettersAndSetters_________;
+	private boolean ___GettersAndSetters_________;
 
-	public void addRequirement(Requirement r){
+	public void addChoice(Requirement r){
 		this.choices.add(r);
 		this.recalcOriginalNumberNeeded();
 		this.storedNumberLeft = this.originalNumberNeeded;
 	}
+	
 	/**
-	 * Return an estimate of the number of courses this requirement still
+	 * This method should be called after all choices are added, so that 
+	 * we can check if your numToChoose is less than choices.size().
+	 * @param n
+	 */
+	public void setNumToChoose(int n){
+		if(n > choices.size()){
+			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
+		}
+		this.numToChoose = n;
+		recalcOriginalNumberNeeded();
+		this.storedNumberLeft = this.originalNumberNeeded;
+	}
+	
+	
+	
+	@SuppressWarnings("unused")
+	private boolean ______storedGetters_________;
+
+	
+	/**
+	 * Return a stored estimate of the number of courses this requirement still
 	 * needs in order to be complete. Automatically takes creditHours requirements
 	 * into account.
 	 * @return
@@ -103,43 +166,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return this.storedNumberLeft;
 	}
 	
-	public void setNumToChoose(int n){
-		if(n > choices.size()){
-			throw new RuntimeException("Not enough choices to set numToChoose of " + n);
-		}
-		this.numToChoose = n;
-		recalcOriginalNumberNeeded();
-		this.storedNumberLeft = this.originalNumberNeeded;
+	public double getStoredPercentComplete(){
+		double result = (1.0 - (storedNumberLeft * 1.0/  this.originalNumberNeeded)); 
+		return result;
 	}
-
-
-	public boolean usesCreditHours(){
-		return usesCreditHours;
+	public boolean getStoredIsComplete(){
+		return this.storedNumberLeft <= 0;
 	}
-
-	public void setHoursNeeded(int hours){
-		this.numToChoose = hours;
-		this.usesCreditHours = true;
-	}
-
-
-	public int getCreditHours() {
-		if(this.isTerminal()){
-			return this.getTerminal().getCreditHours();
-		}
-		else{
-			return defaultCreditHours;
-		}
-	}
-
-
-	public void setName(String name){
-		this.name = name;
-	}
-	public String getName() {
-		return this.name;
-	}
-	
 	
 	
 	/**
@@ -162,6 +195,43 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public int getOriginalNumberNeeded(){
 		return this.originalNumberNeeded;
 	}
+	
+
+
+	public boolean usesCreditHours(){
+		return usesCreditHours;
+	}
+
+	public void setHoursNeeded(int hours){
+		this.numToChoose = hours;
+		this.usesCreditHours = true;
+	}
+
+
+	/**
+	 * How many credit hours will this requirement grant, if this requirement
+	 * is a schedule element dragged into the semester?
+	 * 
+	 */
+	public int getCreditHours() {
+		if(this.isTerminal()){
+			return this.getTerminal().getCreditHours();
+		}
+		else{
+			return defaultCreditHours;
+		}
+	}
+
+
+	public void setName(String name){
+		this.name = name;
+	}
+	public String getName() {
+		return this.name;
+	}
+	
+	
+
 
 
 
@@ -181,47 +251,27 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	@SuppressWarnings("unused")
-	private boolean _________RecursiveMethods_________;
+	private boolean ___RecursiveMethods_________;
 	/////////////////////
 	/////////////////////
 	///// Recursive methods
 	/////////////////////
 	/////////////////////
+	// This section should include all methods that recurse on each member of choices, 
+	// and thus need to be overwritten in TerminalRequirement to prevent infinite loops.
 	//
-	//  The call chain here looks something like:
-	//
-	//
-	//
-	//									percentComplete(taken, bool)
-	//											|
-	//											V
-	//  isComplete(taken, bool)				MMN(taken, bool)
-	//			|								|
-	//			V								V
-	//  isComplete(taken, int, bool) ---> MMN(taken, int, bool)
-	//			^								|
-	// 			|								|
-	//			|								V
-	// 			-----recurse on choices----- MMN(taken)
-	//											|  
-	//											|  
-	//											|  
-	// isSatisfied(p) <----recurse on choices---   
-	// |		  ^								   
-	// | 		  |				
-	// |			--------
-	// |					|
-	// -recurse on choices--
-	//
-	// Terminal requirment only needs to overwrite methods that have
-	// an outedge that recurses, so MMN(taken, int, bool) and
-	// isSatisfied.
+	// This section may also include other methods related to the recursive methods,
+	// like the public version of minMoreNeeded.
 	//
 
 
 
 
 
+	
+	
+	//The following methods, until you reach minMoreNeeded(taken) , use MinMoreNeeded
+	// to do the recursive work.
 	/**
 	 * recalculate how many courses it would take to complete this requirement
 	 * if you started over from scratch.
@@ -243,9 +293,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public boolean isComplete(ArrayList<ScheduleElement> taken, boolean storeValue){
 		return minMoreNeeded(taken, storeValue) <= 0;
 	}
-	public boolean storedIsComplete(){
-		return this.storedNumberLeft <= 0;
-	}
 
 
 	/**
@@ -259,10 +306,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		double minNeeded = minMoreNeeded(taken, storeValue);
 		double originalNeeded = this.originalNumberNeeded;
 		double result = (1.0 - (minNeeded * 1.0/originalNeeded));
-		return result;
-	}
-	public double storedPercentComplete(){
-		double result = (1.0 - (storedNumberLeft * 1.0/  this.originalNumberNeeded)); 
 		return result;
 	}
 
@@ -286,15 +329,22 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	//INFINITELOOPHAZARD
 	/**
-	 * WARNING
+	 * WARNING WARNING WARNING
 	 * This method should not be called by outside classes.
 	 * Use minMoreNeeded(taken, boolean storeValue) instead.
 	 * 
-	 * Only Requirement and Terminal requirement should use it.
+	 * Only Requirement and TerminalRequirement should use it.
+	 * (it has to be protected so TerminalRequirement can overwrite it.)
 	 * 
-	 * Figure out how complete this requirement is, while ignoring
-	 * any scheduled instances of this requirement. (pay attention
-	 * to scheduled subsets of this requirement though).
+	 * Figure out how complete this requirement is if we've 
+	 * taken all the schedule elements in taken.
+	 * 
+	 * Includes scheduled instances of this requirement, but may ignore subset
+	 * requirements (i.e., the element "1 of (A thru K)" would not count towards satisfying
+	 * the req "1 of (A thru Z)".)
+	 * However, it will catch terminal requirement subsets. 
+	 * (so "1 of A" will count towards "1 of (A thru Z)")
+	 * 
 	 * @param taken
 	 * @return
 	 */
@@ -340,22 +390,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			return result;
 		}
-		else{ //this doesn't use credit hours.
-			//Look at each of your sub requirements, figure out how
-			// many each of them needs.
-			// Find the best numToChoose that you could pick, and
-			// use the minMoreNeeded from those numToChoose.
-			ArrayList<Integer> otherNums = new ArrayList<Integer>();
-
-			for(Requirement r : choices){
-				otherNums.add(r.minMoreNeeded(taken));
-			}
-			Collections.sort(otherNums);
+		else{//this doesn't use credit hours
 			
 			//Special case for requirements of the form
 			// "5 of these, at least 3 like this"
-			// These will always have 2 to choose, and
-			// one of the two will be a subset of the other.
+			// Requirements like this should calculate minMoreNeeded differently from normal.
+	
 			ArrayList<Requirement> isAtLeastRequirementPairs = atLeastRequirementPairs();
 			if(isAtLeastRequirementPairs.size() != 0){
 				Requirement superset = isAtLeastRequirementPairs.get(0);
@@ -395,6 +435,17 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				}
 				return result;
 			}
+			
+			//Look at each of your sub requirements, figure out how
+			// many each of them needs.
+			// Find the best numToChoose that you could pick, and
+			// use the minMoreNeeded from those numToChoose.
+			ArrayList<Integer> otherNums = new ArrayList<Integer>();
+
+			for(Requirement r : choices){
+				otherNums.add(r.minMoreNeeded(taken));
+			}
+			Collections.sort(otherNums);
 			int result = 0;
 			for(int i = 0; i < numToChoose ; i ++){
 				result += otherNums.get(i);
@@ -447,7 +498,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
-
+	
+	//INFINITELOOPHAZARD
+	/**
+	 * Check if this requirement if just a nested list of 1 terminal, like
+	 * 1 of (1 of (1 of (MTH-110)))
+	 * If so, you can use getTerminal() to see the TerminalRequirement for it.
+	 * @return
+	 */
 	public boolean isTerminal(){
 		if(this.choices.size() != 1){
 			return false;
@@ -467,9 +525,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return null;
 	}
 
-	
+	//INFINITELOOPHAZARD
 	/**
-	 * Note - this method is used by TerminalRequirement.
+	 * Check if e completes any subrequirement of this requirement.
+	 * 
+	 * Equivalently, returns true if minMoreNeeded(e) < minMoreNeeded(emptyList).
+	 * 
+	 * TODO make a test method for this.
+	 * 
 	 * @param e
 	 * @return
 	 */
@@ -477,8 +540,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(e instanceof Requirement){
 			Requirement r = (Requirement)e;
 			if (r.isTerminal()){
-				if (r.getTerminal().alsoCompletes(this)){
-					return true;
+				for(Requirement c : choices){
+					if(c.isSatisfiedBy(r.getTerminal())){
+						// the recursive call will either use this method
+						// if c is a requirement, or the 
+						// isSatisfiedBy(TerminalRequirement other) method
+						// if c is a terminal.
+						return true;
+					}
 				}
 			}
 			else if(r.equals(this)){
@@ -509,6 +578,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return false;
 	}
+	
+	
+	/**
+	 * Check for equality.
+	 * 
+	 * Note that the requirement "1 of (1 of (MTH 150))" is equal to the 
+	 * requirement "MTH 150", as both are terminals.
+	 */
 	@Override
 	public boolean equals(Object o){
 		if(!(o instanceof Requirement)){
@@ -522,25 +599,23 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(r == null){
 			return false;
 		}
+		//use terminal equality if 
 		if(r instanceof TerminalRequirement){
 			if(this.isTerminal()){
 				return this.getTerminal().equals(r);
 			}
 			return false;
 		}
+		//Check numTochoose are equal
 		if(r.numToChoose != this.numToChoose){
 			return false;
 		}
 		//check that this contains that and that contains this.
-		for(Requirement choice : choices){
-			if(!r.choices.contains(choice)){
-				return false;
-			}
+		if(!this.choices.containsAll(r.choices)){
+			return false;
 		}
-		for(Requirement choice : r.choices){
-			if(!this.choices.contains(choice)){
-				return false;
-			}
+		if(!r.choices.containsAll(r.choices)){
+			return false;
 		}
 		//check for names being equal
 		if(this.name != null && !this.name.equals(r.name)){
@@ -555,7 +630,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	//INFINITELOOPHAZARD
 	@Override
 	public int hashCode(){
-		int total = 0;
+		int total = numToChoose;
 		for(Requirement r : choices){
 			total += r.hashCode();
 		}
@@ -587,7 +662,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	//////////////////////////////////////
 	//////////////////////////////////////
 	@SuppressWarnings("unused")
-	private boolean _________alsoCompletesMethods_________;
+	private boolean ___alsoCompletesMethods_________;
 
 	
 	/**
@@ -630,6 +705,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
+	
+	
+	
 	//INFINITELOOPHAZARD
 			/**
 			 * Return true if each strategy for completing this requirement
@@ -837,7 +915,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	@SuppressWarnings("unused")
-	private boolean _________CompareTo_________;
+	private boolean ___CompareTo_________;
 
 	/////////////////////////////////
 	/////////////////////////////////
@@ -868,7 +946,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 
 		//Then compare based on % complete
-		double percentDifference = this.storedPercentComplete() - other.storedPercentComplete();
+		double percentDifference = this.getStoredPercentComplete() - other.getStoredPercentComplete();
 		if(percentDifference < tolerance){
 			return -1;
 		}
@@ -907,7 +985,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////////////////////////////////
 	/////////////////////////////////
 	@SuppressWarnings("unused")
-	private boolean _________MethodsFromScheduleElement_________;
+	private boolean ___MethodsFromScheduleElement_________;
 
 	@Override
 	public Prefix getPrefix() {
@@ -965,7 +1043,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////////////////////////
 	/////////////////////////
 	@SuppressWarnings("unused")
-	private boolean _________StringMethods_________;
+	private boolean ___StringMethods_________;
 
 
 	
@@ -1298,7 +1376,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	/////////////////////////////////
 	/////////////////////////////////
 	@SuppressWarnings("unused")
-	private boolean _________SavingAndReadingMethods_________;
+	private boolean ___SavingAndReadingMethods_________;
 
 
 
@@ -1487,7 +1565,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			Requirement result = new Requirement();
 			result.numToChoose = 1;
 			do{
-				result.addRequirement(parse(tokens));
+				result.addChoice(parse(tokens));
 				if(tokens.isEmpty()){
 					throw new RuntimeException("Missing ) while parsing requirement");
 				}
@@ -1559,7 +1637,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	
 	
 	@SuppressWarnings("unused")
-	private boolean _________Testing_________;
+	private boolean ___Testing_________;
 
 
 	
@@ -1742,10 +1820,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			int minLeft = r.minMoreNeeded(takens, true);
 
 			double tol = Double.MIN_VALUE * 10000;
-			if(r.storedIsComplete() != complete){
+			if(r.getStoredIsComplete() != complete){
 				needsToBeShown = true;
 			}
-			if(r.storedPercentComplete() != percentComplete){
+			if(r.getStoredPercentComplete() != percentComplete){
 				needsToBeShown = true;
 			}
 

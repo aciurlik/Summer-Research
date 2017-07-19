@@ -811,7 +811,7 @@ public class Schedule implements java.io.Serializable {
 		if(needed == null){
 			return false; //no errors found
 		}
-		if(!needed.storedIsComplete()){
+		if(!needed.getStoredIsComplete()){
 
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
@@ -891,7 +891,7 @@ public class Schedule implements java.io.Serializable {
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
 
-				if(stillNeeded != null && !stillNeeded.storedIsComplete()){
+				if(stillNeeded != null && !stillNeeded.getStoredIsComplete()){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(stillNeeded);
@@ -1115,7 +1115,7 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public boolean checkOptimismError(Requirement r){
-		if(r.storedIsComplete()){
+		if(r.getStoredIsComplete()){
 			return false;
 		}
 		//If adding this requirement to the schedule would entail a leap of faith
@@ -1351,7 +1351,7 @@ public class Schedule implements java.io.Serializable {
 			prereqsM.chosenDegree = -1;
 			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
 			for(Prereq p : prereqs){
-				if(!p.getRequirement().storedIsComplete()){
+				if(!p.getRequirement().getStoredIsComplete()){
 					uniquePrereqs.add(p.getRequirement());
 				}
 			}
@@ -1607,7 +1607,7 @@ public class Schedule implements java.io.Serializable {
 				}
 				result.append("\n" + rDisplay);
 
-				boolean isComplete = r.storedIsComplete();
+				boolean isComplete = r.getStoredIsComplete();
 				if(!isComplete){
 					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
 					if(coursesNeeded == 1){
