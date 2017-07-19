@@ -29,8 +29,14 @@ public class CourseList implements java.io.Serializable  {
 	private static Hashtable<Prefix, String> rawPrereqs;
 	static Hashtable<String, String> savedPrereqMeanings;
 	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
-
+	public static HashSet<String> languagePrefix;
+	
 	public static void loadAllCourses(){
+		String [] lp = {"FRN", "LTN", "SPN", "GRK", "GRM", "CHN", "JPN"};
+		languagePrefix = new HashSet<String>();
+		for(String s: lp){
+			languagePrefix.add(s);
+		}
 		listOfCourses = new ArrayList<Course>();
 		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
 		rawPrereqs = new Hashtable<Prefix, String>();
@@ -104,11 +110,30 @@ public class CourseList implements java.io.Serializable  {
 				return askUserToDefine(p, originalRequirementString);
 			}
 		}
+		if(isPlaceableCourse(p)){
+			Requirement result = new Requirement();
+			result.addRequirement(Requirement.readFrom(ourVersion));
+			result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
+			return result;
+		}
+		
 
 		return Requirement.readFrom(ourVersion);
 	}
 
-
+	
+/**
+ * Used to tell if the prereq should include a placement into the course, currently used for FL. 
+ * @param p
+ * @return true if it should include, false otherwise. 
+ */
+	public static boolean isPlaceableCourse(Prefix p){
+		if(languagePrefix.contains(p.getSubject())){
+			return true;
+		}
+		return false;
+		
+	}
 
 
 

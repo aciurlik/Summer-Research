@@ -729,15 +729,21 @@ public class Schedule implements java.io.Serializable {
 		String[] Language = {"110", "120", "201"};
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
-		//Figure out the index of the given prefixe's number,
-		// so if you were given 120 savedLocation = 1.
+		
+		/**
+		 * This was used to add the prereqs for language placement instead we added
+		 * that placement class to the prereqs of the highest language class. 
+		 * 
+		 * //Figure out the index of the given prefixe's number,
+			// so if you were given 120 savedLocation = 1.
 		int savedLocation = -1;
 		for(int i=0; i<Language.length; i++){
 			if(languagePrefix.getNumber().equals(Language[i])){
 				savedLocation=i;
 			}
 		}
-		//add all the things before it to your prior courses, so if you got
+		 * 
+		 * //add all the things before it to your prior courses, so if you got
 		// placed in 120, we'll add 110 to your prior courses,
 		// and if you got placed in 201, we'll add 120 and 110 to your prior courses.
 		if(savedLocation != -1){
@@ -759,6 +765,11 @@ public class Schedule implements java.io.Serializable {
 				priorSemester.add(cc);
 			}
 		}
+		 * 
+		 
+		 * 
+		 */
+		
 	}
 
 
@@ -1089,7 +1100,7 @@ public class Schedule implements java.io.Serializable {
 		return(result);
 	}
 
-	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded, boolean isAll){
+	public boolean checkDuplicates(ScheduleElement e, boolean alreadyAdded, boolean hideUserOverride){
 		int exactDuplicateCount = 1;
 		if(alreadyAdded){
 			exactDuplicateCount = 0;
@@ -1103,9 +1114,10 @@ public class Schedule implements java.io.Serializable {
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+						duplicate.setOffendingCourse(results[0]);
 						//	duplicate.setInstructions(results[0].getDisplayString() + " duplicates " + results[1]	);
 						duplicate.setElementList(results);
-						if(isAll == false){
+						if(hideUserOverride == false){
 							return(!this.userOverride(duplicate));
 						}
 						else{
@@ -1118,9 +1130,10 @@ public class Schedule implements java.io.Serializable {
 			if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 				ScheduleElement[] result = {e, e1};
 				ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
+				duplicate.setOffendingCourse(result[0]);
 				duplicate.setElementList(result);
 				//	duplicate.setInstructions(result[0].getDisplayString() + " duplicates " + result[1]	);
-				if(isAll == false){
+				if(hideUserOverride == false){
 					return (!this.userOverride(duplicate));
 				}
 				else{
@@ -1131,7 +1144,8 @@ public class Schedule implements java.io.Serializable {
 		return false;
 	}
 
-
+	
+	
 
 	///////////////////////////////
 	///////////////////////////////
@@ -1209,7 +1223,6 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
 	///////////////////////////////
 	///////////////////////////////
 	//	Course overlap error checking
@@ -1263,8 +1276,12 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<ScheduleElement> allTakenElements = getAllElementsSorted();
 		//Same issue here.
 		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
+		ArrayList<ArrayList<Requirement>> reqsFulfilled = new ArrayList<ArrayList<Requirement>> ();
+		for(ScheduleElement e: allTakenElements){
+			reqsFulfilled.add(e.f(reqList));
+		}
 		for(Requirement r : reqList){
-			updateRequirement(r, reqList, allTakenElements);
+			updateRequirement(r, allTakenElements, reqsFulfilled);
 		}
 
 		updatePrereqs();
@@ -1284,15 +1301,19 @@ public class Schedule implements java.io.Serializable {
 	 * satisfying this requirement.
 	 * @param r
 	 */
-	public void updateRequirement(Requirement r, ArrayList<Requirement> reqList, ArrayList<ScheduleElement> allTakenElements){
+	public void updateRequirement(Requirement r, 
+			 ArrayList<ScheduleElement> allTakenElements, ArrayList<ArrayList<Requirement>> reqsFulfilled){
+		//These last two are passed in for speed issues. 
 		//For each requirement, find all the schedule elements that satisfy it
 		// (this prevents enemy requirements from both seeing the same course)s
-
+		
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 
-		for(ScheduleElement e : allTakenElements){
-			if(e.filterEnemyRequirements(reqList).contains(r)){
+		for(int i=0; i<allTakenElements.size();i++){
+			ScheduleElement e = allTakenElements.get(i);
+			if(reqsFulfilled.get(i).contains(r)){
+
 				satisficers.add(e);
 			}
 			
@@ -1581,8 +1602,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!d.GUICheckAllErrors(false).equals("")){
-			result.append("Scheduling Errors:"); // + d.GUICheckAllErrors(false));
+		if(!d.getErrorString().equals(" ")){
+			result.append("Scheduling Errors:" + d.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h2>The Final Countdown: </h2>");
@@ -1593,8 +1614,8 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
-		return result.toString().replaceAll("\n", "<br>");
+		String toResult = result.toString().replaceAll("&", "&amp;");
+		return toResult.replaceAll("\n", "<br>");
 
 
 
@@ -1639,7 +1660,7 @@ public class Schedule implements java.io.Serializable {
 					rDisplay = rDisplay + spaces;
 
 				}
-				result.append("\n" + rDisplay);
+				result.append("\n <b>" +  rDisplay + "</b>" );
 
 				boolean isComplete = r.getStoredIsComplete();
 				if(!isComplete){
@@ -1681,12 +1702,12 @@ public class Schedule implements java.io.Serializable {
 					String priorIndent = "   ";
 					part.append(priorIndent);
 					if(se instanceof Requirement){
-						part.append("Scheduled  " + se.shortString(10000));
+						part.append("Scheduled  " + se.shortString(10000).trim());
 
 
 					}
 					else{
-						part.append(se.getDisplayString());
+						part.append(se.getDisplayString().trim());
 					}
 
 					//When was this thing taken?
@@ -1710,8 +1731,8 @@ public class Schedule implements java.io.Serializable {
 		}
 
 
-		return result.toString().replaceAll("\n", "<br>");
-
+		String toResult = result.toString().replaceAll("&", "&amp;");
+		return toResult.replaceAll("\n", "<br>");
 	}
 
 

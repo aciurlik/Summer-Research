@@ -35,8 +35,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class FileHandler implements ActionListener{
+public class FileHandler{
 	static JFrame popUP = new JFrame();
+	public static final String bellTowerImageFile = MenuOptions.resourcesFolder + "bellTower.jpg";
+	public static final String fireworksImageFile = MenuOptions.resourcesFolder + "fireworks.jpg";
 	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = MenuOptions.resourcesFolder + "SavedStudentData.txt";
@@ -45,13 +47,12 @@ public class FileHandler implements ActionListener{
 
 	static{
 		p = new Properties();
-		FileOutputStream output = null;
 		File file = new File(MenuOptions.settingsDoc);
 		boolean exists = file.exists();
 		if(!exists){
 			restoreDefaultSettings();
-			try {
-				output = new FileOutputStream(MenuOptions.settingsDoc);
+			try(FileOutputStream output = new FileOutputStream(MenuOptions.settingsDoc);) {
+				
 				p.store(output, "New Settings");
 				output.close();
 			} catch (Exception e) {
@@ -60,9 +61,7 @@ public class FileHandler implements ActionListener{
 			}
 		}
 		else{
-			FileInputStream input = null;
-			try {
-				input = new FileInputStream(MenuOptions.settingsDoc);
+			try(FileInputStream input = new FileInputStream(MenuOptions.settingsDoc);) {	
 				p.load(input);
 				input.close();
 
@@ -77,9 +76,7 @@ public class FileHandler implements ActionListener{
 
 	public static void propertySet(String setting, String value){
 		p.setProperty(setting, value);
-		FileOutputStream output;
-		try {
-			output = new FileOutputStream(MenuOptions.settingsDoc);
+		try(FileOutputStream output = new FileOutputStream(MenuOptions.settingsDoc);) {
 			p.store(output, "Edited Settings");
 			output.close();
 		} catch (IOException e) {
@@ -212,7 +209,7 @@ public class FileHandler implements ActionListener{
 		if(fileName != null){
 
 
-			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser");
+			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser"); 
 					ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
 
 
@@ -433,18 +430,20 @@ public class FileHandler implements ActionListener{
 		String chosen = chooseSchedule("delete");
 		if(chosen != null){
 			int n = JOptionPane.showOptionDialog(popUP, "Are you sure you want to delete "+ chosen, "Delete Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.OK_CANCEL_OPTION, null, null, null);
-
 			if(n==0){
 				File toDelete = new File (MenuOptions.savedScheduleFolder + chosen);
-				toDelete.delete();
-
-
+				boolean deleted = toDelete.delete();
+				if(!deleted){
+					JOptionPane.showMessageDialog(popUP, "Error: Unable to delete schedule");
+				}
+				
 			}
 		}
 	}
 
 
-	public static ArrayList<ImageIcon> getInstructions(File folder) {
+	public static ArrayList<ImageIcon> getInstructions() {
+		File folder = new File(MenuOptions.resourcesFolder + "StartUpSlides");
 		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
 
 		for (File f: folder.listFiles(
@@ -468,11 +467,8 @@ public class FileHandler implements ActionListener{
 				)){
 
 			try{
-				
-				
 				ImageIcon image = new ImageIcon(f.toString());
 				Image img = image.getImage();
-				
 								double scalar = 2;
 				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
 				image = new ImageIcon(newimg);
@@ -499,9 +495,27 @@ public class FileHandler implements ActionListener{
 		
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+
+	
+	
+	public void saveMe(Major m, File f){
+	
+		try(BufferedWriter bf = new BufferedWriter(new FileWriter(f));) {
+			bf.write(m.saveString());
+			bf.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
+		
+	}
+
+	public static ImageIcon makeBellTower() {
+		return new ImageIcon(bellTowerImageFile);
+	}
+
+	public static ImageIcon makeFireWorks() {
+		// TODO Auto-generated method stub
+		return  new ImageIcon(fireworksImageFile);
 	}
 }

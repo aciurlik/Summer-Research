@@ -68,16 +68,17 @@ public class ScheduleGUI{
 	String headInstructCourse = "Pick a course";
 	String summerOverload = "You need to delete a course before you can add another";
 	JFrame frame; 
-	
+
 	Course[] coursesDialog;
 
 	ScheduleElement beingDragged;
-	
+
 	public static int defaultPixelWidth = 300;
 
 	ListOfMajors l;
 	BellTower b;
 	//PrintWriter pW;
+	private int defaultCharacterLength = 100;
 
 
 
@@ -89,8 +90,10 @@ public class ScheduleGUI{
 
 		//popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-		l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
-
+		l = FileHandler.getMajorsList();
+		
+		
+		
 		this.sch = sch;
 		sch.setDriver(this);
 
@@ -103,7 +106,7 @@ public class ScheduleGUI{
 
 		JPanel stackPanel = new JPanel();
 		stackPanel.setLayout(new BorderLayout());
-		
+
 		
 		//Adds Additions Panel and belltower
 		AdditionsPanel extras = new AdditionsPanel(this);
@@ -119,22 +122,40 @@ public class ScheduleGUI{
 		//schP.setPreferredSize(new Dimension(500, 500));
 
 		stackPanel.add(schP, BorderLayout.NORTH);
-
+		
+		
+		
+		long one = System.currentTimeMillis();
 		reqs = new RequirementListPanel(sch, this);
+		long two = System.currentTimeMillis();
+		
+		
 		stackPanel.add(reqs, BorderLayout.CENTER);
+		
+		
 		
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(stackPanel);
+		long three = System.currentTimeMillis();
 		//scroll.setPreferredSize(new Dimension(stackPanel.getPreferredSize()));
 		frame.add(scroll);
-		
+
 		this.update();
 
 		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.pack();
 		frame.setVisible(true);
-
+		long four = System.currentTimeMillis();
+		/**
+		 * 
+		 * 	System.out.println("Time intervals");
+		System.out.println(two-one);
+		System.out.println(three-two);
+		System.out.println(four-three);
+		 * 
+		 */
+	
 	}
 
 
@@ -280,6 +301,7 @@ public class ScheduleGUI{
 		if(m.majorType.equals(Major.TRACK) && m.degreeTypes.isEmpty()){
 			typeNeedsToBeChosen = false;
 		}
+		
 		if(m.degreeTypes.size()==1){
 			m.setChosenDegree(m.degreeTypes.get(0));
 			typeNeedsToBeChosen = false;
@@ -294,7 +316,9 @@ public class ScheduleGUI{
 			// these notes.
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
-			JOptionPane.showMessageDialog(null, message + "\n\n" + m.notes, title, JOptionPane.INFORMATION_MESSAGE);
+			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
+			System.out.println(toUser);
+			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
 		this.sch.addMajor(m);
@@ -683,7 +707,7 @@ public class ScheduleGUI{
 		// for each of the schedule elements in the string.
 
 		//instruct will be displayed as the main warning message
-		String instruct= errorString(s, maxElementStringLength); 
+		String instruct= errorString(s, maxElementStringLength, true); 
 
 		//Special cases for overload and duplicate - they get different strings here than when they're 
 		// found in the checkAllErrors button
@@ -694,7 +718,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, "<html><body>" + parseIntoReadableHTML(instruct, defaultPixelWidth) +"</body></html>", header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -704,7 +728,7 @@ public class ScheduleGUI{
 	 * @param e
 	 * @return
 	 */
-	private String errorString(ScheduleError e, int preferredMaxLength){
+	private String errorString(ScheduleError e, int preferredMaxLength, boolean surroundHTML){
 		String result = "";
 		if(e.error.equals(ScheduleError.overlapError)){
 			result = (e.elementList[0].shortString(preferredMaxLength) + "\n    overlaps " + e.elementList[1].shortString(preferredMaxLength));
@@ -736,14 +760,19 @@ public class ScheduleGUI{
 			Requirement r = e.getOptimisticRequirement();
 			ArrayList<Requirement> pair = r.atLeastRequirementPairs();
 			Requirement subset = pair.get(1);
+
 			result = "The requirement " 
 					+ r.shortString(70)
 					+ " must include at least " 
 					+ r.indent(subset.getDisplayString(),  "   ")
 					+ "Until you change this requirment into a course, "
 					+ "\nwe will assume that it represents one of these.";
+
 		}
-		result =  "<html><body>" + parseIntoReadableHTML(result, defaultPixelWidth)+  "</html></body>";
+
+		result = parseIntoReadable(result, defaultCharacterLength);
+		
+		
 		return result;
 	}
 
@@ -763,48 +792,49 @@ public class ScheduleGUI{
 		return null;
 	}
 
-	public String GUICheckAllErrors(boolean displayPopUp) {
-		boolean hasErrors = false;
+
+	public String getErrorString(){
 		int elementPreferredMaxLength = 30;
 		ArrayList<ScheduleError> allErrors =sch.checkAllErrors();
-
 		String result = new String();
 		if(!allErrors.isEmpty()){
-			hasErrors=true;
 			for(ScheduleError s : allErrors){
-				result += errorString(s, elementPreferredMaxLength) + "\n";
+				result += errorString(s, elementPreferredMaxLength, false) + "\n";
 			}
-			if(result.length() < 2){
-				result = "Your Schedule had no errors! You're a pretty savy scheduler";
-			}
+		}
+		return result;
+	}
 
 
-			if(displayPopUp)
-				JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+
+	public void GUICheckAllErrors(boolean displayPopUp) {
+		String errorString = getErrorString();
+		String result = "<html><body>" + errorString;
+		System.out.println(result);
+		if(errorString.equals("")){
+			result = "Your Schedule had no errors! You're a pretty savy scheduler";
 		}
-		else{
-			if(displayPopUp)
-				JOptionPane.showMessageDialog(null, "You have no errors!", "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
-		}
+		result= result.replaceAll("\n", "<br>");
+		JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+
+
 		String majorNotes = "";
 		boolean hasNotes = false;
 		for(Major m : sch.getMajors()){
 			if(m.notes != null){
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
+				majorNotes = parseIntoReadable(majorNotes, defaultCharacterLength);
 				hasNotes = true;
+			
 			}
 		}
-
+		
+		majorNotes.replaceAll("\n", "<br>");
 		if(hasNotes && displayPopUp){
 			JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
-		if(hasErrors){
-			return result;
-		}
-		else{
-			return "";
-		}
+		
 
 	}
 
@@ -829,15 +859,32 @@ public class ScheduleGUI{
 	}
 
 
-/**
- * 
- * @param s
- * @param pixels
- * @return
- */
-	public static String parseIntoReadableHTML(String s, int pixels){
-		s = s.replaceAll("\n", "<br />");
-		return  "<p style='width " + pixels + "px;'>" + s + "</p>";
+	/**
+	 * 
+	 * @param s
+	 * @param pixels
+	 * @return
+	 */
+	public static String parseIntoReadable(String s, int characterLength){
+		ArrayList<String> lines = new ArrayList<String>();
+		for(String line: s.split("\n")){
+			lines.add(line);
+		}
+		for(int i = 0; i<lines.size(); i++){
+			String line = lines.get(i);
+			if(line.length()>characterLength){
+				int splitIndex = line.substring(0, characterLength).lastIndexOf(" ");
+				lines.add(i+1, line.substring(splitIndex));
+				lines.set(i, line.substring(0, splitIndex));
+			}
+		}
+		StringBuilder result = new StringBuilder();
+		for(String element: lines){
+			result.append(element + "\n");
+		}
+		return result.toString();
+		
+		
 	}
 
 
@@ -910,17 +957,17 @@ public class ScheduleGUI{
 		if( (!selectedScheduleLayout) && (!selectedReqLayout)){
 			selectedScheduleLayout = true;
 		}
-		
+
 		//Schedule
 		if(selectedScheduleLayout){
 			finalPrint = finalPrint + sch.printScheduleString() + "<br>";
-			System.out.println(sch.printScheduleString().replaceAll(">", "> \n"));
+		
 		}
 		//Reqs
 		if(selectedReqLayout){
 			finalPrint = finalPrint + sch.printRequirementString() + "<br>";
 		}
-		
+
 
 		if(selectedScheduleLayout || selectedReqLayout){
 			JTextPane schedulePrint = new JTextPane();
@@ -931,9 +978,9 @@ public class ScheduleGUI{
 			schedulePrint.setPreferredSize(new Dimension((int) p.getWidth(), (int) p.getHeight()));
 			//	schedulePrint.setLineWrap(true);
 			schedulePrint.setContentType("text/html");
-		//	System.out.println("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
+			//	System.out.println("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
 			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
-			
+
 			schedulePrint.setEditable(false);
 			//schedulePrint.setFont(FurmanOfficial.monospaced);
 			JScrollPane scrollPane = new JScrollPane(schedulePrint);
@@ -946,6 +993,8 @@ public class ScheduleGUI{
 
 			if(userChoice == 0){
 				try {
+					System.out.println("This is what is sent to the printer");
+					System.out.println(schedulePrint.getText());
 					schedulePrint.print();
 				} catch (PrinterException e) {
 					// TODO Auto-generated catch block
@@ -961,11 +1010,11 @@ public class ScheduleGUI{
 		FileHandler.saveSchedule(this.sch);
 	}
 
-	
+
 	public void addWindowListener(WindowListener w){
 		frame.addWindowListener(w);
 	}
-	
+
 	public void askMasterPassword(){
 		String input = JOptionPane.showInputDialog("Knock knock \n \n...\n \n ... \n \n Password?");
 		if(input == null){
@@ -982,19 +1031,21 @@ public class ScheduleGUI{
 				public void write(int b) throws IOException{
 					out.append(String.valueOf( ( char )b ) );
 				}
+
 			}));
-			
+
 			debugScreen.setTitle("Debug area");
 			debugScreen.add(out);
 			debugScreen.pack();
 			debugScreen.setVisible(true);
 			debugScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		}
 	}
 
 
 
-	
+
 	String importResult;
 	public void importPriorCourses(){
 		JTextArea importArea = new JTextArea("To import your prior courses, "
@@ -1023,7 +1074,7 @@ public class ScheduleGUI{
 		p.setLayout(new BorderLayout());
 		p.add(new JScrollPane(importArea), BorderLayout.SOUTH);
 		p.add(validate, BorderLayout.WEST);
-		
+
 		int chosen = JOptionPane.showOptionDialog(null,p, "Import your schedule",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
 		if(chosen == JOptionPane.OK_OPTION){
 			try{
@@ -1033,12 +1084,13 @@ public class ScheduleGUI{
 				this.sch.readPrior(importResult);
 				FileHandler.writeStudentData(importResult);
 				this.update();
-				
+
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
+
 	
 	/**
 	 * Find the student data hidden in text.
@@ -1121,6 +1173,7 @@ public class ScheduleGUI{
 			result.append("\n");
 		}
 		String saveString = result.toString();
+
 		try{
 			new Schedule(saveString); //this schedule will read from the prior.
 			importResult = saveString;
@@ -1139,7 +1192,7 @@ public class ScheduleGUI{
 
 
 
-	
+
 
 
 

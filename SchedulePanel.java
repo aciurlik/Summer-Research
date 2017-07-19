@@ -160,6 +160,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 				semesterP.setDeletable(false);
 			}
 			
+
 			scrollPanel.add(semesterP, gbc);
 			gbc.gridx ++;
 		}
@@ -171,6 +172,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 
 		//This code opens the secret admin window
 		if(allSemesterPanels.size() == 15){
+			
 			allSemesterPanels.get(10).addMouseListener(new MouseAdapter(){
 				@Override
 				public void mousePressed(MouseEvent e){
