@@ -331,7 +331,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return minMoreNeeded(taken) <= 0;
 	}
 
-	@Override
+	
+	
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
@@ -420,7 +421,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	
 	
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
+	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : reqList){
 			if(this.equals(r)){

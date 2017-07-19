@@ -654,272 +654,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
-
-
-	//////////////////////////////////////
-	//////////////////////////////////////
-	/////alsoCompletes methods
-	//////////////////////////////////////
-	//////////////////////////////////////
 	@SuppressWarnings("unused")
-	private boolean ___alsoCompletesMethods_________;
-
-	
-	/**
-	 * Check (while avoiding large computation times)
-	 * whether this requirement is obviously a subset of 
-	 * the other requirement. Only handles the case where
-	 * this is a list of terminals and other is also a list of
-	 * terminals
-	 * @param other
-	 * @return
-	 */
-	public boolean isSubset(Requirement other){
-		
-		//build the set of the other's terminal requirements
-		HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
-		for(Requirement r : other.choices){
-			if(!r.isTerminal()){
-				return false;
-			}
-			else{
-				othersSubreqs.add(r.getTerminal());
-			}
-		}
-		//build the set of this's terminal requirements
-		HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
-		if(this.isTerminal()){
-			thisSubreqs.add(this.getTerminal());
-		}
-		else{
-			for(Requirement r : this.choices){
-				if(!r.isTerminal()){
-					return false;
-				}
-				else{
-					thisSubreqs.add(r.getTerminal());
-				}
-			}
-		}
-		return othersSubreqs.containsAll(thisSubreqs);
-	}
-
-
-	
-	
-	
-	//INFINITELOOPHAZARD
-			/**
-			 * Return true if each strategy for completing this requirement
-			 * will also complete r.
-			 * Currently does not handle credit hours requirements.
-			 * 
-			 * This method is a brute force method and takes 
-			 * extreme amounts of time - it is currently restricted to
-			 * take at most 50- 60 milliseconds and then quit 
-			 * 	(if it times out, it may give an incorrect response).
-			 * 
-			 * TODO WARNING - CompletionSetsIter has a bug. It should be
-			 * returning an ArrayList of terminal requirements rather than a
-			 * hash set (if a requirement has 2 instances of the same terminal requirement,
-			 *  then this method may display incorrect behavior). However, this
-			 *  bug makes the method much faster and the method is only incorrect in
-			 *  a few cases, so it may be worth leaving it as is...
-			 * @param r
-			 * @return
-			 */
-			public boolean alsoCompletes(Requirement r){
-				if(this.equals(r)){
-					return true;
-				}
-				if(!RequirementGraph.doesPlayNice(this, r)){
-					return false;
-				}
-				//This method can take a very long time due to
-				// the extreme number of ways to 
-				long start = System.currentTimeMillis();
-				CompletionSetsIter csi = new CompletionSetsIter(this);
-				while(csi.hasNext()){
-					HashSet<TerminalRequirement> nextCompletionSet = csi.next();
-					//System.out.println(nextCompletionSet);
-					if(!r.isCompletedBy(nextCompletionSet)){
-						return false;
-					}
-					if(System.currentTimeMillis() - start > 50){
-						return false;
-					}
-				}
-				return true;
-			}
-
-		//INFINITELOOPHAZARD
-		/**
-		 * Check if this set of terminal requirements fully completes this
-		 * requirement. 
-		 * 
-		 * formally, (with bad notation,) returns true if minMoreNeeded(s) <= 0.
-		 * 
-		 * This is contrasted from isSatisfiedBy(), which only
-		 * checks to see if one individual object might help this requirements
-		 * out. 
-		 * @param s
-		 * @return
-		 */
-		public boolean isCompletedBy(HashSet<TerminalRequirement> s){
-			int numSubComplete = 0;
-			for(Requirement r : choices){
-				if(r.isCompletedBy(s)){
-					numSubComplete ++;
-					if(numSubComplete >= numToChoose){
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
-	/**
-	 * This class iterates over a requirement's possible completion sets.
-	 * Each completion set is a set of terminal requirements.
-	 * @author dannyrivers
-	 *
-	 */
-	private class CompletionSetsIter implements Iterator<HashSet<TerminalRequirement>>{
-		SizedPowerSetsIter<Requirement> iter;
-		ArrayList<Requirement> workingSetOfRequirementsToChoose;
-		ArrayList<CompletionSetsIter> subIters;
-		boolean isTerminal;
-		boolean start;
-		public CompletionSetsIter(Requirement r){
-
-			if(r instanceof TerminalRequirement){
-				start = true;
-				isTerminal = true;
-				workingSetOfRequirementsToChoose = new ArrayList<Requirement>();
-				workingSetOfRequirementsToChoose.add(r);
-			}
-			else{
-				isTerminal = false;
-				this.iter = new SizedPowerSetsIter<Requirement> (r.choices, r.numToChoose);
-				subIters = new ArrayList<CompletionSetsIter>(r.numToChoose);
-				for(int i = 0; i < r.numToChoose ; i ++){
-					subIters.add(null);
-				}
-				refreshSubiters();
-				start = true;
-			}
-		}
-		@Override
-		public boolean hasNext() {
-			if(start){
-				return true;
-			}
-			if(isTerminal){
-				return false;
-			}
-			if(!iter.hasNext()){
-				return nextSubiterToIncrement() == -1;
-			}
-			else{
-				return true;
-			}
-		}
-		@Override
-		public HashSet<TerminalRequirement> next() {
-			if(start){
-				start = false;
-				return fullSet();
-			}
-			if(isTerminal){
-				HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
-				result.add((TerminalRequirement)workingSetOfRequirementsToChoose.get(0));
-				return result;
-			}
-			int nextToIncrement = nextSubiterToIncrement();
-			if(nextToIncrement == -1){
-				//We've finished this working set of requirements, time 
-				// to make a new one.
-				refreshSubiters();
-				return fullSet();
-
-			}
-			else{
-				//increment the next subiter, while restarting any
-				// subiter above it in the list
-				subIters.get(nextToIncrement).next();
-				for(int i = nextToIncrement - 1 ; i >= 0 ; i --){
-					subIters.set(i, new CompletionSetsIter(workingSetOfRequirementsToChoose.get(i)));
-				}
-				return fullSet();
-			}
-		}
-
-		private void refreshSubiters(){
-			workingSetOfRequirementsToChoose = new ArrayList<Requirement>(iter.next());
-			//System.out.println(workingSetOfRequirementsToChoose);
-			for(int i = 0; i < workingSetOfRequirementsToChoose.size() ; i ++){
-				Requirement chosenReq = workingSetOfRequirementsToChoose.get(i);
-				//System.out.println(chosenReq instanceof TerminalRequirement);
-				CompletionSetsIter newIter = new CompletionSetsIter(chosenReq);
-				subIters.set(i,newIter);
-			}
-		}
-		//If we think of each subiter as on its own row,
-		// with the first subiter on the top row,
-		// find the first subiter that does have a next.
-		private int nextSubiterToIncrement(){
-			for(int i = 0 ; i <subIters.size(); i ++){
-				if(subIters.get(i) == null){
-					return -1;
-				}
-				if(subIters.get(i).hasNext()){
-					return i;
-				}
-			}
-			return -1;
-		}
-		/**
-		 * Returns one full set of terminal requirements without changing
-		 * any state of the iter.
-		 * @return
-		 */
-		public HashSet<TerminalRequirement> fullSet(){
-			HashSet<TerminalRequirement> result = new HashSet<TerminalRequirement>();
-			if(isTerminal){
-				TerminalRequirement thisReq = (TerminalRequirement)workingSetOfRequirementsToChoose.get(0);
-				result.add(thisReq);
-				return result;
-			}
-			for(CompletionSetsIter csi : subIters){
-				result.addAll(csi.fullSet());
-			}
-			return result;
-		}
-		@Override
-		public void remove() {
-		}
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	@SuppressWarnings("unused")
-	private boolean ___CompareTo_________;
+	private boolean ___Comparisons_________;
 
 	/////////////////////////////////
 	/////////////////////////////////
-	///// CompareTo 
+	///// Comparisons
 	/////////////////////////////////
 	/////////////////////////////////
 
@@ -928,20 +668,30 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 	@Override
 	/**
-	 * This comparison method is used to sort a 
-	 * requirementList displayed to the user.
+	 * Compare by, in order:
+	 * 		Terminal or not (term < req)
+	 * 		stored is complete
+	 * 		stored percent complete
+	 * 		numToChoose
+	 * 		choices.size()
+	 * 
+	 * note - a return of 0 may NOT indicate that these 
+	 * 		requirements are equal. This compareTo
+	 * 		is NOT CONSISTENT WITH EQUALS.
+	 * 
+	 * TODO should this be made consistent with equals?
 	 */
 	public int compareTo(Requirement o) {
-		if(! (o instanceof Requirement)){
+		if(o.isTerminal()){
 			//Requirements are greater than terminalRequirements.
 			return 1;
 		}
 		Requirement other = (Requirement)o;
 		//first compare based on whether they're complete, completed coming later
-		if(this.storedNumberLeft <= 0 && !(other.storedNumberLeft <= 0)){
+		if(this.getStoredIsComplete() && ( !other.getStoredIsComplete() )){
 			return 1;
 		}
-		if(!(this.storedNumberLeft <= 0) && other.storedNumberLeft <= 0){
+		if(( !this.getStoredIsComplete()) && other.getStoredIsComplete()){
 			return -1;
 		}
 
@@ -961,23 +711,73 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 
 
-		//then compare based on prefixes.
-		// first number of prefixes, then containment.
+		//number of choices
 		if(this.choices.size() != other.choices.size()){
 			return this.choices.size() - other.choices.size();
 		}
-
-		// check if this is contained in that.
-		// if not, return that it's greater. 
-		// Note that this ruins the total ordering property, 
-		// two requirements can be greater than each other.
-		//TODO add containment check
-
-
-		//TODO add check for exact equality
 		return 0;
 
 	}
+	
+	/**
+	 * Check (while avoiding large computation times)
+	 * whether this requirement is obviously a subset of 
+	 * the other requirement. Only handles the case where
+	 * this is a list of terminals and other is also a list of
+	 * terminals.
+	 * 
+	 * We tried earlier to do a method 'alsoCompletes', but we couldn't
+	 * figure out an algorithm for it that didn't take enormous amounts of time
+	 * (it was causing delays up to 3 seconds to drag a requirement).
+	 * @param other
+	 * @return
+	 */
+	public boolean isSubset(Requirement other){
+		
+		//To build a requirement's set of terminals, 
+		//first check if the requirement itself is a terminal, then
+		// (if it isn't) add each of its choices to the set of
+		// terminals. If any choice isn't a terminal, just stop computation.
+		
+		//build the set of the other's terminal requirements
+		HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
+		if(other.isTerminal()){
+			othersSubreqs.add(other.getTerminal());
+		}
+		else{
+			for(Requirement r : other.choices){
+				if(!r.isTerminal()){
+					return false;
+				}
+				else{
+					othersSubreqs.add(r.getTerminal());
+				}
+			}
+		}
+		//build the set of this's terminal requirements
+		HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
+		if(this.isTerminal()){
+			thisSubreqs.add(this.getTerminal());
+		}
+		else{
+			for(Requirement r : this.choices){
+				if(!r.isTerminal()){
+					return false;
+				}
+				else{
+					thisSubreqs.add(r.getTerminal());
+				}
+			}
+		}
+		
+		
+		return othersSubreqs.containsAll(thisSubreqs);
+	}
+
+
+
+
+
 
 	/////////////////////////////////
 	/////////////////////////////////
@@ -987,39 +787,53 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	@SuppressWarnings("unused")
 	private boolean ___MethodsFromScheduleElement_________;
 
+	
 	@Override
+	/**
+	 * returns null unless this is an exact terminal requirement.
+	 */
 	public Prefix getPrefix() {
+		if(this.isTerminal()){
+			return this.getTerminal().getPrefix();
+		}
 		return null;
 	}
-
-
+	
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
+		//We never want to throw duplicate errors for requirements,
+		// because you can schedule the same requirement many times.
 		return false;
 	}
+	
 
 
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
+	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> reqList) {
 		if(this.isTerminal()){
-			//remove all enemies
+			//remove all enemies first, because the requirement graph might have
+			// edges using this req rather than the terminal req (this 
+			// is unnecessary while .equals() uses the terminal requirement,
+			// because RequirementGraph uses hashSets which will make all
+			// such requirements into enemies.).
 			ArrayList<Requirement> enemyless = new ArrayList<Requirement>();
 			for(Requirement r : reqList){
 				if(RequirementGraph.doesPlayNice(this, r)){
 					enemyless.add(r);
 				}
 			}
-			return this.getTerminal().getRequirementsFulfilled(enemyless);
+			return this.getTerminal().filterEnemyRequirements(enemyless);
 		}
+		//if it's not terminal, remove enemies as you go.
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement otherReq : reqList){
-			//Remove enemies as you go
 			if(RequirementGraph.doesPlayNice(otherReq, this)){
 				//Figure out if this satisfies otherReq
+				// If this doesn't satisfy otherReq, we can definitely skip
+				// otherReq. TODO START EDITS HERE TODO TODO TODO 
 				if(otherReq.equals(this)){
 					result.add(otherReq);
 				}
-				
 				/* Doesn't work - might not actually be used to complete a new
 				 * piece of otherReq, might instead be a subset of the part that is
 				 * already done.
@@ -1718,43 +1532,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			System.out.println("Short string 50:\t" + r.shortString(50));
 			System.out.println("Short string 10:\t" + r.shortString(10));
 		}
-	}
-
-	public static void testAlsoCompletes(){
-		String[] tests = new String[]{
-				"(MTH-110)", // 1, 2
-				"2 of (MTH-110, 2 of (MTH 120, MTH 130))",  //0, 2
-				"3 of (MTH-110, MTH 120, MTH 130)", //0, 1
-				"4 of (MTH-100, MTH-200, MTH-300, MTH-400, MTH-500)", //4
-				"3 of (MTH-100, MTH-200, MTH-300, MTH-400)", //3
-				"3 of (1 of (MTH-1, MTH-2, MTH-3, MTH-4), MTH-200, MTH-300, MTH-400)",//6, 7
-				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400)",//5, 7
-				"2 of (1 of (MTH-1, MTH-2, MTH-3), MTH-400, 1 of (MTH-1, MTH-4))"//5, 6
-
-		};
-		int[][] matchups = new int[][]
-				{
-			{0,1, 2},
-			{0,1, 2},
-			{0,1, 2},
-			{4},
-			{3},
-			{6, 7},
-			{5, 7},
-			{5, 6}
-				};
-
-
-				for(int i = 0; i < matchups.length ; i ++){
-					Requirement r = Requirement.readFrom(tests[i]);
-					for(int j : matchups[i]){
-						Requirement t = Requirement.readFrom(tests[j]);
-						boolean forward = r.alsoCompletes(t);
-						//boolean backward = t.alsoCompletes(r);
-						System.out.println("fwd:" + forward  + " \"" + tests[i] + "\" alsoCompletes? \"" + tests[j] + "\"" ); 
-					}
-				}
-
 	}
 
 	public static void generalTest(){
