@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -158,37 +159,77 @@ public class Schedule implements java.io.Serializable {
 	 * Sets language prefix, first semester and creates prior semester,
 	 * 
 	 * 
+	 * s should be in the form 
+	 * 
+	 * colmName \t colmName \t colmName \t ...
+	 * r1c1
+	 * r1c2
+	 * r1c3
+	 * .
+	 * .
+	 * .
+	 * r2c1
+	 * r2c2
+	 * .
+	 * .
+	 * .
+	 * rncn
+	 * 
 	 * @param s
 	 */
 	public void readPrior(String s){
-		skipOverrides = true;
-		int index = s.indexOf("global awareness") + 17; // this is the last column from MyFurman.
-		int endIndex = s.indexOf("Total Earned");
+		skipOverrides = true; //don't make popups to the user during this process.
+				//we'll set skipOverrides to false after this method ends.
+		
+		
+		String[] lines = s.split("\n");
+		String[] headers = lines[0].split("\t");
+		
+		
+		//find the indices for the headers that we care about
+		int termIndex = -1;
+		int courseStringIndex = -1;
+		int creditsIndex = -1;
+		for(int i = 0; i < headers.length ; i ++){
+			//System.out.println(headers[i]);
+			if(headers[i].equals("term")){
+				termIndex = i;
+			}
+			else if(headers[i].toUpperCase().contains("COURSE")){
+				courseStringIndex = i;
+			}
+			else if(headers[i].toUpperCase().contains("CREDITS")){
+				creditsIndex = i;
+			}
+		}
+		
+		if(termIndex == -1){
+			throw new RuntimeException("Course-term column not found" + Arrays.toString(headers));
+		}
+		if(courseStringIndex == -1){
+			throw new RuntimeException("subject and section column not found" + Arrays.toString(headers));
+		}
+		if(creditsIndex == -1){
+			throw new RuntimeException("Course-credits column not found" + Arrays.toString(headers));
+		}
+		
 
-		String[] lines = s.substring(index, endIndex).split("\n");
-		//every entry in lines should be in the form
-		/*
-		Course/Section and Title
-		midterm
-		Grade
-		Credits
-		CEUs
-		Repeat
-		term
-		FY seminar
-		core
-		global awareness
-		 */
-
+		
 		int row = 0;
-		int numCols = 10;
+		int numCols = headers.length;
+		
 		//find the earliest and latest dates.
 		SemesterDate earliestDate = new SemesterDate(100000,1);
 		SemesterDate latestDate = new SemesterDate(0, 1);
-		for(; (row+1) * numCols < lines.length ; row ++){
-			int startIndex = row * numCols;
-			String termString = lines[startIndex + 6];
-			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
+		for(; (row+1) * numCols - 1 < lines.length ; row ++){
+			int startIndex = row * numCols + 1;
+			String termString = lines[startIndex + termIndex];
+			SemesterDate takenDate = null;
+			try{
+				takenDate = SemesterDate.readFromFurman(termString);
+			} catch(Exception e){
+				takenDate = SemesterDate.fromFurman(termString);
+			}
 			if(takenDate != null){
 				if(takenDate.compareTo(earliestDate) < 0){
 					earliestDate = takenDate;
@@ -202,19 +243,15 @@ public class Schedule implements java.io.Serializable {
 		setFirstSemester(earliestDate);
 
 
-
-
-
 		//Add each of the prior courses to the schedule
 		row = 0;
 		ArrayList<Course> priorCourses = new ArrayList<Course>();
-		for(; (row+1) * numCols < lines.length ; row ++){
-
+		for(; (row + 1) * numCols  - 1< lines.length ; row ++){
 			//Collect relevant string data
-			int startIndex = row * numCols;
-			String courseString = lines[startIndex].trim();
-			String creditsString = lines[startIndex + 3].trim();
-			String termString = lines[startIndex + 6].trim();
+			int startIndex = row * numCols + 1;
+			String courseString = lines[startIndex + courseStringIndex].trim();
+			String creditsString = lines[startIndex + creditsIndex].trim();
+			String termString = lines[startIndex + termIndex].trim();
 
 			//Turn the strings into objects
 
@@ -242,15 +279,20 @@ public class Schedule implements java.io.Serializable {
 			}
 
 			//credits
-			System.out.println(title);
 			int credits= CourseList.getCoursesCreditHours(p);
 			//if(!" ".equals(creditsString)&&! "".equals(creditsString)&& !(creditsString==null)){
 			//	System.out.println((int)(Double.parseDouble(creditsString)));
 			//	credits = (int)(Double.parseDouble(creditsString));
 			//}
 			//Semester / term
-			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
-
+			SemesterDate takenDate = null;
+			try{
+				takenDate = SemesterDate.readFromFurman(termString);
+			} catch(Exception e){
+				takenDate = SemesterDate.fromFurman(termString);
+			}
+			
+			
 			Course c = null;
 			if(takenDate != null){
 				c = new Course(p, takenDate, null, null, credits, section);
@@ -811,7 +853,7 @@ public class Schedule implements java.io.Serializable {
 		if(needed == null){
 			return false; //no errors found
 		}
-		if(!needed.storedIsComplete()){
+		if(!needed.getStoredIsComplete()){
 
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
@@ -891,7 +933,7 @@ public class Schedule implements java.io.Serializable {
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
 
-				if(stillNeeded != null && !stillNeeded.storedIsComplete()){
+				if(stillNeeded != null && !stillNeeded.getStoredIsComplete()){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(stillNeeded);
@@ -1115,7 +1157,7 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public boolean checkOptimismError(Requirement r){
-		if(r.storedIsComplete()){
+		if(r.getStoredIsComplete()){
 			return false;
 		}
 		//If adding this requirement to the schedule would entail a leap of faith
@@ -1250,9 +1292,10 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 
 		for(ScheduleElement e : allTakenElements){
-			if(e.getRequirementsFulfilled(reqList).contains(r)){
+			if(e.filterEnemyRequirements(reqList).contains(r)){
 				satisficers.add(e);
 			}
+			
 		}
 		r.updateAllStoredValues(satisficers);
 	}
@@ -1271,16 +1314,6 @@ public class Schedule implements java.io.Serializable {
 			counter += r.getStoredCoursesLeft();
 		}
 		return counter;
-	}
-
-
-	/**
-	 * Find all the requirements that this ScheduleElement satisfies.
-	 * @param e
-	 * @return
-	 */
-	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
-		return e.getRequirementsFulfilled(getAllRequirements());
 	}
 
 
@@ -1351,7 +1384,7 @@ public class Schedule implements java.io.Serializable {
 			prereqsM.chosenDegree = -1;
 			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
 			for(Prereq p : prereqs){
-				if(!p.getRequirement().storedIsComplete()){
+				if(!p.getRequirement().getStoredIsComplete()){
 					uniquePrereqs.add(p.getRequirement());
 				}
 			}
@@ -1591,8 +1624,9 @@ public class Schedule implements java.io.Serializable {
 
 		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
 		for(ScheduleElement e : this.getAllElementsSorted()){
-			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
+			elementsSatisfy.put(e, new HashSet<Requirement>(e.filterEnemyRequirements(this.getAllRequirements())));
 		}
+		
 		for(Major m: this.getMajors()){
 			result.append("\n");
 			result.append("<b>" + m.name + "</b>");
@@ -1607,7 +1641,7 @@ public class Schedule implements java.io.Serializable {
 				}
 				result.append("\n" + rDisplay);
 
-				boolean isComplete = r.storedIsComplete();
+				boolean isComplete = r.getStoredIsComplete();
 				if(!isComplete){
 					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
 					if(coursesNeeded == 1){
