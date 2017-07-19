@@ -112,8 +112,8 @@ public class CourseList implements java.io.Serializable  {
 		}
 		if(isPlaceableCourse(p)){
 			Requirement result = new Requirement();
-			result.addRequirement(Requirement.readFrom(ourVersion));
-			result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
+			result.addChoice(Requirement.readFrom(ourVersion));
+			result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 			return result;
 		}
 		

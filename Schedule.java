@@ -1278,7 +1278,7 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
 		ArrayList<ArrayList<Requirement>> reqsFulfilled = new ArrayList<ArrayList<Requirement>> ();
 		for(ScheduleElement e: allTakenElements){
-			reqsFulfilled.add(e.f(reqList));
+			reqsFulfilled.add(e.filterEnemyRequirements(reqList));
 		}
 		for(Requirement r : reqList){
 			updateRequirement(r, allTakenElements, reqsFulfilled);
