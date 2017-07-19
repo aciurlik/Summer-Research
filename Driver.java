@@ -24,7 +24,10 @@ public class Driver {
 	static StartUpMenu startUP = null;
 
 	public static void addScheduleGUI(Schedule s){
+		
+		long one = System.currentTimeMillis();
 		ScheduleGUI schGUI = new ScheduleGUI(s);
+		long two = System.currentTimeMillis();
 		schGUI.addWindowListener(new WindowListener(){
 
 			@Override
@@ -57,34 +60,42 @@ public class Driver {
 			}
 
 		});
+		long three = System.currentTimeMillis();
 		listOfScheduleGUIs.add(schGUI);
-
+		long four = System.currentTimeMillis();
+		/*
+		 * 	System.out.println("Time intervals");
+		System.out.println(two-one);
+		System.out.println(three-two);
+		System.out.println(four-three);
+		 * 
+		 */
+	
+		
+	
 	}
 
 	public static void removeScheduleGUI(ScheduleGUI s){
 		listOfScheduleGUIs.remove(s);
 		if(listOfScheduleGUIs.isEmpty()){
 			System.exit(0);
+			
 		}
 	}
 
 	public static void openSchedule() {
-
 		Schedule result = FileHandler.openSchedule();
+	
 		if(result!=null){
 			//TODO make sure nothing else needs to be set
 			if(FurmanOfficial.masterIsAround){
 				result.reloadMajors();
 			}
-
-			ScheduleGUI d = new ScheduleGUI(result);
-			d.setSchedule(result);
-			d.update();
-
-			//setSchedule(result);
-			//this.update();
+	
+			Driver.addScheduleGUI(result);
+		
 		}
-
+	
 	}
 
 

@@ -56,6 +56,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 
 	public RequirementListPanel(Schedule s, ScheduleGUI d){
 		
+		
 		//this.schedule = s;
 		this.d = d;
 		this.setBackground(FurmanOfficial.grey(60));
@@ -94,6 +95,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		this.infoPanel.setBackground(this.getBackground());
 		this.add(infoPanel, BorderLayout.NORTH);
 		
+		
 		update(s);
 	}
 	
@@ -116,10 +118,9 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	 * the the majors in the schedule. 
 	 */
 	public void update(Schedule schedule){
+		
+		
 		this.inner.removeAll();
-
-
-
 		GridBagConstraints gbc = new GridBagConstraints();
 		//gbc.anchor = gbc.CENTER;
 		gbc.gridx = 0;
@@ -129,11 +130,10 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		gbc.anchor = GridBagConstraints.LINE_START;
 
 		schedule.checkUpdateReqs();
+		
 		ArrayList<Major> majors = schedule.getMajors();
 		//System.out.println(majors.size());
 		int heightCounter = 1;
-
-
 		for(Major m : majors){
 			MajorPanel majorPanel = new MajorPanel(m, d);
 			gbc.gridx = 0;
@@ -142,11 +142,20 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 			this.inner.add(majorPanel, gbc);
 		
 		}
+		
 		this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
 		this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
 		this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
+		
+		
+		
+		
 	}
-
+	
+	
+	
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
@@ -154,17 +163,9 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		}
 	}
 	
-	public static void main(String[] args){
-		// Testing the requirementList panel for the first time
-		RequirementListPanel p = new RequirementListPanel(Schedule.testSchedule(), null);
-
-		JFrame frame = new JFrame();
-		frame.getContentPane().add(p);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
-
-	}
-
+	
+	
+	
 
 }
+

@@ -89,8 +89,10 @@ public class ScheduleGUI{
 
 		//popUP = new JFrame();
 		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
-		l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
-
+		l = FileHandler.getMajorsList();
+		
+		
+		
 		this.sch = sch;
 		sch.setDriver(this);
 
@@ -104,7 +106,7 @@ public class ScheduleGUI{
 		JPanel stackPanel = new JPanel();
 		stackPanel.setLayout(new BorderLayout());
 
-
+		
 		//Adds Additions Panel and belltower
 		AdditionsPanel extras = new AdditionsPanel(this);
 		JPanel left = new JPanel();
@@ -119,12 +121,21 @@ public class ScheduleGUI{
 		//schP.setPreferredSize(new Dimension(500, 500));
 
 		stackPanel.add(schP, BorderLayout.NORTH);
-
+		
+		
+		
+		long one = System.currentTimeMillis();
 		reqs = new RequirementListPanel(sch, this);
+		long two = System.currentTimeMillis();
+		
+		
 		stackPanel.add(reqs, BorderLayout.CENTER);
-
+		
+		
+		
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(stackPanel);
+		long three = System.currentTimeMillis();
 		//scroll.setPreferredSize(new Dimension(stackPanel.getPreferredSize()));
 		frame.add(scroll);
 
@@ -134,7 +145,16 @@ public class ScheduleGUI{
 
 		frame.pack();
 		frame.setVisible(true);
-
+		long four = System.currentTimeMillis();
+		/**
+		 * 
+		 * 	System.out.println("Time intervals");
+		System.out.println(two-one);
+		System.out.println(three-two);
+		System.out.println(four-three);
+		 * 
+		 */
+	
 	}
 
 
@@ -748,7 +768,7 @@ public class ScheduleGUI{
 
 		result = parseIntoReadableHTML(result, defaultPixelWidth);
 		if(surroundHTML){
-			result = "<html><body> " + result + "<html><body>";
+			result = "<html><body> " + result + "</html></body>";
 		}
 		
 		return result;
@@ -786,12 +806,13 @@ public class ScheduleGUI{
 
 
 	public void GUICheckAllErrors(boolean displayPopUp) {
-		
-		String result = "<html><body>" + getErrorString();
+		String errorString = getErrorString();
+		String result = "<html><body>" + errorString;
 		System.out.println(result);
-		if(result.equals("<html><body>")){
+		if(errorString.equals("")){
 			result = "Your Schedule had no errors! You're a pretty savy scheduler";
 		}
+		result= result.replaceAll("\n", "<br>");
 		JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 
 
@@ -802,9 +823,11 @@ public class ScheduleGUI{
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
 				hasNotes = true;
+			
 			}
 		}
-
+		
+		majorNotes.replaceAll("\n", "<br>");
 		if(hasNotes && displayPopUp){
 			JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -950,6 +973,8 @@ public class ScheduleGUI{
 
 			if(userChoice == 0){
 				try {
+					System.out.println("This is what is sent to the printer");
+					System.out.println(schedulePrint.getText());
 					schedulePrint.print();
 				} catch (PrinterException e) {
 					// TODO Auto-generated catch block

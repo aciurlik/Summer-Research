@@ -20,17 +20,9 @@ public class ListOfMajors {
 
 	private ArrayList<Major> completeMajorsList = new ArrayList<Major>();
 
-	public void saveMe(Major m, File f){
-		try {
-			BufferedWriter bf = new BufferedWriter(new FileWriter(f));
-			bf.write(m.saveString());
-			bf.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
+
+	
+	
 	public ArrayList<Major> getCompleteMajorsList() {
 		return completeMajorsList;
 	}
@@ -146,7 +138,7 @@ public class ListOfMajors {
 	}
 
 	public static void main(String[] args){
-		ListOfMajors l = FileHandler.readMajorsFrom(new File(FileHandler.majorsFile));
+		ListOfMajors l = FileHandler.getMajorsList();
 		for(Major m : l.completeMajorsList){
 			System.out.println("Start of Major:");
 			System.out.println(m.saveString());

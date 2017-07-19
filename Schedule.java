@@ -687,15 +687,21 @@ public class Schedule implements java.io.Serializable {
 		String[] Language = {"110", "120", "201"};
 		this.languagePrefix = languagePrefix;
 		recalcGERMajor();
-		//Figure out the index of the given prefixe's number,
-		// so if you were given 120 savedLocation = 1.
+		
+		/**
+		 * This was used to add the prereqs for language placement instead we added
+		 * that placement class to the prereqs of the highest language class. 
+		 * 
+		 * //Figure out the index of the given prefixe's number,
+			// so if you were given 120 savedLocation = 1.
 		int savedLocation = -1;
 		for(int i=0; i<Language.length; i++){
 			if(languagePrefix.getNumber().equals(Language[i])){
 				savedLocation=i;
 			}
 		}
-		//add all the things before it to your prior courses, so if you got
+		 * 
+		 * //add all the things before it to your prior courses, so if you got
 		// placed in 120, we'll add 110 to your prior courses,
 		// and if you got placed in 201, we'll add 120 and 110 to your prior courses.
 		if(savedLocation != -1){
@@ -717,6 +723,11 @@ public class Schedule implements java.io.Serializable {
 				priorSemester.add(cc);
 			}
 		}
+		 * 
+		 
+		 * 
+		 */
+		
 	}
 
 
@@ -1223,8 +1234,12 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<ScheduleElement> allTakenElements = getAllElementsSorted();
 		//Same issue here.
 		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
+		ArrayList<ArrayList<Requirement>> reqsFulfilled = new ArrayList<ArrayList<Requirement>> ();
+		for(ScheduleElement e: allTakenElements){
+			reqsFulfilled.add(e.getRequirementsFulfilled(reqList));
+		}
 		for(Requirement r : reqList){
-			updateRequirement(r, reqList, allTakenElements);
+			updateRequirement(r, allTakenElements, reqsFulfilled);
 		}
 
 		updatePrereqs();
@@ -1244,15 +1259,18 @@ public class Schedule implements java.io.Serializable {
 	 * satisfying this requirement.
 	 * @param r
 	 */
-	public void updateRequirement(Requirement r, ArrayList<Requirement> reqList, ArrayList<ScheduleElement> allTakenElements){
+	public void updateRequirement(Requirement r, 
+			 ArrayList<ScheduleElement> allTakenElements, ArrayList<ArrayList<Requirement>> reqsFulfilled){
+		//These last two are passed in for speed issues. 
 		//For each requirement, find all the schedule elements that satisfy it
 		// (this prevents enemy requirements from both seeing the same course)s
-
+		
 		//Courses that don't have enemies, and exclude courses that do have enemies
 		ArrayList<ScheduleElement> satisficers = new ArrayList<ScheduleElement>();
 
-		for(ScheduleElement e : allTakenElements){
-			if(e.getRequirementsFulfilled(reqList).contains(r)){
+		for(int i=0; i<allTakenElements.size();i++){
+			ScheduleElement e = allTakenElements.get(i);
+			if(reqsFulfilled.get(i).contains(r)){
 				satisficers.add(e);
 			}
 		}
@@ -1562,8 +1580,8 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
-		return result.toString().replaceAll("\n", "<br>");
+		String toResult = result.toString().replaceAll("&", "&amp;");
+		return toResult.replaceAll("\n", "<br>");
 
 
 
@@ -1678,8 +1696,8 @@ public class Schedule implements java.io.Serializable {
 		}
 
 
-		return result.toString().replaceAll("\n", "<br>");
-
+		String toResult = result.toString().replaceAll("&", "&amp;");
+		return toResult.replaceAll("\n", "<br>");
 	}
 
 
