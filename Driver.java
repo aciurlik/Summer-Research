@@ -22,12 +22,12 @@ import javax.swing.JTextPane;
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
 	static StartUpMenu startUP = null;
+	
+	
 
 	public static void addScheduleGUI(Schedule s){
 		
-		long one = System.currentTimeMillis();
 		ScheduleGUI schGUI = new ScheduleGUI(s);
-		long two = System.currentTimeMillis();
 		schGUI.addWindowListener(new WindowListener(){
 
 			@Override
@@ -60,18 +60,7 @@ public class Driver {
 			}
 
 		});
-		long three = System.currentTimeMillis();
 		listOfScheduleGUIs.add(schGUI);
-		long four = System.currentTimeMillis();
-		/*
-		 * 	System.out.println("Time intervals");
-		System.out.println(two-one);
-		System.out.println(three-two);
-		System.out.println(four-three);
-		 * 
-		 */
-	
-		
 	
 	}
 
@@ -204,81 +193,6 @@ public class Driver {
 	}
 
 
-	public static void main(String[] args){
-		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
-
-
-
-		//SemesterDate start = tryPickStartDate();
-
-		/*
-		if(start == null){
-			//this will close any running code, including the JOptionPanes which don't get collected by 
-			// the garbage collector for some reason.
-			System.exit(0);
-			return;
-		}*/
-
-		//Schedule.defaultFirstSemester = start;
-		//new Driver();
-		//Driver.importPriorCourses();
-		JPanel editorHolder = new JPanel();
-		JEditorPane editorPane = new JEditorPane();
-		editorPane.setPreferredSize(new Dimension(500, 250));
-		editorPane.setContentType("text/html");
-
-
-		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "</body></html>");
-		editorPane.setEditable(false);
-		editorHolder.add(editorPane);
-		JFrame frame = new JFrame();
-
-		frame.setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-		JButton confirm = new JButton(MenuOptions.confirm);
-		confirm.setActionCommand(MenuOptions.confirm);
-		confirm.setEnabled(false);
-		confirm.addActionListener(new ActionListener(){
-			@Override 
-			public void actionPerformed(ActionEvent e) {
-				if(e.getActionCommand().equals(MenuOptions.confirm)){
-					frame.dispose();
-					if(startUP != null){
-						startUP.showStartUp(true);
-					}
-					else{
-						Driver.addScheduleGUI(new Schedule());
-					}
-				}
-
-
-			}
-		});
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(confirm);
-		frame.add(buttonPanel, BorderLayout.SOUTH);
-
-		frame.add(editorHolder, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Establishing Settings <br />-           "+ "</p></body></html>");
-		preScheduleLoading();
-		listOfScheduleGUIs = new ArrayList<ScheduleGUI>();
-		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Courses Loading <br />---             "+ "</p></body></html>");
-		CourseList.loadAllCourses();
-		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Majors Loading <br />-----        "+ "</p></body></html>");
-		FileHandler.getMajorsList();
-		editorPane.setText("<html><body>" + Driver.getDisclaimer() +  "<br />  <br /> Finished Loading <br />----------- 100%"+ "</p></body></html>");
-		confirm.setEnabled(true);
-	}
-
-
-
-
 
 
 
@@ -388,5 +302,86 @@ public class Driver {
 
 		}
 	}
+
+
+	public static void main(String[] args){
+		//This just loads FurmanOfficial into memory so that the UIManager
+		// will be set before other static code gets run.
+		Color c = FurmanOfficial.grey;
+
+
+
+		//SemesterDate start = tryPickStartDate();
+
+		/*
+		if(start == null){
+			//this will close any running code, including the JOptionPanes which don't get collected by 
+			// the garbage collector for some reason.
+			System.exit(0);
+			return;
+		}*/
+
+		//Schedule.defaultFirstSemester = start;
+		//new Driver();
+		//Driver.importPriorCourses();
+		JPanel editorHolder = new JPanel();
+		JEditorPane editorPane = new JEditorPane();
+		editorPane.setPreferredSize(new Dimension(500, 250));
+		editorPane.setContentType("text/html");
+
+
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "</body></html>");
+		editorPane.setEditable(false);
+		editorHolder.add(editorPane);
+		JFrame frame = new JFrame();
+
+		frame.setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+		JButton confirm = new JButton(MenuOptions.confirm);
+		confirm.setActionCommand(MenuOptions.confirm);
+		confirm.setEnabled(false);
+		confirm.addActionListener(new ActionListener(){
+			@Override 
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals(MenuOptions.confirm)){
+					frame.dispose();
+					if(startUP != null){
+						startUP.showStartUp(true);
+					}
+					else{
+						String data = FileHandler.getSavedStudentData();
+						if(data != null){
+							Driver.addScheduleGUI(new Schedule(data));
+						}
+						else{
+							Driver.addScheduleGUI(new Schedule());
+						}
+					}
+				}
+
+
+			}
+		});
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(confirm);
+		frame.add(buttonPanel, BorderLayout.SOUTH);
+
+		frame.add(editorHolder, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Establishing Settings <br />-           "+ "</p></body></html>");
+		preScheduleLoading();
+		listOfScheduleGUIs = new ArrayList<ScheduleGUI>();
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Courses Loading <br />---             "+ "</p></body></html>");
+		CourseList.loadAllCourses();
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() + "<br />  <br /> Majors Loading <br />-----        "+ "</p></body></html>");
+		FileHandler.getMajorsList();
+		editorPane.setText("<html><body>" + Driver.getDisclaimer() +  "<br />  <br /> Finished Loading <br />----------- 100%"+ "</p></body></html>");
+		confirm.setEnabled(true);
+	}
+
+
 
 }
