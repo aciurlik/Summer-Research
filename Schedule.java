@@ -270,7 +270,6 @@ public class Schedule implements java.io.Serializable {
 				String numString = p.getNumber();
 				boolean examineTitleForLanguagePrefix = false;
 				if(numString.contains("PL")){
-					System.out.println(numString);
 					if(numString.compareTo("PL.110") > 0){
 						String number = numString.substring(numString.indexOf(".") + 1);
 						try{
