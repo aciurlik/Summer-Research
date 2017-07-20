@@ -320,19 +320,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return false;
 	}
-	
-	public boolean isSatisfiedBy(TerminalRequirement t){
-		return t.isSubset(this);
-	}
-	
-	
-	//TODO is this method ever used?
-	public boolean isCompletedBy(ArrayList<ScheduleElement> taken){
-		return minMoreNeeded(taken) <= 0;
-	}
 
-	
-	
+	@Override
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
@@ -360,6 +349,9 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return ((!usesMin) && (!usesMax));
 	}
 
+	public boolean isSatisfiedBy(ArrayList<ScheduleElement> taken){
+		return minMoreNeeded(taken) <= 0;
+	}
 
 
 
@@ -421,7 +413,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	
 	
 	@Override
-	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> reqList) {
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : reqList){
 			if(this.equals(r)){
@@ -452,7 +444,6 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return this.saveString().compareTo(other.saveString());
 	}
 
-	
 	@Override
 	public boolean isTerminal(){
 		return true;
@@ -465,29 +456,66 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 
 
-	
-	/**
-	 * Check if satisfying t definitely satisfies this.
-	 * @param t
-	 * @return
-	 */
-	public boolean completedBy(TerminalRequirement t){
-		if(this.numToChoose > t.numToChoose){
-			return false;
+
+
+
+
+
+	public static void testTerminalRequirements(){
+		String[] test = { 
+				"MTH-150",
+				"MTH-001",
+				"MTH-500",
+				"MTH > 150",
+				"MTH < 150",
+				"MTH >= 150",
+				"MTH <= 150",
+				"MTH > 150 < 200",
+				"MTH < 200 > 150",
+				"MTH <= 200 >= 150",
+
+				"MTH >= 150 <= 200",
+				"2 of MTH>100"
+		};
+
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
+		taken.add(new PrefixHours(new Prefix("MTH", 150), 4));
+		//taken.add(new Prefix("MTH", 120));
+
+
+		double tol = Double.MIN_VALUE * 10000;
+
+		for(String s : test){
+			TerminalRequirement t = readFrom(s);
+			boolean sat =  t.isSatisfiedBy(taken);
+			int minMore =  t.minMoreNeeded(taken);
+			double percent = t.percentComplete(taken, false);
+			boolean show = false;
+			if(sat && (percent < 1.0 - tol || minMore > 0)){
+				show = true;
+			}
+			if((!sat) && (percent > 1.0-tol || minMore <= 0)){
+				show = true;
+			}
+			if(percent > 1.0-tol && minMore >0){
+				show = true;
+			}
+			if(percent < 1.0-tol && minMore <= 0){
+				show = true;
+			}
+
+			//show = true;
+			if(show){
+				System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
+						+ ",\t" +minMore + ",\t" + percent);
+			}
 		}
-		return isSuperset(t);
+		System.out.println("Finished testing");
 	}
+
+
 	
-	/**
-	 * true iff one course scheduled for t 
-	 * is also a course scheduled for this.
-	 * 
-	 * TODO make a test method for this method.
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public boolean isSuperset(TerminalRequirement t){
+	public boolean completedBy(TerminalRequirement t){
 		if(this.isExact()){
 			if(!t.isExact()){
 				return false;
@@ -567,61 +595,6 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 			result += max;
 		}
 		return result;
-	}
-	
-	
-
-
-	public static void testTerminalRequirements(){
-		String[] test = { 
-				"MTH-150",
-				"MTH-001",
-				"MTH-500",
-				"MTH > 150",
-				"MTH < 150",
-				"MTH >= 150",
-				"MTH <= 150",
-				"MTH > 150 < 200",
-				"MTH < 200 > 150",
-				"MTH <= 200 >= 150",
-
-				"MTH >= 150 <= 200",
-				"2 of MTH>100"
-		};
-
-		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		taken.add(new PrefixHours(new Prefix("MTH", 150), 4));
-		//taken.add(new Prefix("MTH", 120));
-
-
-		double tol = Double.MIN_VALUE * 10000;
-
-		for(String s : test){
-			TerminalRequirement t = readFrom(s);
-			boolean sat =  t.isCompletedBy(taken);
-			int minMore =  t.minMoreNeeded(taken);
-			double percent = t.percentComplete(taken, false);
-			boolean show = false;
-			if(sat && (percent < 1.0 - tol || minMore > 0)){
-				show = true;
-			}
-			if((!sat) && (percent > 1.0-tol || minMore <= 0)){
-				show = true;
-			}
-			if(percent > 1.0-tol && minMore >0){
-				show = true;
-			}
-			if(percent < 1.0-tol && minMore <= 0){
-				show = true;
-			}
-
-			//show = true;
-			if(show){
-				System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
-						+ ",\t" +minMore + ",\t" + percent);
-			}
-		}
-		System.out.println("Finished testing");
 	}
 
 

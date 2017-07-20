@@ -1,5 +1,6 @@
 import java.io.File;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 
 
@@ -55,13 +56,21 @@ public class MenuOptions implements java.io.Serializable{
 		public static final String file = "File"; //Kept lowercase so it didn't interfere with File class
 	 		//File Submenu
 			public static final  String newSchedule = "New Schedule";
+				public static final String newBlankSchedule = "Blank Schedule";
+				public static final String newLoadedSchedule = "Use Last Import";
 			public static final  String openSchedule = "Open Schedule";
 			public static final  String saveSchedule = "Save Schedule";
 			public static final  String printSchedule = "Print Schedule";
 			public static String deleteSchedule = "Delete Schedule";
 			public static String checkAllErrors = "Check all Errors";
 			public static String loadPriorCourses = "Import Prior Courses";
-		
+						public static String student = "Student";
+							public static String dragAndDrop = "Drag and drop via MyFurman";
+								public static String studentDnD = "studentDnD";
+						public static String advisor = "Advisor";
+							public static String downloadcsv = "Import via csv";
+							//public static String dragAndDrop = "Drag and drop via MyFurman";
+								public static String advisorDnD = "advisorDnD";
 		
 		//Edit 
 		public static final String Edit = "Edit";
@@ -70,6 +79,9 @@ public class MenuOptions implements java.io.Serializable{
 			public static final String Minor = "Minor";
 			public static final String Track = "Track";
 			//All of the add Major/Minor/Track are all in both A&MB
+			
+			
+			
 	
 		//Settings
 		public static String settings = "Settings";
@@ -160,6 +172,10 @@ public class MenuOptions implements java.io.Serializable{
 		public static boolean UIType;
 
 		public static String confirm = "Yes, I understand";
+
+	
+
+	
 		
 		public boolean isUIType() {
 			return UIType;

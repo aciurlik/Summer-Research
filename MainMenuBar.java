@@ -34,13 +34,16 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 	private static final long serialVersionUID = 1L;
 	JTextArea output;
 	JScrollPane scrollPane;
-	ScheduleGUI d;
+	ScheduleGUI schGUI;
+	static JMenu newSchedule;
+	static JMenuItem importPriorSchedule;
+	static JMenuItem blankSchedule;
 
 
-	public MainMenuBar(ScheduleGUI d) {
+	public MainMenuBar(ScheduleGUI schGUI) {
 		super();
-		this.d=d;
-		JMenu menu, submenu;
+		this.schGUI=schGUI;
+		JMenu menu, submenu, subTwomenu;
 		JMenuItem menuItem;
 
 
@@ -50,7 +53,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		menu = new JMenu(MenuOptions.FurmanAdvantage);
-
+		
+		
 
 		submenu = new JMenu(MenuOptions.MayX);
 		menuItem = new JMenuItem(MenuOptions.exploreMayX);
@@ -92,25 +96,46 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		JPopupMenu exploreInternship = new JPopupMenu();
 		menuItem.addActionListener(this);
 		exploreInternship.add(menuItem);
+		System.out.println(menu.getName());
+		
 		menu.add(menuItem);
-
-
-
+		
 		this.add(menu);
 
 
+		
+		
+		
 
 		//Build the file menu-> Add/Save Schedule
 		menu = new JMenu(MenuOptions.file);
-		this.add(menu);
+		
 
 
-		menuItem = new JMenuItem(MenuOptions.newSchedule,
-				KeyEvent.VK_T);
-		JPopupMenu newSched = new JPopupMenu(MenuOptions.newSchedule);
-		menuItem.addActionListener(this);
-		newSched.add(menuItem);
-		menu.add(menuItem);
+		newSchedule = new JMenu(MenuOptions.newSchedule);
+		newSchedule.setMnemonic(KeyEvent.VK_S);
+		blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
+		JPopupMenu newBlank = new JPopupMenu();
+		blankSchedule.addActionListener(this);
+		newBlank.add(blankSchedule);
+		newSchedule.add(blankSchedule);
+
+
+
+		String s = FileHandler.getSavedStudentData();
+
+		importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
+		JPopupMenu newLoaded = new JPopupMenu();
+		importPriorSchedule.addActionListener(this);
+		newLoaded.add(importPriorSchedule);
+		if(s != null){
+			newSchedule.add(importPriorSchedule);
+
+		}
+		
+		menu.add(newSchedule);
+
+
 
 
 		menuItem = new JMenuItem(MenuOptions.openSchedule);
@@ -118,6 +143,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		openSched.add(menuItem);
 		menu.add(menuItem);
+
+
 
 
 
@@ -147,14 +174,51 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		allErrors.add(menuItem);
 		menu.add(menuItem);
+
+		submenu = new JMenu(MenuOptions.loadPriorCourses);
 		
-		menuItem = new JMenuItem(MenuOptions.loadPriorCourses);
-		JPopupMenu loadCourses = new JPopupMenu(MenuOptions.loadPriorCourses);
+		
+		subTwomenu = new JMenu(MenuOptions.student);
+		
+		
+		
+		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
+		menuItem.setActionCommand(MenuOptions.studentDnD);
+		JPopupMenu loadPrior = new JPopupMenu();
 		menuItem.addActionListener(this);
-		loadCourses.add(menuItem);
-		menu.add(menuItem);
+		loadPrior.add(menuItem);
+		subTwomenu.add(menuItem);
+		
+		submenu.add(subTwomenu);
+		
+		subTwomenu = new JMenu(MenuOptions.advisor);
+		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
+		menuItem.setActionCommand(MenuOptions.advisorDnD);
+		JPopupMenu loadPriorAdvisor = new JPopupMenu();
+		menuItem.addActionListener(this);
+		loadPriorAdvisor.add(menuItem);
+		subTwomenu.add(menuItem);
+		submenu.add(subTwomenu);
 
 		
+		menuItem = new JMenuItem(MenuOptions.downloadcsv);
+		JPopupMenu csv = new JPopupMenu();
+		menuItem.addActionListener(this);
+		csv.add(menuItem);
+		subTwomenu.add(menuItem);
+		
+		
+		submenu.add(subTwomenu);
+		
+		
+		
+		
+	
+		
+		
+		
+		menu.add(submenu);
+
 		//Unimplemented method will come back to 
 		if(FurmanOfficial.masterIsAround){
 			menuItem = new JMenuItem("Compare");
@@ -163,11 +227,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			compare.add(menuItem);
 			menu.add(menuItem);
 		}
+
+		this.add(menu);
 		
 		
 		//Build Edit menu in the menu bar.
 		menu = new JMenu(MenuOptions.Edit);
-		this.add(menu);
+		
 		menu.setMnemonic(KeyEvent.VK_N);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"This allows edits to schedule");
@@ -207,9 +273,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menu.add(submenu);
 
 
-
-		menu = new JMenu(MenuOptions.settings);
 		this.add(menu);
+		
+		
+		menu = new JMenu(MenuOptions.settings);
+		
 
 		menuItem = new JMenuItem(MenuOptions.changeSettings);
 		menuItem.setActionCommand(MenuOptions.changeSettings);
@@ -227,7 +295,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-
+		this.add(menu);
 
 
 		menu = new JMenu(MenuOptions.help);
@@ -267,7 +335,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 	}
 
 
+	public static void addImportScheduleOption(){
+		if(newSchedule != null){
+			newSchedule.removeAll();
+			newSchedule.add(blankSchedule);
+			newSchedule.add(importPriorSchedule);
 
+		}
+	}
 
 
 
@@ -275,58 +350,60 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.exploreInternship)){
-			d.GUIOutsideLink(e.getActionCommand());
+			schGUI.GUIOutsideLink(e.getActionCommand());
 		}
-		if(e.getActionCommand().equals(MenuOptions.addMayX)){
-			d.GUIYearsPopUP(e.getActionCommand());
-		}
-
-		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
-			d.GUIChooseSummerSession();
+		else if(e.getActionCommand().equals(MenuOptions.addMayX)){
+			schGUI.GUIYearsPopUP(e.getActionCommand());
 		}
 
-		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
-			d.GUIPopUP(e.getActionCommand());
+		else if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
+			schGUI.GUIChooseSummerSession();
 		}
-		if(e.getActionCommand().equals(MenuOptions.newSchedule)){
-			d.GUINewSchedule();
+
+		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
+			schGUI.GUIPopUP(e.getActionCommand());
 		}
-		if(e.getActionCommand().equals(MenuOptions.openSchedule)){
+		else if(e.getActionCommand().equals(MenuOptions.newBlankSchedule) || e.getActionCommand().equals(MenuOptions.newLoadedSchedule)){
+			schGUI.GUINewSchedule(e.getActionCommand());
+		}
+		else if(e.getActionCommand().equals(MenuOptions.openSchedule)){
 			Driver.openSchedule();
 		}
-		if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
-			d.GUISaveSchedule();
+		else if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
+			schGUI.GUISaveSchedule();
 		}
-		if(e.getActionCommand().equals(MenuOptions.printSchedule)){
+		else if(e.getActionCommand().equals(MenuOptions.printSchedule)){
 
-			d.GUIPrintSchedule();
+			schGUI.GUIPrintSchedule();
 		}
-
-		if(e.getActionCommand().equals(MenuOptions.viewStartUp)){
+		else if(e.getActionCommand().equals(MenuOptions.viewStartUp)){
 			Driver.startUpMessage();
 		}
-		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			d.GUICheckAllErrors(true);
+		else if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
+			schGUI.GUICheckAllErrors(true);
 		}
-		if(e.getActionCommand().equals(MenuOptions.loadPriorCourses)){
-			d.importPriorCourses();
+		else if(e.getActionCommand().equals(MenuOptions.studentDnD) ){
+			schGUI.importPriorCourses(true);
 		}
-		if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
+		else if(e.getActionCommand().equals(MenuOptions.advisorDnD) ){
+			schGUI.importPriorCourses(false);
+		}
+		else if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();
 		}
-		if(e.getActionCommand().equals(MenuOptions.changeSettings)){
+		else if(e.getActionCommand().equals(MenuOptions.changeSettings)){
 			FileHandler.showSetting();
 		}
-		if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
+		else if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
 			FileHandler.GUICalledRestoreDefaultSettings();
 		}
-		if(e.getActionCommand().equals(MenuOptions.examineRequirementHelp)){
-			d.showExamineRequirementHelp();
+		else if(e.getActionCommand().equals(MenuOptions.examineRequirementHelp)){
+			schGUI.showExamineRequirementHelp();
 		}
-		if(e.getActionCommand().equals(MenuOptions.findACourse)){
-			d.showFindACourseHelp();
+		else if(e.getActionCommand().equals(MenuOptions.findACourse)){
+			schGUI.showFindACourseHelp();
 		}
-		if(e.getActionCommand().equals("Compare")){
+		else if(e.getActionCommand().equals("Compare")){
 			Driver.chooseSchedulesToCompare();
 		}
 	}

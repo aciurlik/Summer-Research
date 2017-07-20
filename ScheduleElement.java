@@ -50,15 +50,16 @@ public interface ScheduleElement {
 	
 	/**
 	 * 
-	 * @return If there is any requirement in loaded that isn't allowed to use this element,
-	 * because of requirement enemies, remove it.
+	 * @return An ArrayList of the requirements this ScheduleElement fulfills,
+	 * if element has no requirements it fulfills, an empty ArrayList is returned.
 	 * 
-	 * You can also remove any requirements that are guaranteed to not be satisfied by this
-	 * element, but that is only if doing so takes very little computation time.
-	 * 
+	 * If this element doesn't satisfy some requirement due to an
+	 * issue with requirement enemies, then issue requirements should not be 
+	 * in the returned list (if enemy issues are overridden, then the requirements
+	 * that were allowed to use this element may be in the list).
 	 */
 
-	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> loaded);
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded);
 
 	
 }
