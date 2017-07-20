@@ -233,6 +233,16 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 			return false;
 		}
 	}
+	
+	/**
+	 * Add this element without any updates or
+	 * error checking
+	 * @param e
+	 * @return
+	 */
+	protected boolean directAdd(ScheduleElement e){
+		return this.elements.add(e);
+	}
 
 
 

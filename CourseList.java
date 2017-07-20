@@ -645,7 +645,18 @@ public class CourseList implements java.io.Serializable  {
 
 
 
-	public static Requirement FLRequirement(Prefix p, int degreeType){
+	/**
+	 * Get the FL requirement based on this degree type and language prefix.
+	 * Language prefix specifies the placement that the student got, so
+	 * something like "FRN-201" or "FRN-201.PL", and may be null. 
+	 * The requirement would then be to get FRN-201 or higher, or else
+	 * to get up to some standard level in a non-FRN language.
+	 * 
+	 * @param languagePrefix
+	 * @param degreeType
+	 * @return
+	 */
+	public static Requirement FLRequirement(Prefix languagePrefix, int degreeType){
 		int standard=0;
 		Requirement	r= new Requirement();
 		r.setName("FL");
@@ -655,38 +666,28 @@ public class CourseList implements java.io.Serializable  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
-
-
-		if (p != null){
-
-			r.addChoice(TerminalRequirement.readFrom(p.getSubject() + ">=" + p.getNumber()));
-
+		
+		String[] languages = {"GRK", "LTN", "JPN", "FRN", "SPN", "CHN", "GRK"};
+		String subj = "";
+		
+		//if you've got a prefix like FRN-201, and it's greater than or equal to
+		// standard, then add it to the list of requirements.
+		if (languagePrefix != null){
+			subj = languagePrefix.getSubject();
+			int number = Integer.parseInt(languagePrefix.getNumber());
+			if(number < standard){
+				number = standard;
+			}
+			r.addChoice(TerminalRequirement.readFrom(subj + ">=" + number));
 		}
-
-		if(p==null || !p.getSubject().equals("GRK") ) {
-
-			r.addChoice(TerminalRequirement.readFrom("GRK" + ">=" + standard + "<=" + (standard+100)));
+		
+		//For every language that isn't the same as your languagePrefix, add the standard requirement.
+		for(String language : languages){
+			if(!language.equals(subj)){
+				r.addChoice(TerminalRequirement.readFrom(language + ">=" + standard));
+			}
 		}
-		if(p==null || !p.getSubject().equals("LTN")){
-
-			r.addChoice(TerminalRequirement.readFrom("LTN" + ">=" + standard + "<=" + (standard+100)));
-		}
-		if(p==null || !p.getSubject().equals("JPN")){
-
-			r.addChoice(TerminalRequirement.readFrom("JPN" + ">=" + standard + "<=" + (standard+100)));
-		}
-		if(p==null || !p.getSubject().equals("FRN")){
-
-			r.addChoice(TerminalRequirement.readFrom("FRN" + ">=" + standard + "<=" + (standard+100)));
-		}
-		if(p==null || !p.getSubject().equals("SPN")){
-
-			r.addChoice(TerminalRequirement.readFrom("SPN" + ">=" + standard + "<=" + (standard+100)));
-		}
-		if(p==null || !p.getSubject().equals("CHN")){
-
-			r.addChoice(TerminalRequirement.readFrom("CHN" + ">=" + standard + "<=" + (standard+100)));
-		}
+		
 		return r;
 	}
 
