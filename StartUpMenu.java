@@ -52,7 +52,7 @@ public class StartUpMenu implements ActionListener {
 		previous = new JButton(MenuOptions.previous);
 		previous.setActionCommand(MenuOptions.previous);
 		previous.addActionListener(this);
-		previousNextPanel.add(previous, BorderLayout.WEST);
+		previousNextPanel.add(previous, BorderLayout.CENTER);
 		previous.setVisible(false);
 
 		cancel = new JButton(MenuOptions.Cancel);
@@ -64,7 +64,7 @@ public class StartUpMenu implements ActionListener {
 		next = new JButton(MenuOptions.next);
 		next.setActionCommand(MenuOptions.next);
 		next.addActionListener(this);
-		previousNextPanel.add(next, BorderLayout.CENTER);
+		previousNextPanel.add(next, BorderLayout.EAST);
 		next.setVisible(true);
 
 

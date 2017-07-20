@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -22,7 +23,6 @@ public class Schedule implements java.io.Serializable {
 
 
 
-/
 
 	//transient is for Serializable purposes.
 	public transient ScheduleGUI d;
@@ -48,7 +48,6 @@ public class Schedule implements java.io.Serializable {
 
 	//boolean reqsValid; // The set of requirements entailed by all majors is up to date
 
-/
 	public static Schedule testSchedule(){
 		//	CourseList l = CourseList.testList();
 		Schedule result = new Schedule();
@@ -71,14 +70,8 @@ public class Schedule implements java.io.Serializable {
 		this.prereqs = new HashSet<Prereq>();
 		//this.masterList = masterList;
 
-		String past = FileHandler.getSavedStudentData();
-		if(past != null){
-			readPrior(past);
-		}
-		else{
-			readBlankPrior(); //loads prior courses, recalc firstSemester and sets as currentSemester as well,
-			// and create default semesters.
-		}
+		readBlankPrior(); //loads prior courses, recalc firstSemester and sets as currentSemester as well,
+		// and create default semesters.
 		this.recalcGERMajor();
 	}
 
@@ -88,15 +81,8 @@ public class Schedule implements java.io.Serializable {
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
 
-		if(priorCourses != null){
-			readPrior(priorCourses);
-		}
-		else{
-			readBlankPrior();
-		}
-
-
-    recalcGERMajor();
+		readPrior(priorCourses);
+		recalcGERMajor();
 		updatePrereqs();
 		updateReqs();
 	}
@@ -170,10 +156,25 @@ public class Schedule implements java.io.Serializable {
 	 * Sets language prefix, first semester and creates prior semester,
 	 * 
 	 * 
+	 * s should be in the form 
+	 * 
+	 * colmName \t colmName \t colmName \t ...
+	 * r1c1
+	 * r1c2
+	 * r1c3
+	 * .
+	 * .
+	 * .
+	 * r2c1
+	 * r2c2
+	 * .
+	 * .
+	 * .
+	 * rncn
+	 * 
 	 * @param s
 	 */
 	public void readPrior(String s){
-
 		
 		String[] lines = s.split("\n");
 		String[] headers = lines[0].split("\t");
@@ -213,22 +214,25 @@ public class Schedule implements java.io.Serializable {
 		}
 		
 
-
+		
 		int row = 0;
-
 		int numCols = headers.length;
 		
 		//First, go through the data and 
 		// find freshman year (the earliest found date),
 		// and current semester (the latest found date).
 		//so we can add the correct semesters to the schedule.
-
 		SemesterDate earliestDate = new SemesterDate(100000,1);
 		SemesterDate latestDate = new SemesterDate(0, 1);
-		for(; (row+1) * numCols < lines.length ; row ++){
-			int startIndex = row * numCols;
-			String termString = lines[startIndex + 6];
-			SemesterDate takenDate = SemesterDate.readFromFurman(termString);
+		for(; (row+1) * numCols - 1 < lines.length ; row ++){
+			int startIndex = row * numCols + 1;
+			String termString = lines[startIndex + termIndex];
+			SemesterDate takenDate = null;
+			try{
+				takenDate = SemesterDate.readFromFurman(termString);
+			} catch(Exception e){
+				takenDate = SemesterDate.fromFurman(termString);
+			}
 			if(takenDate != null){
 				if(takenDate.compareTo(earliestDate) < 0){
 					earliestDate = takenDate;
@@ -242,14 +246,10 @@ public class Schedule implements java.io.Serializable {
 		setFirstSemester(earliestDate);
 
 
-
-
-
 		//Add each of the prior courses to the schedule
 		// skip the course if an error occurs.
 		row = 0;
 		ArrayList<Course> priorCourses = new ArrayList<Course>();
-
 		for(; (row + 1) * numCols  - 1< lines.length ; row ++){
 			try{
 				//Collect relevant string data
@@ -297,9 +297,7 @@ public class Schedule implements java.io.Serializable {
 					if(found){
 						this.setLanguagePrefix(new Prefix(p.getSubject(), m.group()));
 					}
-
 				}
-
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);
@@ -325,7 +323,6 @@ public class Schedule implements java.io.Serializable {
 				}
 				c.setName(title);
 				priorCourses.add(c);
-
 			}
 			catch(Exception e){
 				if(FurmanOfficial.masterIsAround){
@@ -344,9 +341,8 @@ public class Schedule implements java.io.Serializable {
 			ScheduleCourse cc = new ScheduleCourse(c, this);
 			this.directAddScheduleElement(cc, c.semester);
 		}
-
 		MainMenuBar.addImportScheduleOption();
-
+		
 	}
 
 	/**
@@ -367,6 +363,9 @@ public class Schedule implements java.io.Serializable {
 		}
 		return false;
 	}
+
+
+
 
 
 
@@ -904,7 +903,7 @@ public class Schedule implements java.io.Serializable {
 		if(needed == null){
 			return false; //no errors found
 		}
-		if(!needed.storedIsComplete()){
+		if(!needed.getStoredIsComplete()){
 
 			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 			preReq.setOffendingCourse(e);
@@ -984,7 +983,7 @@ public class Schedule implements java.io.Serializable {
 			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
 				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
 
-				if(stillNeeded != null && !stillNeeded.storedIsComplete()){
+				if(stillNeeded != null && !stillNeeded.getStoredIsComplete()){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
 					preReq.setNeededCourses(stillNeeded);
@@ -1211,7 +1210,7 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public boolean checkOptimismError(Requirement r){
-		if(r.storedIsComplete()){
+		if(r.getStoredIsComplete()){
 			return false;
 		}
 		//If adding this requirement to the schedule would entail a leap of faith
@@ -1319,7 +1318,7 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
 		ArrayList<ArrayList<Requirement>> reqsFulfilled = new ArrayList<ArrayList<Requirement>> ();
 		for(ScheduleElement e: allTakenElements){
-			reqsFulfilled.add(e.getRequirementsFulfilled(reqList));
+			reqsFulfilled.add(e.filterEnemyRequirements(reqList));
 		}
 		for(Requirement r : reqList){
 			updateRequirement(r, allTakenElements, reqsFulfilled);
@@ -1375,17 +1374,6 @@ public class Schedule implements java.io.Serializable {
 		}
 		return counter;
 	}
-
-
-	/**
-	 * Find all the requirements that this ScheduleElement satisfies.
-	 * @param e
-	 * @return
-	 */
-	public ArrayList<Requirement> getRequirementsSatisfied(ScheduleElement e){
-		return e.getRequirementsFulfilled(getAllRequirements());
-	}
-
 
 	/**
 	 * /**
@@ -1454,7 +1442,7 @@ public class Schedule implements java.io.Serializable {
 			prereqsM.chosenDegree = -1;
 			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
 			for(Prereq p : prereqs){
-				if(!p.getRequirement().storedIsComplete()){
+				if(!p.getRequirement().getStoredIsComplete()){
 					uniquePrereqs.add(p.getRequirement());
 				}
 			}
@@ -1694,7 +1682,7 @@ public class Schedule implements java.io.Serializable {
 
 		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
 		for(ScheduleElement e : this.getAllElementsSorted()){
-			elementsSatisfy.put(e, new HashSet<Requirement>(e.getRequirementsFulfilled(this.getAllRequirements())));
+			elementsSatisfy.put(e, new HashSet<Requirement>(e.filterEnemyRequirements(this.getAllRequirements())));
 		}
 		for(Major m: this.getMajors()){
 			result.append("\n");
@@ -1710,7 +1698,7 @@ public class Schedule implements java.io.Serializable {
 				}
 				result.append("\n <b>" +  rDisplay + "</b>" );
 
-				boolean isComplete = r.storedIsComplete();
+				boolean isComplete = r.getStoredIsComplete();
 				if(!isComplete){
 					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
 					if(coursesNeeded == 1){

@@ -40,7 +40,7 @@ public class PrefixHours implements ScheduleElement, HasCreditHours, java.io.Ser
 		return toString();
 	}
 	@Override
-	public ArrayList<Requirement> getRequirementsFulfilled(
+	public ArrayList<Requirement> filterEnemyRequirements(
 			ArrayList<Requirement> loaded) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>(); 
 		for(Requirement r : loaded){ 
