@@ -41,11 +41,12 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	JPanel scrollPanel = new JPanel();
 	JPanel infoPanel; //reqs left, credit hours, and CLPs
 	public JLabel creditHoursLabel;
-	public String cHText = "     Credit Hours Left: ";
+	public String cHText = "        Credit Hours: ";
+	public String chInformText = " planned of 128";
 	public JLabel reqsLeftLabel;
-	public String reqsText = "Estimated Courses Left: ";
-	public JLabel clpLeftLabel;
-	public String clpText =  "     CLPs Left:   ";
+	//public String reqsText = "Estimated Courses Left: ";
+	//public JLabel clpLeftLabel;
+	//public String clpText =  "     CLPs Left:   ";
 	//public Schedule schedule;
 
 
@@ -79,20 +80,22 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 
 		
 		this.infoPanel = new JPanel();
+		infoPanel.setLayout(new BorderLayout());
 		creditHoursLabel = new JLabel();
-		creditHoursLabel.setFont(FurmanOfficial.bigHeaderFont);
-		reqsLeftLabel = new JLabel();
-		reqsLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
-		clpLeftLabel = new JLabel();
-		clpLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
+		creditHoursLabel.setFont(FurmanOfficial.smallHeaderFont);
+		//reqsLeftLabel = new JLabel();
+		//reqsLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
+		//clpLeftLabel = new JLabel();
+		//clpLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
 		JButton checkAllErrors = new JButton(MenuOptions.checkAllErrors);
 		checkAllErrors.addActionListener(this);
 		
 		
-		this.infoPanel.add(reqsLeftLabel);
+		//this.infoPanel.add(reqsLeftLabel);
 		this.infoPanel.add(creditHoursLabel);
-		this.infoPanel.add(clpLeftLabel);
-		this.infoPanel.add(checkAllErrors);
+		//this.infoPanel.add(clpLeftLabel);
+		this.infoPanel.add(checkAllErrors, BorderLayout.EAST);
+		
 		this.infoPanel.setBackground(this.getBackground());
 		this.add(infoPanel, BorderLayout.NORTH);
 		
@@ -144,9 +147,9 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		
 		}
 		
-		this.creditHoursLabel.setText(this.cHText + Math.max(0, (128 - schedule.getCreditHoursComplete())));
-		this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
-		this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
+		this.creditHoursLabel.setText(this.cHText + Math.max(0, schedule.getCreditHoursComplete()) + this.chInformText);
+		//this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
+		//this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
 		
 		
 		

@@ -89,20 +89,20 @@ public class CourseList implements java.io.Serializable  {
 					Requirement result = new Requirement();
 					TerminalRequirement t = TerminalRequirement.readFrom("FYW>0");
 					t.setName("Any FYW");
-					result.addChoice(t);
+					result.addRequirement(t);
 					return result;
 				}
 
 				//"appropriate placement" is common
 				if(originalRequirementString.toUpperCase().equals("APPROPRIATE PLACEMENT")){
 					Requirement result = new Requirement();
-					result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
+					result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 					return result;
 				}
 				//"audition required" is common
 				if(originalRequirementString.equals("audition required")){
 					Requirement result = new Requirement();
-					result.addChoice(new TerminalRequirement(new Prefix("Audition", p.getSubject() + "-" + p.getNumber())));
+					result.addRequirement(new TerminalRequirement(new Prefix("Audition", p.getSubject() + "-" + p.getNumber())));
 					return result;
 				}
 				//If none of the special strings happened, we 
@@ -112,8 +112,8 @@ public class CourseList implements java.io.Serializable  {
 		}
 		if(isPlaceableCourse(p)){
 			Requirement result = new Requirement();
-			result.addChoice(Requirement.readFrom(ourVersion));
-			result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
+			result.addRequirement(Requirement.readFrom(ourVersion));
+			result.addRequirement(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 			return result;
 		}
 		
@@ -432,12 +432,12 @@ public class CourseList implements java.io.Serializable  {
 						//only courses numbered 110 or greater
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.addChoice(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						for(Prefix p : GERRequirements.get("NW")){
 							if(p.getNumber().compareTo("110") >= 0){
-								r.addChoice(new TerminalRequirement(p));
+								r.addRequirement(new TerminalRequirement(p));
 							}
 						}
 						includeDefaultPrefixes = false;
@@ -448,7 +448,7 @@ public class CourseList implements java.io.Serializable  {
 					case BM:
 					default:
 						for(Prefix p : GERRequirements.get("NWL")){
-							r.addChoice(new TerminalRequirement(p));
+							r.addRequirement(new TerminalRequirement(p));
 						}
 					}
 					break;
@@ -468,7 +468,7 @@ public class CourseList implements java.io.Serializable  {
 				} //end switch
 				if(includeDefaultPrefixes){
 					for(Prefix p : GERRequirements.get(key)){
-						r.addChoice(new TerminalRequirement(p));
+						r.addRequirement(new TerminalRequirement(p));
 					}
 				}
 				r.setNumToChoose(newNumToChoose);
@@ -494,8 +494,8 @@ public class CourseList implements java.io.Serializable  {
 			}
 			else{
 				Requirement nwnwl = new Requirement();
-				nwnwl.addChoice(nw);
-				nwnwl.addChoice(nwl);
+				nwnwl.addRequirement(nw);
+				nwnwl.addRequirement(nwl);
 				nwnwl.setNumToChoose(2);
 				nwnwl.setName("NW/NWL");
 
@@ -617,7 +617,7 @@ public class CourseList implements java.io.Serializable  {
 
 	public static Requirement FYWRequirement(){
 		Requirement result = new Requirement();
-		result.addChoice(TerminalRequirement.readFrom("FYW>0"));
+		result.addRequirement(TerminalRequirement.readFrom("FYW>0"));
 		result.setName("FYW");
 		return result;
 	}
@@ -666,6 +666,7 @@ public class CourseList implements java.io.Serializable  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
+
 		
 		String[] languages = {"GRK", "LTN", "JPN", "FRN", "SPN", "CHN", "GRK"};
 		String subj = "";
@@ -686,6 +687,7 @@ public class CourseList implements java.io.Serializable  {
 			if(!language.equals(subj)){
 				r.addChoice(TerminalRequirement.readFrom(language + ">=" + standard));
 			}
+
 		}
 		
 		return r;

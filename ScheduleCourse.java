@@ -127,7 +127,7 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	 * Return an unsorted list of the requirements satisfied by this course.
 	 */
 	@Override
-	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> loaded){
+	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded){
 		//get the reqs fulfilled while having the user resolve conflicts.
 		return getRequirementsFulfilled(loaded, true);
 	}

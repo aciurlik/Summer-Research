@@ -111,7 +111,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		String fullText = "";
 
 
-		this.percentComplete =(int) Math.round(req.getStoredPercentComplete() * 100);
+		this.percentComplete =(int) Math.round(req.storedPercentComplete() * 100);
 		
 		/*
 		 * This section would add (25%) to the requirement's text
