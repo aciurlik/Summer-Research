@@ -1055,6 +1055,7 @@ public class ScheduleGUI{
 
 
 	String importResult;
+	final String successText = "You're all set! The import went smoothly.";
 	public void importPriorCourses(boolean isStudent){
 		String importText;
 		if(isStudent){
@@ -1079,15 +1080,19 @@ public class ScheduleGUI{
 		}
 
 		JTextArea importArea = new JTextArea(importText);
-
+		
+		
 		JButton validate = new JButton("validate");
 		validate.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				boolean success = trySetStudentData(importArea.getText());
+				String givenText = importArea.getText();
+				if(successText.equals(givenText)){
+					return;
+				}
+				boolean success = trySetStudentData(givenText);
 				if(success){
-					importResult = importArea.getText();
-					importArea.setText("You're all set! The import went smoothly.");
+					importArea.setText(successText);
 				}
 				else{
 					String errorText;
@@ -1119,6 +1124,7 @@ public class ScheduleGUI{
 				if(importResult == null){
 					trySetStudentData(importArea.getText());
 				}
+				System.out.println(importResult);
 				this.sch.readPrior(importResult);
 				FileHandler.writeStudentData(importResult);
 				this.update();
@@ -1210,6 +1216,7 @@ public class ScheduleGUI{
 			result.append("\n");
 		}
 		String saveString = result.toString();
+		
 
 		try{
 			new Schedule(saveString); //this schedule will read from the prior.
