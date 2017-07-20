@@ -938,20 +938,27 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			//Remove enemies as you go
 			if(RequirementGraph.doesPlayNice(otherReq, this)){
 				//Figure out if this satisfies otherReq
+				// If this doesn't satisfy otherReq, we can definitely skip
+				// otherReq. 
+				// TODO Should we delete this check? It may be preventing
+				// any subreqs from satisfying other reqs, and that might be bad.
+				// Is there a better way to do this?
+				// TODO
 				if(otherReq.equals(this)){
 					result.add(otherReq);
 				}
-				
-				/* Doesn't work - might not actually be used to complete a new
-				 * piece of otherReq, might instead be a subset of the part that is
-				 * already done.
+				/* Warning - the subreq might only help this
+				 * req in ways that this req no longer needs,
+				 * for example if this = "2 of (1 of (A thru K), 1 of (L thru Z))"
+				 * and we've already taken L, the subreq
+				 *  "1 of (L thru P)" should not make this any more complete.
+
 				if(this.isSubset(otherReq)){
 					result.add(otherReq);
 				}
 				*/
 			}
 		}
-		
 		return result;
 	}
 
@@ -978,7 +985,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public String getDisplayString() {
 		StringBuilder result = new StringBuilder();
 
-		//Special case for lab - "5 () with at least 1 lab from ()"
+		//Special case for lab - "2 of () with at least 1 lab from ()"
+		// This if clause will be taken on the second recursion.
 		if("NWL".equals(this.name)){
 			recursePrintOn(s -> result.append(s), r ->r.getDisplayString(),
 					"1 lab from (",
@@ -999,6 +1007,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return result.toString();
 		}
 		
+		//Otherwise, we can just use recursePrintOn.
 		String[] startMidEnd = syntaxSugars();
 		recursePrintOn(s -> result.append(s), r -> r.getDisplayString(), 
 				startMidEnd[0], 
@@ -1008,22 +1017,28 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 	
 	/**
+	 * Helper method for recursive string methods.
 	 * Return a list of the start, divider, and end strings for
 	 * special cases of requirements.
+	 * These strings will be placed around recursive calls.
 	 * For example, if this is a requirement for 1 of 2 choices,
 	 *    this method returns {"either (", " or ", ")"}
+	 *    and another method would fill in the missing pieces
+	 *    to make something like
+	 *    "either (" + "MTH 110" + " or " + "MTH 220" + ")" ;
 	 * @return
 	 */
 	private String[] syntaxSugars(){
-		if(this.isTerminal()){
-			return new String[]{"", ", ",""};
-		}
 		if(this.numToChoose == 1 && this.choices.size() == 1){
 			return new String[]{"", ", ", ""};
+		}
+		if(this.isTerminal()){
+			return new String[]{"", ", ",""};
 		}
 		if(this.usesCreditHours){
 			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
 		}
+		
 		
 		//The next few cases use englishResult
 		// because they all have similar behavior with inner parenthesis.
@@ -1075,12 +1090,27 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			if(!r.isTerminal()){
 				return true;
 			}
+			if(!r.getTerminal().isExact()){
+				return true;
+			}
 		}
 		return false;
 	}
 	
 
 	@Override
+	/**
+	 * returns:
+	 * 	name, if one exists
+	 *  else display string, if its small enough
+	 *  else recursePrintOn(shortString) if that result is small enough
+	 *  else (numToChoose + " choices").
+	 *  
+	 * the recursive third option means that you can have a 
+	 * short string of the form
+	 * "1 of (2 choices, 3 choices)"
+	 * and other complex nested behavior, but all complex behavior
+	 */
 	public String shortString(int preferredLength) {
 		//Return name, if you have one
 		if(this.name != null){
@@ -1157,9 +1187,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		StringBuilder result = new StringBuilder();
 		//http://www.furman.edu/academics/academics/majorsandminors/Pages/default.aspx
 		result.append(
-				    "This text shows, in as much detail as possible, how this requirement works. "
+				    "This text shows, in as much detail as possible, how this requirement "
+				+ "\n  works within this program. "
 				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
-				+ "\nwebsite for another explanation of the requirement."
+				+ "\n  website for another explanation of the requirement."
 				+ "\n\n");
 		result.append(this.getDisplayString());
 		return indent(result.toString(), "   ");

@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1107,14 +1108,51 @@ public void importPriorCourses(boolean isStudent){
 				importArea.setText(errorText);
 			}
 		}
-	});
-	JPanel p = new JPanel();
-	p.setLayout(new BorderLayout());
-	p.add(new JScrollPane(importArea), BorderLayout.SOUTH);
-	p.add(validate, BorderLayout.WEST);
 
-	int chosen = JOptionPane.showOptionDialog(null,p, "Import your schedule",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
-	if(chosen == JOptionPane.OK_OPTION){
+		int headersStart = headersStartMatcher.start();
+		
+		//Find last column header, which is always 'global awareness'.
+		int headersEnd = text.indexOf("global awareness", headersStart);
+		if(headersEnd == -1){
+			importResult = "We couldn't find the last column 'global awareness' in the text "
+					+ "\n   if the last column doesn't say 'global awareness', "
+					+ "\n   then you may be on the wrong page. Make sure you're at your unofficial transcript!";
+			return false;
+		}
+		headersEnd += 16; // go to the end, but don't include the newline 
+		// (we don't want to think there are more headers than there actually are.)
+		String[] headers = text.substring(headersStart, headersEnd).split("\t");
+		if(headers.length < 2){
+			headers = text.substring(headersStart, headersEnd).split("\n");
+		}
+		
+		
+		int numCols = headers.length;
+		
+		int dataStart = headersEnd + 1; //add the newline
+		int dataEnd = text.indexOf("Total Earned Credits");
+		if(dataEnd == -1){
+			importResult = "We couldn't find your GPA in the text"
+					+ "\n Be sure to highlight all the data including your GPA! ";
+			return false;
+		}
+		
+		
+		StringBuilder result = new StringBuilder();
+		for(int i = 0; i < headers.length - 1 ; i ++){
+			result.append(headers[i].trim() + "\t");
+		}
+		result.append(headers[headers.length - 1]);
+		result.append("\n");
+		
+		String[] data = text.substring(dataStart, dataEnd).split("\n");
+		int numDataRows = data.length / numCols;
+		for(int i = 0; i < numDataRows * numCols ; i ++){
+			result.append(data[i]);
+			result.append("\n");
+		}
+		String saveString = result.toString();
+
 		try{
 			if(importResult == null){
 				importResult = importArea.getText();
@@ -1125,6 +1163,17 @@ public void importPriorCourses(boolean isStudent){
 
 		}catch(Exception e){
 			e.printStackTrace();
+
+			importResult = "";
+			for(StackTraceElement element : e.getStackTrace()){
+				importResult += "\n" + element;
+			}
+			importResult += e.getMessage();
+			importResult += "\n\n\nSomething went wrong with the import:"
+					+ "\nOur coders didn't make any plans for this error,\n"
+					+ "the details are displayed above.";
+			return false;
+
 		}
 	}
 }

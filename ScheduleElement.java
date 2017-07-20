@@ -42,7 +42,9 @@ public interface ScheduleElement {
 	 * while attempting to use less than preferredLength characters.
 	 * However, this method should not truncate 
 	 * if it goes over perferredLength characters.
+	 * 
 	 * Acts as a default name if no name is provided.
+	 * 
 	 * @return String that has less information than display string
 	 */
 	public String shortString(int preferredLength);
