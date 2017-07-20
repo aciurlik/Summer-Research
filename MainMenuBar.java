@@ -113,7 +113,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		newSchedule = new JMenu(MenuOptions.newSchedule);
-		newSchedule.setMnemonic(KeyEvent.VK_S);
+		//newSchedule.setMnemonic(KeyEvent.VK_S);
 		blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
 		JPopupMenu newBlank = new JPopupMenu();
 		blankSchedule.addActionListener(this);
@@ -234,7 +234,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		//Build Edit menu in the menu bar.
 		menu = new JMenu(MenuOptions.Edit);
 		
-		menu.setMnemonic(KeyEvent.VK_N);
+		//menu.setMnemonic(KeyEvent.VK_N);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"This allows edits to schedule");
 

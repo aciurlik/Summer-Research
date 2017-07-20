@@ -12,9 +12,14 @@ import javax.swing.SwingConstants;
 
 public class AdditionsPanel extends JPanel implements ActionListener{
 	/**
-	 * This panel provides options for the high impact request the user might need. Those buttons that have explore link to 
-	 * an outside web page, while the others contained within this program. 
-	 * 
+	 *  This panel holds buttons for high-impact functionality that should
+ 	 * always be visible (as opposed to buttons being hidden in a menu, 
+ 	 * or only becoming visible after some other action).
+ 	 * 
+ 	 * As of 7/18/2017, it is the panel on the left of the GUI and includes
+ 	 * 	add a Major/Track/Minor, add MayX or Summer, and explore other
+ 	 *  options from the Furman Advantage (these last just open webpages.)
+ 	 *   
 	 */
 
 	public String AdditionsHeader = new String(MenuOptions.FurmanAdvantage);
