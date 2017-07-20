@@ -239,38 +239,35 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 				"This allows edits to schedule");
 
 
-		submenu = new JMenu(MenuOptions.Major);
-		submenu.setMnemonic(KeyEvent.VK_S);
 		menuItem = new JMenuItem(MenuOptions.addMajor);
 		JPopupMenu majorPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
 		majorPopup.add(menuItem);
-		submenu.add(menuItem);
+		
 
 
 
-		menu.add(submenu);
+		menu.add(menuItem);
 
 
 
 
-		submenu = new JMenu(MenuOptions.Minor);
+		
 		menuItem = new JMenuItem(MenuOptions.addMinor);
 		JPopupMenu minorPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
 		minorPopup.add(menuItem);
-		submenu.add(menuItem);
+		
 
+		menu.add(menuItem);
 
-		menu.add(submenu);
-
-		submenu = new JMenu(MenuOptions.Track);
+	
 		menuItem = new JMenuItem(MenuOptions.addTrack);
 		JPopupMenu trackPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
 		trackPopup.add(menuItem);
-		submenu.add(menuItem);
-		menu.add(submenu);
+		
+		menu.add(menuItem);
 
 
 		this.add(menu);

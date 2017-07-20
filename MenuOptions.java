@@ -65,11 +65,12 @@ public class MenuOptions implements java.io.Serializable{
 			public static String checkAllErrors = "Check all Errors";
 			public static String loadPriorCourses = "Import Prior Courses";
 						public static String student = "Student";
-							public static String dragAndDrop = "Drag and drop via MyFurman";
+							public static String dragAndDrop = "Drag and Drop via MyFurman";
 								public static String studentDnD = "studentDnD";
 						public static String advisor = "Advisor";
 							public static String downloadcsv = "Import via csv";
-							//public static String dragAndDrop = "Drag and drop via MyFurman";
+							//public static String dragAndDrop = "Drag and drop via MyFurman"; //This needs a special 
+						    //actionCommand (advisorDnD) to give different instructions to the user. 
 								public static String advisorDnD = "advisorDnD";
 		
 		//Edit 
@@ -107,8 +108,8 @@ public class MenuOptions implements java.io.Serializable{
 		public static final  String help ="Help";
 				// submenus in help
 				public static String viewStartUp = "View Start Up Guide";
-				public static String examineRequirementHelp = "Requirement help";
-				public static String findACourse = "Find a course";
+				public static String examineRequirementHelp = "Requirement Help";
+				public static String findACourse = "Find a Course";
 	
 	///////////////////
 	///// Only AdditionsPanel
