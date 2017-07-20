@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1148,6 +1149,7 @@ public class ScheduleGUI{
 			headers = text.substring(headersStart, headersEnd).split("\n");
 		}
 		
+		
 		int numCols = headers.length;
 		
 		int dataStart = headersEnd + 1; //add the newline
@@ -1161,7 +1163,7 @@ public class ScheduleGUI{
 		
 		StringBuilder result = new StringBuilder();
 		for(int i = 0; i < headers.length - 1 ; i ++){
-			result.append(headers[i] + "\t");
+			result.append(headers[i].trim() + "\t");
 		}
 		result.append(headers[headers.length - 1]);
 		result.append("\n");
@@ -1181,8 +1183,14 @@ public class ScheduleGUI{
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			importResult = "Our coders didn't make any plans for this error:\n" + 
-			e.getMessage();
+			importResult = "";
+			for(StackTraceElement element : e.getStackTrace()){
+				importResult += "\n" + element;
+			}
+			importResult += e.getMessage();
+			importResult += "\n\n\nSomething went wrong with the import:"
+					+ "\nOur coders didn't make any plans for this error,\n"
+					+ "the details are displayed above.";
 			return false;
 		}
 	}
