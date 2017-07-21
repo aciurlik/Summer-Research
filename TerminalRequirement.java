@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Stack;
 
 
@@ -51,7 +52,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 			return defaultCreditHours;
 		}
 	}
-	
+
 	public int getCreditHours(){
 		if(this.storedCreditHours == -1){
 			this.storedCreditHours = calculateCreditHours();
@@ -288,7 +289,6 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 	}
 
 
-
 	/**
 	 * Efficiently calculate whether this prefix counts towards
 	 * this terminal requirement at all.
@@ -319,19 +319,19 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return false;
 	}
-	
+
 	public boolean isSatisfiedBy(TerminalRequirement t){
 		return t.isSubset(this);
 	}
-	
-	
+
+
 	//TODO is this method ever used?
 	public boolean isCompletedBy(ArrayList<ScheduleElement> taken){
 		return minMoreNeeded(taken) <= 0;
 	}
 
-	
-	
+
+
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
@@ -379,7 +379,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return null;
 	}
-	
+
 	@Override public String getDisplayString(){
 		if(this.isExact()){
 			return this.saveString();
@@ -406,7 +406,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return result + this.p.getSubject() + " numbered greater than " + min;
 	}
-	
+
 	@Override public String shortString(int preferredLength){
 		if(name != null){
 			return name;
@@ -417,8 +417,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return result;
 	}
-	
-	
+
+
 	@Override
 	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> reqList) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
@@ -436,8 +436,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return result;
 	}
-	
-	
+
+
 
 
 
@@ -451,7 +451,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		return this.saveString().compareTo(other.saveString());
 	}
 
-	
+
 	@Override
 	public boolean isTerminal(){
 		return true;
@@ -464,7 +464,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 
 
-	
+
 	/**
 	 * Check if satisfying t definitely satisfies this.
 	 * @param t
@@ -476,7 +476,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return isSuperset(t);
 	}
-	
+
 	/**
 	 * true iff one course scheduled for t 
 	 * is also a course scheduled for this.
@@ -533,7 +533,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		//after recursion, r is a terminal.
 		TerminalRequirement other = (TerminalRequirement)r;
-		
+
 		//check if they complete each other
 		if(! (this.completedBy(other) && other.completedBy(this) )){
 			return false;
@@ -567,8 +567,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		}
 		return result;
 	}
-	
-	
+
+
 
 
 	public static void testTerminalRequirements(){
@@ -632,8 +632,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		System.out.println(x.equals(t));
 		System.out.println(y.equals(x));
 		System.out.println(x.equals(y));
-		
-		
+
+
 		/*System.out.println(t.hashCode());
 		System.out.println(x.hashCode());
 
@@ -642,7 +642,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		set.add(x);
 		System.out.println(set.size());
 		System.out.println(set.contains(x));
-		*/
+		 */
 	}
 
 

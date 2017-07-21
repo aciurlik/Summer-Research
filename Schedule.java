@@ -1145,6 +1145,13 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<Requirement> reqList = this.getAllRequirementsMinusPrereqs();
 		ArrayList<ArrayList<Requirement>> reqsFulfilled = new ArrayList<ArrayList<Requirement>> ();
 		for(ScheduleElement e: allTakenElements){
+			if(e instanceof ScheduleCourse){
+				if (((ScheduleCourse) e).c.name.contains("Roman")){
+					ArrayList<Requirement> filter = e.filterEnemyRequirements(reqList);
+					System.out.println("updateReqs " + filter);
+					System.out.println("updateReqs" + filter.size() );
+				}
+			}
 			reqsFulfilled.add(e.filterEnemyRequirements(reqList));
 		}
 		for(Requirement r : reqList){
@@ -1350,6 +1357,7 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public HashSet<Requirement> resolveConflictingRequirements(HashSet<Requirement> enemies, Course c){
+		System.out.println("RESOLVE CALLED");
 		HashSet<Requirement> result = new HashSet<Requirement>();
 		ArrayList<Requirement> reqs = new ArrayList<Requirement>();
 		ArrayList<Major> majors = new ArrayList<Major>();

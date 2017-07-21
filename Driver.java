@@ -22,11 +22,11 @@ import javax.swing.JTextPane;
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
 	static StartUpMenu startUP = null;
-	
-	
+
+
 
 	public static void addScheduleGUI(Schedule s){
-		
+
 		ScheduleGUI schGUI = new ScheduleGUI(s);
 		schGUI.addWindowListener(new WindowListener(){
 
@@ -61,30 +61,30 @@ public class Driver {
 
 		});
 		listOfScheduleGUIs.add(schGUI);
-	
+
 	}
 
 	public static void removeScheduleGUI(ScheduleGUI s){
 		listOfScheduleGUIs.remove(s);
 		if(listOfScheduleGUIs.isEmpty()){
 			System.exit(0);
-			
+
 		}
 	}
 
 	public static void openSchedule() {
 		Schedule result = FileHandler.openSchedule();
-	
+
 		if(result!=null){
 			//TODO make sure nothing else needs to be set
 			if(FurmanOfficial.masterIsAround){
 				result.reloadMajors();
 			}
-	
+
 			Driver.addScheduleGUI(result);
-		
+
 		}
-	
+
 	}
 
 
@@ -306,8 +306,7 @@ public class Driver {
 
 	public static void main(String[] args){
 		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
+		// will be set before other static code gets run.		Color c = FurmanOfficial.grey;
 
 
 
@@ -317,7 +316,7 @@ public class Driver {
 		if(start == null){
 			//this will close any running code, including the JOptionPanes which don't get collected by 
 			// the garbage collector for some reason.
-			System.exit(0);
+{			System.exit(0);
 			return;
 		}*/
 
@@ -347,17 +346,18 @@ public class Driver {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals(MenuOptions.confirm)){
 					frame.dispose();
-					if(startUP != null){
-						startUP.showStartUp(true);
+					PriorData data = FileHandler.getSavedStudentData();
+					if(data != null){
+						Driver.addScheduleGUI(new Schedule(data));
 					}
 					else{
-						PriorData data = FileHandler.getSavedStudentData();
-						if(data != null){
-							Driver.addScheduleGUI(new Schedule(data));
-						}
-						else{
-							Driver.addScheduleGUI(new Schedule());
-						}
+<
+						Driver.addScheduleGUI(new Schedule());
+
+					}
+					if(startUP != null){
+						startUP.showStartUp(true);
+
 					}
 				}
 

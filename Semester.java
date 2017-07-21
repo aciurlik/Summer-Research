@@ -260,11 +260,10 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
 		if(!this.checkReplaceOverload(newElement, oldElement)){
-			//	System.out.println(oldElement);
+			
 
 			int i = this.elements.indexOf(oldElement);
-			//	System.out.println(i);
-			//	System.out.println(this.elements.size());
+		
 			this.elements.set(i, newElement);
 
 			return true;

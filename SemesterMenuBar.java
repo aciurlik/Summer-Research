@@ -52,12 +52,12 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 		
 		JMenuItem studyAway = new JMenuItem();
 		if(semPanel.sem.studyAway){
-		//System.out.println("REMOVE");
+	
 			studyAway.setText(MenuOptions.removeStudyAway);
 			studyAway.setActionCommand(MenuOptions.removeStudyAway);
 		}
 		else{
-		//	System.out.println("ADD");
+	
 			studyAway.setText(MenuOptions.addStudyAway);
 			studyAway.setActionCommand(MenuOptions.addStudyAway);
 		}

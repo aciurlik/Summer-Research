@@ -30,7 +30,56 @@ public class CourseList implements java.io.Serializable  {
 	static Hashtable<String, String> savedPrereqMeanings;
 	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
 	public static HashSet<String> languagePrefix;
-	
+
+	public static HashMap<Prefix, Requirement> flPrereqs;
+
+
+
+	private static String[][] languageReqs = {
+			{"CHN", "CHN-PL.110", null, "(CHN-110, CHN-PL.120)", "(CHN-120, CHN-PL.201)", "(CHN-201, CHN-PL.202)", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+			{"FRN", "(FRN-PL.110)", "(FRN-PL.115)", "(FRN-110)", "(FRN-115, FRN-120, FRN-PL.201)", null, "(FRN-201, FRN-PL.210+)", "(FRN-201, FRN-120, FRN-220, FRN-PL.210+)", "(FRN-201, FRN-PL.220+)", "(FRN-201, FRN-PL.220+)", null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+			{"GRK", "GRK-PL.110", null, "(GRK-110)", "(GRK-120, GRK-PL.201)", null, null, null, null, null, null, null, null, null, null, null, null, null, "GRK-301", "GRK-301", "GRK-301", "GRK-301", "GRK-301", null },
+			{"GRM", "(GRM-PL.110)", "GRM-PL.115", "(GRM-PL.110, GRM-PL.115)", "(GRM-115, GRM-120, GRM-PL.201)", null, "(GRM-201, GRM-PL.210+)", "(GRM->200, GRM-PL.210+)", "(GRM->200, GRM-PL.220+)", null, "(GRM-115, GRM-120, GRM-PL.201, GRM-PL.220+)", "(GRM->200, GRM-PL.200+)", null, null, null, null, null, null, null, null, null, null, null, null},
+			{"JPN", "JPN-PL.110", null, "(JPN-110, JPN-PL.120)", "(JPN-120, JPN-PL.201)", "(JPN-201, JPN-PL.202)", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+			{"LTN", "LTN-PL.110", null, "LTN-110", "(LTN-120, LTN-PL.201)", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)"},
+			
+			{"SPN", "SPN-PL.110", "SPN-PL.115", "SPN-110", "(SPN-115, SPN-120, SPN-PL.201)", null, "(SPN-201, SPN-PL.210+)", "(SPN-201, SPN-PL.210+, SPN-PL.215)", "(SPN-210, SPN-215, SPN-PL.220)", null, null, null, null, null, null, null, null, "(SPN-210, SPN-215, SPN-PL.220+)", null, null, null, null, null, null}
+
+	};
+
+	static String[] flClassNumbers = {"110", "115", "120", "201", "202", "210", "215", "220", "221", "222", "230", "231", "232", "233", "234", "235", "240", "310", "320", "331", "332", "333", "334"};
+
+
+	static{
+		flPrereqs =LanguageSequencePreReqandPlacementLevels();	
+
+	}
+
+	/**
+	 * This method creates a hashmap that relates each level of a language (such as CH-120) to all of its
+	 * possible prereq classes (such as CHN-120, and PL.201). 
+	 * @return HashMap<Prefix (Language Class), Requirement (its prereqs)>
+	 */
+
+	public static HashMap<Prefix, Requirement> LanguageSequencePreReqandPlacementLevels(){//based on graph
+		HashMap<Prefix, Requirement> languagePreReqPlacement = new HashMap<Prefix, Requirement>();
+		for(int i= 0; languageReqs.length>i; i++){ //subjects
+			for(int n = 0; flClassNumbers.length>n; n++){ //prefix numbers that correspond
+				Requirement req= null;
+				if(languageReqs[i][n+1] != null){ //refers to the corresponding place in the table that will become the newPreReqs. 
+					req = Requirement.readFrom(languageReqs[i][n+1]);
+					Prefix p = new Prefix(languageReqs[i][0], flClassNumbers[n]);
+					languagePreReqPlacement.put(p, req );
+				}
+
+			}
+		}
+		return languagePreReqPlacement;
+	}
+
+
+
+
 	public static void loadAllCourses(){
 		String [] lp = {"FRN", "LTN", "SPN", "GRK", "GRM", "CHN", "JPN"};
 		languagePrefix = new HashSet<String>();
@@ -457,6 +506,14 @@ public class CourseList implements java.io.Serializable  {
 					if(majorType == CourseList.BM){
 						continue outerloop;
 					}
+					if(majorType == CourseList.BS){
+						for(Prefix p : GERRequirements.get("NWL")){
+							if(p.getNumber().compareTo("110") >= 0){
+								r.addChoice(new TerminalRequirement(p));
+							}
+						}
+						includeDefaultPrefixes = false;
+					}
 					break;
 				case "HB":
 					//every major type needs 2 hb.
@@ -840,7 +897,13 @@ public class CourseList implements java.io.Serializable  {
 	public static void main(String[] args){
 		//setPrereqMeaning("PSY-202 or BIO-222", "(PSY-202, BIO-222 )");
 		//setPrereqMeaning("PSY-201 or BIO-222", "(PSY-201, BIO-222 )");
+
+		//viewKnownPrereqs();
+	
+		//LanguageSequencePreReqandPlacementLevels();
+
 		viewKnownPrereqs();
+
 
 	}
 

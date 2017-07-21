@@ -113,9 +113,6 @@ public class StartUpMenu implements ActionListener {
 				FileHandler.propertySet(MenuOptions.startUp, "false");
 			}
 			frame.dispose();
-			if(showStartUp){
-				Driver.addScheduleGUI(Schedule.testSchedule());
-			}
 		}
 
 		//Next

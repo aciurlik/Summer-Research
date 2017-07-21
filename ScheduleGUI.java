@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -201,16 +202,25 @@ public class ScheduleGUI{
 		JPanel problems = new JPanel();
 		problems.setLayout(new BorderLayout());
 
+		String advisorAdvice;
+		if(enemies.size()>2){
+			advisorAdvice = " \n If you are unsure of why or how these requirements conflict, talk to your advisor.";
+		}
+		else{
+			advisorAdvice = "";
+		}
 		JLabel instruct = new JLabel(
-				"The course "+ c.getPrefix() + " might satisfy the following requirements,"
-						+ "\n   but it is not allowed to satisfy all of them at once. "
-						+ "\nWhich requirements do you want it to satisfy?");
+				"<html><p style = 'width: 300px;'> The course "+ c.getPrefix() + " might satisfy the following requirements,"
+						+  " but it is not allowed to satisfy all of them at once."
+						+  advisorAdvice
+						+ "<br> Which requirements do you want it to satisfy?</p> </html>");
 
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
+		stack.setLayout(new GridLayout(enemies.size(), 1, 1, 1));
 
 		for(int i = 0; i<enemies.size(); i++){
-			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(40) + " (" +  majors.get(i).name + ")" );
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(10) + " (" +  majors.get(i).name + ")" );
 			stack.add(combattingReqs);
 			userOptions.add(combattingReqs);
 		}
@@ -324,7 +334,6 @@ public class ScheduleGUI{
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
 			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
-			System.out.println(toUser);
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
@@ -817,7 +826,6 @@ public class ScheduleGUI{
 	public void GUICheckAllErrors(boolean displayPopUp) {
 		String errorString = getErrorString();
 		String result = "<html><body>" + errorString;
-		System.out.println(result);
 		if(errorString.equals("")){
 			result = "Your Schedule had no errors! You're a pretty savy scheduler";
 		}
@@ -929,7 +937,7 @@ public class ScheduleGUI{
 	public void update() {
 		updateAll();
 		repaintAll(); 
-		//System.out.println(this.sch.semesters.get(0).hasNotes);
+
 
 	}
 
@@ -985,7 +993,6 @@ public class ScheduleGUI{
 			schedulePrint.setPreferredSize(new Dimension((int) p.getWidth(), (int) p.getHeight()));
 			//	schedulePrint.setLineWrap(true);
 			schedulePrint.setContentType("text/html");
-			//	System.out.println("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
 			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
 
 			schedulePrint.setEditable(false);
@@ -1000,8 +1007,6 @@ public class ScheduleGUI{
 
 			if(userChoice == 0){
 				try {
-					System.out.println("This is what is sent to the printer");
-					System.out.println(schedulePrint.getText());
 					schedulePrint.print();
 				} catch (PrinterException e) {
 					// TODO Auto-generated catch block
@@ -1095,9 +1100,11 @@ public class ScheduleGUI{
 				try{
 					trySetStudentDataFromWebsite(givenText);
 					importArea.setText(successText);
+
 				}catch(Exception except){
 					importArea.setText("Please try your import again");
 					showImportException(except);
+
 				}
 			}
 		}); //end action listener
@@ -1160,7 +1167,9 @@ public class ScheduleGUI{
 	 * @param text
 	 * @return
 	 */
+
 	public void trySetStudentDataFromWebsite(String text){
+
 
 		PriorData d = new PriorData();
 		try{

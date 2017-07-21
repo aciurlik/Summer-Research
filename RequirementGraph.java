@@ -96,6 +96,7 @@ public class RequirementGraph implements java.io.Serializable {
 				}
 			}
 		}
+	
 		return result;
 	}
 }
