@@ -11,7 +11,14 @@ import javax.swing.JOptionPane;
  * 
  * This class holds all the prior data about a student that we might get from myFurman.
  * 
- * It is a file side class.
+ * The two main methods are readFromWebsiteDraggedData and readFromCSV. 
+ * General use is:
+ * 	PriorData p = new PriorData();
+ *  p.readFromWebsiteDraggedData(a string with data dragged in from furman's website.);
+ *  schedule.readPrior(p);
+ * 
+ * 
+ * It is a FILE side class, as opposed to DATA or GUI. 
  *
  */
 public class PriorData implements Serializable{
@@ -33,62 +40,108 @@ public class PriorData implements Serializable{
 
 	}
 
-
+	
+	
 	/**
-	 * Read in the info from Furman's text string, copied from myFurman.
-	 * Sets language prefix, first semester and creates prior semester,
+	 * Read from the text given by a drag from furman's website
 	 * 
-	 * 
-	 * s should be in the form 
-	 * 
-	 * colmName \t colmName \t colmName \t ...
-	 * r1c1
-	 * r1c2
-	 * r1c3
-	 * .
-	 * .
-	 * .
-	 * r2c1
-	 * r2c2
-	 * .
-	 * .
-	 * .
-	 * rncn
-	 * 
-	 * @param s
+	 * Throws lots of possible runtime exceptions
+	 * @param text
+	 * @return
 	 */
-	public void readFromWebsiteDraggedData(String s){
+	public void readFromWebsiteDraggedData(String text){
 
-		String[] lines = s.split("\n");
-		String[] headers = lines[0].split("\t");
+		//First, find the index of the ID/Name.
+		Matcher idMatch = Pattern.compile("\\d{5,20}").matcher(text); //at least 5 digits from the ID 
+		//(this prevents matching on years or other digits in the text, and gives an unambiguous
+		// start to the string.
+		if(!idMatch.find()){
+			throw new RuntimeException( "We couldn't find your ID number in the text.");
+		}
 
-		ArrayList<ArrayList<String>> resultList = new ArrayList<ArrayList<String>>();
+		//put startIndex in a location where the next instance of the string 'course'
+		// can only be a column header.
+		int startIndex = idMatch.start();
+		int advisorSkipLineIndex = text.indexOf("Download course", startIndex);
+		if(advisorSkipLineIndex != -1){
+			startIndex = text.indexOf("\n", advisorSkipLineIndex) + 1;
+		}
+		text = text.substring(startIndex);
+
+		//Find the first column header, either "Course/Section and Title" or "course" depending on advisor view or student view.
+		Matcher headersStartMatcher = Pattern.compile("Course/Section and Title|course").matcher(text);
+		if(!headersStartMatcher.find()){
+			throw new RuntimeException(  "We couldn't find the table headers in the text"
+					+ "\n We're looking for a table where the first column is either"
+					+ "\n 'Course/Section and Title' or 'course.' If you don't see that, "
+					+ "\n you may be on the wrong page. Make sure you're at your unofficial transcript!");
+		}
+		
+		
+		int headersStart = headersStartMatcher.start();
+
+		//Find last column header, which is always 'global awareness'.
+		int headersEnd = text.indexOf("global awareness", headersStart);
+		if(headersEnd == -1){
+			throw new RuntimeException( "We couldn't find the last column 'global awareness' in the text "
+					+ "\n   if the last column doesn't say 'global awareness', "
+					+ "\n   then you may be on the wrong page. Make sure you're at your unofficial transcript!");
+		}
+		headersEnd += 16; // go to the end of the column headers, but don't include the newline 
+		// (we don't want to think there are more headers than there actually are in the next step.)
+		
+		
+		//Collect the headers.
+		String[] headers = text.substring(headersStart, headersEnd).split("\t");
+		if(headers.length < 2){
+			headers = text.substring(headersStart, headersEnd).split("\n");
+		}
+		for(int i = 0; i  < headers.length ; i ++){
+			headers[i] = headers[i].trim();
+		}
 
 		int numCols = headers.length;
-		int row = 0; //the first data row is index 0.
-		for(;(row+1) * numCols - 1 < lines.length ; row ++){
-			ArrayList<String> rowList = new ArrayList<String>();
-			int startIndex = row * numCols + 1;
-			for(int i = 0 ; i < numCols ; i ++){
-				rowList.add(lines[startIndex + i]);
+
+		
+		//Find the start and end of the data section
+		int dataStart = headersEnd + 1; //add the newline
+		int dataEnd = text.indexOf("Total Earned Credits");
+		if(dataEnd == -1){
+			throw new RuntimeException( "We couldn't find your GPA in the text"
+					+ "\n Be sure to highlight all the data including your GPA! ");
+		}
+
+
+		
+		
+
+		String[] data = text.substring(dataStart, dataEnd).split("\n");
+		int numRows = data.length / numCols;
+		String[][] csvResult = new String[numRows + 1][];
+		csvResult[0] = headers;
+		
+		for(int i = 0; i < numRows ; i ++){
+			int rowStartIndex = i * numCols;
+			String[] row = new String[numCols];
+			for(int j = 0; j < numCols ; j ++){
+				row[j] = data[rowStartIndex + j];
 			}
-			resultList.add(rowList);
+			csvResult[i+1] = row;
 		}
-
-		String[][] result = new String[resultList.size() + 1][];
-		result[0] = headers;
-		for(int i = 1 ; i < resultList.size() + 1 ; i ++){
-			ArrayList<String> rowList = resultList.get(i-1);
-			result[i] = rowList.toArray(new String[rowList.size()]);
-		}
-
-		readFromCSV(result);
+		readFromCSV(csvResult);
 	}
 
 
+	/**
+	 * Try to read from this prior course data.
+	 *  If you just find a course or two that you
+	 * can't read, just show a popup informing the user that you're skipping
+	 * that course. Throws fatal errors though.
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public void readFromCSV(String[][] s){
-		data = s;
-
 
 		String[] headers = s[0];
 		int termIndex = -1;
@@ -111,16 +164,16 @@ public class PriorData implements Serializable{
 		}
 
 		if(termIndex == -1){
-			throw new RuntimeException("Course-term column not found" + Arrays.toString(headers));
+			throw new RuntimeException( "Course-term column not found in " + Arrays.toString(headers));
 		}
 		if(courseStringIndex == -1){
-			throw new RuntimeException("subject and section column not found" + Arrays.toString(headers));
+			throw new RuntimeException( "subject and section column not found in " + Arrays.toString(headers));
 		}
 		if(creditsIndex == -1){
-			throw new RuntimeException("Course-credits column not found" + Arrays.toString(headers));
+			throw new RuntimeException( "Course-credits column not found in " + Arrays.toString(headers));
 		}
 		if(gradeIndex == -1){
-			throw new RuntimeException("Course grade column not found" + Arrays.toString(headers));
+			throw new RuntimeException( "Course grade column not found in " + Arrays.toString(headers));
 		}	
 
 
@@ -150,6 +203,7 @@ public class PriorData implements Serializable{
 		courseList = new ArrayList<Course>();
 		for(int i = 1 ; i < s.length ; i ++){
 			String[] row = s[i];
+			System.out.println(Arrays.toString(row));
 			try{
 				//Collect relevant string data
 				String courseString = row[courseStringIndex].trim();
@@ -198,15 +252,15 @@ public class PriorData implements Serializable{
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);
-				//if(!" ".equals(creditsString)&&! "".equals(creditsString)&& !(creditsString==null)){
-				//	System.out.println((int)(Double.parseDouble(creditsString)));
-				//	credits = (int)(Double.parseDouble(creditsString));
-				//}
+				if(( ! "".equals(creditsString) )&& creditsString!=null){
+					//System.out.println((int)(Double.parseDouble(creditsString)));
+					credits = (int)(Double.parseDouble(creditsString));
+				}
 				
 				
 				
 				//Semester / term
-				SemesterDate takenDate = readSemesterDate(row[termIndex]);
+				SemesterDate takenDate = readSemesterDate(termString);
 
 
 				Course c = null;
@@ -217,9 +271,15 @@ public class PriorData implements Serializable{
 					c = new Course(p, earliestDate.previous(), null, null, credits, section);
 				}
 				c.setName(title);
-				courseList.add(c);
+				
+				//skip failing grades (this will still let a course be added if it has no grade)
+				// X was used to redact grades at one point.
+				if("ABCDX ".contains(gradeString)){
+					courseList.add(c);
+				}
 			}
 			catch(Exception e){
+				System.out.println(Arrays.toString(row));
 				if(FurmanOfficial.masterIsAround){
 					throw e;
 				}
@@ -233,7 +293,7 @@ public class PriorData implements Serializable{
 
 			}
 		}
-
+		data = s;
 	}
 	
 	private SemesterDate readSemesterDate(String s){
@@ -254,27 +314,49 @@ public class PriorData implements Serializable{
 	}
 
 	public SemesterDate getEarliestDate(){
-		if(earliestDate == null){
-			throw new RuntimeException("Tried to get null earliest date");
-		}
+		checkIsCorrupted();
 		return earliestDate;
 	}
 	public SemesterDate getLatestDate(){
-		if(latestDate == null){
-			throw new RuntimeException("Tried to get null latest date");
-		}
+		checkIsCorrupted();
 		return latestDate;
 	}
 
 	public Prefix getLanguagePrefix(){
-		if(languagePrefix == null){
-			throw new RuntimeException("Tried to get null language prefix");
-		}
+		checkIsCorrupted();
 		return languagePrefix;
 	}
 
 	public ArrayList<Course> getAllCourses(){
 		return courseList;
+	}
+	
+	public String dataToString(){
+		StringBuilder result = new StringBuilder();
+		for(String[] s : data){
+			for(String t : s){
+				result.append(t + "\t");
+			}
+			result.append("\n");
+		}
+		return result.toString();
+	}
+	
+	public boolean isCorrupted(){
+		return data==null;
+	}
+	
+	public void checkIsCorrupted(){
+		if(isCorrupted()){
+			throw new RuntimeException("The data you were trying to read from never loaded correctly");
+		}
+	}
+	
+	
+	
+	
+	public void testReading(){
+		
 	}
 
 
