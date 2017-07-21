@@ -718,7 +718,6 @@ public class CourseList implements java.io.Serializable  {
 			standard=201;
 		}
 
-
 		String[] languages = {"GRK", "LTN", "JPN", "FRN", "SPN", "CHN", "GRK"};
 		String subj = "";
 
