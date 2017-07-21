@@ -138,21 +138,33 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	 * @return
 	 */
 	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded, boolean haveUserResolveConflicts) {
-
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
 			if(r.isSatisfiedBy(this.getPrefix())){
 				result.add(r);
 			}
 		}
+		
 		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
+		
+		
+		
+	    //  There are different sets of enemies being called for REL-226
+	    if (((ScheduleCourse) this).c.name.contains("Roman")){
+		
+		}
+	    
 		result.removeAll(enemies);
+		
+		
 		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
+			
 			if(enemies.isEmpty()){
 				this.userSpecifiedReqs = new HashSet<Requirement>();
 				this.oldEnemyList = enemies;
 			}
 			else{
+				
 				//the enemies changed.  
 				//ask the user which requirements should now be satisfied by this course. 
 				
@@ -161,10 +173,15 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 					kept = this.s.resolveConflictingRequirements(enemies, this.c); 
 				}
 				this.userSpecifiedReqs = kept; 
-				this.oldEnemyList = enemies; 
-
+				if(haveUserResolveConflicts){
+					this.oldEnemyList = enemies; 
+				}
 			}
+			
 		}
+
+
+		
 		result.addAll(this.userSpecifiedReqs);
 		return result;
 

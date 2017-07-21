@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -200,16 +201,25 @@ public class ScheduleGUI{
 		JPanel problems = new JPanel();
 		problems.setLayout(new BorderLayout());
 
+		String advisorAdvice;
+		if(enemies.size()>2){
+			advisorAdvice = " \n If you are unsure of why or how these requirements conflict, talk to your advisor.";
+		}
+		else{
+			advisorAdvice = "";
+		}
 		JLabel instruct = new JLabel(
-				"The course "+ c.getPrefix() + " might satisfy the following requirements,"
-						+ "\n   but it is not allowed to satisfy all of them at once. "
-						+ "\nWhich requirements do you want it to satisfy?");
+				"<html><p style = 'width: 300px;'> The course "+ c.getPrefix() + " might satisfy the following requirements,"
+						+  " but it is not allowed to satisfy all of them at once."
+						+  advisorAdvice
+						+ "<br> Which requirements do you want it to satisfy?</p> </html>");
 
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
+		stack.setLayout(new GridLayout(enemies.size(), 1, 1, 1));
 
 		for(int i = 0; i<enemies.size(); i++){
-			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(40) + " (" +  majors.get(i).name + ")" );
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(10) + " (" +  majors.get(i).name + ")" );
 			stack.add(combattingReqs);
 			userOptions.add(combattingReqs);
 		}
@@ -323,7 +333,6 @@ public class ScheduleGUI{
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
 			String title = "Notes for " + m.name;
 			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
-			System.out.println(toUser);
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
@@ -816,7 +825,6 @@ public class ScheduleGUI{
 	public void GUICheckAllErrors(boolean displayPopUp) {
 		String errorString = getErrorString();
 		String result = "<html><body>" + errorString;
-		System.out.println(result);
 		if(errorString.equals("")){
 			result = "Your Schedule had no errors! You're a pretty savy scheduler";
 		}
@@ -928,7 +936,7 @@ public class ScheduleGUI{
 	public void update() {
 		updateAll();
 		repaintAll(); 
-		//System.out.println(this.sch.semesters.get(0).hasNotes);
+
 
 	}
 
@@ -984,7 +992,6 @@ public class ScheduleGUI{
 			schedulePrint.setPreferredSize(new Dimension((int) p.getWidth(), (int) p.getHeight()));
 			//	schedulePrint.setLineWrap(true);
 			schedulePrint.setContentType("text/html");
-			//	System.out.println("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
 			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
 
 			schedulePrint.setEditable(false);
@@ -999,8 +1006,6 @@ public class ScheduleGUI{
 
 			if(userChoice == 0){
 				try {
-					System.out.println("This is what is sent to the printer");
-					System.out.println(schedulePrint.getText());
 					schedulePrint.print();
 				} catch (PrinterException e) {
 					// TODO Auto-generated catch block
@@ -1107,7 +1112,7 @@ public class ScheduleGUI{
 								+ "\nBe sure that you found the student's course credit summary on"
 								+ "\n  myFurman, and that you hilighted the data from the student's"
 								+ "\n  ID-Name to thier GPA (and no more) ";
-						
+
 					}
 					importArea.setText(errorText);
 				}
@@ -1145,7 +1150,7 @@ public class ScheduleGUI{
 	 * @return
 	 */
 	public boolean trySetStudentData(String text){
-		
+
 		//First, find the index of the ID/Name.
 		Matcher idMatch = Pattern.compile("\\d{5,20}").matcher(text); //at least 5 digits from the ID 
 		//(this prevents matching on years or other digits in the text, and gives an unambiguous
@@ -1154,7 +1159,7 @@ public class ScheduleGUI{
 			importResult = "We couldn't find your ID number in the text.";
 			return false;
 		}
-		
+
 		//put startIndex in a location where the next instance of 'course'
 		// can only be a column header.
 		int startIndex = idMatch.start();
@@ -1163,7 +1168,7 @@ public class ScheduleGUI{
 			startIndex = text.indexOf("\n", advisorSkipLineIndex) + 1;
 		}
 		text = text.substring(startIndex);
-		
+
 		//Find the first column header, either "Course/Section and Title" or "course" depending on advisor view or student view.
 		Matcher headersStartMatcher = Pattern.compile("Course/Section and Title|course").matcher(text);
 		if(!headersStartMatcher.find()){
@@ -1174,7 +1179,7 @@ public class ScheduleGUI{
 			return false;
 		}
 		int headersStart = headersStartMatcher.start();
-		
+
 		//Find last column header, which is always 'global awareness'.
 		int headersEnd = text.indexOf("global awareness", headersStart);
 		if(headersEnd == -1){
@@ -1189,10 +1194,10 @@ public class ScheduleGUI{
 		if(headers.length < 2){
 			headers = text.substring(headersStart, headersEnd).split("\n");
 		}
-		
-		
+
+
 		int numCols = headers.length;
-		
+
 		int dataStart = headersEnd + 1; //add the newline
 		int dataEnd = text.indexOf("Total Earned Credits");
 		if(dataEnd == -1){
@@ -1200,15 +1205,15 @@ public class ScheduleGUI{
 					+ "\n Be sure to highlight all the data including your GPA! ";
 			return false;
 		}
-		
-		
+
+
 		StringBuilder result = new StringBuilder();
 		for(int i = 0; i < headers.length - 1 ; i ++){
 			result.append(headers[i].trim() + "\t");
 		}
 		result.append(headers[headers.length - 1]);
 		result.append("\n");
-		
+
 		String[] data = text.substring(dataStart, dataEnd).split("\n");
 		int numDataRows = data.length / numCols;
 		for(int i = 0; i < numDataRows * numCols ; i ++){
@@ -1216,7 +1221,7 @@ public class ScheduleGUI{
 			result.append("\n");
 		}
 		String saveString = result.toString();
-		
+
 
 		try{
 			new Schedule(saveString); //this schedule will read from the prior.

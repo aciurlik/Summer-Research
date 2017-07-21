@@ -22,11 +22,11 @@ import javax.swing.JTextPane;
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
 	static StartUpMenu startUP = null;
-	
-	
+
+
 
 	public static void addScheduleGUI(Schedule s){
-		
+
 		ScheduleGUI schGUI = new ScheduleGUI(s);
 		schGUI.addWindowListener(new WindowListener(){
 
@@ -61,30 +61,30 @@ public class Driver {
 
 		});
 		listOfScheduleGUIs.add(schGUI);
-	
+
 	}
 
 	public static void removeScheduleGUI(ScheduleGUI s){
 		listOfScheduleGUIs.remove(s);
 		if(listOfScheduleGUIs.isEmpty()){
 			System.exit(0);
-			
+
 		}
 	}
 
 	public static void openSchedule() {
 		Schedule result = FileHandler.openSchedule();
-	
+
 		if(result!=null){
 			//TODO make sure nothing else needs to be set
 			if(FurmanOfficial.masterIsAround){
 				result.reloadMajors();
 			}
-	
+
 			Driver.addScheduleGUI(result);
-		
+
 		}
-	
+
 	}
 
 
@@ -347,17 +347,16 @@ public class Driver {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals(MenuOptions.confirm)){
 					frame.dispose();
-					if(startUP != null){
-						startUP.showStartUp(true);
+					String data = FileHandler.getSavedStudentData();
+					if(data != null){
+						Driver.addScheduleGUI(new Schedule(data));
 					}
 					else{
-						String data = FileHandler.getSavedStudentData();
-						if(data != null){
-							Driver.addScheduleGUI(new Schedule(data));
-						}
-						else{
-							Driver.addScheduleGUI(new Schedule());
-						}
+						Driver.addScheduleGUI(new Schedule());
+
+					}
+					if(startUP != null){
+						startUP.showStartUp(true);
 					}
 				}
 

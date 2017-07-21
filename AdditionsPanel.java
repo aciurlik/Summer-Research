@@ -12,6 +12,8 @@ import javax.swing.SwingConstants;
 
 public class AdditionsPanel extends JPanel implements ActionListener{
 	/**
+	 * Blurb Written: 7/19/2017
+	 * Last Updated:  7/21/2017 
 	 *  This panel holds buttons for high-impact functionality that should
  	 * always be visible (as opposed to buttons being hidden in a menu, 
  	 * or only becoming visible after some other action).
@@ -145,5 +147,16 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 
 	}
+	/**
+	 * Recommended Testing
+	 * Go through and check to make sure each button gives the expected result.
+	 * 
+	 * Bounds Test: 
+	 * In addition when one adds a major/minor/track that should be removed from the 
+	 * list the next time that command in pressed. When all of either of these three have been 
+	 * added to the list the pop-up should display but give the user no viable choices. When one of 
+	 * these majors/minor/tracks is deleted from the RequirementList Panel it's name should reappear 
+	 * in the popUp add window. 
+	 */
 
 }

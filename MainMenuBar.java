@@ -46,28 +46,19 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		JMenu menu, submenu, subTwomenu;
 		JMenuItem menuItem;
 
-
-
-
-		//Create the menu bar.
-
-
+		
 		menu = new JMenu(MenuOptions.FurmanAdvantage);
 		
 		
 
 		submenu = new JMenu(MenuOptions.MayX);
 		menuItem = new JMenuItem(MenuOptions.exploreMayX);
-		JPopupMenu exploreMayXPopup = new JPopupMenu();
 		menuItem.addActionListener(this);
-		exploreMayXPopup.add(menuItem);
 		submenu.add(menuItem);
 
 
 		menuItem = new JMenuItem(MenuOptions.addMayX);
-		JPopupMenu addMayX = new JPopupMenu();
 		menuItem.addActionListener(this);
-		addMayX.add(menuItem);
 		submenu.add(menuItem);
 
 		menu.add(submenu);
@@ -76,27 +67,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		submenu = new JMenu(MenuOptions.StudyAbroad);
 
 		menuItem = new JMenuItem(MenuOptions.exploreStudyAway);
-		JPopupMenu exploreStudyAway = new JPopupMenu();
 		menuItem.addActionListener(this);
-		exploreStudyAway.add(menuItem);
 		submenu.add(menuItem);
 
 		menu.add(submenu);
 
 
 		menuItem = new JMenuItem(MenuOptions.addSummerClass);
-		JPopupMenu addSummer = new JPopupMenu();
 		menuItem.addActionListener(this);
-		addSummer.add(menuItem);
 		menu.add(menuItem);
 
 
 
 		menuItem = new JMenuItem(MenuOptions.exploreInternship);
-		JPopupMenu exploreInternship = new JPopupMenu();
 		menuItem.addActionListener(this);
-		exploreInternship.add(menuItem);
-		System.out.println(menu.getName());
+
+	
 		
 		menu.add(menuItem);
 		
@@ -113,11 +99,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		newSchedule = new JMenu(MenuOptions.newSchedule);
-		//newSchedule.setMnemonic(KeyEvent.VK_S);
+		
 		blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
-		JPopupMenu newBlank = new JPopupMenu();
 		blankSchedule.addActionListener(this);
-		newBlank.add(blankSchedule);
 		newSchedule.add(blankSchedule);
 
 
@@ -125,9 +109,8 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		String s = FileHandler.getSavedStudentData();
 
 		importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
-		JPopupMenu newLoaded = new JPopupMenu();
 		importPriorSchedule.addActionListener(this);
-		newLoaded.add(importPriorSchedule);
+		
 		if(s != null){
 			newSchedule.add(importPriorSchedule);
 
@@ -139,9 +122,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		menuItem = new JMenuItem(MenuOptions.openSchedule);
-		JPopupMenu openSched = new JPopupMenu(MenuOptions.newSchedule);
 		menuItem.addActionListener(this);
-		openSched.add(menuItem);
 		menu.add(menuItem);
 
 
@@ -149,30 +130,22 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 		menuItem = new JMenuItem(MenuOptions.saveSchedule);
-		JPopupMenu	saveSched = new JPopupMenu(MenuOptions.saveSchedule);
 		menuItem.addActionListener(this);
-		saveSched.add(menuItem);
 		menu.add(menuItem);
 
 
 
 		menuItem = new JMenuItem(MenuOptions.printSchedule);
-		JPopupMenu	printSched = new JPopupMenu(MenuOptions.printSchedule);
 		menuItem.addActionListener(this);
-		printSched.add(menuItem);
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem(MenuOptions.deleteSchedule);
-		JPopupMenu deleteSched = new JPopupMenu(MenuOptions.deleteSchedule);
 		menuItem.addActionListener(this);
-		deleteSched.add(menuItem);
 		menu.add(menuItem);
 
 
 		menuItem = new JMenuItem(MenuOptions.checkAllErrors);
-		JPopupMenu allErrors = new JPopupMenu(MenuOptions.checkAllErrors);
 		menuItem.addActionListener(this);
-		allErrors.add(menuItem);
 		menu.add(menuItem);
 
 		submenu = new JMenu(MenuOptions.loadPriorCourses);
@@ -184,9 +157,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		
 		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
 		menuItem.setActionCommand(MenuOptions.studentDnD);
-		JPopupMenu loadPrior = new JPopupMenu();
 		menuItem.addActionListener(this);
-		loadPrior.add(menuItem);
 		subTwomenu.add(menuItem);
 		
 		submenu.add(subTwomenu);
@@ -194,17 +165,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		subTwomenu = new JMenu(MenuOptions.advisor);
 		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
 		menuItem.setActionCommand(MenuOptions.advisorDnD);
-		JPopupMenu loadPriorAdvisor = new JPopupMenu();
 		menuItem.addActionListener(this);
-		loadPriorAdvisor.add(menuItem);
 		subTwomenu.add(menuItem);
 		submenu.add(subTwomenu);
 
 		
 		menuItem = new JMenuItem(MenuOptions.downloadcsv);
-		JPopupMenu csv = new JPopupMenu();
 		menuItem.addActionListener(this);
-		csv.add(menuItem);
 		subTwomenu.add(menuItem);
 		
 		

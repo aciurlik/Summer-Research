@@ -65,7 +65,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// of credit hours, and storedCoursesLeft stores the number of credit hours left.
 	private boolean usesCreditHours;
 	String name;
-	
+
 	// These stored fields are used to reduce computation time for expensive recursive methods.
 	private int originalNumberNeeded; //stores minMoreNeeded(emptyList)
 	private int storedNumberLeft; // this field is essentially a holder for passing data between 
@@ -73,8 +73,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	// an expensive recursive method, like minMoreNeeded, and tell this requirement to
 	// store the result to be used for display. When GUI classes display a requirement, 
 	// they use this field to determine how complete it is (using the getStoredXXXX methods).
-	
-	
+
+
 	public static int defaultCreditHours =4;
 
 
@@ -108,8 +108,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		this.numToChoose = numToChoose;
 	}
-	
-	
+
+
 	/////////////////////////
 	/////////////////////////
 	////Getters and setters
@@ -123,7 +123,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		this.recalcOriginalNumberNeeded();
 		this.storedNumberLeft = this.originalNumberNeeded;
 	}
-	
+
 	/**
 	 * This method should be called after all choices are added, so that 
 	 * we can check if your numToChoose is less than choices.size().
@@ -137,13 +137,13 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		recalcOriginalNumberNeeded();
 		this.storedNumberLeft = this.originalNumberNeeded;
 	}
-	
-	
-	
+
+
+
 	@SuppressWarnings("unused")
 	private boolean ______storedGetters_________;
 
-	
+
 	/**
 	 * Return a stored estimate of the number of courses this requirement still
 	 * needs in order to be complete. Automatically takes creditHours requirements
@@ -156,7 +156,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return storedNumberLeft;
 	}
-	
+
 	/**
 	 * Return the number needed - may be a number of courses or a number of
 	 * credit hours.
@@ -165,7 +165,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public int getStoredNumberLeft(){
 		return this.storedNumberLeft;
 	}
-	
+
 	public double getStoredPercentComplete(){
 		double result = (1.0 - (storedNumberLeft * 1.0/  this.originalNumberNeeded)); 
 		return result;
@@ -173,8 +173,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public boolean getStoredIsComplete(){
 		return this.storedNumberLeft <= 0;
 	}
-	
-	
+
+
 	/**
 	 * Return an estimate of the number of courses originally needed,
 	 * assuming each course is 4 credit hours.
@@ -195,7 +195,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public int getOriginalNumberNeeded(){
 		return this.originalNumberNeeded;
 	}
-	
+
 
 
 	public boolean usesCreditHours(){
@@ -229,8 +229,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	public String getName() {
 		return this.name;
 	}
-	
-	
+
+
 
 
 
@@ -268,8 +268,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 
-	
-	
+
+
 	//The following methods, until you reach minMoreNeeded(taken) , use MinMoreNeeded
 	// to do the recursive work.
 	/**
@@ -348,7 +348,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @param taken
 	 * @return
 	 */
-	
+
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
 		if(this.isTerminal()){
 			return this.getTerminal().minMoreNeeded(taken);
@@ -391,11 +391,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return result;
 		}
 		else{//this doesn't use credit hours
-			
+
 			//Special case for requirements of the form
 			// "5 of these, at least 3 like this"
 			// Requirements like this should calculate minMoreNeeded differently from normal.
-	
+
 			ArrayList<Requirement> isAtLeastRequirementPairs = atLeastRequirementPairs();
 			if(isAtLeastRequirementPairs.size() != 0){
 				Requirement superset = isAtLeastRequirementPairs.get(0);
@@ -435,7 +435,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				}
 				return result;
 			}
-			
+
 			//Look at each of your sub requirements, figure out how
 			// many each of them needs.
 			// Find the best numToChoose that you could pick, and
@@ -450,7 +450,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			for(int i = 0; i < numToChoose ; i ++){
 				result += otherNums.get(i);
 			}
-			
+
 			//Check if you planned any instances later out
 			for(ScheduleElement e : taken){
 				if(this.equals(e)){
@@ -461,8 +461,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return result;
 		}
 	}
-	
-	
+
+
 	public boolean isAtLeastRequirement(){
 		return !atLeastRequirementPairs().isEmpty();
 	}
@@ -476,19 +476,35 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 */
 	public ArrayList<Requirement> atLeastRequirementPairs(){
 		if(this.numToChoose == 2 && this.choices.size() == 2){
+
 			ArrayList<Requirement> choices = new ArrayList<Requirement>();
 			for(Requirement r : this.choices){
 				choices.add(r);
 			}
+			boolean swapNeeded = false;
 			if(choices.get(0).isSubset(choices.get(1))){
-				// 0 is a subset of 1
-				// so we put 0 second
-				Requirement holder = choices.get(0);
-				choices.set(0, choices.get(1));
-				choices.set(1, holder);
+				if(choices.get(1).isSubset(choices.get(0))){
+					//they're equal, so 
+					// the one with more to choose has to be the superset
+					if(choices.get(0).numToChoose<choices.get(1).numToChoose){
+						swapNeeded = true;
+					}
+					else{
+						swapNeeded = false;
+					}
+				}
+				else{
+					swapNeeded = true;
+				}
+				if(swapNeeded){
+					Requirement holder = choices.get(0);
+					choices.set(0, choices.get(1));
+					choices.set(1, holder);
+				}
 				return choices;
 			}
 			else if(choices.get(1).isSubset(choices.get(0))){
+
 				//1 is a subset of 0
 				// so we put 1 second
 				return choices;
@@ -498,7 +514,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Check if this requirement if just a nested list of 1 terminal, like
@@ -559,7 +575,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			return isSatisfiedBy(e.getPrefix());
 		}
 	}
-	
+
 	//INFINITELOOPHAZARD
 	/**
 	 * See if this prefix could ever possibly help this 
@@ -578,8 +594,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Check for equality.
 	 * 
@@ -636,10 +652,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return total;
 	}
-	
-	
-	
-	
+
+
+
+
 
 
 	/**
@@ -718,7 +734,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		return 0;
 
 	}
-	
+
 	/**
 	 * Check (while avoiding large computation times)
 	 * whether this requirement is obviously a subset of 
@@ -733,49 +749,34 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	 * @return
 	 */
 	public boolean isSubset(Requirement other){
-		
+
 		//To build a requirement's set of terminals, 
 		//first check if the requirement itself is a terminal, then
 		// (if it isn't) add each of its choices to the set of
 		// terminals. If any choice isn't a terminal, just stop computation.
-		
 		//build the set of the other's terminal requirements
 		HashSet<TerminalRequirement> othersSubreqs = new HashSet<TerminalRequirement>();
-		if(other.isTerminal()){
-			othersSubreqs.add(other.getTerminal());
-		}
-		else{
-			for(Requirement r : other.choices){
-				if(!r.isTerminal()){
-					return false;
-				}
-				else{
-					othersSubreqs.add(r.getTerminal());
-				}
-			}
-		}
+		other.addAllTerminalRequirements(othersSubreqs);
+		
 		//build the set of this's terminal requirements
 		HashSet<TerminalRequirement> thisSubreqs = new HashSet<TerminalRequirement>();
-		if(this.isTerminal()){
-			thisSubreqs.add(this.getTerminal());
-		}
-		else{
-			for(Requirement r : this.choices){
-				if(!r.isTerminal()){
-					return false;
-				}
-				else{
-					thisSubreqs.add(r.getTerminal());
-				}
-			}
-		}
-		
-		
+		this.addAllTerminalRequirements(thisSubreqs);
+
+
 		return othersSubreqs.containsAll(thisSubreqs);
 	}
 
+	
+	public void addAllTerminalRequirements(HashSet<TerminalRequirement> tReqs){
+		if(this.isTerminal()){
+			tReqs.add(this.getTerminal());
+			return;
+		}
+		for(Requirement r: this.choices){
+			r.addAllTerminalRequirements(tReqs);
+		}
 
-
+	}
 
 
 
@@ -787,7 +788,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	@SuppressWarnings("unused")
 	private boolean ___MethodsFromScheduleElement_________;
 
-	
+
 	@Override
 	/**
 	 * returns null unless this is an exact terminal requirement.
@@ -798,14 +799,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isDuplicate(ScheduleElement other) {
 		//We never want to throw duplicate errors for requirements,
 		// because you can schedule the same requirement many times.
 		return false;
 	}
-	
+
 
 
 	@Override
@@ -846,7 +847,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				if(this.isSubset(otherReq)){
 					result.add(otherReq);
 				}
-				*/
+				 */
 			}
 		}
 		return result;
@@ -865,12 +866,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	private boolean ___StringMethods_________;
 
 
-	
+
 	//////
 	////// String methods from Schedule Element
 	//////
-	
-	
+
+
 	@Override
 	public String getDisplayString() {
 		StringBuilder result = new StringBuilder();
@@ -884,7 +885,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 					")");
 			return result.toString();
 		}
-		
+
 		//if you've got an atLeast requirement, the order matters,
 		// so we can't just use recursePrintOn.
 		if(this.isAtLeastRequirement()){
@@ -896,7 +897,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			result.append(subset.getDisplayString());
 			return result.toString();
 		}
-		
+
 		//Otherwise, we can just use recursePrintOn.
 		String[] startMidEnd = syntaxSugars();
 		recursePrintOn(s -> result.append(s), r -> r.getDisplayString(), 
@@ -905,7 +906,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				startMidEnd[2]);
 		return result.toString();
 	}
-	
+
 	/**
 	 * Helper method for recursive string methods.
 	 * Return a list of the start, divider, and end strings for
@@ -928,8 +929,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		if(this.usesCreditHours){
 			return new String[]{numToChoose + " credit hours of (" , ", " , ")"};
 		}
-		
-		
+
+
 		//The next few cases use englishResult
 		// because they all have similar behavior with inner parenthesis.
 		// If you need to make a string like 
@@ -963,18 +964,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			return englishResult;
 		}
-		
-		
+
+
 		//TODO remove this to speed things up, its an expensive debug check.
 		if(this.isAtLeastRequirement()){
 			throw new RuntimeException("Should not use syntax sugar method for atLeast "
 					+ "requirements - they need to know subchoice order");
 		}
-		
+
 		//default case
 		return new String[]{numToChoose + " of (" ,", ",")"};
 	}
-	
+
 	private boolean syntaxSugarNeedsInnerParenthesis(){
 		for(Requirement r : choices){
 			if(!r.isTerminal()){
@@ -986,7 +987,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return false;
 	}
-	
+
 
 	@Override
 	/**
@@ -1016,14 +1017,14 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		// or from popups.
 		ArrayList<Requirement> reqPairs = atLeastRequirementPairs();
 		if(!reqPairs.isEmpty()){
-			return reqPairs.get(1).shortString(preferredLength);
+			return reqPairs.get(0).shortString(preferredLength);
 		}
-		
+
 		//Now comes the actual attempt to reduce characters.
 		StringBuilder builtResult = new StringBuilder();
 		String[] sugars = syntaxSugars();
-		
-		
+
+
 		//Reduce the length of the given sugars
 		// then check if you're short enough.
 		String replacementFirst = sugars[0];
@@ -1032,18 +1033,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		String replacementMid = ",";
 		String replacementEnd = sugars[2];
-		
+
 		sugars[0] = replacementFirst;
 		sugars[1] = replacementMid;
 		sugars[2] = replacementEnd;
 
 		final int recursivePreferredLength = 
 				( 
-				  preferredLength 
-				  - sugars[0].length() 
-				  - sugars[2].length() 
-				  - (this.choices.size() - 1) * sugars[1].length()
-				) / choices.size();
+						preferredLength 
+						- sugars[0].length() 
+						- sugars[2].length() 
+						- (this.choices.size() - 1) * sugars[1].length()
+						) / choices.size();
 		recursePrintOn(s -> builtResult.append(s), r -> r.shortString(recursivePreferredLength),
 				sugars[0],
 				sugars[1],
@@ -1062,12 +1063,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return builtResult.toString();
 	}
-	
+
 	///
 	/// Other string methods
 	///
-	
-	
+
+
 	@Override
 	public String toString(){
 		return this.getDisplayString();
@@ -1077,18 +1078,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		StringBuilder result = new StringBuilder();
 		//http://www.furman.edu/academics/academics/majorsandminors/Pages/default.aspx
 		result.append(
-				    "This text shows, in as much detail as possible, how this requirement "
-				+ "\n  works within this program. "
-				+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
-				+ "\n  website for another explanation of the requirement."
-				+ "\n\n");
+				"This text shows, in as much detail as possible, how this requirement "
+						+ "\n  works within this program. "
+						+ "\nIf the text doesn't make sense, ask an advisor or check out the Furman "
+						+ "\n  website for another explanation of the requirement."
+						+ "\n\n");
 		result.append(this.getDisplayString());
 		return indent(result.toString(), "   ");
 	}
 
 
-	
-	
+
+
 	/**
 	 * Turn the save string of this requirement into something you might
 	 * see from eclipse, with nice spacing and a limit on line length.
@@ -1098,8 +1099,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		String tab = "  ";
 		return indent(this.saveString(), tab);
 	}
-	
-	
+
+
 	/**
 	 * Indents using default ( and ) as open and closing parens.
 	 * @param s
@@ -1127,7 +1128,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		for(char c : s.toCharArray()){
 			stack.addLast(c);
 		}
-		
+
 		while(!stack.isEmpty()){
 			char c = stack.pop();
 			if(openParens.contains(c)){
@@ -1143,7 +1144,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			}
 			else if(closeParens.contains(c)){
 				depth --;
-				
+
 				//newline
 				result.append("\n");
 				lineLength = 0;
@@ -1151,9 +1152,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 					result.append(tab);
 					lineLength += tab.length();
 				}
-				
+
 				result.append(c);
-				
+
 				//newline
 				result.append("\n");
 				lineLength = 0;
@@ -1198,8 +1199,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		return result.toString();
 	}
-	
-	
+
+
 	///
 	/// String methods for saving / reading
 	///
@@ -1314,8 +1315,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		recursePrintOn(s -> result.append(s), r -> r.saveString(), "(", ", ", ")");
 		return result.toString();
 	}
-	
-	
+
+
 	//INFINITELOOPHAZARD
 	/**
 	 * Recursively applies func to each of choices, and appends to out as 
@@ -1340,7 +1341,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 		}
 		printFunction.accept(end);
 	}
-	
+
 
 	//INFINITELOOPHAZARD
 	/**
@@ -1472,18 +1473,18 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			throw new RuntimeException("readFromFurmanPrereqs in Requirement is not fully implemented yet");
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	@SuppressWarnings("unused")
 	private boolean ___Testing_________;
 
 
-	
+
 	public static void testStringDisplays(){
 		String[] tests = new String[]{
 				"(MTH 110)",
@@ -1500,7 +1501,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"2 of (MTH 110, MTH 120)",
 				"3 of (MTH 110, MTH 120, MTH 130)",
 				"1 of (MTH 110, MTH 120)",
-				
+
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, MTH 160)",
 				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
 				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
@@ -1513,9 +1514,10 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				"(1 of MTH>100)",
 				"1 of MTH>100",
 				"4 of MTH>100",
-				"1 of MTH > 300"
+				"1 of MTH > 300", 
+				"2 of (1 of (2 of (MTH-151, MTH-334, MTH-121)), 4 of (MTH-151, MTH-334, MTH-121, MTH-335, MTH-721, MTH-4821))"
 		};
-		
+
 		int testNum = 0;
 		for(String s : tests){
 			System.out.println("Test number " + testNum);
@@ -1525,7 +1527,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			testStrings(r, true);
 			System.out.println("\n\n");
 		}
-		
+
 		String[][] namedTests = {
 				{"ART < 150 > 300", "Western art"},
 				{"ART > 150 < 300", "Western art"},
@@ -1551,8 +1553,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			testStrings(r, true);
 			System.out.println("\n\n");
 		}
-		
-		
+
+
 	}
 	private static void testStrings(Requirement r, boolean autoPrint){
 		if(autoPrint){
@@ -1653,7 +1655,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 
-	
+
 
 
 	public static void main(String[] args){

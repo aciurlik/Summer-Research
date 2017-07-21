@@ -29,8 +29,8 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	 * Blurb Written: 7/19/2017
 	 * Last Updated:  7/19/2017
 	 * 
-	 * This is the graphic at the bottom, west side of the ScheduleGUI. It consists of Image of the bellTower loaded from the FileHandler
-	 *  It fills with purple (the rectangle is placed on top of the image) the  as the user
+	 * This is the graphic at the bottom, west side of the ScheduleGUI. It consists of Image of the BellTower loaded from the FileHandler
+	 * It fills with purple (the rectangle is placed on top of the image) the  as the user
 	 * fulfills his/her requirements. (Roughly represents the percentage done)
 	 * When all the requirements are considered satisfied (and the user has at least one major
 	 * in his/her schedule) the bellTower will display a message describing all of the current user
@@ -40,31 +40,22 @@ public class BellTower extends JPanel implements java.io.Serializable{
 
 	public BellTower(Schedule sch) {
 		super();
+		this.sch=sch;
 		wasComplete = false;
 
 
 		layerPanel = new JPanel();
-		
-		
 		bellTowerIcon = FileHandler.makeBellTower();
-		
-		
-		
+
 		fireworkIcon = FileHandler.makeFireWorks();
 		pictureLabel = new JLabel(fireworkIcon);
-		
-		
-		
-		
-		this.sch= sch;
+
+		//Belltower icon and scaling
 		int givenHeight = 300;
 		int givenWidth =100;
-		
-		//Belltower icon and scaling
 		Image image = bellTowerIcon.getImage();
 		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
 		bellTowerIcon = new ImageIcon(newImage);
-
 		belltowerLabel = new JLabel(bellTowerIcon);
 		belltowerLabel.add(layerPanel);
 
@@ -72,8 +63,11 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		this.setPreferredSize(new Dimension(100, 300));
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 	}
-
-
+	
+	/**
+	 * Allows the BellTower to change with the schedule attached to the current scheduleGUI.  
+	 * @param s
+	 */
 	public void setSchedule(Schedule s){
 		this.sch=s;
 	}
@@ -92,7 +86,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		layerPanel.setLocation(0, bellTowerIcon.getIconHeight()-newHeight);
 		layerPanel.setBackground(FurmanOfficial.officialAlpha);
 
-		
+
 		//If you complete all the requirements in your schedule and have at least one major a popup will give you either
 		//a list of errors that are still present in your schedule, or a some fireworks of congrats if your schedule is perfect
 		boolean nowComplete = sch.isComplete(); //This method checks errors and Major>1
@@ -112,8 +106,18 @@ public class BellTower extends JPanel implements java.io.Serializable{
 				}
 			}
 		}
-		
+
 	}
+	
+	/**
+	 * Test cases:
+	 * The BellTower should rise in accordance with the percentage of requirements selected.
+	 * Once all the requirements are completed, and at least one major is added a popup should either
+	 * display all of the errors still existing in the schedule, and then give major notes. If there
+	 * are no errors present then the bellTower should display festive fireworks. Once the schedule is 
+	 * deemed complete the popup should not reappear unless the user alters thier schedule so it becomes incomplete
+	 * and then complete once again.  
+	 */
 }
 
 

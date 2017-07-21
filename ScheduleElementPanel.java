@@ -188,10 +188,6 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	}
 
 
-	/*void dndDone(){
-		System.out.println("hi");
-	}
-	 */
 
 
 
