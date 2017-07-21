@@ -306,7 +306,8 @@ public class Driver {
 
 	public static void main(String[] args){
 		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.		Color c = FurmanOfficial.grey;
+		// will be set before other static code gets run.		
+		Color c = FurmanOfficial.grey;
 
 
 
@@ -351,9 +352,7 @@ public class Driver {
 						Driver.addScheduleGUI(new Schedule(data));
 					}
 					else{
-<
 						Driver.addScheduleGUI(new Schedule());
-
 					}
 					if(startUP != null){
 						startUP.showStartUp(true);
