@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -30,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -122,6 +124,59 @@ public class FileHandler{
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Was not able to save the loaded data");
 		}
+	}
+	
+	/**
+	 * Return the loaded data, or else null.
+	 * No error checks
+	 * @return
+	 */
+	public static String[][] importCSVStudentData(){
+		JFileChooser fc = new JFileChooser(
+				Paths.get(".").toAbsolutePath().normalize().toString()){
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean accept(File f){
+				return f.isDirectory() || (f.isFile() && ".csv".equals(getExtension(f)));
+			}
+		};
+		int userChoice = fc.showOpenDialog(null);
+		javax.swing.filechooser.FileFilter f = new javax.swing.filechooser.FileFilter(){
+			@Override
+			public boolean accept(File f){
+				return f.isFile() && ".csv".equals(getExtension(f));
+			}
+			@Override
+			public String getDescription() {
+				return "csv files";
+			}
+		};
+		fc.addChoosableFileFilter(f);
+		fc.setFileFilter(f);
+		if(userChoice != JFileChooser.APPROVE_OPTION){
+			return null;
+		}
+		File file = fc.getSelectedFile();
+		ArrayList<String> fullString = FileHandler.fileToStrings(file);
+		String[][] result = new String[fullString.size()][];
+		for(int i = 0; i < fullString.size() ; i ++){
+			ArrayList<String> splitLine = SaverLoader.parseCSVLine(fullString.get(i));
+			result[i] = splitLine.toArray(new String[splitLine.size()]);
+		}
+		return result;
+
+	}
+	
+	public static String getExtension(File f){
+		if(!f.isFile()){
+			return null;
+		}
+		String name = f.getName();
+		int i = name.lastIndexOf('.');
+		if(i == -1){
+			throw new RuntimeException("File " + name + " has no extension");
+		}
+		return name.substring(i);
 	}
 
 	
