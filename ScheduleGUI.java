@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -1059,7 +1060,6 @@ public class ScheduleGUI{
 
 
 
-	String importResult;
 	final String successText = "You're all set! The import went smoothly.";
 	public void importPriorCourses(boolean isStudent){
 		String importText;
@@ -1086,8 +1086,10 @@ public class ScheduleGUI{
 
 		JTextArea importArea = new JTextArea(importText);
 
-		JButton validate = new JButton("Validate");
 
+
+		//Validate button
+		JButton validate = new JButton("Validate");
 		validate.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
@@ -1095,166 +1097,129 @@ public class ScheduleGUI{
 				if(successText.equals(givenText)){
 					return;
 				}
-				boolean success = trySetStudentData(givenText);
-				if(success){
+				try{
+					trySetStudentDataFromWebsite(givenText);
 					importArea.setText(successText);
-				}
-				else{
-					String errorText;
-					if(isStudent){
-						errorText = "Something went wrong with the import. \n"
-								+ "\nBe sure that you found your unofficial transcript on"
-								+ "\n  myFurman, and that you hilighted the data from your"
-								+ "\n  ID-Name to your GPA (and no more) ";
-					}
-					else{
-						errorText = "Something went wrong with the import. \n"
-								+ "\nBe sure that you found the student's course credit summary on"
-								+ "\n  myFurman, and that you hilighted the data from the student's"
-								+ "\n  ID-Name to thier GPA (and no more) ";
 
-					}
-					importArea.setText(errorText);
+				}catch(Exception except){
+					importArea.setText("Please try your import again");
+					showImportException(except);
+
 				}
 			}
-		});
+		}); //end action listener
+
+
+		/* showInstructions button
+		JButton showInstructions = new JButton("Show Instructions");
+		showInstructions.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+
+			}
+		});*/
+
+
+
+		//Make the popup
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
 		p.add(new JScrollPane(importArea), BorderLayout.SOUTH);
-		p.add(validate, BorderLayout.WEST);
+		p.add(validate, BorderLayout.NORTH);
+		JOptionPane.showOptionDialog(null,p, "Import your schedule",
+				JOptionPane.CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
+	}
 
-		int chosen = JOptionPane.showOptionDialog(null,p, "Import your schedule",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
-		if(chosen == JOptionPane.OK_OPTION){
-			try{
-				if(importResult == null){
-					trySetStudentData(importArea.getText());
-				}
-				System.out.println(importResult);
-				this.sch.readPrior(importResult);
-				FileHandler.writeStudentData(importResult);
-				this.update();
-
-			}catch(Exception e){
-				e.printStackTrace();
+	public void showImportException(Exception e){
+		String errorText = "";
+		if(e.getMessage() == null){
+			errorText = "Something very unexpected happened with your import, we're not sure what went wrong. \n";
+			for(StackTraceElement element: e.getStackTrace()){
+				errorText += element + "\n";
 			}
 		}
+		else{
+			errorText = "Something went wrong with the import: "
+					+ "\n" + e.getMessage();
+			if(FurmanOfficial.masterIsAround){
+				errorText += "\n\n";
+				for(StackTraceElement element: e.getStackTrace()){
+					errorText += element + "\n";
+				}
+			}
+		}
+		JScrollPane scroll = new JScrollPane(new JTextArea(errorText));
+		scroll.setPreferredSize(new Dimension(300,300));
+		JOptionPane.showMessageDialog(null,scroll , "Import error ", JOptionPane.ERROR_MESSAGE);
 	}
 	/**
-	 * Find the student data hidden in text.
-	 * if it works, set importResult to the student data.
-	 * if there are obvious issues, set importResult to the issue.
+	 * Try to:
+	 * 		Find the student data hidden in text.
+	 * 		Test the data on an actual schedule
+	 * 		use the data on this schedule
+	 * 		write the data to the save file
+	 * 
+	 * If anything goes wrong, call showImportException.
 	 * 
 	 * text should be the text of the import textArea after the user has dragged in
 	 * some data.
+	 * 
 	 * @param text
 	 * @return
 	 */
-	public boolean trySetStudentData(String text){
 
-		//First, find the index of the ID/Name.
-		Matcher idMatch = Pattern.compile("\\d{5,20}").matcher(text); //at least 5 digits from the ID 
-		//(this prevents matching on years or other digits in the text, and gives an unambiguous
-		// start to the string.
-		if(!idMatch.find()){
-			importResult = "We couldn't find your ID number in the text.";
-			return false;
-		}
-
-		//put startIndex in a location where the next instance of 'course'
-		// can only be a column header.
-		int startIndex = idMatch.start();
-		int advisorSkipLineIndex = text.indexOf("Download course", startIndex);
-		if(advisorSkipLineIndex != -1){
-			startIndex = text.indexOf("\n", advisorSkipLineIndex) + 1;
-		}
-		text = text.substring(startIndex);
-
-		//Find the first column header, either "Course/Section and Title" or "course" depending on advisor view or student view.
-		Matcher headersStartMatcher = Pattern.compile("Course/Section and Title|course").matcher(text);
-		if(!headersStartMatcher.find()){
-			importResult = "We couldn't find the table headers in the text"
-					+ "\n We're looking for a table where the first column is either"
-					+ "\n 'Course/Section and Title' or 'course.' If you don't see that, "
-					+ "\n you may be on the wrong page. Make sure you're at your unofficial transcript!";
-			return false;
-		}
-		int headersStart = headersStartMatcher.start();
-
-		//Find last column header, which is always 'global awareness'.
-		int headersEnd = text.indexOf("global awareness", headersStart);
-		if(headersEnd == -1){
-			importResult = "We couldn't find the last column 'global awareness' in the text "
-					+ "\n   if the last column doesn't say 'global awareness', "
-					+ "\n   then you may be on the wrong page. Make sure you're at your unofficial transcript!";
-			return false;
-		}
-		headersEnd += 16; // go to the end, but don't include the newline 
-		// (we don't want to think there are more headers than there actually are.)
-		String[] headers = text.substring(headersStart, headersEnd).split("\t");
-		if(headers.length < 2){
-			headers = text.substring(headersStart, headersEnd).split("\n");
-		}
+	public void trySetStudentDataFromWebsite(String text){
 
 
-		int numCols = headers.length;
-
-		int dataStart = headersEnd + 1; //add the newline
-		int dataEnd = text.indexOf("Total Earned Credits");
-		if(dataEnd == -1){
-			importResult = "We couldn't find your GPA in the text"
-					+ "\n Be sure to highlight all the data including your GPA! ";
-			return false;
-		}
-
-
-		StringBuilder result = new StringBuilder();
-		for(int i = 0; i < headers.length - 1 ; i ++){
-			result.append(headers[i].trim() + "\t");
-		}
-		result.append(headers[headers.length - 1]);
-		result.append("\n");
-
-		String[] data = text.substring(dataStart, dataEnd).split("\n");
-		int numDataRows = data.length / numCols;
-		for(int i = 0; i < numDataRows * numCols ; i ++){
-			result.append(data[i]);
-			result.append("\n");
-		}
-		String saveString = result.toString();
-
-
+		PriorData d = new PriorData();
 		try{
-			new Schedule(saveString); //this schedule will read from the prior.
-			importResult = saveString;
-			return true;
+			d.readFromWebsiteDraggedData(text);
+			new Schedule(d); //this actually tests the data out in practice.
+			this.sch.readPrior(d);
+			FileHandler.writeStudentData(d);
+			this.update();
 		}
 		catch(Exception e){
-			e.printStackTrace();
-			importResult = "";
-			for(StackTraceElement element : e.getStackTrace()){
-				importResult += "\n" + element;
-			}
-			importResult += "\n Message: " + e.getMessage();
-			importResult += "\n\n\nSomething went wrong with the import:"
-					+ "\nOur coders didn't make any plans for this error,\n"
-					+ "the details are displayed above.";
-			return false;
+			showImportException(e);
+			this.update();
 		}
 	}
 
 
 
-
-
-
-
-
-
-
-
-
-
+	/**
+	 * Try to use the csv data:
+	 * 		on a test schedule
+	 * 		to load courses into the current schedule
+	 * 		saved the data to a file
+	 * 
+	 * if anything goes wrong, call showImportException.
+	 * 
+	 */
+	public void tryImportPriorCoursesViaFile(){
+		PriorData d = new PriorData();
+		try{
+			String[][] data = FileHandler.importCSVStudentData();
+			if(data == null){
+				//the user canceled.
+				return;
+			}
+			d.readFromCSV(data);
+			new Schedule(d); //this actually tests the data out in practice.
+			this.sch.readPrior(d);
+			FileHandler.writeStudentData(d);
+			this.update();
+		}
+		catch(Exception e){
+			showImportException(e);
+			this.update();
+		}
+	}
 }
+
+
+
+
 
 
 

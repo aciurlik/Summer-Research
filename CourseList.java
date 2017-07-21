@@ -2,7 +2,6 @@
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
@@ -20,8 +19,8 @@ public class CourseList implements java.io.Serializable  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
-
-
+	
+	
 	public static final int defaultCreditHours = 4;
 	public static final boolean nwAndNwlAreOne = true; //for Dr. Bouzarth
 
@@ -31,6 +30,7 @@ public class CourseList implements java.io.Serializable  {
 	static Hashtable<String, String> savedPrereqMeanings;
 	public static Hashtable<String, HashSet<Prefix>> GERRequirements;
 	public static HashSet<String> languagePrefix;
+
 	public static HashMap<Prefix, Requirement> flPrereqs;
 
 
@@ -79,6 +79,7 @@ public class CourseList implements java.io.Serializable  {
 
 
 
+
 	public static void loadAllCourses(){
 		String [] lp = {"FRN", "LTN", "SPN", "GRK", "GRM", "CHN", "JPN"};
 		languagePrefix = new HashSet<String>();
@@ -117,14 +118,9 @@ public class CourseList implements java.io.Serializable  {
 		if(p == null){
 			return null;
 		}
-
 		String originalRequirementString = rawPrereqs.get(p);
 		if(originalRequirementString == null){
 			return null;
-		}
-
-		if(flPrereqs.containsKey(p)){
-			return flPrereqs.get(p);
 		}
 		String ourVersion = savedPrereqMeanings.get(originalRequirementString);
 		if(ourVersion == null){
@@ -169,23 +165,23 @@ public class CourseList implements java.io.Serializable  {
 			result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 			return result;
 		}
-
+		
 
 		return Requirement.readFrom(ourVersion);
 	}
 
-
-	/**
-	 * Used to tell if the prereq should include a placement into the course, currently used for FL. 
-	 * @param p
-	 * @return true if it should include, false otherwise. 
-	 */
+	
+/**
+ * Used to tell if the prereq should include a placement into the course, currently used for FL. 
+ * @param p
+ * @return true if it should include, false otherwise. 
+ */
 	public static boolean isPlaceableCourse(Prefix p){
 		if(languagePrefix.contains(p.getSubject())){
 			return true;
 		}
 		return false;
-
+		
 	}
 
 
@@ -573,7 +569,7 @@ public class CourseList implements java.io.Serializable  {
 		Requirement wc = m.getRequirement("WC");
 		Requirement ne = m.getRequirement("NE");
 		RequirementGraph.putEdge(wc, ne);
-
+		
 		//sort the GER list
 		String[] beforeNW = {"FYW", "WR"};
 		String[] afterNW = {"HB","HA","TA","VP","MR","FL","UQ","MB","NE", "WC"};
@@ -590,8 +586,8 @@ public class CourseList implements java.io.Serializable  {
 			m.removeRequirement(holder);
 			m.addRequirement(holder);
 		}
-
-
+		
+		
 
 		m.setChosenDegree(majorType);
 		return m;
@@ -727,10 +723,10 @@ public class CourseList implements java.io.Serializable  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
-
+		
 		String[] languages = {"GRK", "LTN", "JPN", "FRN", "SPN", "CHN", "GRK"};
 		String subj = "";
-
+		
 		//if you've got a prefix like FRN-201, and it's greater than or equal to
 		// standard, then add it to the list of requirements.
 		if (languagePrefix != null){
@@ -741,7 +737,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 			r.addChoice(TerminalRequirement.readFrom(subj + ">=" + number));
 		}
-
+		
 		//For every language that isn't the same as your languagePrefix, add the standard requirement.
 		for(String language : languages){
 			if(!language.equals(subj)){
@@ -749,7 +745,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 
 		}
-
+		
 		return r;
 	}
 
@@ -901,9 +897,12 @@ public class CourseList implements java.io.Serializable  {
 	public static void main(String[] args){
 		//setPrereqMeaning("PSY-202 or BIO-222", "(PSY-202, BIO-222 )");
 		//setPrereqMeaning("PSY-201 or BIO-222", "(PSY-201, BIO-222 )");
+
 		//viewKnownPrereqs();
 	
 		//LanguageSequencePreReqandPlacementLevels();
+
+		viewKnownPrereqs();
 
 
 	}

@@ -306,8 +306,7 @@ public class Driver {
 
 	public static void main(String[] args){
 		//This just loads FurmanOfficial into memory so that the UIManager
-		// will be set before other static code gets run.
-		Color c = FurmanOfficial.grey;
+		// will be set before other static code gets run.		Color c = FurmanOfficial.grey;
 
 
 
@@ -317,7 +316,7 @@ public class Driver {
 		if(start == null){
 			//this will close any running code, including the JOptionPanes which don't get collected by 
 			// the garbage collector for some reason.
-			System.exit(0);
+{			System.exit(0);
 			return;
 		}*/
 
@@ -347,16 +346,18 @@ public class Driver {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals(MenuOptions.confirm)){
 					frame.dispose();
-					String data = FileHandler.getSavedStudentData();
+					PriorData data = FileHandler.getSavedStudentData();
 					if(data != null){
 						Driver.addScheduleGUI(new Schedule(data));
 					}
 					else{
+<
 						Driver.addScheduleGUI(new Schedule());
 
 					}
 					if(startUP != null){
 						startUP.showStartUp(true);
+
 					}
 				}
 

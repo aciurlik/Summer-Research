@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -29,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -99,13 +102,13 @@ public class FileHandler{
 		
 	}
 	
-	public static String getSavedStudentData(){
+	public static PriorData getSavedStudentData(){
 		File f = new File(studentDataFile);
 		if(!f.exists()){
 			return null;
 		}
 		try{
-			return FileHandler.fileToString(new File(studentDataFile));
+			return (PriorData)FileHandler.readObjectFromFile(studentDataFile);
 		}
 		catch(Exception e){
 			JOptionPane.showMessageDialog(null, "There was an issue loading your saved student data");
@@ -114,8 +117,66 @@ public class FileHandler{
 		}
 	}
 	
-	public static void writeStudentData(String s){
-		FileHandler.saveToFile(studentDataFile, s);
+	public static void writeStudentData(PriorData d){
+		try{
+			FileHandler.saveObjectToFile(studentDataFile, d);
+		}catch(IOException e){
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Was not able to save the loaded data");
+		}
+	}
+	
+	/**
+	 * Return the loaded data, or else null.
+	 * No error checks
+	 * @return
+	 */
+	public static String[][] importCSVStudentData(){
+		JFileChooser fc = new JFileChooser(
+				Paths.get(".").toAbsolutePath().normalize().toString()){
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean accept(File f){
+				return f.isDirectory() || (f.isFile() && ".csv".equals(getExtension(f)));
+			}
+		};
+		int userChoice = fc.showOpenDialog(null);
+		javax.swing.filechooser.FileFilter f = new javax.swing.filechooser.FileFilter(){
+			@Override
+			public boolean accept(File f){
+				return f.isFile() && ".csv".equals(getExtension(f));
+			}
+			@Override
+			public String getDescription() {
+				return "csv files";
+			}
+		};
+		fc.addChoosableFileFilter(f);
+		fc.setFileFilter(f);
+		if(userChoice != JFileChooser.APPROVE_OPTION){
+			return null;
+		}
+		File file = fc.getSelectedFile();
+		ArrayList<String> fullString = FileHandler.fileToStrings(file);
+		String[][] result = new String[fullString.size()][];
+		for(int i = 0; i < fullString.size() ; i ++){
+			ArrayList<String> splitLine = SaverLoader.parseCSVLine(fullString.get(i));
+			result[i] = splitLine.toArray(new String[splitLine.size()]);
+		}
+		return result;
+
+	}
+	
+	public static String getExtension(File f){
+		if(!f.isFile()){
+			return null;
+		}
+		String name = f.getName();
+		int i = name.lastIndexOf('.');
+		if(i == -1){
+			throw new RuntimeException("File " + name + " has no extension");
+		}
+		return name.substring(i);
 	}
 
 	
@@ -169,22 +230,17 @@ public class FileHandler{
 	public static Schedule openSchedule(){
 		String chosenSched = chooseSchedule("open");
 		if(chosenSched !=null){
-
-			try(FileInputStream fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched); ObjectInputStream ois = new ObjectInputStream(fis);) {
+			try(FileInputStream fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
+					ObjectInputStream ois = new ObjectInputStream(fis);) {
 				Schedule result = (Schedule) ois.readObject();
 				ois.close();
 				return result;
-
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-
 			}
-
-
 		}
 		return null;
-
 	}
 
 
@@ -200,33 +256,25 @@ public class FileHandler{
 					String newName = (String)JOptionPane.showInputDialog(popUP, "Please choose a different name for your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
 					fileName=newName;
 				}
-
-
 			}
-
-
 		}
 		if(fileName != null){
-
-
-			try( FileOutputStream saveFile = new FileOutputStream(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser"); 
-					ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
-
-
-				save.writeObject(sch);	
-				save.close();
-				saveFile.close();
-
-			} catch (IOException e) {
+			try{
+				saveObjectToFile(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser", sch);
+			}catch (IOException e) {
 				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(popUP, "This schedule was not able to be saved. ");
 				e.printStackTrace();
-
 				System.out.println(e.getLocalizedMessage());
 			}
-
 		}
 	}
+	
+	
+	
+	
+	
+	
 	private static void saveToFile(String fileName, String data){
 		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
 			b.write(data);
@@ -235,6 +283,26 @@ public class FileHandler{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
+		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
+				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
+			save.writeObject(data);	
+			save.close();
+			saveFile.close();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+	
+	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
+		try(FileInputStream fis = new FileInputStream(fileName);
+				ObjectInputStream ois = new ObjectInputStream(fis);) {
+			Object result = ois.readObject();
+			ois.close();
+			return result;
+		}
 	}
 
 	public static ArrayList<String> getScheduleNames(String FolderName){
@@ -494,6 +562,7 @@ public class FileHandler{
 		SettingsPanel sp = new SettingsPanel();
 		
 	}
+	
 
 
 	

@@ -77,7 +77,7 @@ public class Schedule implements java.io.Serializable {
 
 	
 	
-	public Schedule(String priorCourses){
+	public Schedule(PriorData priorCourses){
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
 
@@ -151,188 +151,16 @@ public class Schedule implements java.io.Serializable {
 		this.setCLP(10);
 	}
 
-	/**
-	 * Read in the info from Furman's text string, copied from myFurman.
-	 * Sets language prefix, first semester and creates prior semester,
-	 * 
-	 * 
-	 * s should be in the form 
-	 * 
-	 * colmName \t colmName \t colmName \t ...
-	 * r1c1
-	 * r1c2
-	 * r1c3
-	 * .
-	 * .
-	 * .
-	 * r2c1
-	 * r2c2
-	 * .
-	 * .
-	 * .
-	 * rncn
-	 * 
-	 * @param s
-	 */
-	public void readPrior(String s){
+
+	public void readPrior(PriorData pd){
 		
-		String[] lines = s.split("\n");
-		String[] headers = lines[0].split("\t");
-		
-		
-		//find the indices for the headers that we care about
-		int termIndex = -1;
-		int courseStringIndex = -1;
-		int creditsIndex = -1;
-		int gradeIndex = -1;
-		for(int i = 0; i < headers.length ; i ++){
-			if(headers[i].equals("term")){
-				termIndex = i;
-			}
-			else if(headers[i].toUpperCase().contains("COURSE")){
-				courseStringIndex = i;
-			}
-			else if(headers[i].toUpperCase().contains("CREDITS")){
-				creditsIndex = i;
-			}
-			else if (headers[i].toUpperCase().equals("GRADE")){
-				gradeIndex = i;
-			}
-		}
-		
-		if(termIndex == -1){
-			throw new RuntimeException("Course-term column not found" + Arrays.toString(headers));
-		}
-		if(courseStringIndex == -1){
-			throw new RuntimeException("subject and section column not found" + Arrays.toString(headers));
-		}
-		if(creditsIndex == -1){
-			throw new RuntimeException("Course-credits column not found" + Arrays.toString(headers));
-		}
-		if(gradeIndex == -1){
-			throw new RuntimeException("Course grade column not found" + Arrays.toString(headers));
-		}
-		
+		currentSemester = pd.getLatestDate();
+		setFirstSemester(pd.getEarliestDate());
+
 
 		
-		int row = 0;
-		int numCols = headers.length;
-		
-		//First, go through the data and 
-		// find freshman year (the earliest found date),
-		// and current semester (the latest found date).
-		//so we can add the correct semesters to the schedule.
-		SemesterDate earliestDate = new SemesterDate(100000,1);
-		SemesterDate latestDate = new SemesterDate(0, 1);
-		for(; (row+1) * numCols - 1 < lines.length ; row ++){
-			int startIndex = row * numCols + 1;
-			String termString = lines[startIndex + termIndex];
-			SemesterDate takenDate = null;
-			try{
-				takenDate = SemesterDate.readFromFurman(termString);
-			} catch(Exception e){
-				takenDate = SemesterDate.fromFurman(termString);
-			}
-			if(takenDate != null){
-				if(takenDate.compareTo(earliestDate) < 0){
-					earliestDate = takenDate;
-				}
-				else if(takenDate.compareTo(latestDate) > 0){
-					latestDate = takenDate;
-				}
-			}
-		}
-		currentSemester = latestDate;
-		setFirstSemester(earliestDate);
-
-
-		//Add each of the prior courses to the schedule
-		// skip the course if an error occurs.
-		row = 0;
-		ArrayList<Course> priorCourses = new ArrayList<Course>();
-		for(; (row + 1) * numCols  - 1< lines.length ; row ++){
-			try{
-				//Collect relevant string data
-				int startIndex = row * numCols + 1;
-				String courseString = lines[startIndex + courseStringIndex].trim();
-				String creditsString = lines[startIndex + creditsIndex].trim();
-				String termString = lines[startIndex + termIndex].trim();
-				String gradeString = lines[startIndex + gradeIndex].trim();
-
-				//Turn the strings into objects
-
-				//Prefix, title, and section number
-				String title = null;
-				String section = null;
-				int firstSpace = courseString.indexOf(" ");
-				String prefixString = courseString.substring(0, firstSpace);
-				Prefix p = Prefix.readFrom(prefixString);
-				String numString = p.getNumber();
-				boolean examineTitleForLanguagePrefix = false;
-				if(numString.contains("PL")){
-					if(numString.compareTo("PL.110") > 0){
-						String number = numString.substring(numString.indexOf(".") + 1);
-						try{
-							this.setLanguagePrefix(new Prefix(p.getSubject(), number)); 
-						}
-						catch(Exception e){
-							examineTitleForLanguagePrefix = true;
-						}
-					}
-				}
-				int secondSpace = courseString.indexOf(" ", firstSpace + 1);
-				if(secondSpace == firstSpace + 2){
-					title = courseString.substring(secondSpace);
-					section = courseString.substring(firstSpace + 1, secondSpace);
-				}
-				else{
-					title = courseString.substring(firstSpace);
-				}
-				
-				if(examineTitleForLanguagePrefix){
-					//Take the first instance of a number found in the title.
-					Matcher m = Pattern.compile("\\d+").matcher(title);
-					boolean found = m.find();
-					if(found){
-						this.setLanguagePrefix(new Prefix(p.getSubject(), m.group()));
-					}
-				}
-
-				//credits
-				int credits= CourseList.getCoursesCreditHours(p);
-				//if(!" ".equals(creditsString)&&! "".equals(creditsString)&& !(creditsString==null)){
-				//	System.out.println((int)(Double.parseDouble(creditsString)));
-				//	credits = (int)(Double.parseDouble(creditsString));
-				//}
-				//Semester / term
-				SemesterDate takenDate = null;
-				try{
-					takenDate = SemesterDate.readFromFurman(termString);
-				} catch(Exception e){
-					takenDate = SemesterDate.fromFurman(termString);
-				}
-
-
-				Course c = null;
-				if(takenDate != null){
-					c = new Course(p, takenDate, null, null, credits, section);
-				}
-				else{
-					c = new Course(p, priorSemester.semesterDate, null, null, credits, section);
-				}
-				c.setName(title);
-				priorCourses.add(c);
-			}
-			catch(Exception e){
-				if(FurmanOfficial.masterIsAround){
-					throw e;
-				}
-			}
-		}
-
 		//Add the courses
-
-		for(Course c : priorCourses){
+		for(Course c : pd.getAllCourses()){
 			// Skip all the placement courses
 			//if(c.getPrefix().getNumber().contains("PL")){
 			//	continue;
