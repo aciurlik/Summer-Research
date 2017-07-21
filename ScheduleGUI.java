@@ -1080,7 +1080,7 @@ public class ScheduleGUI{
 
 		JTextArea importArea = new JTextArea(importText);
 
-		JButton validate = new JButton("validate");
+		JButton validate = new JButton("Validate");
 		validate.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
