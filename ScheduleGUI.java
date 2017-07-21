@@ -1080,9 +1080,9 @@ public class ScheduleGUI{
 		}
 
 		JTextArea importArea = new JTextArea(importText);
-
-		JButton validate = new JButton("Validate");
-
+		
+		
+		JButton validate = new JButton("validate");
 		validate.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
@@ -1124,9 +1124,10 @@ public class ScheduleGUI{
 				if(importResult == null){
 					trySetStudentData(importArea.getText());
 				}
-				System.out.println(importResult);
-				this.sch.readPrior(importResult);
-				FileHandler.writeStudentData(importResult);
+				PriorData d = new PriorData();
+				d.readFromWebsiteDraggedData(importResult);
+				this.sch.readPrior(d);
+				FileHandler.writeStudentData(d);
 				this.update();
 
 			}catch(Exception e){
@@ -1219,7 +1220,9 @@ public class ScheduleGUI{
 		
 
 		try{
-			new Schedule(saveString); //this schedule will read from the prior.
+			PriorData d = new PriorData();
+			d.readFromWebsiteDraggedData(saveString);
+			new Schedule(d); //this schedule will read from the prior.
 			importResult = saveString;
 			return true;
 		}

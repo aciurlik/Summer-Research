@@ -122,7 +122,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 
 
 
-		String s = FileHandler.getSavedStudentData();
+		PriorData s = FileHandler.getSavedStudentData();
 
 		importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
 		JPopupMenu newLoaded = new JPopupMenu();
