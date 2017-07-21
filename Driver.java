@@ -351,7 +351,7 @@ public class Driver {
 						startUP.showStartUp(true);
 					}
 					else{
-						String data = FileHandler.getSavedStudentData();
+						PriorData data = FileHandler.getSavedStudentData();
 						if(data != null){
 							Driver.addScheduleGUI(new Schedule(data));
 						}
