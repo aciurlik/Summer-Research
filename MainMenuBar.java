@@ -385,9 +385,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		else if(e.getActionCommand().equals(MenuOptions.advisorDnD) ){
 			schGUI.importPriorCourses(false);
 		}
-		else if (e.getActionCommand().equals(MenuOptions.downloadcsv)){
-			schGUI.tryImportPriorCoursesViaFile();
-		}
 		else if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();
 		}
