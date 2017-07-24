@@ -27,6 +27,11 @@ public class Major implements java.io.Serializable{
 	public static final String NORMAL_MAJOR = "Major";
 	public static final String MINOR = "Minor";
 	public static final String TRACK = "Track";
+	
+	public static final int BA = 1;
+	public static final int BS = 2;
+	public static final int BM = 0;
+	public static final int None = 4;
 
 	String majorType;
 
@@ -41,8 +46,8 @@ public class Major implements java.io.Serializable{
 
 	public static Major testMajor(){
 		Major result = new Major("Math");
-		result.degreeTypes.add(CourseList.BA);
-		result.degreeTypes.add(CourseList.BS);
+		result.degreeTypes.add(BA);
+		result.degreeTypes.add(BS);
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 250)}, 1));
 		result.addRequirement(new Requirement(new Prefix[]{new Prefix("MTH", 260)}, 1));
 		result.addRequirement(new Requirement(new Prefix[]{
@@ -83,13 +88,13 @@ public class Major implements java.io.Serializable{
 	
 	public void addDegreeType(String degreeType){
 		if(degreeType.equals("BM")){
-			this.degreeTypes.add(CourseList.BM);
+			this.degreeTypes.add(BM);
 		}
 		if(degreeType.equals("BS")){
-			this.degreeTypes.add(CourseList.BS);
+			this.degreeTypes.add(BS);
 		}
 		if(degreeType.equals("BA")){
-			this.degreeTypes.add(CourseList.BA);
+			this.degreeTypes.add(BA);
 		}
 	}
 

@@ -557,11 +557,10 @@ public class Time implements Comparable<Time>, java.io.Serializable{
 
 
 
-	public Time findMidPoint(Time other){
-		
-		int avgSec = (int)((this.toSec() + other.toSec()))/2;
+	
+	public static Time findMidPoint(Time start, Time end){
+		int avgSec = (int)((start.toSec() + end.toSec()))/2;
 		return(timeFromSeconds(avgSec));
-
 	}
 
 	public static Time timeFromSeconds(long seconds) {

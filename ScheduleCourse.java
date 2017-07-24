@@ -27,6 +27,9 @@ public class ScheduleCourse implements ScheduleElement, HasCreditHours, java.io.
 	}
 
 	@Override
+	/**
+	 * Only compare based on prefix
+	 */
 	public boolean isDuplicate(ScheduleElement other) {
 		if(! ( other instanceof ScheduleCourse )){
 			return false;
