@@ -33,7 +33,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	JLabel shown;
 	MajorPanel m;
 	
-	public static int shortStringLength = 20;
+	public static int shortStringLength = 25;
 
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
