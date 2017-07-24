@@ -360,9 +360,9 @@ public class ScheduleGUI{
 
 
 			if(m.degreeTypes.size()==0){
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BS));
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BA));
-				toAdd.add(CourseList.getDegreeTypeString(CourseList.BM));
+				toAdd.add(CourseList.getDegreeTypeString(Major.BS));
+				toAdd.add(CourseList.getDegreeTypeString(Major.BA));
+				toAdd.add(CourseList.getDegreeTypeString(Major.BM));
 				instructions = "Your major was not given a degree type. Please look up your major and choose the appropriate option.";
 				header = "WARNING";
 			}
@@ -380,7 +380,7 @@ public class ScheduleGUI{
 
 			String GERNeeded = (String)JOptionPane.showInputDialog(null, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
 
-			int MajorType = CourseList.BA;
+			int MajorType = Major.BA;
 			if(GERNeeded == null){
 				return false;
 			}

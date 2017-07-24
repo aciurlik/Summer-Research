@@ -27,32 +27,44 @@ import javax.swing.table.TableRowSorter;
 
 
 /**
+ * blurb written: 7/23/2017
+ * last updated: 7/23/2017
+ * 
  * This class displays a list of courses for the user to choose from,
  * and offers options to sort or filter these courses to find
  * the ones you want.
+ * 
+ * it is in the GUI group of classes.
  *
  */
 public class CourseChooser extends JPanel implements FocusListener, ActionListener{
 	private static final long serialVersionUID = 1L;
 	ScheduleCourse[] choices;
-	int maxNumColumns;
-	ArrayList<Requirement> reqs;
+	//the courses the user can choose from. Does not change as the user filters.
 	ArrayList<ScheduleCourse> displayChoices;
+	//the courses that the user is shown - changes based on filtering.
+	ArrayList<Requirement> reqs; //the set of requirements 
+	// loaded in the schedule when the courseChooser was created.
+
+	int maxNumColumns;
+	// used to determine how far out the courses should display 
+	// (the num cols changes based on the number of reqs a course satisfies)
+	// so that the table doesn't throw errors.
+	
+	JPanel northPanel;
+	JButton toggleFiltersButton;
+	boolean filtersVisible;
+	public static final String showFiltersText = "Show Filters";
+	public static final String hideFiltersText = "Hide Filters";
 	FiltersPanel filtersPanel;
 	
-	boolean advancedSettingsVisible; //tells whether the user has clicked the
-	// button to open advanced settings.
-	public static final String showText = "Show Filters";
-	public static final String hideText = "Hide Filters";
-	JPanel advancedSettingsPanel;
-	JButton advancedSettingsButton;
 	JPanel coursesPanel;
 	JTable visibleCoursesTable;
 	
-	boolean finishedChoosing;
 	
 	
 	//Used in filterPanel
+	// times between 5:00AM and 9:00 PM into the time filter choices.
 	public static final Time[] timesToChooseFromWhenFiltering;
 	static{
 		ArrayList<Time> times = new ArrayList<Time>();
@@ -72,12 +84,21 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	
 	
 	
-	
-	
-	
 
+
+	/**
+	 * Convenience method to do the course choosing without creating a CourseChooser
+	 * object.
+	 * 
+	 * May return null.
+	 * 
+	 * @param courses: the set of courses to choose from
+	 * @param reqs: the set of requirements currently loaded into the schedule
+	 * @return the course, or else null if none was chosen.
+	 */
 	public static ScheduleCourse chooseCourse(ScheduleCourse[] courses, ArrayList<Requirement> reqs){
 		CourseChooser c = new CourseChooser(courses, reqs);
+		
 		int chosen = JOptionPane.showConfirmDialog(null,
 				c,
 				"Choose a course",
@@ -100,56 +121,54 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		//Data fields
 		this.choices = courses;
 		this.reqs = reqs;
-		//We only care about unfulfilled requirements
-		// However, if we're choosing a course for a requirement that is fulfilled,
-		// we still want to see that the courses all satisfy that requirement, 
-		// so I'm taking this code out.
-				/*new ArrayList<Requirement>();
-		for(Requirement r : reqs){
-			if(!r.storedIsComplete()){
-				this.reqs.add(r);
-			}
-		}*/
-		finishedChoosing = false;
+		//note - once, we removed all reqs that were fulfilled.
+		// however, if you drag a req in the schedule and make the req fulfilled 
+		// on that move, then when you go to choose a course for that req
+		// you won't get to see the req you're choosing for in the table.
+		// This is very bad for NW/NWL, because you can't tell any more
+		// which things are NW and which are NWL.
+		
 		maxNumColumns = 0;
 		for(ScheduleCourse c : courses){
 			maxNumColumns = Math.max(dataFor(c).size(), maxNumColumns);
 		}
 		
 		//GUI fields
-		advancedSettingsVisible = false;
+		filtersVisible = false;
 		filtersPanel = new FiltersPanel();
-		//this.setPreferredSize(new Dimension(700,200));
 		
 		
 		//Construction of the GUI
 		this.setLayout(new BorderLayout());
 		
-		advancedSettingsPanel = new JPanel();
-		advancedSettingsPanel.setLayout(new BorderLayout());
+		northPanel = new JPanel();
+		northPanel.setLayout(new BorderLayout());
 		
-		advancedSettingsButton = new JButton(showText);
-		advancedSettingsButton.addActionListener(this);
-		
+		toggleFiltersButton = new JButton(showFiltersText);
+		toggleFiltersButton.addActionListener(this);
 		
 		
 		recalcDisplayChoices();
 		updateDisplay();
-		
-		
 	}	
 	
-	
+	/////////////////////////
+	/////////////////////////
+	//// GUI Updates
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___GUIUpdates_________;
 	
 	/**
-	 * Assuming that displayChoices and advancedSettingsVisible are
-	 * both up to date, recalculate all other values necessary 
-	 * and update the display.
+	 * use displayChoices and filtersVisible to recalculate all other
+	 *  values necessary and update the display.
 	 */
 	public void updateDisplay(){
 		this.removeAll();
 		
 		
+		//Collect the data to be displayed in the table
 		Object[][] data = new Object[displayChoices.size()][maxNumColumns];
 		for(int i = 0; i < displayChoices.size() ; i ++){
 			ArrayList<Object> dataList = dataFor(displayChoices.get(i));
@@ -160,13 +179,8 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			data[i] = fullList;
 		}
 		
-		
+		//make the table
 		visibleCoursesTable = new JTable(data, columnNames(maxNumColumns));
-		
-		//set table's column width
-		CourseChooser.setJTableColumnsWidth(visibleCoursesTable, 
-				visibleCoursesTable.getPreferredSize().width,
-				columnSizes(maxNumColumns));
 		
 		
 		//This section of code ensures that the table's values are not editable
@@ -182,6 +196,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(visibleCoursesTable.getModel());
 		visibleCoursesTable.setRowSorter(sorter);
 		ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+		  //initial sort based on column 1
 		sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
 		sorter.setSortKeys(sortKeys);
 		
@@ -195,60 +210,44 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 				300));
 		
 		
-		
-		
-		showAdvancedSettings(advancedSettingsVisible);
-		this.add(advancedSettingsPanel, BorderLayout.NORTH);
+		showFilters(filtersVisible);
+		this.add(northPanel, BorderLayout.NORTH);
 		
 		this.revalidate();
 		this.repaint();
 	}
-	public void showAdvancedSettings(boolean show){
-		advancedSettingsPanel.removeAll();
-		advancedSettingsPanel.add(advancedSettingsButton, BorderLayout.NORTH);
+	
+	public void showFilters(boolean show){
+		northPanel.removeAll();
+		northPanel.add(toggleFiltersButton, BorderLayout.NORTH);
 		if(show){
-			advancedSettingsPanel.add(filtersPanel, BorderLayout.CENTER);
+			northPanel.add(filtersPanel, BorderLayout.CENTER);
 		}
 	}
 	
+	/////////////////////////
+	/////////////////////////
+	//// Data Updates
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___DataUpdates_________;
 	
-	
-	
-	
-	
-	
-	
-	
-	public ScheduleCourse getChosenCourse(){
-		int index = visibleCoursesTable.getSelectedRow();
-		if(index == -1){
-			return null;
-		}
-		else{
-			int actualIndex = visibleCoursesTable.convertRowIndexToModel(index);
-			return displayChoices.get(actualIndex);
-		}
-	}
-	
-	
+	/**
+	 * Make one row of data for this course
+	 * 
+	 *
+	 * @param c
+	 * @return
+	 */
 	public ArrayList<Object> dataFor(ScheduleCourse c){
+		//If you change this method, be sure to update the method
+		// getColumnNames to reflect the change.
 		ArrayList<Object> results = new ArrayList<Object>();
 		
-		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs, false);
 		
-		//Filter out reqs that are already complete
-		// This code made it so that if you pick "choose a course"
-		// from a req that is complete, it won't show you which courses
-		// fulfill that req (meaning you can't see which ones are NW and
-		// NWL for that particular requirement.)
-		/*
-		for(int i = 0; i < reqsFulfilled.size() ; i ++){
-			Requirement r = reqsFulfilled.get(i);
-			if(r.storedIsComplete()){
-				reqsFulfilled.remove(i);
-				i--;
-			}
-		}*/
+		//Reqs that this course fulfills
+		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs, false);
 		
 		//Special case for NW and NWL
 		for(int i = 0; i < reqsFulfilled.size() ; i ++){
@@ -268,9 +267,8 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			}
 		}
 		
-		
+		//start time, prefix, professor
 		Time startTime = c.c.getStartTime();
-		
 		Prefix prefix = c.getPrefix();
 		String professor = c.c.professor;
 				
@@ -290,6 +288,17 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		//results.add(Arrays.toString(c.c.meetingDays));
 		return results;
 	}
+	/**
+	 * Get the column names.
+	 * This method should reflect the return values from
+	 *  the method dataFor(Course)
+	 *  
+	 * For the last few columns, which are requirements that satisfy the course,
+	 * just use blank column names.
+	 * 
+	 * @param numberColumns
+	 * @return
+	 */
 	public String[] columnNames(int numberColumns){
 		String[] result = new String[numberColumns];
 		String[] known = new String[]{
@@ -303,71 +312,10 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		return result;
 	}
 	
-	/**
-	 * Find column sizes as percent of total
-	 */
-	public double[] columnSizes(int numColumns){
-		double[] result = new double[numColumns];
-		double[] known = new double[]{5,5,20,10,2};
-		for(int i = 0; i < known.length ; i ++){
-			result[i] = known[i];
-		}
-		for(int i = known.length ; i < numColumns ; i ++){
-			result[i] = 5;
-		}
-		return rescale(result);
-	}
-	public double[] rescale(double[] input){
-		double sum = 0;
-		for(double d : input){
-			sum += d;
-		}
-		double[] result = new double[input.length];
-		for(int i =0 ; i < result.length ; i ++){
-			result[i] = input[i] / sum * 100;
-		}
-		return result;
-	}
 	
 	
-	/**
-	 * Sets a JTable's column widths 
-	 * Found on 
-	 * http://www.codejava.net/java-se/swing/setting-column-width-and-row-height-for-jtable
-	 * @param table
-	 * @param tablePreferredWidth
-	 * @param percentages
-	 */
-	public static void setJTableColumnsWidth(JTable table, int tablePreferredWidth,
-	        double[] percentages) {
-	    double total = 0;
-	    for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
-	        total += percentages[i];
-	    }
-	 
-	    for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
-	        TableColumn column = table.getColumnModel().getColumn(i);
-	        column.setPreferredWidth((int)
-	                (tablePreferredWidth * (percentages[i] / total)));
-	    }
-	}
 
 	
-	
-	
-	
-	
-	
-	
-	
-	public boolean allApply(ArrayList<Predicate<Course>> filters, ScheduleCourse c){
-		for(Predicate<Course> p : filters){
-			if(!p.test(c.c)){
-				return false;
-			}
-		}
-		return true;
-	}
 	
 	public void recalcDisplayChoices(){
 		ArrayList<ScheduleCourse> result = new ArrayList<ScheduleCourse>();
@@ -391,11 +339,44 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	
 	
 	
+	public ScheduleCourse getChosenCourse(){
+		int index = visibleCoursesTable.getSelectedRow();
+		if(index == -1){
+			return null;
+		}
+		else{
+			int actualIndex = visibleCoursesTable.convertRowIndexToModel(index);
+			return displayChoices.get(actualIndex);
+		}
+	}
+	
+	
+
+	
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	/////////////////////////
+	/////////////////////////
+	////Prevent focus being lost
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___keepFocus_________;
 	
 
 	@Override
 	public void focusGained(FocusEvent e) {
 	}
+	
 	/*
 	 * 
 	 * Keep the focus until you're closed.
@@ -406,36 +387,86 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			this.requestFocus();
 		}
 	}
+	
+	
+	
+	/////////////////////////
+	/////////////////////////
+	////MISC
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___miscellaneous_________;
+	
+	
 
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
-		if(source == advancedSettingsButton){
-			advancedSettingsVisible = !advancedSettingsVisible;
-			if(advancedSettingsVisible){
-				advancedSettingsButton.setText(hideText);
+		if(source == toggleFiltersButton){
+			filtersVisible = !filtersVisible;
+			if(filtersVisible){
+				toggleFiltersButton.setText(hideFiltersText);
 			}
 			else{
-				advancedSettingsButton.setText(showText);
+				toggleFiltersButton.setText(showFiltersText);
 			}
 			updateDisplay();
 		}
 	}
 	
+	
+	/**
+	 * Check whether each predicate evaluates to true on c.
+	 * 
+	 * Essentially the AND of a bunch of predicates.
+	 * 
+	 * Used for filtering.
+	 * @param filters
+	 * @param c
+	 * @return
+	 */
+	public boolean allApply(ArrayList<Predicate<Course>> filters, ScheduleCourse c){
+		for(Predicate<Course> p : filters){
+			if(!p.test(c.c)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * This class represents the panel that can be shown or hidden in courseChooser, 
+	 * which the user can use to create filters on the list of courses.
+	 * 
+	 * When other classes are ready to get the list of filters, 
+	 * use the getFilters() method. The result will be a
+	 * list of Predicate<Course> objects (a Predicate<Course> is a function
+	 * that takes in a course and returns a boolean) and a course c
+	 * can pass through the filters if each filter returns true when
+	 * evaluated on c. You can then convenience method allApply(filters, course)
+	 * to see if a course can pass through a list of filters 
+	 * 
+	 */
 	private class FiltersPanel extends JPanel implements ActionListener{
 	
 		
 		private static final long serialVersionUID = 1L;
-		String professorStartString;
-		Time startTime;
-		Time endTime;
 		JToggleButton[] meetingDaysButtons;
-		JButton applyButton;
 		JTextField profNameField;
-		JComboBox<String> startTimeRange;
-		JComboBox<String> endTimeRange;
+		
+		JComboBox<String> startOfTimeRange; //filter all courses who's start times
+		// are after startOfTimeRange.
+		JComboBox<String> endOfTimeRange;// filter all courses who's start times
+		// are after endOfTimeRange
+		
+		JButton applyButton; //the user can force an update if they need to, like
+		// for giving data to the professor name textField.
 		
 	
 		
@@ -477,18 +508,18 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			for(int i = 0; i < timesToChooseFromWhenFiltering.length ; i ++){
 				timeStrings[i] = timesToChooseFromWhenFiltering[i].clockTime();
 			}
-			startTimeRange = new JComboBox<String>(timeStrings);
-			endTimeRange = new JComboBox<String>(timeStrings);
+			startOfTimeRange = new JComboBox<String>(timeStrings);
+			endOfTimeRange = new JComboBox<String>(timeStrings);
 			
 			int last = timeStrings.length - 1;
-			endTimeRange.setSelectedIndex(last);
+			endOfTimeRange.setSelectedIndex(last);
 			
-			startTimeRange.addActionListener(this);
-			endTimeRange.addActionListener(this);
+			startOfTimeRange.addActionListener(this);
+			endOfTimeRange.addActionListener(this);
 			timesPanel.add(new JLabel("Starts after:"));
-			timesPanel.add(startTimeRange);
+			timesPanel.add(startOfTimeRange);
 			timesPanel.add(new JLabel("Starts before:"));
-			timesPanel.add(endTimeRange);
+			timesPanel.add(endOfTimeRange);
 			this.add(timesPanel);
 			
 			
@@ -504,6 +535,13 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		
 		
 		
+		/**
+		 * Collect the list of filters from this panel.
+		 * Each filter is a Predicate<Course>, which is a function
+		 * that takes a course and returns a boolean. A course can pass through
+		 * the filter f if the f(Course) == true.
+		 * @return
+		 */
 		public ArrayList<Predicate<Course>> getFilters(){
 			
 			ArrayList<Predicate<Course>> result = new ArrayList<Predicate<Course>>();
@@ -540,8 +578,8 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			
 			
 			//Times filter
-			Time startTime = timesToChooseFromWhenFiltering[startTimeRange.getSelectedIndex()];
-			Time endTime = timesToChooseFromWhenFiltering[endTimeRange.getSelectedIndex()];
+			Time startTime = timesToChooseFromWhenFiltering[startOfTimeRange.getSelectedIndex()];
+			Time endTime = timesToChooseFromWhenFiltering[endOfTimeRange.getSelectedIndex()];
 			final Interval<Time> validStartInterval = new Interval<Time>(startTime, endTime);
 			result.add(c -> c.getStartTime() == null || validStartInterval.contains(c.getStartTime(), true));
 			
@@ -552,6 +590,10 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 
 
 		@Override
+		/**
+		 * if the user does an action on any of the filter GUI things, 
+		 * do an update of the course table.
+		 */
 		public void actionPerformed(ActionEvent e) {
 			recalcDisplayChoices();
 			updateDisplay();

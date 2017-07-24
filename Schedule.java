@@ -645,7 +645,7 @@ public class Schedule implements java.io.Serializable {
 	private void recalcGERMajor(){
 		int type = this.determineGER();
 		if(type == -1){
-			type = CourseList.BA;
+			type = Major.BA;
 		}
 		this.GER =CourseList.getGERMajor(languagePrefix, type);
 		updateTotalCoursesNeeded();
@@ -708,7 +708,7 @@ public class Schedule implements java.io.Serializable {
 			}
 			for (ScheduleElement e : s.getElements()){
 				inSemester.add(e);
-				Requirement needed = CourseList.getPrereqsShallow(e.getPrefix());
+				Requirement needed = CourseList.getPrereq(e.getPrefix());
 				if(needed != null){
 					boolean complete = needed.isComplete(taken, true);
 					if(!complete){
@@ -761,7 +761,7 @@ public class Schedule implements java.io.Serializable {
 			if(this.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(elementsTakenIn(sD));
 			}
-			Requirement needed = CourseList.getPrereqsShallow(p);
+			Requirement needed = CourseList.getPrereq(p);
 			if(needed != null){
 				needed.updateAllStoredValues(taken);
 			}
@@ -844,7 +844,7 @@ public class Schedule implements java.io.Serializable {
 			// we satisfied one of that element's prereqs.
 			HashSet<Prefix> elementsThatUsedTheMovingElement = new HashSet<Prefix>();
 			for(ScheduleElement p : intersection){
-				Requirement r = CourseList.getPrereqsShallow(p.getPrefix());
+				Requirement r = CourseList.getPrereq(p.getPrefix());
 				if(r != null && r.isSatisfiedBy(newE)){
 					elementsThatUsedTheMovingElement.add(p.getPrefix());
 				}
@@ -1305,7 +1305,7 @@ public class Schedule implements java.io.Serializable {
 					continue;
 				}
 			}
-			Requirement r = CourseList.getPrereqsShallow(e.getPrefix());
+			Requirement r = CourseList.getPrereq(e.getPrefix());
 			if(r != null){
 				Prereq newPrereq = new Prereq(r, e.getPrefix());
 				prereqs.add(newPrereq);

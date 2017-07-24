@@ -4,33 +4,61 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
+/**
+ * This class represents one actual offered course in furman's system,
+ * including the section number and semester.
+ * 
+ * It can compare with other courses to see if their times overlap, and 
+ * is a ScheduleElement.
+ * 
+ * It can contain null values for:
+ * 		Professor
+ * 		name (title)
+ * 		credit hours
+ * 		any time-related field except 'semester'
+ * 		section number
+ * 		
+ * but it must have:
+ * 		coursePrefix (see prefix class)
+ * 		Semester
+ * 		
+ * 		
+ * 
+ *  It is in the DATA group of classes.
+ *  
+ *  
+ * 
+ * This blurb written: 7/23/2017
+ * last updated: 7/23/2017
+ *
+ *
+ */
 public class Course implements HasCreditHours, java.io.Serializable{
-
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	protected int creditHours;
 	protected Prefix coursePrefix;
 	protected String sectionNumber; //was originally an int, but for courses like
 	// ACC-221-BLK is was converted to a string.
+	protected String name; //course title, like "Principles of Accounting"
+	String professor;
+	
 	protected SemesterDate semester;
 	protected int[] meetingDays; //specified by the constants in the Time class, 
 	//  as in Time.SUNDAY.
-	protected Time[] meetingTime; //two times where the day, month, and year are unused.
-	protected String name;
-	Time[] labTime; //assumed to repeat weakly until examTime. Month and year are unused.
+	protected Time[] meetingTime; //two times where the day, month, and year will be unused.
+	// The course meets each day in meedingDays, between meetingTime[0] and meetingTime[1].
+	Time[] labTime; //assumed to repeat weakly until examTime. Month and year will be unused.
 	int labDay;
-	Time[] examTime; // month, day, year, and so on are all used.
+	Time[] examTime; // month, day, and year are USED, not unused, because 
+	// the exam time is just one day and doesn't repeat. 
+	
+	
+	//These two fields are used to estimate whether a course loaded from Furma's data is in SS1 or SS2.
+	//See the readFromFurmanData method
+	static Time SummerSessionOne = new Time(Time.UNUSED, 6, 16, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+	static Time SummerSessionTwo = new Time(Time.UNUSED, 7, 25, Time.UNUSED, Time.UNUSED, Time.UNUSED);
 
 
-
-	public static final int defaultCreditHours = 4;
-
-
-	String professor;
 
 
 
@@ -59,7 +87,17 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public Course(Prefix prefix, String sectionNumber, String professor, int[] meetingDays, int creditHours, SemesterDate semester ){
 		this(prefix, semester, professor, meetingDays, creditHours, sectionNumber);
 	}
-
+	
+	
+	
+	/////////////////////////
+	/////////////////////////
+	////Getters and setters
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___GettersAndSetters_________;
+	
 
 	public void setName(String name){
 		this.name = name;
@@ -94,6 +132,12 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		return this.semester;
 	}
 
+	
+	/**
+	 * turn the meeting days array, of the form [1, 3, 5], into a string
+	 * of the form "MWF" and return that string.
+	 * @return
+	 */
 	public String meetingDaysCode(){
 		String result = "";
 		if (meetingDays==null){
@@ -107,11 +151,25 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 
 
-	///////////////////
-	///////////////////
-	////Methods used to for setting Time objects
-	///////////////////
-	///////////////////
+	/////////////////////////
+	/////////////////////////
+	////Time getters and setters
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______TimeGettersAndSetters_________;
+	
+	/**
+	 * set the meeting time to start at hours:min(AM)
+	 * and last for durationMinutes minutes. So, if hours = 8, min = 30, 
+	 * AM = false, and durationMinutes = 60 it will set the time to
+	 * 8:30PM to 9:30PM.
+	 * 
+	 * @param hours
+	 * @param AM
+	 * @param minutes
+	 * @param durationMinutes
+	 */
 	public void setMeetingTime(int hours, boolean AM, int minutes, int durationMinutes){
 		Time startTime = new Time(hours, AM, minutes, 0);
 		startTime.setYear(semester.getYear());
@@ -121,6 +179,12 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public void setMeetingTime(Time[] t){
 		this.meetingTime = t;
 	}
+	
+	/**
+	 * This method must be given a Time object that uses month, day, and year.
+	 * @param examStartTime
+	 * @param durationInMinutes
+	 */
 	public void setExamTime(Time examStartTime, int durationInMinutes){
 		this.examTime = new Time[]{
 				examStartTime, 
@@ -129,6 +193,16 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public void setExamTime(Time[] t){
 		this.examTime = t;
 	}
+	
+	/**
+	 * See setMeetingTime(hours, AM, minutes, durationMinutes)
+	 *  for explanation of the arguments.
+	 * @param dayOfWeek
+	 * @param hour
+	 * @param AM
+	 * @param minutes
+	 * @param durationMinutes
+	 */
 	public void setLabTime(int dayOfWeek, int hour, boolean AM, int minutes, int durationMinutes){
 		Time startTime = new Time( hour, AM, minutes, 0);
 		this.labTime = new Time[]{startTime, startTime.addMinutes(durationMinutes)};
@@ -137,10 +211,7 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	public void setLabTime(Time[] t){
 		this.labTime = t;
 	}
-	/**
-	 * Should only be called after setting labTime.
-	 * @param labDay
-	 */
+	
 	public void setLabDay(int labDay){
 		this.labDay = labDay;
 	}
@@ -170,8 +241,9 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		}
 		return null;
 	}
+	
 	/**
-	 * Return times with the exact 
+	 * Return times that use 
 	 * year, month, day, hour, and min
 	 * 		(sec may be unused)
 	 * may return null
@@ -191,7 +263,7 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	 *  
 	 * Each interval in the list represents one day, so it will have times
 	 * of the form 
-	 * 		year:UNUSED month:UNUSED day:0-6 hour:given min:given sec:UNUSED or given.
+	 * 		year:UNUSED month:UNUSED day:one of 0-6 hour:given min:given sec:UNUSED or given.
 	 * @return
 	 */
 	public Intervals<Time> meetingTimes(){
@@ -212,19 +284,16 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	}
 
 
-
-
-
-
-
-
-	public boolean isDuplicate(ScheduleElement other) {
-		if(! ( other instanceof Course )){
-			return false;
-		}
-		return this.coursePrefix.compareTo(((Course)other).coursePrefix) == 0;
-	}
-
+	/////////////////////////
+	/////////////////////////
+	////SavingAndReadingMethods
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___SavingAndReadingMethods_________;
+	
+	
+	
 	public String toString(){
 		StringBuilder result = new StringBuilder();
 		result.append(coursePrefix.toString());
@@ -251,9 +320,8 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 
 
-
+	/*
 	public String saveString(){
-		/*  TODO add name
 		 creditHours;
 		 coursePrefix;
 		 sectionNumber;
@@ -269,7 +337,6 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		Examples:
 		MTH-220-01;Fray;[3,5,7];11:30:A,50;5/30/2017 14:30:00;4;2017-2;2,2:30:P,150
 		MTH-220-01;Fray;[3,5,7];11:30:P,50;5/30/2017 12:30:00;4;2017-2;
-		 */
 
 		StringBuilder result = new StringBuilder();
 		result.append(this.coursePrefix.toString() + "-" + sectionNumber + ";");
@@ -296,8 +363,10 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		}
 
 		return result.toString();
-
 	}
+*/
+	
+	/*
 	public static Course readFrom(String saveString){
 		int chunkNumber = 0;
 		String[] chunks = saveString.split(";");
@@ -367,12 +436,21 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 			result.setLabTime(labDay, labHours, labAM, labMinutes, labDuration);
 		}
-
 		return result;
-
-
-
 	}
+	*/
+	
+	
+	/**
+	 * last updated 7/23/2017
+	 * Read from data of the form found in a course catalog downloaded from furman.
+	 * To download a course catalog, go to myFurman, view course listings
+	 *  (Registration --> course listings), choose a particular semester
+	 *  and click "search" or "submit" without putting any other filters in.
+	 * It should give you the option to download the full catalog, and that's the data.
+	 * @param furmanData
+	 * @return
+	 */
 	public static Course readFromFurmanData(ArrayList<String> furmanData){
 		String semesterString = furmanData.get(0); // EX "Fall 2017 - Day"
 		String section = furmanData.get(1); // EX "ACC-111-01"
@@ -400,29 +478,33 @@ public class Course implements HasCreditHours, java.io.Serializable{
 
 
 		if(semester.sNumber==(SemesterDate.SUMMERONE) || semester.sNumber==(SemesterDate.SUMMERTWO)){
-			Time SummerSessionOne = new Time(times[0].year, 6, 16, Time.UNUSED, Time.UNUSED, Time.UNUSED);
-			Time SummerSessionTwo = new Time(times[0].year, 7, 25, Time.UNUSED, Time.UNUSED, Time.UNUSED);
+			//Furman doesn't specify S1 or S2 in the course catalog, so we have to try to figure out which
+			// semester the course is offered in using the meeting times.
+			// Our strategy is to make two times, 6/16 and 7/25, which will be the estimated
+			// midpoints of the two summer sessions. Then, for each course, 
+			// if the dates the course meets contain one of these two midpoints, 
+			// categorize that course accordingly (so if the course meets between
+			// 5/12 and 6/30, we'll call it a summer session one course).
+			// Then shift the summerSessionOne midpoint in the direction of the midpoint
+			// for the course's dates, so that our 6/16 and 7/25 update as we go.
+
 			Interval<Time> sessionInterval = new  Interval<Time>(times[0], times[2]);
-
-
+			SummerSessionOne.year = times[0].year;
+			SummerSessionTwo.year = times[0].year;
+			
 			if(sessionInterval.contains(SummerSessionOne, true)){
-
 				semester = new SemesterDate(semester.year, SemesterDate.SUMMERONE);
-				Time midpoint = times[0].findMidPoint(times[2]);
-				SummerSessionOne = SummerSessionOne.findMidPoint(midpoint);
-
-
+				Time courseMidpoint = Time.findMidPoint(times[0], times[2]);
+				//Now, shift SummerSessionTwo to be closer to the midpoint of this course.
+				SummerSessionOne = Time.findMidPoint(SummerSessionOne,courseMidpoint);
 			}
 			if(sessionInterval.contains(SummerSessionTwo, true)){
 				semester = new SemesterDate(semester.year,SemesterDate.SUMMERTWO);
-				Time midpoint = times[0].findMidPoint(times[2]);
-				SummerSessionTwo = SummerSessionTwo.findMidPoint(midpoint);
+				Time courseMidpoint = Time.findMidPoint(times[0],times[2]);
+				//Now, shift SummerSessionTwo to be closer to the midpoint of this course.
+				SummerSessionTwo = Time.findMidPoint(SummerSessionTwo,courseMidpoint);
 			}
-
-
 		}
-
-
 		Course result =  new Course(p, sectionNumber, professor, Time.meetingDaysFrom(meetingDays), creditHours, semester);
 		if(meetingTime[0].hours != Time.UNUSED){
 			result.setMeetingTime(meetingTime);
@@ -431,10 +513,6 @@ public class Course implements HasCreditHours, java.io.Serializable{
 			result.setName(title);
 		}
 		return result;
-
-
-
-
 	}
 
 	/**
@@ -469,10 +547,6 @@ public class Course implements HasCreditHours, java.io.Serializable{
 		c.setMeetingTime(11, true, 30, 50);
 		c.setExamTime(new Time(2017, 6, 20, 13, 30, 0), 150);
 
-
-		System.out.println(c.saveString());
-		Course d = Course.readFrom(c.saveString());
-		System.out.println(d.saveString());
 
 
 	}

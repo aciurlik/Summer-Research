@@ -310,9 +310,9 @@ public class PriorData implements Serializable{
 	}
 
 	public void setLanguagePrefix(Prefix p){
-		CourseList.FLRequirement(p, CourseList.BM);
-		CourseList.FLRequirement(p, CourseList.BA);
-		CourseList.FLRequirement(p, CourseList.BS);
+		CourseList.FLRequirement(p, Major.BM);
+		CourseList.FLRequirement(p, Major.BA);
+		CourseList.FLRequirement(p, Major.BS);
 		languagePrefix = p;
 	}
 
