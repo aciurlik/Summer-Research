@@ -1,16 +1,12 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.awt.print.Paper;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -18,16 +14,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,11 +29,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.ImageView;
 
 
 
@@ -126,21 +112,11 @@ public class ScheduleGUI{
 		//schP.setPreferredSize(new Dimension(500, 500));
 
 		stackPanel.add(schP, BorderLayout.NORTH);
-
-
-
-		long one = System.currentTimeMillis();
 		reqs = new RequirementListPanel(sch, this);
-		long two = System.currentTimeMillis();
-
-
 		stackPanel.add(reqs, BorderLayout.CENTER);
-
-
 
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(stackPanel);
-		long three = System.currentTimeMillis();
 		//scroll.setPreferredSize(new Dimension(stackPanel.getPreferredSize()));
 		frame.add(scroll);
 
@@ -150,7 +126,6 @@ public class ScheduleGUI{
 
 		frame.pack();
 		frame.setVisible(true);
-		long four = System.currentTimeMillis();
 		/**
 		 * 
 		 * 	System.out.println("Time intervals");
@@ -461,7 +436,6 @@ public class ScheduleGUI{
 		if(season == SemesterDate.OTHER){
 			return;
 		}
-		ScheduleCourse c = null;
 		Semester addedSemester = null;
 		//What year you'd like this summer class
 		Integer year = this.createYearDialogBox(getAvaliableYears(season), "Add Summer");
@@ -469,19 +443,15 @@ public class ScheduleGUI{
 			return;
 		}
 		addedSemester = sch.addNewSemesterInsideSch(year, season);
-		//Choose course you would like to add
-		c =  addCourseDialogBox(addedSemester);
-		if(c != null){
-			sch.addScheduleElement(c, addedSemester);
-		}
-		this.update();
-
+		addCourseTo(addedSemester);
 	}
 	/**
 	 * This asks the user what year they would 
 	 * like to add a MayX, and then provides them
 	 * with a list of courses avaibiable at that time. 
-	 * It then adds the user's choice to that semester. 
+	 * It then adds the user's choice to that semester.
+	 * 
+	 *  Does not allow the user to choose a year where a MayX already exists.
 	 */
 	public void addMayX(){
 		ScheduleCourse c = null;
@@ -490,14 +460,7 @@ public class ScheduleGUI{
 			return;
 		}
 		Semester addedSemester = sch.addNewSemesterInsideSch(year, SemesterDate.MAYX);
-		c =  addCourseDialogBox(addedSemester);
-		if(c != null){
-			//Removes all courses that have already been added in case of MayX 
-			addedSemester.elements.clear();
-			sch.addScheduleElement(c, addedSemester);
-		}
-		this.update();
-
+		addCourseTo(addedSemester);
 	}
 
 	/**
@@ -583,6 +546,8 @@ public class ScheduleGUI{
 	 * Ask the user which course in this semester they want to add.
 	 * Used by MayX or Summer semesters, or the addCourse button of
 	 * a semester.
+	 * 
+	 * Does not perform the actual addition of the course to the semester
 	 * @param s
 	 */
 	public ScheduleCourse addCourseDialogBox(Semester s){	
@@ -596,6 +561,27 @@ public class ScheduleGUI{
 
 		ScheduleCourse c = GUIChooseCourse(finalCourseList);
 		return c;
+	}
+	
+	/**
+	 * Add a new course to s.
+	 * 
+	 * Uses addCourseDialogBox to pick the course.
+	 * @param s
+	 */
+	public void addCourseTo(Semester s){
+		if(s.semesterDate.sNumber == SemesterDate.MAYX){
+			if(!s.elements.isEmpty()){
+				//TODO
+				// when adding a course to a mayX which already has a course
+				// replace, keep the old course, or keep both?
+			}
+		}
+		ScheduleCourse c = addCourseDialogBox(s);
+		if(c != null){
+			sch.addScheduleElement(c, s);
+		}
+		this.update();
 	}
 
 
@@ -1101,23 +1087,23 @@ public class ScheduleGUI{
 	public void importPriorCourses(boolean isStudent){
 		String importText;
 		if(isStudent){
-			importText=  "To import your prior courses, "
+			importText=  "To import your prior courses and placements, "
 					+ "\n  1) Go to MyFurman. "
 					+ "\n  2) Navigate to your unofficial transcript. "
 					+ "\n  3) You should see your name and ID in the top left corner,"
 					+ "\n     and your cumulative GPA listed at the bottom."
-					+ "\n  4) Hilight all the data between your name and your GPA and"
-					+ "\n    drag it into this text box. "
+					+ "\n  4) Highlight all the data from your ID to your GPA and"
+					+ "\n     drag it into this text box. "
 					+ "\n  5) Click 'Validate' to make sure the process worked!";
 		}
 		else{
-			importText = "To import your prior courses, "
+			importText = "To import a student's prior courses and placements, "
 					+ "\n  1) Go to MyFurman. "
 					+ "\n  2) Navigate to the student's course credit summary. "
 					+ "\n  3) You should see the student's name and ID in the top left corner,"
 					+ "\n     and their cumulative GPA listed at the bottom."
-					+ "\n  4) Hilight all the data between the student's name and their GPA and"
-					+ "\n    drag it into this text box. "
+					+ "\n  4) Highlight all the data from their ID to their GPA and"
+					+ "\n     drag it into this text box."
 					+ "\n  5) Click 'Validate' to make sure the process worked!";
 		}
 
@@ -1161,8 +1147,8 @@ public class ScheduleGUI{
 		//Make the popup
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
-		p.add(new JScrollPane(importArea), BorderLayout.SOUTH);
-		p.add(validate, BorderLayout.NORTH);
+		p.add(new JScrollPane(importArea), BorderLayout.NORTH);
+		p.add(validate, BorderLayout.EAST);
 		JOptionPane.showOptionDialog(null,p, "Import your schedule",
 				JOptionPane.CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
 	}

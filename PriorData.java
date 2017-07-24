@@ -342,7 +342,7 @@ public class PriorData implements Serializable{
 
 	public String getStudentName() {
 		checkIsCorrupted();
-		return "Cats";
+		return studentName;
 	}
 
 	public ArrayList<Course> getAllCourses(){
