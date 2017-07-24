@@ -29,7 +29,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	
 	public int optionsNumber = 8; //Number of Buttons
 	public int headerNumber = 2;  //Number of Headers (The Furman Advantage. Major/Minor)
-	public int spacingConstant = 3;
+	public int spacingConstant = 0;// Kept this way to line up smaller than the bellTower
 	
 	ScheduleGUI d;
 	
