@@ -166,7 +166,9 @@ public class Schedule implements java.io.Serializable {
 			//	continue;
 			//}
 			ScheduleCourse cc = new ScheduleCourse(c, this);
-			this.directAddScheduleElement(cc, c.semester);
+			if(!this.directAddScheduleElement(cc, c.semester)){
+				throw new RuntimeException("Could neither find nor make the semester for the couse \n" + cc.getDisplayString());
+			}
 		}
 		MainMenuBar.addImportScheduleOption();
 		
@@ -180,13 +182,28 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	private boolean directAddScheduleElement(ScheduleElement e, SemesterDate d){
-		for(Semester s : semesters){
+		ArrayList<Semester> allSemesters = this.getAllSemestersSorted();
+		
+		for(int i = 0; i < allSemesters.size(); i ++){
+			Semester s  = allSemesters.get(i);
 			if(s.semesterDate.compareTo(d) == 0){
 				return s.directAdd(e);
 			}
-		}
-		if(priorSemester.semesterDate.compareTo(d) == 0){
-			return priorSemester.directAdd(e);
+			if(s.semesterDate.compareTo(d) > 0){
+				//we've passed where the semester should have been, so we need to make a 
+				// new semester.
+				
+				//TODO replace this with addNewSemesterInsideSch method
+				// (if the method name changes, it's the second method in the 
+				// gui methods for adding semesters).
+				int indexInSemesters = i-1;
+				if(i == -1){
+					return false;
+				}
+				Semester newSemester = new Semester(d, this);
+				semesters.add(indexInSemesters, newSemester);
+				return newSemester.directAdd(e);
+			}
 		}
 		return false;
 	}
@@ -199,7 +216,8 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
+	@SuppressWarnings("unused")
+	private boolean ___StartMethodsUsedByGUI_________;
 
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
@@ -219,6 +237,9 @@ public class Schedule implements java.io.Serializable {
 	//	Adding and removing semesters
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______addRemoveSemesters_________;
+	
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.next(), this);
@@ -248,6 +269,8 @@ public class Schedule implements java.io.Serializable {
 	//	Adding and removing Elements
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______addRemoveElements_________;
 
 
 	/**
@@ -326,6 +349,8 @@ public class Schedule implements java.io.Serializable {
 	//	Adding and removing Majors
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______addRemoveMajors_________;
 
 
 	public void addMajor(Major newMajor){
@@ -360,6 +385,15 @@ public class Schedule implements java.io.Serializable {
 		}
 		return highestDegree;
 	}
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Completion Status
+	///////////////////////////////
+	///////////////////////////////
+	
+	@SuppressWarnings("unused")
+	private boolean ______completionStatus_________;
 
 	/**
 	 * Return a number between 0 and 1 representing the completion level.
@@ -398,77 +432,8 @@ public class Schedule implements java.io.Serializable {
 	/////////////////////////////////////////////
 	 */
 
-
-
-	///////////////////////////////
-	///////////////////////////////
-	//	General error checks for GUI events
-	///////////////////////////////
-	///////////////////////////////
-	public boolean userOverride(ScheduleError s){
-		if(this.d != null){
-			return(d.userOverrideError(s));
-		}
-		else{
-			return true;
-		}
-	}
-
-
-
-	public boolean checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
-		if(this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement)){
-			return true;
-		}
-
-
-		if(newElement == oldElement){
-			if (checkDuplicates(newElement, true, false)){
-				return true;
-			}
-		}
-		else{
-			if (checkDuplicates(newElement, false, false)){
-				return true;
-			}
-		}
-
-
-		if(newS.checkOverlap(newElement)){
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * Return true if an error is found.
-	 * @param e
-	 * @param s
-	 * @return
-	 */
-	public boolean checkErrorsWhenAdding(ScheduleElement e, Semester s){
-		if(checkPrerequsitesAdding(e, s.semesterDate)){
-			return true;
-		}
-		if(s.checkOverlap(e)){
-			return true;
-		}
-		if(checkDuplicates(e,false, false)){
-			return true;
-		}
-		if(e instanceof Requirement){
-			if(checkOptimismError((Requirement)e)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean checkErrorsWhenRemoving(ScheduleElement e, Semester s){
-		return(this.checkPrerequsitesRemoving(e, s));
-	}
+	@SuppressWarnings("unused")
+	private boolean ___EndMethodsUsedByGUI_________;
 
 
 
@@ -495,6 +460,9 @@ public class Schedule implements java.io.Serializable {
 	//	Nice getters
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___GettersAndSetters_________;
+	
 	/**
 	 * This does not include prior Semester, because that is not apart of this.semesters
 	 * @return The first real (not prior Semester)
@@ -576,6 +544,39 @@ public class Schedule implements java.io.Serializable {
 		allSemesters.addAll(this.semesters);
 		return allSemesters;
 	}
+	
+
+	/**
+	 * doesn't update the requirements (this would cause an infinite loop, 
+	 * updating a requirement means knowing all requirements, which can't happen unless
+	 * you get all majors.)
+	 * @return
+	 */
+	public ArrayList<Major> getMajors(){
+		ArrayList<Major> result = new ArrayList<Major>();
+		if(GER != null){
+			result.add(GER);
+		}
+		if(prereqs.size() > 0){
+			Major prereqsM = new Major("Prereqs");
+			prereqsM.chosenDegree = -1;
+			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
+			for(Prereq p : prereqs){
+				if(!p.getRequirement().getStoredIsComplete()){
+					uniquePrereqs.add(p.getRequirement());
+				}
+			}
+			for(Requirement r : uniquePrereqs){
+				prereqsM.addRequirement(r);
+			}
+			Collections.sort(prereqsM.reqList);
+			if(uniquePrereqs.size() > 0){
+				result.add(prereqsM);
+			}
+		}
+		result.addAll(this.majorsList);
+		return result;
+	}
 
 
 
@@ -642,42 +643,99 @@ public class Schedule implements java.io.Serializable {
 
 
 
-	private void recalcGERMajor(){
-		int type = this.determineGER();
-		if(type == -1){
-			type = Major.BA;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	///////////////////////////////
+	///////////////////////////////
+	//	General error checks for GUI events
+	///////////////////////////////
+	///////////////////////////////
+	
+	@SuppressWarnings("unused")
+	private boolean ___GeneralErrorChecksForGUIEvents_________;
+	
+	public boolean userOverride(ScheduleError s){
+		if(this.d != null){
+			return(d.userOverrideError(s));
 		}
-		this.GER =CourseList.getGERMajor(languagePrefix, type);
-		updateTotalCoursesNeeded();
+		else{
+			return true;
+		}
 	}
 
-	private void updateTotalCoursesNeeded(){
-		totalCoursesNeeded = 0;
-		
-		for(Requirement r : getAllRequirements()){
-			
-			totalCoursesNeeded += r.getOriginalCoursesNeeded();
+
+
+	public boolean checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
+		if(this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement)){
+			return true;
 		}
+
+
+		if(newElement == oldElement){
+			if (checkDuplicates(newElement, true, false)){
+				return true;
+			}
+		}
+		else{
+			if (checkDuplicates(newElement, false, false)){
+				return true;
+			}
+		}
+
+
+		if(newS.checkOverlap(newElement)){
+			return true;
+		}
+
+		return false;
 	}
 
 
+	/**
+	 * Return true if an error is found.
+	 * @param e
+	 * @param s
+	 * @return
+	 */
+	public boolean checkErrorsWhenAdding(ScheduleElement e, Semester s){
+		if(checkPrerequsitesAdding(e, s.semesterDate)){
+			return true;
+		}
+		if(s.checkOverlap(e)){
+			return true;
+		}
+		if(checkDuplicates(e,false, false)){
+			return true;
+		}
+		if(e instanceof Requirement){
+			if(checkOptimismError((Requirement)e)){
+				return true;
+			}
+		}
+		return false;
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	public boolean checkErrorsWhenRemoving(ScheduleElement e, Semester s){
+		return(this.checkPrerequsitesRemoving(e, s.getDate()));
+	}
 
 
 
@@ -686,6 +744,9 @@ public class Schedule implements java.io.Serializable {
 	//	Prerequisite error checking
 	///////////////////////////////
 	///////////////////////////////
+	
+	@SuppressWarnings("unused")
+	private boolean ______prereqErrorChecking_________;
 
 	/**
 	 * Check every element to see if it has all the prereqs it needs.
@@ -706,15 +767,15 @@ public class Schedule implements java.io.Serializable {
 			if(this.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(inSemester);
 			}
-			for (ScheduleElement e : s.getElements()){
-				inSemester.add(e);
-				Requirement needed = CourseList.getPrereq(e.getPrefix());
+			for (ScheduleElement e : inSemester){
+				Prereq needed = CourseList.getPrereq(e.getPrefix());
 				if(needed != null){
-					boolean complete = needed.isComplete(taken, true);
+					needed.updateOn(taken);
+					boolean complete = needed.getRequirement().getStoredIsComplete();
 					if(!complete){
 						ScheduleError prereq = new ScheduleError(ScheduleError.preReqError);
 						prereq.setOffendingCourse(e);
-						prereq.setNeededCourses(needed);
+						prereq.setNeededCourses(needed.getRequirement());
 						prereq.setOffendingSemester(s);
 						result.add(prereq);
 					}
@@ -727,32 +788,18 @@ public class Schedule implements java.io.Serializable {
 		return result;
 	}
 
-	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
-		Requirement needed = prereqsNeededFor(e.getPrefix(), sD);
-		if(needed == null){
-			return false; //no errors found
-		}
-		if(!needed.getStoredIsComplete()){
-
-			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
-			preReq.setOffendingCourse(e);
-			preReq.setNeededCourses(needed);
-			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
-
-			return(!this.userOverride(preReq));
-			//throw new PrerequsiteException(needed, e);
-		}
-		return false;
-	}
 
 	/**
-	 * Find the prereqs needed for this prefix if taken at the given
-	 * time.
+	 * Find the Prereq needed for this prefix if taken at the given
+	 * time. Return the Prereq after it has been updated based on the
+	 * correct set of schedule elements.
+	 * 
+	 * May return null.
 	 * @param p
 	 * @param sD
 	 * @return
 	 */
-	public Requirement prereqsNeededFor(Prefix p, SemesterDate sD){
+	public Prereq prereqNeededFor(Prefix p, SemesterDate sD){
 		if(p == null){
 			return null;
 		}
@@ -761,31 +808,93 @@ public class Schedule implements java.io.Serializable {
 			if(this.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(elementsTakenIn(sD));
 			}
-			Requirement needed = CourseList.getPrereq(p);
+			Prereq needed = CourseList.getPrereq(p);
 			if(needed != null){
-				needed.updateAllStoredValues(taken);
+				needed.updateOn(taken);
 			}
 			return needed;
 		}
 	}
+	
 
-	public boolean checkPrerequsitesRemoving(ScheduleElement e, Semester s){
-		//TODO fix this logic to use the sorted nature of getAllSemestersSorted
-		// right now it's checking every semester when that's not necessary.
+	/**
+	 * Check if any prereq errors happen as a result of adding (not replacing or removing)
+	 * element e to the schedule at date SD.
+	 * @param e
+	 * @param sD
+	 * @return
+	 */
+	public boolean checkPrerequsitesAdding(ScheduleElement e, SemesterDate sD){
+		//The only possible errors are if e itself has a prereq - 
+		// we can't mess up any other courses by just adding.
+		Prereq needed = prereqNeededFor(e.getPrefix(), sD);
+		//needed will have correct storedMinMoreNeeded values at this point.
+		if(needed == null){
+			return false; //no errors found
+		}
+		if(!needed.getRequirement().getStoredIsComplete()){
+			ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
+			preReq.setOffendingCourse(e);
+			preReq.setNeededCourses(needed.getRequirement());
+			//	preReq.setInstructions(e.getDisplayString() + " needs prerequisite(s)" + needed.toString());
+			return(!this.userOverride(preReq));
+			//throw new PrerequsiteException(needed, e);
+		}
+		return false;
+	}
+
+	/**
+	 * Check if any prereq errors happen as a result of removing (not adding or replacing) 
+	 * element e to the schedule at date SD.
+	 * @param e
+	 * @param s
+	 * @return
+	 */
+	public boolean checkPrerequsitesRemoving(ScheduleElement e, SemesterDate SD){
+		//A remove might mess up a course after e, but can't hurt courses
+		// before e.
 		Prefix currentP = e.getPrefix();
+		if(currentP == null){
+			return false; //null prefix can't satisfy any prereqs.
+		}
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		for(Semester other : this.getAllSemestersSorted()){
-			if(other.getDate().compareTo(s.getDate()) >= 0 ){
-				for(ScheduleElement oElement : s.getElements()){
-					Requirement needed = prereqsNeededFor(oElement.getPrefix(),other.semesterDate);
-					if(needed == null){
-						return false;
+			//if this semester is after s
+			if( (prereqsCanBeSatisfiedInSameSemester && other.getDate().compareTo(SD) == 0 )
+					||  other.getDate().compareTo(SD) > 0 ){
+				//add all the elements in this semester into taken, leaving out e.
+				for(ScheduleElement laterElement : other.elements){
+					if(other.getDate().compareTo(SD) != 0 || (!laterElement.equals(e))){
+						taken.add(laterElement);
 					}
-					if(needed.isSatisfiedBy(currentP)){
-						ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
-						preReq.setOffendingCourse(e);
-						preReq.setNeededCourses(needed);
-						//		preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
-						return(!this.userOverride(preReq));
+				}
+				//compare the prereqs needed if you include e to the
+				// prereqs needed if you leave e out. If they're different,
+				// throw a prereq error.
+				ArrayList<ScheduleElement> causes = new ArrayList<ScheduleElement>();
+				for(ScheduleElement laterElement  : other.elements){
+					Prereq needed = CourseList.getPrereq(laterElement.getPrefix());
+					if(needed == null){
+						continue;
+					}
+					needed.updateOn(taken);
+					int neededWithoutE = needed.getRequirement().getStoredNumberLeft();
+					taken.add(e);
+					needed.updateOn(taken);
+					int neededWithE = needed.getRequirement().getStoredCoursesLeft();
+					taken.remove(taken.size() - 1);
+					
+					if(neededWithoutE != neededWithE){
+						causes.add(laterElement);
+					}
+				}
+				for( int i = 0; i < causes.size() ; i ++){
+					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
+					preReq.setOffendingCourse(causes.get(i));
+					preReq.setNeededCourses(new TerminalRequirement(e.getPrefix()));
+					//		preReq.setInstructions(e.getDisplayString() + " needs prerequisit(s) " + needed.toString());
+					if(!this.userOverride(preReq)){
+						return true;
 					}
 				}
 			}
@@ -795,27 +904,44 @@ public class Schedule implements java.io.Serializable {
 
 	/**
 	 * If an error is found, return true.
-	 * @param oldSem
-	 * @param newSem
+	 * @param fromSem
+	 * @param toSem
 	 * @param oldE
 	 * @param newE
 	 * @return
 	 */
-	public boolean checkPrerequsitesReplacing(Semester oldSem, Semester newSem, 
+	public boolean checkPrerequsitesReplacing(Semester fromSem, Semester toSem, 
 			ScheduleElement oldE, ScheduleElement newE){
-		//If the elements are equal, we're really moving the time we take it.
-		// Check to see if anything happening before the new placement but
-		// after the old placement now has an unfilled prereq.
-		if(newE.equals(oldE)){
+		Prefix newP = newE.getPrefix();
+		Prefix oldP = oldE.getPrefix();
+		
+		
+		//If the prefixes aren't the same,
+		// then as far as prereqs care,
+		// we're just doing an add and a remove.
+		if(newP == null || oldP == null || !(newP.equals(oldP))){
+			return (checkPrerequsitesRemoving(oldE, fromSem.getDate()) ||checkPrerequsitesAdding(newE, toSem.semesterDate));
+		}
+		//If the prefixes are equal, we're really moving the time we take this prefix.
+		else{
+			if(fromSem.semesterDate.compareTo(toSem.semesterDate) == 0){
+				return false;// no errors.
+			}
 			//If we're moving the course backward in time 
 			// we might no longer satisfy its prereqs.
-			if(oldSem.semesterDate.compareTo(newSem.semesterDate) >= 1){
-				Requirement stillNeeded = prereqsNeededFor(oldE.getPrefix(), newSem.semesterDate);
+			if(fromSem.semesterDate.compareTo(toSem.semesterDate) > 0){
+				Prereq stillNeeded = prereqNeededFor(newP, toSem.semesterDate);
+				Prereq neededBefore = prereqNeededFor(oldP, fromSem.semesterDate);
+				if(stillNeeded == null){
+					 return false;
+				}
+				int stillNeededNum = stillNeeded.getRequirement().getStoredNumberLeft();
+				int neededBeforeNum = neededBefore.getRequirement().getStoredNumberLeft();
 
-				if(stillNeeded != null && !stillNeeded.getStoredIsComplete()){
+				if(stillNeededNum != neededBeforeNum){
 					ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
 					preReq.setOffendingCourse(newE);
-					preReq.setNeededCourses(stillNeeded);
+					preReq.setNeededCourses(stillNeeded.getRequirement());
 					//	preReq.setInstructions(newE.toString() + " has prerequisite " + missing.toString());
 					return((!this.userOverride(preReq)));
 				}
@@ -824,46 +950,40 @@ public class Schedule implements java.io.Serializable {
 				}
 			}
 			//If we're moving the course forward in time. 
-			//The only courses that need to be checked are those in between the new position and
-			//the old position of the moving course, this is because any other course 
-			//has already had an error thrown, and therefore has been checked by the user. 
+			//the only courses that need to be checked are those in between the new position and
+			//the old position of the moving course, these are the only
+			//courses that might loose a prereq by this operation. 
 
 			//prefixes between oldSem and newSem.
 			// In the following code, new refers to the new location for the element, and 
 			// to the semester who's date comes later. (2020 is new, 2018 is old).
-			ArrayList<ScheduleElement> beforeNew = this.elementsTakenBefore(newSem.semesterDate);
-			ArrayList<ScheduleElement> afterOld = this.elementsTakenAfter(oldSem.semesterDate);
-			ArrayList<ScheduleElement> old = this.elementsTakenIn(oldSem);
+			ArrayList<ScheduleElement> beforeTo = this.elementsTakenBefore(toSem.semesterDate);
+			ArrayList<ScheduleElement> afterFrom = this.elementsTakenAfter(fromSem.semesterDate);
+			ArrayList<ScheduleElement> inFrom = this.elementsTakenIn(fromSem);
 			if(this.prereqsCanBeSatisfiedInSameSemester){
-				afterOld.addAll(old);
+				afterFrom.addAll(inFrom);
 			}
-			afterOld.retainAll(beforeNew);
-			ArrayList<ScheduleElement> intersection = afterOld;
+			afterFrom.retainAll(beforeTo);
+			ArrayList<ScheduleElement> intersection = afterFrom;
 
 			//for each element we're jumping over, check if
 			// we satisfied one of that element's prereqs.
-			HashSet<Prefix> elementsThatUsedTheMovingElement = new HashSet<Prefix>();
-			for(ScheduleElement p : intersection){
-				Requirement r = CourseList.getPrereq(p.getPrefix());
-				if(r != null && r.isSatisfiedBy(newE)){
-					elementsThatUsedTheMovingElement.add(p.getPrefix());
+			HashSet<ScheduleElement> elementsThatUsedTheMovingElement = new HashSet<ScheduleElement>();
+			for(ScheduleElement e : intersection){
+				Prereq p = CourseList.getPrereq(e.getPrefix());
+				if(p != null && p.getRequirement().isSatisfiedBy(newE)){
+					elementsThatUsedTheMovingElement.add(e);
 				}
 			}
-			if(!elementsThatUsedTheMovingElement.isEmpty()){
+			for(ScheduleElement e : elementsThatUsedTheMovingElement){
 				ScheduleError preReq = new ScheduleError(ScheduleError.preReqError);
-				preReq.setNeededCourses(new Requirement(elementsThatUsedTheMovingElement
-						.toArray(new Prefix[elementsThatUsedTheMovingElement.size()]),1));
-				preReq.setOffendingCourse(newE);
-				return(!this.userOverride(preReq));
+				preReq.setOffendingCourse(e);
+				preReq.setNeededCourses(new TerminalRequirement(newP));
+				if(!this.userOverride(preReq)){
+					return true;
+				}
 			}
 			return false;
-
-		}
-		//If the element's aren't the same,
-		// we're really just doing an
-		// add and a remove.
-		else{
-			return (checkPrerequsitesRemoving(oldE, oldSem) ||checkPrerequsitesAdding(newE, newSem.semesterDate));
 		}
 	}
 
@@ -937,7 +1057,8 @@ public class Schedule implements java.io.Serializable {
 	//	Duplicate error checking
 	///////////////////////////////
 	///////////////////////////////
-
+	@SuppressWarnings("unused")
+	private boolean ______duplicateErrorChecking_________;
 
 
 	/**
@@ -1020,6 +1141,8 @@ public class Schedule implements java.io.Serializable {
 	//	Optimism error
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______optimismErrorChecking_________;
 
 
 
@@ -1097,6 +1220,8 @@ public class Schedule implements java.io.Serializable {
 	//	Course overlap error checking
 	///////////////////////////////
 	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ______courseOverlapErrorChecking_________;
 
 	/**
 	 * Check all semesters to see if any elements in them
@@ -1113,6 +1238,34 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
+	
+	
+	
+	///////////////////////////////
+	///////////////////////////////
+	//	Updating methods
+	///////////////////////////////
+	///////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Updates_________;
+
+	private void recalcGERMajor(){
+		int type = this.determineGER();
+		if(type == -1){
+			type = Major.BA;
+		}
+		this.GER =CourseList.getGERMajor(languagePrefix, type);
+		updateTotalCoursesNeeded();
+	}
+
+	private void updateTotalCoursesNeeded(){
+		totalCoursesNeeded = 0;
+		
+		for(Requirement r : getAllRequirements()){
+			
+			totalCoursesNeeded += r.getOriginalCoursesNeeded();
+		}
+	}
 
 	///////////////////////////////
 	///////////////////////////////
@@ -1129,6 +1282,8 @@ public class Schedule implements java.io.Serializable {
 	//
 	// reqsFulfilledValid tells if each scheduleElement knows
 	// which requirements it satisfies.
+	@SuppressWarnings("unused")
+	private boolean ______updateRequirements_________;
 
 
 	/**
@@ -1262,39 +1417,6 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	/**
-	 * doesn't update the requirements (this would cause an infinite loop, 
-	 * updating a requirement means knowing all requirements, which can't happen unless
-	 * you get all majors.)
-	 * @return
-	 */
-	public ArrayList<Major> getMajors(){
-		ArrayList<Major> result = new ArrayList<Major>();
-		if(GER != null){
-			result.add(GER);
-		}
-		if(prereqs.size() > 0){
-			Major prereqsM = new Major("Prereqs");
-			prereqsM.chosenDegree = -1;
-			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
-			for(Prereq p : prereqs){
-				if(!p.getRequirement().getStoredIsComplete()){
-					uniquePrereqs.add(p.getRequirement());
-				}
-			}
-			for(Requirement r : uniquePrereqs){
-				prereqsM.addRequirement(r);
-			}
-			Collections.sort(prereqsM.reqList);
-			if(uniquePrereqs.size() > 0){
-				result.add(prereqsM);
-			}
-		}
-		result.addAll(this.majorsList);
-		return result;
-	}
-
-
 	public void updatePrereqs(){
 		//Make sure prereqs accurately reflect the currently scheduled elements.
 		prereqs = new HashSet<Prereq>();
@@ -1305,10 +1427,9 @@ public class Schedule implements java.io.Serializable {
 					continue;
 				}
 			}
-			Requirement r = CourseList.getPrereq(e.getPrefix());
-			if(r != null){
-				Prereq newPrereq = new Prereq(r, e.getPrefix());
-				prereqs.add(newPrereq);
+			Prereq p = CourseList.getPrereq(e.getPrefix());
+			if(p != null){
+				prereqs.add(p);
 			}
 		}
 

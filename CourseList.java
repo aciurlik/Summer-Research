@@ -178,7 +178,7 @@ public class CourseList implements java.io.Serializable  {
 	 * @param p
 	 * @return
 	 */
-	public static Requirement getPrereq(Prefix p){
+	public static Prereq getPrereq(Prefix p){
 		if(p == null){
 			return null;
 		}
@@ -254,7 +254,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 		}
 
-		return result;
+		return new Prereq(result, p);
 
 	}
 
@@ -411,7 +411,7 @@ public class CourseList implements java.io.Serializable  {
 	 */
 	public static void addToPrereqMeanings(){
 		for(Prefix p : rawPrereqs.keySet()){
-			Requirement r = getPrereq(p);
+			getPrereq(p);
 		}
 	}
 	public static ArrayList<String> allUnknownPrereqs(){
@@ -733,14 +733,6 @@ public class CourseList implements java.io.Serializable  {
 				m.removeRequirement(holder);
 				m.addRequirement(holder);
 			}
-		}
-
-		if(majorType != BM){
-			System.out.println(m.getRequirement("MR").saveString());
-		}
-		else{
-			System.out.println("This is not a BM");
-			System.out.println(m.reqList);
 		}
 		
 		m.setChosenDegree(majorType);
