@@ -94,15 +94,15 @@ public class CourseList implements java.io.Serializable  {
 
 
 	static String[] flClassNumbers = 
-		    {		"110", 			"115", 			"120", 						"201", 								"202", 						"210", 						"215", 										"220", 						"221", 					"222", 											"230", 						"231","232","233","234","235","240", 							"310", 		"320", 		"331", 					"332", 					"333", 					"334"};
+		    {		"110", 			"115", 			"120", 						"201", 								"202", 						"210", 							"214",						"215", 										"220", 						"221", 						"222", 											"230", 						"231","232","233","234","235","240", 								"270",		   					"310", 	   "320", 		"331", 				    "332", 					"333", 					"334"};
 	private static String[][] languagePrereqsArray = {
-			{"CHN", "CHN-PL.110",   null,           "(CHN-110, CHN-PL.120)", 	"(CHN-120, CHN-PL.201)", 			"(CHN-201, CHN-PL.202)", 	null, 						null, 										null, 						null, 					null, 											null, 						null, null, null, null, null, null, 							null, 		null, 		null, 					null, 					null, 					null},
-			{"FRN", "(FRN-PL.110)", "(FRN-PL.115)", "(FRN-110)", 				"(FRN-115, FRN-120, FRN-PL.201)", 	null, 						"(FRN-201, FRN-PL.210+)", 	"(FRN-201, FRN-120, FRN-220, FRN-PL.210+)", "(FRN-201, FRN-PL.220+)", 	"(FRN-201, FRN-PL.220+)", null, 										null, 						null, null, null, null, null, null, 							null, 		null, 		null, 					null, 					null, 					null },
-			{"GRK", "GRK-PL.110",   null,			"(GRK-110)", 				"(GRK-120, GRK-PL.201)",	 		null, 						null, 						null, 										null, 						null, 					null, 											null, 						null, null, null, null, null, null, 							"GRK-301", 	"GRK-301", "GRK-301", 				"GRK-301", 				"GRK-301", 				null },
-			{"GRM", "(GRM-PL.110)", "GRM-PL.115", 	"(GRM-PL.110, GRM-PL.115)", "(GRM-115, GRM-120, GRM-PL.201)", 	null, 						"(GRM-201, GRM-PL.210+)", 	"(GRM->200, GRM-PL.210+)", 					"(GRM->200, GRM-PL.220+)", 	null, 					"(GRM-115, GRM-120, GRM-PL.201, GRM-PL.220+)", "(GRM->200, GRM-PL.200+)", 	null, null, null, null, null, null, 							null, 		null, 		null, 					null, 					null, 					null},
-			{"JPN", "JPN-PL.110",   null, 			"(JPN-110, JPN-PL.120)", 	"(JPN-120, JPN-PL.201)", 			"(JPN-201, JPN-PL.202)", 	null, 						null, 										null, 						null, 					null, 											null, 						null, null, null, null, null, null, 							null, 		null, 		null, 					null, 					null, 					null},
-			{"LTN", "LTN-PL.110",   null, 			"LTN-110", 					"(LTN-120, LTN-PL.201)", 			null, 						null, 						null, 										null, 						null, 					null, 											null, 						null, null, null, null, null, null, 							null, 		null, 		"(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)"},
-			{"SPN", "SPN-PL.110",   "SPN-PL.115", 	"SPN-110", 					"(SPN-115, SPN-120, SPN-PL.201)", 	null, 						"(SPN-201, SPN-PL.210+)", 	"(SPN-201, SPN-PL.210+, SPN-PL.215)", 		"(SPN-210, SPN-215, SPN-PL.220)",null, 				null, 											null, 						null, null, null, null, null, "(SPN-210, SPN-215, SPN-PL.220+)",null, 		null, 		null, 					null, 					null, 					null}
+			{"CHN", "CHN-PL.110",   null,           "(CHN-110, CHN-PL.120)", 	"(CHN-120, CHN-PL.201)", 			"(CHN-201, CHN-PL.202)", 	null, 		  					null,						null, 										null, 						null, 						null, 											null, 						null, null, null, null, null, null, 								null,							null, 		null, 		null, 					null, 					null, 					null},
+			{"FRN", "FRN-PL.110",  "FRN-PL.115",    "(FRN-110)", 				"(FRN-115, FRN-120, FRN-PL.201)", 	null, 						"(FRN-201, FRN-PL.210+)", 		"(FRN-201, FRN-PL.210+)",	"(FRN-201, FRN-PL.210+)",                   "(FRN-201)", 	            "(FRN-201)",             	null, 										    null, 						null, null, null, null, null, null, 								null,							null, 		null, 		null, 					null, 					null, 					null },
+			{"GRK", "GRK-PL.110",   null,			"(GRK-110)", 				"(GRK-120, GRK-PL.201)",	 		null, 						null, 							null,						null, 										null, 						null, 						null, 											null, 						null, null, null, null, null, null, 								null,							"GRK-301", 	"GRK-301", "GRK-301", 				"GRK-301", 				"GRK-301", 				null },
+			{"GRM", "GRM-PL.110",   null, 	        "(GRM-PL.110, GRM-PL.120)", "(GRM-120, GRM-PL.201)", 	        null, 						"(GRM-201, GRM-PL.210+)", 		null,						"(GRM->200, GRM-PL.210+)", 					"(GRM->200, GRM-PL.220+)", 	null, 						"(GRM->120, GRM-PL.210+)",                      "(GRM->200, GRM-PL.200+)", 	null, null, null, null, null, null, 								null,							null, 		null, 		null, 					null, 					null, 					null},
+			{"JPN", "JPN-PL.110",   null, 			"(JPN-110, JPN-PL.120)", 	"(JPN-120, JPN-PL.201)", 			"(JPN-201, JPN-PL.202)", 	null, 							null,						null, 										null, 						null, 						null, 											null, 						null, null, null, null, null, null, 								null,							null, 		null, 		null, 					null, 					null, 					null},
+			{"LTN", "LTN-PL.110",   null, 			"LTN-110", 					"(LTN-120, LTN-PL.201)", 			null, 						null, 							null,						null, 										null, 						null, 						null, 											null, 						null, null, null, null, null, null, 								null,							null, 		null, 		"(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)"},
+			{"SPN", "SPN-PL.110",   "SPN-PL.115", 	"SPN-110", 					"(SPN-115, SPN-120, SPN-PL.201)", 	null, 						"(SPN-201, SPN-PL.210+)", 		null,						"(SPN-201, SPN-PL.210+, SPN-PL.215)", 		"(SPN-215, SPN-PL.220)",    null, 						null, 											null, 						null, null, null, null, null, "(SPN-215, SPN-PL.220+)",	            "(SPN-215, SPN-PL.220)",		null, 		null, 		null, 					null, 					null, 					null}
 
 	};
 	
@@ -734,7 +734,7 @@ public class CourseList implements java.io.Serializable  {
 				m.addRequirement(holder);
 			}
 		}
-		
+
 		m.setChosenDegree(majorType);
 		return m;
 	}

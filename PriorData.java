@@ -29,6 +29,7 @@ public class PriorData implements Serializable{
 	SemesterDate latestDate;
 	Prefix languagePrefix;
 	String[][] data;
+	String studentName;
 
 
 
@@ -50,7 +51,7 @@ public class PriorData implements Serializable{
 	 * @return
 	 */
 	public void readFromWebsiteDraggedData(String text){
-
+		//String name = 
 		//First, find the index of the ID/Name.
 		Matcher idMatch = Pattern.compile("\\d{5,20}").matcher(text); //at least 5 digits from the ID 
 		//(this prevents matching on years or other digits in the text, and gives an unambiguous
@@ -58,16 +59,21 @@ public class PriorData implements Serializable{
 		if(!idMatch.find()){
 			throw new RuntimeException( "We couldn't find your ID number in the text.");
 		}
-
+		
 		//put startIndex in a location where the next instance of the string 'course'
 		// can only be a column header.
 		int startIndex = idMatch.start();
+		String name = (text.substring(idMatch.end()+1, text.indexOf("\n", startIndex)));
+		studentName = name.trim();
 		int advisorSkipLineIndex = text.indexOf("Download course", startIndex);
 		if(advisorSkipLineIndex != -1){
 			startIndex = text.indexOf("\n", advisorSkipLineIndex) + 1;
 		}
 		text = text.substring(startIndex);
-
+		
+		
+		
+		
 		//Find the first column header, either "Course/Section and Title" or "course" depending on advisor view or student view.
 		Matcher headersStartMatcher = Pattern.compile("Course/Section and Title|course").matcher(text);
 		if(!headersStartMatcher.find()){
@@ -79,7 +85,6 @@ public class PriorData implements Serializable{
 		
 		
 		int headersStart = headersStartMatcher.start();
-
 		//Find last column header, which is always 'global awareness'.
 		int headersEnd = text.indexOf("global awareness", headersStart);
 		if(headersEnd == -1){
@@ -335,6 +340,11 @@ public class PriorData implements Serializable{
 		return languagePrefix;
 	}
 
+	public String getStudentName() {
+		checkIsCorrupted();
+		return "Cats";
+	}
+
 	public ArrayList<Course> getAllCourses(){
 		return courseList;
 	}
@@ -392,6 +402,9 @@ public class PriorData implements Serializable{
 	public void testReading(){
 		
 	}
+
+
+
 
 
 }

@@ -317,11 +317,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			schGUI.GUIOutsideLink(e.getActionCommand());
 		}
 		else if(e.getActionCommand().equals(MenuOptions.addMayX)){
-			schGUI.GUIYearsPopUP(e.getActionCommand());
+			schGUI.addMayX();
 		}
 
 		else if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
-			schGUI.GUIChooseSummerSession();
+			schGUI.addSummerSession();
 		}
 
 		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){

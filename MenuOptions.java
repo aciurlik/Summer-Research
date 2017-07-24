@@ -28,7 +28,7 @@ public class MenuOptions implements java.io.Serializable{
 			public static final  String addResearch = "Explore Research";
 			public static final  String exploreInternship = "Explore Internships";
 			public static final  String addMayX = "Add MayX";
-			public static final  String addSummerClass = "Add Summer Class";
+			public static final  String addSummerClass = "Add Summer Session";
 		
 			public static final  String addMajor = "Add Major";
 			public static final  String addMinor = "Add Minor";
