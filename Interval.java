@@ -1,14 +1,14 @@
 
 
 /**
- * A class that represents an interval between two elements 
- * from a set of comparable objects.
- * it should always be true that start.compareTo(end) <= 0.
+ * A class that represents a time interval between startTime and endTime.
+ * startTime must be less than endTime, so
+ * starTime.compareTo(endTime) <= 0 should always be true.
  * 
  * @author dannyrivers
  *
  */
-public class Interval<T extends Comparable<T>> implements java.io.Serializable{
+public class Interval<T extends Comparable<T>> implements Comparable<Interval<T>>, java.io.Serializable{
 	T start;
 	T end;
 
@@ -16,66 +16,34 @@ public class Interval<T extends Comparable<T>> implements java.io.Serializable{
 		this.start = start;
 		this.end = end;
 	}
-	
-	
+
 	/**
-	 * check if these two intervals overlap where 
-	 * endpoints don't count as overlaping 
-	 * so (3, 3) does not overlap (3, 7).
+	 * Check if these two intervals overlap.
+	 * 
+	 * If they just touch, they don't overlap.
 	 * @param other
 	 * @return
 	 */
 	public boolean overlaps(Interval<T> other){
-		return overlaps(other, false);
-	}
-
-	/**
-	 * 
-	 * TODO 
-	 * 
-	 * Replace this with an intersection finding method.
-	 * 
-	 * Intersection finder (written by Lindsay)
-	 * Given L1, R1, L2, R2
-	 * if (R2 < L1) or (R1 < L2):
-	 *   return noIntersection
-	 * else:
-	 *   return [max(L1, L2), min(R1, R2)]
-	 * 
-	 * 
-	 * 
-	 * Check if these two intervals overlap.
-	 * if includeEndpoints, then the intervals (1,3) and (3,7)
-	 *   do overlap. Otherwise, they don't.
-	 * Note that (3, 3) and (3, 7) may or may not overlap.
-	 * @param other
-	 * @return
-	 */
-	public boolean overlaps(Interval<T> other, boolean includeEndpoints){
-		//Imagine other as a fixed interval on a number line, 
+		//Imagine other as a fixed time interval on a number line, 
 		// with earlier times to the left. We'll imagine two scenarios:
-		// either this is entirely to the right of other.start or 
-		// this starts to the left of other.start.
+		// either this is entirely to the right of otherStartTime or 
+		// this starts to the left of otherStartTime.
 
 
-		//this.start is after other.start, 
+		//thisStartTime is after otherStartTime, 
 		// so we are to the right of the fixed other
 		if(this.start.compareTo(other.start) >= 0){
-			//if other.end is to the right of this.start
+			//if otherEndTime is to the right of thisStartTime
 			// then there is overlap.
-			if(includeEndpoints){
-				//case with =
-				if(this.start.compareTo(other.end) <= 0)
-					return true;
-				else
-					return false;
+			//Otherwise, overlap is impossible.
+			if(this.start.compareTo(other.end) < 0){
+				// Alternatively, this code makes it so overlaps occur
+				// when intervals just touch. other.end.compareTo(this.start) >= 0){
+				return true;
 			}
 			else{
-				//case without =
-				if(this.start.compareTo(other.end) < 0)
-					return true;
-				else
-					return false;
+				return false;
 			}
 		}
 		else{
@@ -83,23 +51,35 @@ public class Interval<T extends Comparable<T>> implements java.io.Serializable{
 			// so we are to the left of the fixed other
 			//if thisEndTime is to the right of otherStartTime, 
 			// then there is overlap.
-			if (includeEndpoints){
-				//case with =
-				if(this.end.compareTo(other.start) >= 0)
-					return true;
-				else
-					return false;
+			//Otherwise, overlap is impossible.
+			if(this.end.compareTo(other.start) > 0){
+				return true;
 			}
 			else{
-				//case without =
-				if(this.end.compareTo(other.start) > 0)
-					return true;
-				else
-					return false;
+				return false;
 			}
 		}
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * 
+	 * Compares based on start time first, smaller start times, and 
+	 *   in the case of ties compares end times, with small 
+	 *   end times first.
+	 */
+	@Override
+	public int compareTo(Interval<T> o) {
+		int first = this.start.compareTo(o.start);
+		if(first == 0){
+			return this.end.compareTo(o.end);
+		}
+		else{
+			return first;
+		}
+	}
 	/**
 	 * Check if other is contained within this interval.
 	 * 
