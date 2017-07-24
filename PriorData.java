@@ -149,7 +149,7 @@ public class PriorData implements Serializable{
 		int creditsIndex = -1;
 		int gradeIndex = -1;
 		for(int i = 0; i < headers.length ; i ++){
-			if(headers[i].equals("term")){
+			if(headers[i].toUpperCase().equals("TERM")){
 				termIndex = i;
 			}
 			else if(headers[i].toUpperCase().contains("COURSE")){
@@ -158,7 +158,8 @@ public class PriorData implements Serializable{
 			else if(headers[i].toUpperCase().contains("CREDITS")){
 				creditsIndex = i;
 			}
-			else if (headers[i].toUpperCase().equals("GRADE")){
+			else if (headers[i].toUpperCase().equals("GRADE") || 
+					headers[i].toUpperCase().equals("FINAL GRADE")){
 				gradeIndex = i;
 			}
 		}
