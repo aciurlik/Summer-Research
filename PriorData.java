@@ -214,10 +214,11 @@ public class PriorData implements Serializable{
 				//Collect relevant string data
 				String courseString = row[courseStringIndex].trim();
 				String creditsString = row[creditsIndex].trim();
-				creditsString = creditsString.replaceAll("\\s+", "");
-				System.out.println("\"" +courseString + "\"" + "  Credits:  " + "\""+ creditsString + "\"");
 				String termString = row[termIndex].trim();
 				String gradeString = row[gradeIndex].trim();
+				//remove spaces from these fields
+				creditsString = creditsString.replaceAll("\\s+", "");
+				gradeString = gradeString.replaceAll("\\s+", "");
 
 				//Turn the strings into objects
 
@@ -260,7 +261,7 @@ public class PriorData implements Serializable{
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);
-				if( ((! "".equals(creditsString)) )&& creditsString!=null){
+				if( creditsString!=null && creditsString.matches(".*\\d.*")){
 					//System.out.println((int)(Double.parseDouble(creditsString)));
 					credits = (int)(Double.parseDouble(creditsString));
 				}
@@ -282,11 +283,15 @@ public class PriorData implements Serializable{
 				
 				//skip failing grades (this will still let a course be added if it has no grade)
 				// X was used to redact grades at one point.
-				if("ABCDX ".contains(gradeString)){
+				if(isPassing(gradeString)){
 					courseList.add(c);
+				}
+				else{
+					System.out.println("Not adding " + Arrays.toString(row));
 				}
 			}
 			catch(Exception e){
+				System.out.println("Started catch" + Arrays.toString(row));
 				System.out.println(Arrays.toString(row));
 				if(FurmanOfficial.masterIsAround){
 					throw e;
@@ -364,6 +369,32 @@ public class PriorData implements Serializable{
 			throw new RuntimeException("The data you were trying to read from never loaded correctly");
 		}
 	}
+	
+	
+	/**
+	 * Check if this is a passing grade and the course 
+	 * can be used in the schedule. If a student fails a course,
+	 * for planning purposes it's like they never took it in the first place.
+	 * 
+	 * Because taken courses can't be removed, we want to err on the side of
+	 * not adding passing courses rather than adding a failing course, so
+	 * this method checks if the grade is known to be a passing grade 
+	 * (not known to be a failing grade) and marks unknowns as failing grades.
+	 * @param grade
+	 * @return
+	 */
+	public boolean isPassing(String grade){
+		if(grade == null || grade.equals("")){
+			return true;
+		}
+		for(char c : grade.toCharArray()){
+			if("ABCDSP X".contains(c + "")){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	
 	
