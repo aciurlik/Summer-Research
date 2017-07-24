@@ -20,8 +20,8 @@ public class CourseList implements java.io.Serializable  {
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
-	
-	
+
+
 	public static final int defaultCreditHours = 4;
 	public static final boolean nwAndNwlAreOne = true; //for Dr. Bouzarth
 
@@ -43,7 +43,6 @@ public class CourseList implements java.io.Serializable  {
 			{"GRM", "(GRM-PL.110)", "GRM-PL.115", "(GRM-PL.110, GRM-PL.115)", "(GRM-115, GRM-120, GRM-PL.201)", null, "(GRM-201, GRM-PL.210+)", "(GRM->200, GRM-PL.210+)", "(GRM->200, GRM-PL.220+)", null, "(GRM-115, GRM-120, GRM-PL.201, GRM-PL.220+)", "(GRM->200, GRM-PL.200+)", null, null, null, null, null, null, null, null, null, null, null, null},
 			{"JPN", "JPN-PL.110", null, "(JPN-110, JPN-PL.120)", "(JPN-120, JPN-PL.201)", "(JPN-201, JPN-PL.202)", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
 			{"LTN", "LTN-PL.110", null, "LTN-110", "(LTN-120, LTN-PL.201)", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)", "(LTN-301, LTN-PL.UL)"},
-			
 			{"SPN", "SPN-PL.110", "SPN-PL.115", "SPN-110", "(SPN-115, SPN-120, SPN-PL.201)", null, "(SPN-201, SPN-PL.210+)", "(SPN-201, SPN-PL.210+, SPN-PL.215)", "(SPN-210, SPN-215, SPN-PL.220)", null, null, null, null, null, null, null, null, "(SPN-210, SPN-215, SPN-PL.220+)", null, null, null, null, null, null}
 
 	};
@@ -166,23 +165,23 @@ public class CourseList implements java.io.Serializable  {
 			result.addChoice(new TerminalRequirement(new Prefix(p.getSubject()  ,  "PL."+p.getNumber())));
 			return result;
 		}
-		
+
 
 		return Requirement.readFrom(ourVersion);
 	}
 
-	
-/**
- * Used to tell if the prereq should include a placement into the course, currently used for FL. 
- * @param p
- * @return true if it should include, false otherwise. 
- */
+
+	/**
+	 * Used to tell if the prereq should include a placement into the course, currently used for FL. 
+	 * @param p
+	 * @return true if it should include, false otherwise. 
+	 */
 	public static boolean isPlaceableCourse(Prefix p){
 		if(languagePrefix.contains(p.getSubject())){
 			return true;
 		}
 		return false;
-		
+
 	}
 
 
@@ -369,6 +368,9 @@ public class CourseList implements java.io.Serializable  {
 	 * @return
 	 */
 	public static int getCoursesCreditHours(Prefix p){
+		if(p!= null && p.getNumber().contains("PL.")){ //Placement courses don't give credits
+			return 0;
+		}
 		if(getCoursesSatisfying(p).isEmpty()){
 			return defaultCreditHours;
 		}
@@ -570,7 +572,7 @@ public class CourseList implements java.io.Serializable  {
 		Requirement wc = m.getRequirement("WC");
 		Requirement ne = m.getRequirement("NE");
 		RequirementGraph.putEdge(wc, ne);
-		
+
 		//sort the GER list
 		String[] beforeNW = {"FYW", "WR"};
 		String[] afterNW = {"HB","HA","TA","VP","MR","FL","UQ","MB","NE", "WC"};
@@ -584,12 +586,20 @@ public class CourseList implements java.io.Serializable  {
 		}
 		for(String s : afterNW){
 			Requirement holder = m.getRequirement(s);
-			m.removeRequirement(holder);
-			m.addRequirement(holder);
+			if(holder != null){
+				m.removeRequirement(holder);
+				m.addRequirement(holder);
+			}
+		}
+
+		if(majorType != BM){
+			System.out.println(m.getRequirement("MR").saveString());
+		}
+		else{
+			System.out.println("This is not a BM");
+			System.out.println(m.reqList);
 		}
 		
-		
-
 		m.setChosenDegree(majorType);
 		return m;
 	}
@@ -724,10 +734,10 @@ public class CourseList implements java.io.Serializable  {
 		if(degreeType == CourseList.BA || degreeType == CourseList.BM){
 			standard=201;
 		}
-		
+
 		String[] languages = {"GRK", "LTN", "JPN", "FRN", "SPN", "CHN", "GRK"};
 		String subj = "";
-		
+
 		//if you've got a prefix like FRN-201, and it's greater than or equal to
 		// standard, then add it to the list of requirements.
 		if (languagePrefix != null){
@@ -738,7 +748,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 			r.addChoice(TerminalRequirement.readFrom(subj + ">=" + number));
 		}
-		
+
 		//For every language that isn't the same as your languagePrefix, add the standard requirement.
 		for(String language : languages){
 			if(!language.equals(subj)){
@@ -746,7 +756,7 @@ public class CourseList implements java.io.Serializable  {
 			}
 
 		}
-		
+
 		return r;
 	}
 
@@ -900,10 +910,10 @@ public class CourseList implements java.io.Serializable  {
 		//setPrereqMeaning("PSY-201 or BIO-222", "(PSY-201, BIO-222 )");
 
 		//viewKnownPrereqs();
-	
+
 		//LanguageSequencePreReqandPlacementLevels();
 
-		viewKnownPrereqs();
+		//viewKnownPrereqs();
 
 
 	}

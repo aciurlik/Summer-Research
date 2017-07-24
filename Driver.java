@@ -184,7 +184,7 @@ public class Driver {
 		String instruct = " <center> <h1> THIS IS FOR PLANNING PURPOSES ONLY </h1> </center>" 
 				+"<p style='width 100px;'>This tool does not officially enroll you in any courses. " 
 				+ "There is no guarantee that the courses you select will be available in the semester you select them. "
-				+ "There is no guarantee that the majors and requirements in this program are accurate."
+				+ "There is no guarantee that the majors and requirements in this program are accurate. "
 				+ "It is your responsibility to ensure that you have met the graduation requirements. "
 				+ "To officially enroll in courses, you must meet with your advisor  "
 				+ " and go through the course registration process via MyFurman or Enrollment Services. </p> " ;

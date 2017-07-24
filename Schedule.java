@@ -653,7 +653,9 @@ public class Schedule implements java.io.Serializable {
 
 	private void updateTotalCoursesNeeded(){
 		totalCoursesNeeded = 0;
+		
 		for(Requirement r : getAllRequirements()){
+			
 			totalCoursesNeeded += r.getOriginalCoursesNeeded();
 		}
 	}

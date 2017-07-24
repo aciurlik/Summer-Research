@@ -197,6 +197,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		for(ScheduleElement e : this.elements){
 
 			if(e instanceof ScheduleCourse){
+			
 				totalHours = totalHours + ((ScheduleCourse) e).getCreditHours();
 
 

@@ -209,6 +209,8 @@ public class PriorData implements Serializable{
 				//Collect relevant string data
 				String courseString = row[courseStringIndex].trim();
 				String creditsString = row[creditsIndex].trim();
+				creditsString = creditsString.replaceAll("\\s+", "");
+				System.out.println("\"" +courseString + "\"" + "  Credits:  " + "\""+ creditsString + "\"");
 				String termString = row[termIndex].trim();
 				String gradeString = row[gradeIndex].trim();
 
@@ -253,7 +255,7 @@ public class PriorData implements Serializable{
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);
-				if(( ! "".equals(creditsString) )&& creditsString!=null){
+				if( ((! "".equals(creditsString)) )&& creditsString!=null){
 					//System.out.println((int)(Double.parseDouble(creditsString)));
 					credits = (int)(Double.parseDouble(creditsString));
 				}

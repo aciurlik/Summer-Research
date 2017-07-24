@@ -312,10 +312,7 @@ public class ScheduleGUI{
 
 	public void GUIAddMajor(Major m) {
 		boolean typeNeedsToBeChosen = true;
-		if (m.majorType.equals(Major.MINOR)){
-			typeNeedsToBeChosen = false;
-		}
-		if(m.majorType.equals(Major.TRACK) && m.degreeTypes.isEmpty()){
+		if( m.degreeTypes.isEmpty()){
 			typeNeedsToBeChosen = false;
 		}
 
@@ -332,7 +329,7 @@ public class ScheduleGUI{
 			//show the user the notes, and let them know that this is the last time they'll see 
 			// these notes.
 			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
-			String title = "Notes for " + m.name;
+			String title = "Notes for " + m.name + ":";
 			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
