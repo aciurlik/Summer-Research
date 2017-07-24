@@ -166,7 +166,9 @@ public class Schedule implements java.io.Serializable {
 			//	continue;
 			//}
 			ScheduleCourse cc = new ScheduleCourse(c, this);
-			this.directAddScheduleElement(cc, c.semester);
+			if(!this.directAddScheduleElement(cc, c.semester)){
+				throw new RuntimeException("Could neither find nor make the semester for the couse \n" + cc.getDisplayString());
+			}
 		}
 		MainMenuBar.addImportScheduleOption();
 		
@@ -180,13 +182,24 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	private boolean directAddScheduleElement(ScheduleElement e, SemesterDate d){
-		for(Semester s : semesters){
+		ArrayList<Semester> allSemesters = this.getAllSemestersSorted();
+		
+		for(int i = 0; i < allSemesters.size(); i ++){
+			Semester s  = allSemesters.get(i);
 			if(s.semesterDate.compareTo(d) == 0){
 				return s.directAdd(e);
 			}
-		}
-		if(priorSemester.semesterDate.compareTo(d) == 0){
-			return priorSemester.directAdd(e);
+			if(s.semesterDate.compareTo(d) > 0){
+				//we've passed where the semester should have been, so we need to make a 
+				// new semester.
+				int indexInSemesters = i-1;
+				if(i == -1){
+					return false;
+				}
+				Semester newSemester = new Semester(d, this);
+				semesters.add(indexInSemesters, newSemester);
+				return newSemester.directAdd(e);
+			}
 		}
 		return false;
 	}
