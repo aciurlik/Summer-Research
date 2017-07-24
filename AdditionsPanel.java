@@ -31,7 +31,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public int headerNumber = 2;  //Number of Headers (The Furman Advantage. Major/Minor)
 	public int spacingConstant = 0;// Kept this way to line up smaller than the bellTower
 	
-	ScheduleGUI d;
+	ScheduleGUI schGUI;
 	
 	//Buttons As Seen in Panel
 	private JButton ExploreStudyAwayButton;
@@ -48,7 +48,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public AdditionsPanel(ScheduleGUI schGUI){
 		//Sets layout, and style of the Panel
 		super();
-		this.d=schGUI;
+		this.schGUI=schGUI;
 		this.setLayout((new GridLayout(optionsNumber+headerNumber, 1, spacingConstant, spacingConstant)));
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 		JLabel header = new JLabel(AdditionsHeader);
@@ -131,18 +131,18 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		//For add Major, Minor, Track
 		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor)|| e.getActionCommand().equals(MenuOptions.addTrack)){
-			d.GUIPopUP(e.getActionCommand());
+			schGUI.GUIPopUP(e.getActionCommand());
 		}
 		//Explore Buttons, goes to outside links
 		if((e.getActionCommand().equals(MenuOptions.exploreInternship)) || (e.getActionCommand().equals(MenuOptions.addResearch))||(e.getActionCommand().equals(MenuOptions.exploreStudyAway))){
 
-			d.GUIOutsideLink(e.getActionCommand());
+			schGUI.GUIOutsideLink(e.getActionCommand());
 		}
 		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
-			d.GUIChooseSummerSession();
+			schGUI.addSummerSession();
 		}
 		if(e.getActionCommand().equals(MenuOptions.addMayX)){
-			d.GUIYearsPopUP(e.getActionCommand());
+			schGUI.addMayX();
 		}
 
 

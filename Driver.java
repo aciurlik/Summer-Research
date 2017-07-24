@@ -66,6 +66,16 @@ public class Driver {
 
 	public static void removeScheduleGUI(ScheduleGUI s){
 		listOfScheduleGUIs.remove(s);
+		if(!FurmanOfficial.masterIsAround){
+			int n = JOptionPane.showConfirmDialog(
+					new JFrame(),
+					"Would you like to save your schedule?",
+					"Save Schedule",
+					JOptionPane.YES_NO_OPTION);
+			if(n==0){
+				s.GUISaveSchedule();
+			}
+		}
 		if(listOfScheduleGUIs.isEmpty()){
 			System.exit(0);
 
@@ -305,6 +315,15 @@ public class Driver {
 
 
 	public static void main(String[] args){
+		
+		// take the menu bar off the jframe
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+		// set the name of the application menu item
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "PlanIt!");
+		
+		
+		
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.		
 		Color c = FurmanOfficial.grey;

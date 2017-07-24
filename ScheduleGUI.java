@@ -62,7 +62,7 @@ public class ScheduleGUI{
 
 	JList<Integer> pickYears;
 	String seasonName;
-	Integer[] yearsDialog;
+	//Integer[] yearsDialog;
 	static ImageIcon icon;
 
 	String instructYear = "Please pick a year you would like to add a ";
@@ -101,6 +101,7 @@ public class ScheduleGUI{
 		sch.setDriver(this);
 
 		frame = new JFrame();
+		frame.setTitle(sch.studentName);
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
 		menu.setFont(FurmanOfficial.normalFont);
@@ -448,37 +449,92 @@ public class ScheduleGUI{
 		this.update();
 
 	}
+	/**
+	 * First asks the user to pick the appropriate summer session.
+	 * Then asks them what year they would like to add. 
+	 * It then displays list of classes that the user can choose
+	 * to add. 
+	 */
+	public void addSummerSession(){
+		//Choose Summer Session One or Two
+		int season = GUIChooseSummerSession();
+		if(season == SemesterDate.OTHER){
+			return;
+		}
+		ScheduleCourse c = null;
+		Semester addedSemester = null;
+		//What year you'd like this summer class
+		Integer year = this.createYearDialogBox(getAvaliableYears(season), "Add Summer");
+		if(year == null){
+			return;
+		}
+		addedSemester = sch.addNewSemesterInsideSch(year, season);
+		//Choose course you would like to add
+		c =  addCourseDialogBox(addedSemester);
+		if(c != null){
+			sch.addScheduleElement(c, addedSemester);
+		}
+		this.update();
 
+	}
+	/**
+	 * This asks the user what year they would 
+	 * like to add a MayX, and then provides them
+	 * with a list of courses avaibiable at that time. 
+	 * It then adds the user's choice to that semester. 
+	 */
+	public void addMayX(){
+		ScheduleCourse c = null;
+		Integer year = this.createYearDialogBox(getAvaliableYears(SemesterDate.MAYX), MenuOptions.addMayX);
+		if(year == null){
+			return;
+		}
+		Semester addedSemester = sch.addNewSemesterInsideSch(year, SemesterDate.MAYX);
+		c =  addCourseDialogBox(addedSemester);
+		if(c != null){
+			//Removes all courses that have already been added in case of MayX 
+			addedSemester.elements.clear();
+			sch.addScheduleElement(c, addedSemester);
+		}
+		this.update();
 
-
-
-	public void GUIChooseSummerSession() {
-		String[] summerChoice = {SemesterDate.getSeason(SemesterDate.SUMMERONE), SemesterDate.getSeason(SemesterDate.SUMMERTWO)};
-		String c = (String)JOptionPane.showInputDialog(null, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
-		GUIYearsPopUP(c);
 	}
 
-	public void GUIYearsPopUP(String actionCommand){
-		if(actionCommand.equals(SemesterDate.getSeason(SemesterDate.SUMMERONE))){
-			season= SemesterDate.SUMMERONE;
-			seasonName = SemesterDate.getSeason(SemesterDate.SUMMERONE);
+	/**
+	 * Asks the user for which Summer Session they would like to add
+	 * @return Number associated with the user specified semesterDate's season
+	 * and returns SemesterDate.OTHER if c is null. 
+	 */
+	public int GUIChooseSummerSession() {
+		String[] summerChoice = {SemesterDate.getSeason(SemesterDate.SUMMERONE), SemesterDate.getSeason(SemesterDate.SUMMERTWO)};
+		String c = (String)JOptionPane.showInputDialog(null, "Choose Summer Session" , "Summer Session" , JOptionPane.PLAIN_MESSAGE, icon, summerChoice, "Dr. Fray");
+		if(c == null){
+			return SemesterDate.OTHER;
 		}
-		if(actionCommand.equals(SemesterDate.getSeason(SemesterDate.SUMMERTWO))){
-			season = SemesterDate.SUMMERTWO;
-			seasonName = SemesterDate.getSeason(SemesterDate.SUMMERTWO);
+		if(c.equals(summerChoice[0])){
+			return SemesterDate.SUMMERONE;
 		}
-
-		if(actionCommand.equals(MenuOptions.addMayX)){
-			season= SemesterDate.MAYX;
-			seasonName = SemesterDate.getSeason(SemesterDate.MAYX);
+		if(c.equals(summerChoice[1])){
+			return SemesterDate.SUMMERTWO;
 		}
-
-
-
-
+		return SemesterDate.OTHER;
+		
+	}
+	/**
+	 * This gives returns the list of years that
+	 * a user can choose to add a MayX or Summer session.
+	 * This looks at the years included in the schedule
+	 * and filters out all years that already have that 
+	 * type of addition in them. For example if the user 
+	 * has already added a MayX in 2005, when they press
+	 * "add MayX" again 2005 will not be an option. 
+	 * @param season
+	 * @return Viable years one can add that type of Semester. 
+	 */
+	public Integer[] getAvaliableYears(int season){
+		Integer[] yearsDialog;
 		//Gets available years
 		ArrayList<Integer> availableYears = new ArrayList<Integer>();
-
 		ArrayList<Semester> allSemesters = sch.getAllSemestersSorted();
 		int last = (allSemesters.size()-1);
 		int end = allSemesters.get(last).semesterDate.year;
@@ -488,18 +544,13 @@ public class ScheduleGUI{
 				availableYears.add(i);
 			}
 		}
-
-
 		yearsDialog = new Integer[availableYears.size()];
 		for(int i=0; i<availableYears.size(); i++){
 			yearsDialog[i]= availableYears.get(i);
 		}
+		return yearsDialog;
 
-		if(availableYears.size()!=0){
 
-			createYearDialogBox(seasonName);
-
-		}
 
 
 	}
@@ -523,13 +574,9 @@ public class ScheduleGUI{
 	 * 
 	 * @param s
 	 */
-	public void createYearDialogBox(String s){
+	public Integer createYearDialogBox(Integer[] yearsDialog, String s){
 		Integer y = (Integer)JOptionPane.showInputDialog(null, instructYear + s,  headInstructYear, JOptionPane.PLAIN_MESSAGE, icon, yearsDialog, "cat" );
-		if((y != null) && (y !=0)){
-			Semester addedSemester = sch.addNewSemesterInsideSch(y,season);
-			this.update();
-			addCourseDialogBox(addedSemester);
-		}
+		return y;
 	}
 
 	/**
@@ -538,7 +585,7 @@ public class ScheduleGUI{
 	 * a semester.
 	 * @param s
 	 */
-	public void addCourseDialogBox(Semester s){	
+	public ScheduleCourse addCourseDialogBox(Semester s){	
 		ArrayList<ScheduleCourse> addCourses = new ArrayList<ScheduleCourse>();
 		addCourses = sch.getCoursesInSemester(s);
 		ArrayList<ScheduleCourse> toFinal =sch.filterAlreadyChosenCourses(addCourses);
@@ -548,15 +595,7 @@ public class ScheduleGUI{
 		}
 
 		ScheduleCourse c = GUIChooseCourse(finalCourseList);
-
-		if(c != null){
-			//Removes all courses that have already been added in case of MayX 
-			if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
-				s.elements.clear();
-			}
-			sch.addScheduleElement(c, s);
-			this.update();
-		}
+		return c;
 	}
 
 
@@ -914,6 +953,7 @@ public class ScheduleGUI{
 	}
 
 	public void updateAll(){
+		frame.setTitle(sch.studentName);
 		schP.update(sch);
 		reqs.update(sch);
 		b.update();

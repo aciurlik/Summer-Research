@@ -38,6 +38,10 @@ public class Schedule implements java.io.Serializable {
 	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	public SemesterDate currentSemester;
 	SemesterDate firstSemester;
+	public String studentName;
+
+	
+
 
 	public static final boolean prereqsCanBeSatisfiedInSameSemester = false;
 
@@ -78,6 +82,7 @@ public class Schedule implements java.io.Serializable {
 	
 	
 	public Schedule(PriorData priorCourses){
+		
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
 
@@ -153,7 +158,7 @@ public class Schedule implements java.io.Serializable {
 
 
 	public void readPrior(PriorData pd){
-		
+		this.studentName = pd.getStudentName();
 		currentSemester = pd.getLatestDate();
 		setFirstSemester(pd.getEarliestDate());
 
@@ -505,7 +510,7 @@ public class Schedule implements java.io.Serializable {
 		return this.semesters.get(0);
 	}
 
-
+	
 
 	public Semester getPriorSemester() {
 		return priorSemester;
@@ -1477,7 +1482,7 @@ public class Schedule implements java.io.Serializable {
 		result.append("\n");
 		//If any Errors Prints them 
 		if(!d.getErrorString().equals(" ")){
-			result.append("Scheduling Errors:" + d.getErrorString());
+			result.append("Scheduling Errors: <br>" + d.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h2>The Final Countdown: </h2>");
@@ -1674,7 +1679,6 @@ public class Schedule implements java.io.Serializable {
 		ListOfMajors m = FileHandler.getMajorsList();
 		ArrayList<Major> newMajorsList = new ArrayList<Major>();
 		for(Major major: this.majorsList){
-			System.out.println(major.name +"  " + major.chosenDegree);
 			Major refreshed = m.getMajor(major.name);
 			refreshed.setChosenDegree(major.chosenDegree);
 			newMajorsList.add(refreshed);
