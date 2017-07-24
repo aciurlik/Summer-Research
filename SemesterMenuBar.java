@@ -92,7 +92,7 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.addInstruct)){
-			semPanel.d.addCourseDialogBox(semPanel.sem);
+			semPanel.d.addCourseTo(semPanel.sem);
 		}
 		if(e.getActionCommand().equals(MenuOptions.supriseMe)){
 			semPanel.d.GUISupriseWindow(semPanel.sem);

@@ -108,12 +108,16 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 			toRemove.setPreferredSize(buttonSize);
 		}
 		
+		//mark this element as taken if necessary
 		if(s instanceof ScheduleCourse){
 			if (((ScheduleCourse) s).getSemester().compareTo(container.d.sch.currentSemester)<0){
-				toRemove.setEnabled(false);
+				if(!FurmanOfficial.masterIsAround){
+					toRemove.setEnabled(false);
+				}
 				elementLabel.setForeground(FurmanOfficial.grey(170));
 			}
 		}
+		
 		toRemove.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				removeSelf();

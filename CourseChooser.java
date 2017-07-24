@@ -459,6 +459,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		private static final long serialVersionUID = 1L;
 		JToggleButton[] meetingDaysButtons;
 		JTextField profNameField;
+		JTextField subjField;
 		
 		JComboBox<String> startOfTimeRange; //filter all courses who's start times
 		// are after startOfTimeRange.
@@ -500,7 +501,23 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			profNameField.addActionListener(this);//revalidate when typed
 			professorNamePanel.add(new JLabel("Professor name contains"));
 			professorNamePanel.add(profNameField);
-			this.add(professorNamePanel);
+			//this.add(professorNamePanel);
+			
+			//subject 
+			JPanel subjFieldPanel = new JPanel();
+			subjField = new JTextField();
+			subjField.setColumns(4);
+			subjField.setText("");
+			subjField.addActionListener(this);
+			subjFieldPanel.add(new JLabel("Subject"));
+			subjFieldPanel.add(subjField);
+			//this.add(subjFieldPanel);
+			
+			JPanel fieldsPanel = new JPanel();
+			fieldsPanel.add(professorNamePanel);
+			fieldsPanel.add(subjFieldPanel);
+			this.add(fieldsPanel);
+			
 			
 			//Times
 			JPanel timesPanel = new JPanel();
@@ -571,9 +588,16 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			
 			
 			//Professor name filter
-			String profText = profNameField.getText();
+			String profText = profNameField.getText().toUpperCase();
 			if(!profText.equals("")){
-				result.add(c -> c.professor.contains(profText));
+				result.add(c -> c.professor.toUpperCase().contains(profText));
+			}
+			
+			//subject filter
+			
+			String subjFilter = subjField.getText().toUpperCase();
+			if(!subjFilter.equals("")){
+				result.add(c -> c.coursePrefix.getSubject().contains(subjFilter));
 			}
 			
 			
