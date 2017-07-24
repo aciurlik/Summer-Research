@@ -734,14 +734,6 @@ public class CourseList implements java.io.Serializable  {
 				m.addRequirement(holder);
 			}
 		}
-
-		if(majorType != BM){
-			System.out.println(m.getRequirement("MR").saveString());
-		}
-		else{
-			System.out.println("This is not a BM");
-			System.out.println(m.reqList);
-		}
 		
 		m.setChosenDegree(majorType);
 		return m;
