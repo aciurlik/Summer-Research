@@ -259,18 +259,30 @@ public class PriorData implements Serializable{
 						this.setLanguagePrefix(new Prefix(p.getSubject(), m.group()));
 					}
 				}
+				
 
-				//credits
-				int credits= CourseList.getCoursesCreditHours(p);
-				if( creditsString!=null && creditsString.matches(".*\\d.*")){
-					//System.out.println((int)(Double.parseDouble(creditsString)));
-					credits = (int)(Double.parseDouble(creditsString));
-				}
-				
-				
 				
 				//Semester / term
 				SemesterDate takenDate = readSemesterDate(termString);
+				//takenDate may be null
+				if(takenDate != null){
+					if(takenDate.sNumber == SemesterDate.OTHER || takenDate.year < 1500 || takenDate.year > 2500){
+						throw new RuntimeException("Could not make the semester from string \""+ termString + "\"");
+					}
+				}
+
+				//credits
+				int credits= CourseList.getCoursesCreditHours(p);
+				//If credits data exists, contains a number, and isn't a recently planned course
+				// (because planned courses 
+				if( creditsString!=null && creditsString.matches(".*\\d.*") ){
+					//System.out.println((int)(Double.parseDouble(creditsString)));
+					credits = (int)(Double.parseDouble(creditsString));
+					if(latestDate.equals(takenDate) && credits == 0){
+						credits = CourseList.getCoursesCreditHours(p);
+					}
+				}
+				
 
 
 				Course c = null;
@@ -315,6 +327,7 @@ public class PriorData implements Serializable{
 		try{
 			result = SemesterDate.readFromFurman(s);
 		} catch(Exception e){
+			//if this read fails, throw the exception
 			result = SemesterDate.fromFurman(s);
 		}
 		return result;

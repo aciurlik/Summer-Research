@@ -169,13 +169,9 @@ public class Schedule implements java.io.Serializable {
 		
 		//Add the courses
 		for(Course c : pd.getAllCourses()){
-			// Skip all the placement courses
-			//if(c.getPrefix().getNumber().contains("PL")){
-			//	continue;
-			//}
 			ScheduleCourse cc = new ScheduleCourse(c, this);
 			if(!this.directAddScheduleElement(cc, c.semester)){
-				throw new RuntimeException("Could neither find nor make the semester for the couse \n" + cc.getDisplayString());
+				throw new RuntimeException("Could neither find nor make the semester for the course \n" + cc.getDisplayString() +"," + c.semester);
 			}
 		}
 		MainMenuBar.addImportScheduleOption();

@@ -21,7 +21,7 @@ public class PopUpChooser implements java.io.Serializable {
 	JFrame frame = new JFrame();
 	ArrayList <Major> displayThings;
 	String polite = "Please ";
-	ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "dioglogIcon.gif");
+	ImageIcon icon = FileHandler.getDialogImage();
 
 
 
