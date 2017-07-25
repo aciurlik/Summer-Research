@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,9 @@ public class SettingsPanel implements ActionListener {
 
 
 		JPanel layer = new JPanel();
+		layer.setPreferredSize(new Dimension(400, 200));
+		
+		
 		layer.setLayout(new BorderLayout());
 		JPanel buttonPanel = new JPanel();
 		JButton saveChanges = new JButton(MenuOptions.saveChanges);
@@ -33,40 +37,48 @@ public class SettingsPanel implements ActionListener {
 		buttonPanel.add(cancel);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-
-
-		JComponent panel1 = makeTextPanel("");
-		JPanel checkBoxHolder = new JPanel();
-		checkBoxHolder.setSize(200, 150);
+		JPanel layerOne = new JPanel();
+		layerOne.setLayout(new GridLayout(3, 3, 1, 1));
+	
+		
 		showStartUp = new JCheckBox(MenuOptions.startUp);
 		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){
 			showStartUp.setSelected(true);
 		}
+		
+		layerOne.setLayout(new GridLayout(3, 3, 0, 0));
+		layerOne.add(new JLabel(""));
+		layerOne.add(new JLabel(""));
+		layerOne.add(new JLabel (""));
+		layerOne.add(new JLabel(""));
+		layerOne.add(showStartUp);
+		layerOne.add(new JLabel(""));
+		layerOne.add(new JLabel (""));
+		layerOne.add(new JLabel(""));
+		layerOne.add(new JLabel(""));
+	
 
-		checkBoxHolder.add(showStartUp);
-		panel1.add(checkBoxHolder);
-		tabbedPane.addTab(MenuOptions.startUp, null, panel1,
-				"Add/Remove Start Up Instructions");
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+		tabbedPane.addTab(MenuOptions.startUp, layerOne);
+	
+		
+		JPanel comingSoon = new JPanel();
+		comingSoon.setLayout(new BorderLayout());
+		JLabel label = new JLabel("Coming Soon");
+		comingSoon.add(label, BorderLayout.NORTH);
+	
+		tabbedPane.addTab("Other Settings", label);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-
-
-
-		layer.add(tabbedPane, BorderLayout.NORTH);
+		
+		layer.add(tabbedPane);
+		
+	
 		layer.add(buttonPanel, BorderLayout.SOUTH);
 		popUp.add(layer);
 		popUp.pack();
 		popUp.setVisible(true);
 
 	}
-	protected static JComponent makeTextPanel(String text) {
-		JPanel panel = new JPanel(false);
-		JLabel filler = new JLabel(text);
-		filler.setHorizontalAlignment(JLabel.CENTER);
-		panel.setLayout(new GridLayout(1, 1));
-		panel.add(filler);
-		return panel;
-	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.Cancel)){
