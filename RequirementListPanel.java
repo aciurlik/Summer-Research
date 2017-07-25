@@ -1,26 +1,19 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
+
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
+
 
 /**
  * This panel is the list of requirements that can be added to the
@@ -136,7 +129,6 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		schedule.checkUpdateReqs();
 		
 		ArrayList<Major> majors = schedule.getMajors();
-		//System.out.println(majors.size());
 		int heightCounter = 1;
 		for(Major m : majors){
 			MajorPanel majorPanel = new MajorPanel(m, d);

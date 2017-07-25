@@ -39,7 +39,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	JPanel hidePanel;
 	JLabel fallSpring;
 	JButton deleteSemesterButton;
-	ScheduleGUI d;
+	ScheduleGUI schGUI;
 	Semester sem;
 	final static int height=300;
 	JTextArea notes;
@@ -58,7 +58,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		//Sets up the panel that will hold one semester
 		super();
 		this.sem=sem;
-		this.d = d;
+		this.schGUI = d;
 
 		this.addMouseListener(this);
 
@@ -165,8 +165,8 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	public void localRepaint(){
 		revalidate();
 		repaint();
-		this.d.schP.revalidate();
-		this.d.schP.repaint();
+		this.schGUI.schP.revalidate();
+		this.schGUI.schP.repaint();
 	}
 
 	@Override
@@ -201,7 +201,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.deleteSemester)){
-			d.GUIRemoveSemester(this);
+			schGUI.GUIRemoveSemester(this);
 		}
 		else{
 			hide();
@@ -374,16 +374,16 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	public void addElement(Component s){
 		if(s instanceof RequirementPanel){
 			RequirementPanel r = (RequirementPanel) s;
-			d.GUIRequirementPanelDropped(r, this);
+			schGUI.GUIRequirementPanelDropped(r, this);
 		}
 		else{
 			ScheduleElementPanel p = (ScheduleElementPanel) s;
-			d.GUIScheduleElementPanelDropped(p, this);
+			schGUI.GUIScheduleElementPanelDropped(p, this);
 		}
 	}
 
 	public void removeElement(ScheduleElementPanel e){
-		d.GUIRemoveElement(e, this);
+		schGUI.GUIRemoveElement(e, this);
 		//this.updatePanel(true);
 	}
 
@@ -472,7 +472,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		try {
-			this.d.GUITextBeingWritten(e, sem);
+			this.schGUI.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
@@ -482,7 +482,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		try {
-			this.d.GUITextBeingWritten(e, sem);
+			this.schGUI.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
@@ -492,7 +492,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		try {
-			this.d.GUITextBeingWritten(e, sem);
+			this.schGUI.GUITextBeingWritten(e, sem);
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}

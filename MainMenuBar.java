@@ -1,192 +1,123 @@
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
 
+import java.awt.event.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.ButtonGroup;
 import javax.swing.JMenuBar;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.ImageIcon;
-
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.JFrame;
-import javax.swing.JList;
 
-/* 
+/**
+ * Blurb written 7/24/2017
+ * Last updated 7/24/2017
  * 
- * http://docs.oracle.com/javase/tutorial/uiswing/examples/components/MenuLookDemoProject/src/components/MenuLookDemo.java
+ *This is the main menu bar that is on the north section of the JFrame.  
+ *The class is structured to mirror the look of the menubar, the more indented
+ *the more menus the user must click through to reach the menuItem. 
+ *
  */
 
 
-
-public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Serializable {
-	/**
-	 * 
-	 */
+public class MainMenuBar extends JMenuBar implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	JTextArea output;
-	JScrollPane scrollPane;
 	ScheduleGUI schGUI;
-	static JMenu newSchedule;
-	static JMenuItem importPriorSchedule;
-	static JMenuItem blankSchedule;
+	static JMenu newSchedule; //The following are fields
+	static JMenuItem importPriorSchedule; // because they can be updated 
+	static JMenuItem blankSchedule;//based on the scheduleGUI's status
 
 
 	public MainMenuBar(ScheduleGUI schGUI) {
 		super();
 		this.schGUI=schGUI;
-		JMenu menu, submenu, subTwomenu;
-		JMenuItem menuItem;
+		JMenu menu, submenu, subTwomenu; //The branch of the tree,
+		// the longer the name the more menues connect it with the menubar 
+		JMenuItem menuItem;//The leaf of the tree where the actionListener is
 
 		
 		menu = new JMenu(MenuOptions.FurmanAdvantage);
-		
-		
-
-		submenu = new JMenu(MenuOptions.MayX);
-		menuItem = new JMenuItem(MenuOptions.exploreMayX);
-		menuItem.addActionListener(this);
-		submenu.add(menuItem);
-
-
-		menuItem = new JMenuItem(MenuOptions.addMayX);
-		menuItem.addActionListener(this);
-		submenu.add(menuItem);
-
+			submenu = new JMenu(MenuOptions.MayX);
+				menuItem = new JMenuItem(MenuOptions.exploreMayX);
+				menuItem.addActionListener(this);
+			submenu.add(menuItem);
+				menuItem = new JMenuItem(MenuOptions.addMayX);
+				menuItem.addActionListener(this);
+			submenu.add(menuItem);
 		menu.add(submenu);
-
-
-		submenu = new JMenu(MenuOptions.StudyAbroad);
-
-		menuItem = new JMenuItem(MenuOptions.exploreStudyAway);
-		menuItem.addActionListener(this);
-		submenu.add(menuItem);
-
-		menu.add(submenu);
-
-
-		menuItem = new JMenuItem(MenuOptions.addSummerClass);
-		menuItem.addActionListener(this);
+		
+			menuItem = new JMenuItem(MenuOptions.exploreStudyAway);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-
-
-		menuItem = new JMenuItem(MenuOptions.exploreInternship);
-		menuItem.addActionListener(this);
-
-	
-		
+			menuItem = new JMenuItem(MenuOptions.addSummerClass);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-		
+
+			menuItem = new JMenuItem(MenuOptions.exploreInternship);
+			menuItem.addActionListener(this);
+		menu.add(menuItem);
 		this.add(menu);
 
-
 		
-		
-		
-
 		//Build the file menu-> Add/Save Schedule
 		menu = new JMenu(MenuOptions.file);
-		
+			newSchedule = new JMenu(MenuOptions.newSchedule);
+				blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
+				blankSchedule.addActionListener(this);
+			newSchedule.add(blankSchedule);
 
+				PriorData s = FileHandler.getSavedStudentData();
 
-		newSchedule = new JMenu(MenuOptions.newSchedule);
-		
-		blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
-		blankSchedule.addActionListener(this);
-		newSchedule.add(blankSchedule);
-
-
-
-		PriorData s = FileHandler.getSavedStudentData();
-
-		importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
-		importPriorSchedule.addActionListener(this);
-		
-		if(s != null){
+			importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
+				importPriorSchedule.addActionListener(this);
+			if(s != null){
 			newSchedule.add(importPriorSchedule);
-
-		}
-		
+			}
 		menu.add(newSchedule);
 
-
-
-
-		menuItem = new JMenuItem(MenuOptions.openSchedule);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.openSchedule);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-
-
-
-
-		menuItem = new JMenuItem(MenuOptions.saveSchedule);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.saveSchedule);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-
-
-		menuItem = new JMenuItem(MenuOptions.printSchedule);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.printSchedule);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem(MenuOptions.deleteSchedule);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.deleteSchedule);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-
-		menuItem = new JMenuItem(MenuOptions.checkAllErrors);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.checkAllErrors);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
 
-		submenu = new JMenu(MenuOptions.loadPriorCourses);
+			submenu = new JMenu(MenuOptions.loadPriorCourses);
+				subTwomenu = new JMenu(MenuOptions.student);
+					menuItem = new JMenuItem(MenuOptions.dragAndDrop);
+					menuItem.setActionCommand(MenuOptions.studentDnD);
+					menuItem.addActionListener(this);
+				subTwomenu.add(menuItem);
+			submenu.add(subTwomenu);
 		
-		
-		subTwomenu = new JMenu(MenuOptions.student);
-		
-		
-		
-		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
-		menuItem.setActionCommand(MenuOptions.studentDnD);
-		menuItem.addActionListener(this);
-		subTwomenu.add(menuItem);
-		
-		submenu.add(subTwomenu);
-		
-		subTwomenu = new JMenu(MenuOptions.advisor);
-		menuItem = new JMenuItem(MenuOptions.dragAndDrop);
-		menuItem.setActionCommand(MenuOptions.advisorDnD);
-		menuItem.addActionListener(this);
-		subTwomenu.add(menuItem);
-		submenu.add(subTwomenu);
+				subTwomenu = new JMenu(MenuOptions.advisor);
+					menuItem = new JMenuItem(MenuOptions.dragAndDrop);
+					menuItem.setActionCommand(MenuOptions.advisorDnD);
+					menuItem.addActionListener(this);
+				subTwomenu.add(menuItem);
+			submenu.add(subTwomenu);
 
 		
-		menuItem = new JMenuItem(MenuOptions.downloadcsv);
-		menuItem.addActionListener(this);
-		subTwomenu.add(menuItem);
-		
-		
-		submenu.add(subTwomenu);
-		
-		
-		
-		
-	
-		
-		
-		
+					menuItem = new JMenuItem(MenuOptions.downloadcsv);
+					menuItem.addActionListener(this);
+				subTwomenu.add(menuItem);
+			submenu.add(subTwomenu);
 		menu.add(submenu);
 
-		//Unimplemented method will come back to 
+		//This is a feature still in construction.
+		//This will only appear if the programmer's view
+		//is set to true. 
 		if(FurmanOfficial.masterIsAround){
 			menuItem = new JMenuItem("Compare");
 			JPopupMenu compare = new JPopupMenu("Compare");
@@ -194,109 +125,42 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			compare.add(menuItem);
 			menu.add(menuItem);
 		}
-
 		this.add(menu);
 		
-		
-		//Build Edit menu in the menu bar.
 		menu = new JMenu(MenuOptions.Edit);
-		
-		//menu.setMnemonic(KeyEvent.VK_N);
-		menu.getAccessibleContext().setAccessibleDescription(
-				"This allows edits to schedule");
-
-
-		menuItem = new JMenuItem(MenuOptions.addMajor);
-		JPopupMenu majorPopup = new JPopupMenu();
-		menuItem.addActionListener(this);
-		majorPopup.add(menuItem);
-		
-
-
-
+			menuItem = new JMenuItem(MenuOptions.addMajor);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-
-
-
-		
-		menuItem = new JMenuItem(MenuOptions.addMinor);
-		JPopupMenu minorPopup = new JPopupMenu();
-		menuItem.addActionListener(this);
-		minorPopup.add(menuItem);
-		
-
+			menuItem = new JMenuItem(MenuOptions.addMinor);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-	
-		menuItem = new JMenuItem(MenuOptions.addTrack);
-		JPopupMenu trackPopup = new JPopupMenu();
-		menuItem.addActionListener(this);
-		trackPopup.add(menuItem);
-		
+			menuItem = new JMenuItem(MenuOptions.addTrack);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-
 		this.add(menu);
-		
 		
 		menu = new JMenu(MenuOptions.settings);
-		
-
-		menuItem = new JMenuItem(MenuOptions.changeSettings);
-		menuItem.setActionCommand(MenuOptions.changeSettings);
-		JPopupMenu settings =new JPopupMenu();
-		settings.add(menuItem);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.changeSettings);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-
-
-		menuItem = new JMenuItem(MenuOptions.restoreDefault);
-		menuItem.setActionCommand(MenuOptions.restoreDefault);
-		JPopupMenu restoreDefault = new JPopupMenu();
-		restoreDefault.add(menuItem);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.restoreDefault);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
 		this.add(menu);
-
 
 		menu = new JMenu(MenuOptions.help);
-		menuItem = new JMenuItem(MenuOptions.viewStartUp);
-		menuItem.setActionCommand(MenuOptions.viewStartUp);
-		//JPopupMenu viewStartUp = new JPopupMenu(MenuOptions.viewStartUp);
-		menuItem.addActionListener(this);
-		//viewStartUp.add(menuItem);
+			menuItem = new JMenuItem(MenuOptions.viewStartUp);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-		menuItem = new JMenuItem(MenuOptions.examineRequirementHelp);
-		menuItem.setActionCommand(MenuOptions.examineRequirementHelp);
-		//new JPopupMenu().add(menuItem);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.examineRequirementHelp);	
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-		menuItem = new JMenuItem(MenuOptions.findACourse);
-		menuItem.setActionCommand(MenuOptions.findACourse);
-		menuItem.addActionListener(this);
+			menuItem = new JMenuItem(MenuOptions.findACourse);
+			menuItem.addActionListener(this);
 		menu.add(menuItem);
-
-
 		this.add(menu);
-
-
-
-
-
 	}
 
-
-
-	public Container createContentPane() {
-		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.setOpaque(true);
-		return contentPane;
-	}
 
 
 	public static void addImportScheduleOption(){
@@ -309,8 +173,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 	}
 
 
-
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.exploreInternship)){
@@ -319,11 +181,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 		else if(e.getActionCommand().equals(MenuOptions.addMayX)){
 			schGUI.addMayX();
 		}
-
 		else if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
 			schGUI.addSummerSession();
 		}
-
 		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
 			schGUI.GUIPopUP(e.getActionCommand());
 		}
@@ -374,8 +234,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener, java.io.Ser
 			Driver.chooseSchedulesToCompare();
 		}
 	}
-
-
 }
 
+/**
+ * Test
+ * Make sure every menuItem is activated when clicked. If it does act as expected problem
+ * resides in other class. 
+ */
 

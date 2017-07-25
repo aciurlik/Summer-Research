@@ -1,4 +1,6 @@
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,6 +56,7 @@ public class Schedule implements java.io.Serializable {
 
 	public static Schedule testSchedule(){
 		//	CourseList l = CourseList.testList();
+		Driver.tryPickStartDate();
 		Schedule result = new Schedule();
 		result.readBlankPrior();
 		return result;
@@ -73,7 +76,6 @@ public class Schedule implements java.io.Serializable {
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
 		//this.masterList = masterList;
-
 		readBlankPrior(); //loads prior courses, recalc firstSemester and sets as currentSemester as well,
 		// and create default semesters.
 		this.recalcGERMajor();
@@ -121,10 +123,11 @@ public class Schedule implements java.io.Serializable {
 
 	public void readBlankPrior(){
 		if(defaultFirstSemester == null){
-			defaultFirstSemester = Driver.tryPickStartDate();
+			throw new RuntimeException("Tried to make a blank schedule before a default first semester was chosen");
 		}
 		setFirstSemester(defaultFirstSemester);
 		setCurrentSemester(defaultFirstSemester);
+		
 	}
 
 	public void readTestPrior(){
@@ -1481,7 +1484,6 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public HashSet<Requirement> resolveConflictingRequirements(HashSet<Requirement> enemies, Course c){
-		System.out.println("RESOLVE CALLED");
 		HashSet<Requirement> result = new HashSet<Requirement>();
 		ArrayList<Requirement> reqs = new ArrayList<Requirement>();
 		ArrayList<Major> majors = new ArrayList<Major>();
@@ -1598,8 +1600,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!d.getErrorString().equals(" ")){
-			result.append("Scheduling Errors: <br>" + d.getErrorString());
+		if(!d.getErrorString().equals("")){
+			result.append("<b> Scheduling Errors: </b> <br>" + d.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h2>The Final Countdown: </h2>");
@@ -1649,7 +1651,7 @@ public class Schedule implements java.io.Serializable {
 			ArrayList<Requirement> sortedReq = new ArrayList<Requirement>(m.reqList);
 			Collections.sort(sortedReq);
 			for(Requirement r: sortedReq){
-				String rDisplay = r.shortString(10000) + "-";
+				String rDisplay = r.shortString(10000) + " -";
 				if(rDisplay.length()<=30){
 					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
 					rDisplay = rDisplay + spaces;

@@ -65,6 +65,7 @@ public class PriorData implements Serializable{
 		int startIndex = idMatch.start();
 		String name = (text.substring(idMatch.end()+1, text.indexOf("\n", startIndex)));
 		studentName = name.trim();
+		
 		int advisorSkipLineIndex = text.indexOf("Download course", startIndex);
 		if(advisorSkipLineIndex != -1){
 			startIndex = text.indexOf("\n", advisorSkipLineIndex) + 1;
