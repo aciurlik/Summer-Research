@@ -211,7 +211,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	public Color semesterColor(Semester s){
 		if(s.studyAway){
-			return FurmanOfficial.grey;
+			return FurmanOfficial.officialGrey;
 		}
 		if(s.isTaken()){
 			return FurmanOfficial.grey(170);
@@ -360,6 +360,26 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		dropLabel.setFont(FurmanOfficial.normalFont);
 		return dropLabel;
 	}
+	
+	
+	/**
+	 * If the user starts dragging element e,
+	 * you may need to highlight if you can recieve
+	 * e as a drop.
+	 * @param e
+	 */
+	public void dragStarted(ScheduleElement e){
+		if(this.canTake(e)){
+			this.setHilighted(true);
+		}
+	}
+	/**
+	 * When a drag ends, any semester who was highlighted
+	 * should stop highlighting.
+	 */
+	public void dragEnded(){
+		this.setHilighted(false);
+	}
 
 
 
@@ -367,11 +387,15 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		JButton alter = new JButton(s);
 		alter.setActionCommand(s);
 		alter.addActionListener(this);
-
 		return alter;
 	}
 
 	public void addElement(Component s){
+		if(this.sem.isTaken()){
+			throw new RuntimeException("This exception is thrown so that "
+					+ "\nan element dragged into a taken semester will not"
+					+ "\nbe accepted.");
+		}
 		if(s instanceof RequirementPanel){
 			RequirementPanel r = (RequirementPanel) s;
 			schGUI.GUIRequirementPanelDropped(r, this);
@@ -387,25 +411,20 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		//this.updatePanel(true);
 	}
 
-
-	public void dragStarted(ScheduleElement e){
-		if(this.canTake(e)){
-			this.setHilighted(true);
-		}
-	}
-	public void dragEnded(){
-		this.setHilighted(false);
-	}
-
+	/**
+	 * Change the color of this semesterPanel based on whether 
+	 * we want to highlight it or not.
+	 * @param b
+	 */
 	public void setHilighted(boolean b){
 		if(b){
-			this.setBackground(FurmanOfficial.official);
-
+			this.setBackground(FurmanOfficial.darkPurple);
 		}
 		else{
 			this.setBackground(semesterColor(this.sem));
 		}
 	}
+	
 	/**
 	 * This method is used to determine whether this panel should
 	 * hilight itself while the user is dragging e.

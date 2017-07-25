@@ -189,7 +189,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 		newCourse = new JPanel();
 
-		newCourse.setBackground(FurmanOfficial.grey);
+		newCourse.setBackground(FurmanOfficial.officialGrey);
 
 		//	newCourse.setPreferredSize(new Dimension(300, 300));
 

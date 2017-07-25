@@ -159,7 +159,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 		else{
 			JLabel noCourse = new JLabel("No courses avaliable");
 			noCourse.setFont(FurmanOfficial.normalFont);
-			noCourse.setBackground(FurmanOfficial.official);
+			noCourse.setBackground(FurmanOfficial.darkPurple);
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
 			remove.add(noCourse);

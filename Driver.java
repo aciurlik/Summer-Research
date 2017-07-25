@@ -330,7 +330,9 @@ public class Driver {
 
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.		
-		Color c = FurmanOfficial.grey;
+		// If you omit this code, you'll get a nullPointerException before
+		// a schedule can display.
+		Color c = FurmanOfficial.lightPurple;
 
 
 

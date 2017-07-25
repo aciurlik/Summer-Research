@@ -58,7 +58,6 @@ import javax.swing.JTabbedPane;
  * FileHandler also stores the settings for the rest of the program in its
  * Properties field.
  * 
- * TODO make it so other classes don't use file handler fields for image icons.
  * 
  * Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
  * color, fonts, formatting information. 
@@ -74,7 +73,6 @@ public class FileHandler{
 	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
-
 	public static final String savedScheduleFolder = userDataFolder + "SavedSchedule" + File.separator;
 	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
 	public static final String settingsDoc = userDataFolder +  "Settings";
@@ -104,12 +102,7 @@ public class FileHandler{
 			//if the file isn't found, make one with
 			// the default settings
 			restoreDefaultSettings();
-			try(FileOutputStream output = new FileOutputStream(settingsDoc);) {
-				properties.store(output, "New Settings");
-				output.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			saveProperties();
 		}
 		else{
 			// if the file is found, load the settings.
@@ -120,32 +113,43 @@ public class FileHandler{
 				e.printStackTrace();
 			}
 		}
-
 	}
-
-
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * set this setting to the specified value.
+	 * @param setting
+	 * @param value
+	 */
 	public static void propertySet(String setting, String value){
 		properties.setProperty(setting, value);
+		saveProperties();
+	}
+	public static void requestRestoreDefaultSettings(){
+		int n = JOptionPane.showConfirmDialog(null, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
+		if(n==0){
+			FileHandler.restoreDefaultSettings();
+		}
+	}
+	private static void restoreDefaultSettings() {
+		properties.setProperty(MenuOptions.startUp, "true");
+		saveProperties();
+	}
+	
+	private static void saveProperties(){
 		try(FileOutputStream output = new FileOutputStream(settingsDoc);) {
 			properties.store(output, "Edited Settings");
 			output.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void GUICalledRestoreDefaultSettings(){
-		int n = JOptionPane.showConfirmDialog(null, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
-		if(n==0){
-			FileHandler.restoreDefaultSettings();
-		}
-	}
-	
-	
-	private static void restoreDefaultSettings() {
-		properties.setProperty(MenuOptions.startUp, "true");
-		
 	}
 	
 	public static PriorData getSavedStudentData(){

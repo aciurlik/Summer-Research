@@ -54,8 +54,6 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	JPanel northPanel;
 	JButton toggleFiltersButton;
 	boolean filtersVisible;
-	public static final String showFiltersText = "Show Filters";
-	public static final String hideFiltersText = "Hide Filters";
 	FiltersPanel filtersPanel;
 	
 	JPanel coursesPanel;
@@ -144,7 +142,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		northPanel = new JPanel();
 		northPanel.setLayout(new BorderLayout());
 		
-		toggleFiltersButton = new JButton(showFiltersText);
+		toggleFiltersButton = new JButton(MenuOptions.showCourseFiltersText);
 		toggleFiltersButton.addActionListener(this);
 		
 		
@@ -408,10 +406,10 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		if(source == toggleFiltersButton){
 			filtersVisible = !filtersVisible;
 			if(filtersVisible){
-				toggleFiltersButton.setText(hideFiltersText);
+				toggleFiltersButton.setText(MenuOptions.hideCourseFiltersText);
 			}
 			else{
-				toggleFiltersButton.setText(showFiltersText);
+				toggleFiltersButton.setText(MenuOptions.showCourseFiltersText);
 			}
 			updateDisplay();
 		}

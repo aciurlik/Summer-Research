@@ -36,7 +36,6 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public static int shortStringLength = 25;
 
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
-	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
 	public RequirementPanel(Requirement req, ScheduleGUI d, MajorPanel m){
 		super();
@@ -70,7 +69,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		};
 		this.addMouseListener(listener);
 
-		this.setBackground(FurmanOfficial.official);
+		this.setBackground(FurmanOfficial.darkPurple);
 
 		update(req, m);
 
@@ -87,17 +86,16 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		int height = this.getHeight();
 		//We want the rectangle like this
 		// 
-		//  (0,0)------|         (width,0)
-		//  |          |
-		//  |__________|          (width, height)
+		//  (0,0)------|  -   -   -   -   |
+		//  | -------- |                  |
+		//  |__________|  _   _   _   (width, height)
 		//
+		//           (%Complete)
 
 		Color c = g.getColor();
 		g.setColor(GreyedOut);
 		g.fillRect(0, 0, (width * percentComplete)/100, height);
 		g.setColor(c);
-
-
 	}
 
 
@@ -106,37 +104,29 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		this.req =req;
 		this.m=m;
 
-		//The full text (displayed on hover over) will be
-		// chopped down to size in order to fit in the requirement panel
-		String fullText = "";
-
-
+		
 		this.percentComplete =(int) Math.round(req.getStoredPercentComplete() * 100);
 		
-		/*
-		 * This section would add (25%) to the requirement's text
-		if(percentComplete > 0 && percentComplete < 100){
-			fullText = "(" + percentComplete + "%)" ;
-			fullText += req.storedCoursesLeft + "left\n";
-		}
-		*/
-		
-		
-		fullText += req.shortString(shortStringLength);
-		String labelText = fullText;
+		//make labelText (seen on the draggable requirement panel)
+		// as the first 20 characters of the shortString,
+		// and capitalize the first letter.
+		String labelText = req.shortString(shortStringLength);
+		labelText = labelText.substring(0,1).toUpperCase() + labelText.substring(1);
 		if(labelText.length() > shortStringLength){
 			labelText = labelText.substring(0,shortStringLength-3) + "...";
 		}
+		
 		shown = new JLabel(labelText);
 		shown.setForeground(Color.white);
 		shown.setFont(FurmanOfficial.normalFont);
-		//if(!m.major.name.equals("GER")){
+		
+		//set the tooltip (showed when the mouse hovers on a requirement panel)
+		// to be the display string (if it fits) or the short string(if it doesn't).
 		String toolTipText = req.getDisplayString(); 
 		if(toolTipText.length() > 60){
 			toolTipText = req.shortString(60);
 		}
 		shown.setToolTipText(toolTipText);
-		//}
 		shown.addMouseListener(ComponentDragHandler.passingAdapter());
 
 
