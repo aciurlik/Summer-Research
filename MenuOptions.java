@@ -1,11 +1,13 @@
 import java.io.File;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
+
 
 
 public class MenuOptions implements java.io.Serializable{
 	/**
+	 * Blurb written 7/18/2017
+	 * Last updated 7/18/2017
+	 * 
 	 * All buttons in the GUI should reference a String in MenuOptions. 
 	 * If you add a new button/GUI Element string it should be placed in this class
 	 * in the appropriate place. Add a comment in the appropriate location if you 

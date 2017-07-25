@@ -1,33 +1,28 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.ScrollPane;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.awt.print.Paper;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,11 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.ImageView;
+
 
 
 
@@ -75,13 +66,12 @@ public class ScheduleGUI{
 	Course[] coursesDialog;
 
 	ScheduleElement beingDragged;
-
-	public static int defaultPixelWidth = 300;
-
+	
+	
 	ListOfMajors l;
 	BellTower b;
 	//PrintWriter pW;
-	private int defaultCharacterLength = 100;
+	
 
 
 
@@ -104,9 +94,9 @@ public class ScheduleGUI{
 		frame.setTitle(sch.studentName);
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
-		menu.setFont(FurmanOfficial.normalFont);
+		menu.setFont(FurmanOfficial.normalFont); 
 		frame.setJMenuBar(menu);
-		frame.setContentPane(menu.createContentPane());
+		
 
 		JPanel stackPanel = new JPanel();
 		stackPanel.setLayout(new BorderLayout());
@@ -171,7 +161,12 @@ public class ScheduleGUI{
 		//CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
 		if(actionCommand.equals(MenuOptions.newBlankSchedule)){
-			current = new Schedule();
+			if(Schedule.defaultFirstSemester == null && Driver.tryPickStartDate() == null){
+				return;
+			}
+			else{
+				current = new Schedule();
+			}
 		}
 		else{
 			current = new Schedule(FileHandler.getSavedStudentData());
@@ -214,7 +209,7 @@ public class ScheduleGUI{
 				"<html><p style = 'width: 300px;'> The course "+ c.getPrefix() + " might satisfy the following requirements,"
 						+  " but it is not allowed to satisfy all of them at once."
 						+  advisorAdvice
-						+ "<br> Which requirements do you want it to satisfy?</p> </html>");
+						+ "<br> <br> Which requirements do you want it to satisfy?</p> </html>");
 
 		problems.add(instruct, BorderLayout.NORTH);
 		JPanel stack = new JPanel();
@@ -329,9 +324,19 @@ public class ScheduleGUI{
 		if(m.notes != null){
 			//show the user the notes, and let them know that this is the last time they'll see 
 			// these notes.
-			String message = "Notes for " + m.name + " (can be displayed by performing a full check of your schedule)";
+			String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
 			String title = "Notes for " + m.name + ":";
-			String toUser =  parseIntoReadable(message + "\n\n" +m.notes, defaultCharacterLength);
+		
+			String bulletedList = "<ul width =" + Driver.defaultPixelWidth + ">";
+			String [] toAddBullets = m.notes.split("\n");
+			for(String s: toAddBullets){
+				bulletedList += "<li>" + s + "</li>";
+			}
+			bulletedList += "</ul>";
+			
+			String toUser = "<html>" + message+ "<br><br>" + bulletedList + "</html>";
+			//String toUser =  parseIntoReadable(  message + "\n\n" + bulletedList , defaultCharacterLength );
+			//toUser = "<html>" + toUser + "</html>";
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
@@ -402,7 +407,7 @@ public class ScheduleGUI{
 	 * @param s
 	 */
 	public void GUIPopUP(String s){
-		new PopUpChooser(s, this, sch);
+		new MajorPopUpChooser(s, this, sch);
 	}
 
 	/**
@@ -518,7 +523,7 @@ public class ScheduleGUI{
 			return SemesterDate.SUMMERTWO;
 		}
 		return SemesterDate.OTHER;
-		
+
 	}
 	/**
 	 * This gives returns the list of years that
@@ -770,7 +775,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, Driver.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -822,7 +827,7 @@ public class ScheduleGUI{
 
 		}
 
-		result = parseIntoReadable(result, defaultCharacterLength);
+		result = parseIntoReadable(result, Driver.defaultCharacterLength);
 
 
 		return result;
@@ -863,7 +868,7 @@ public class ScheduleGUI{
 		String errorString = getErrorString();
 		String result = "<html><body>" + errorString;
 		if(errorString.equals("")){
-			result = "Your Schedule had no errors! You're a pretty savy scheduler";
+			result = "Your Schedule had no errors! You're a pretty savvy scheduler";
 		}
 		result= result.replaceAll("\n", "<br>");
 		JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
@@ -875,7 +880,7 @@ public class ScheduleGUI{
 			if(m.notes != null){
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
-				majorNotes = parseIntoReadable(majorNotes, defaultCharacterLength);
+				majorNotes = parseIntoReadable(majorNotes, Driver.defaultCharacterLength);
 				hasNotes = true;
 
 			}
@@ -1001,6 +1006,11 @@ public class ScheduleGUI{
 		options.add(ReqLayout, BorderLayout.EAST);
 		options.add(ScheduleLayout, BorderLayout.WEST);
 		String finalPrint = new String();
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate localDate = LocalDate.now();
+
+
+		finalPrint = sch.studentName + "<br>" + dtf.format(localDate) + "<br>";
 		JOptionPane.showMessageDialog(null, options);
 		boolean selectedScheduleLayout = userOptions.get(1).isSelected();
 		boolean selectedReqLayout = userOptions.get(0).isSelected();
@@ -1031,6 +1041,7 @@ public class ScheduleGUI{
 			//	schedulePrint.setLineWrap(true);
 			schedulePrint.setContentType("text/html");
 			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
+			schedulePrint.setCaretPosition(0);
 
 			schedulePrint.setEditable(false);
 			//schedulePrint.setFont(FurmanOfficial.monospaced);

@@ -3,12 +3,11 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -16,13 +15,17 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 public class Driver {
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; 
 	static StartUpMenu startUP = null;
-
+	
+	
+	public static int defaultCharacterLength = 100; //Provides a uniform dialog box size for the whole program
+	static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	public static int defaultPixelWidth = (int) screenSize.getWidth()/3;//Sets the text in a dialog box
+	// based on the user screen size should be referenced by all dialog boxes in the program who have a large
+	//amount of context, that needs to be formatted to prevent the text from going off the screen. 
 
 
 	public static void addScheduleGUI(Schedule s){
@@ -66,21 +69,26 @@ public class Driver {
 
 	public static void removeScheduleGUI(ScheduleGUI s){
 		listOfScheduleGUIs.remove(s);
-		if(!FurmanOfficial.masterIsAround){
-			int n = JOptionPane.showConfirmDialog(
-					new JFrame(),
-					"Would you like to save your schedule?",
-					"Save Schedule",
-					JOptionPane.YES_NO_OPTION);
-			if(n==0){
-				s.GUISaveSchedule();
-			}
+		String[] Options = {"Yes", "No"};
+
+		int n = JOptionPane.showOptionDialog(new JFrame(),
+				"Would you like to save your schedule",
+						"Save Schedule",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						Options,Options[1]);
+		if(n==0){
+			s.GUISaveSchedule();
 		}
+
 		if(listOfScheduleGUIs.isEmpty()){
 			System.exit(0);
 
 		}
+
 	}
+
 
 	public static void openSchedule() {
 		Schedule result = FileHandler.openSchedule();
@@ -150,9 +158,7 @@ public class Driver {
 		supportedSemesters.add( new SemesterDate(2017, SemesterDate.FALL ));
 
 		SemesterDate result = GUIChooseStartTime(supportedSemesters);
-		if(result == null){
-			result = supportedSemesters.get(0);
-		}
+		Schedule.defaultFirstSemester = result;
 		return result;
 	}
 
@@ -315,15 +321,15 @@ public class Driver {
 
 
 	public static void main(String[] args){
-		
+
 		// take the menu bar off the jframe
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 		// set the name of the application menu item
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "PlanIt!");
-		
-		
-		
+
+
+
 		//This just loads FurmanOfficial into memory so that the UIManager
 		// will be set before other static code gets run.		
 		Color c = FurmanOfficial.grey;
@@ -371,7 +377,12 @@ public class Driver {
 						Driver.addScheduleGUI(new Schedule(data));
 					}
 					else{
-						Driver.addScheduleGUI(new Schedule());
+						if(Schedule.defaultFirstSemester == null && Driver.tryPickStartDate() == null){
+							return;
+						}
+						else{
+							Driver.addScheduleGUI(new Schedule());
+						}
 					}
 					if(startUP != null){
 						startUP.showStartUp(true);

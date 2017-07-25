@@ -55,7 +55,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 
 		if(s instanceof ScheduleCourse){
-			if(((ScheduleCourse) s).getSemester().compareTo(container.d.sch.currentSemester)<0){
+			if(((ScheduleCourse) s).getSemester().compareTo(container.schGUI.sch.currentSemester)<0){
 				return;
 			}
 
@@ -79,7 +79,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	 */
 	public void dropdownSelected(){
 		ScheduleElement e = (ScheduleElement) this.requirementDropDown.getSelectedItem();
-		container.d.GUIElementChanged(container, this, e);
+		container.schGUI.GUIElementChanged(container, this, e);
 	}
 
 
@@ -109,7 +109,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 		}
 		
 		if(s instanceof ScheduleCourse){
-			if (((ScheduleCourse) s).getSemester().compareTo(container.d.sch.currentSemester)<0){
+			if (((ScheduleCourse) s).getSemester().compareTo(container.schGUI.sch.currentSemester)<0){
 				toRemove.setEnabled(false);
 				elementLabel.setForeground(FurmanOfficial.grey(170));
 			}
@@ -140,9 +140,9 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
 			addCourse.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					ScheduleCourse c = container.d.GUIChooseCourse(allPossibleCourses);
+					ScheduleCourse c = container.schGUI.GUIChooseCourse(allPossibleCourses);
 					if(c != null){
-						container.d.GUIElementChanged(container, reference , c);
+						container.schGUI.GUIElementChanged(container, reference , c);
 					}
 				}
 			});
@@ -175,14 +175,14 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 			//alert the driver of the change
 			//container.d.dragStarted(toBeDragged);
-			container.d.dragStarted(s);
+			container.schGUI.dragStarted(s);
 		}
 
 		@Override
 		public void afterDrop(Container source, JComponent dragged,
 				boolean moveAction) {
 
-			container.d.dragEnded();
+			container.schGUI.dragEnded();
 		}
 
 	}
