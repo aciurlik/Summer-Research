@@ -325,7 +325,7 @@ public class PriorData implements Serializable{
 				}
 				String courseString = Arrays.toString(row);
 				JOptionPane.showMessageDialog(null, 
-						    "<html><p style=\"width:" + Driver.defaultPixelWidth +"px;\">We couldn't read in the course <br>" 
+						    "<html><p style=\"width:" + FurmanOfficial.defaultPixelWidth +"px;\">We couldn't read in the course <br>" 
 						+    courseString 
 						+ "<br>due to something unexpected in the data, "
 						+ "so it won't show up in your schedule.</p></html>");
