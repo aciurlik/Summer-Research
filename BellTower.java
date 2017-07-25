@@ -84,7 +84,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		int newHeight = (int)(percentDone * bellTowerIcon.getIconHeight()) - 1;
 		layerPanel.setSize(bellTowerIcon.getIconWidth(), newHeight);
 		layerPanel.setLocation(0, bellTowerIcon.getIconHeight()-newHeight);
-		layerPanel.setBackground(FurmanOfficial.officialAlpha);
+		layerPanel.setBackground(FurmanOfficial.lightPurple);
 
 
 		//If you complete all the requirements in your schedule and have at least one major a popup will give you either

@@ -23,34 +23,75 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  */
 public class FurmanOfficial implements java.io.Serializable{
 	private static final long serialVersionUID = 1L;
-	public static final Color lightPurple = new Color(76,42,135);
-	public static final int[] lightPurpleRGB = {76, 42, 135}; // official Furman light purple
-	public static final Color darkPurple = new Color(62,24,94);
-	public static final int[] darkPurpleRGB = {62, 24, 94}; //official Furman dark purple
-	public static final Color grey = new Color(91,91,91);
-	public static final int[] greyRGB = {91, 91, 91}; //official Furman grey
+	
+	
+	
+	
+	
+	
+	////////////////////////////
+	////////////////////////////
+	/////Colors 
+	////////////////////////////
+	////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Colors_________;
+	
+	//These are the official colors from Furman's website.
+	private static final int[] officialLightPurpleRGB = {76, 42, 135}; // official Furman light purple
+	private static final int[] officialDarkPurpleRGB = {62, 24, 94}; //official Furman dark purple
+	private static final int[] officialGreyRGB = {91, 91, 91}; //official Furman grey
 	
 	
 	//The Nimbus UI lightens and darkens buttons.
-	// These two fields give the actual displayed 
-	public static final Color nimbus = new Color(93,45, 133); 
-	public static final Color nimbusAlpha = new Color(93, 45, 133, 200);
-	
-	public static Color official;
-	public static Color officialAlpha;
-	
-	public static boolean masterIsAround = false;
+	// These two fields give the actual displayed color
+	// of a nimbus button if the button's color is set to
+	// officialDarkPurple.
+	private static final Color nimbusPurple = new Color(93,45, 133); 
+	private static final Color nimbusAlpha = new Color(93, 45, 133, 200);
+	private static final Color bouzarthDarkPurple = darkPurple(230);
 	
 	
-	public static final Color bouzarthDarkPurple = darkPurple(230);
 	
+	// These fields are the main color fields used by other classes.
+	// They are decided in static blocks at compile time, and might
+	// be different combinations of the above colors.
+	public static Color darkPurple;
+	public static Color lightPurple;
+	public static Color buttonPurple;
 	public static final Color bouzarthGrey = grey(60);
+	public static final Color officialGrey = new Color(
+			officialGreyRGB[0],officialGreyRGB[1],officialGreyRGB[2]);
+	
+	
+	
+	////////////////////////////
+	////////////////////////////
+	/////Fonts
+	////////////////////////////
+	////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Fonts_________;
 	
 	public static final Font bigHeaderFont = getFont(18);
 	public static final Font smallHeaderFont = getFont(14);
 	public static final Font normalFont = getFont(12);
 	public static final Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
 	
+	
+	public static boolean masterIsAround = false;
+	
+	
+	
+	
+	
+	////////////////////////////
+	////////////////////////////
+	///// Loading static block
+	////////////////////////////
+	////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___LoadingBlock_________;
 	
 	
 	/**
@@ -63,9 +104,10 @@ public class FurmanOfficial implements java.io.Serializable{
 		UIManager.put("OptionPane.buttonFont", getFont(12));
 		UIManager.put("ComboBox.font", monospaced);
 		
-		try {
 		
-			// Set cross-platform Java L&F (also called "Metal")
+		//Try to set the UIManager to Nimbus.
+		// set darkPurple and lightPurple based on whether that's successful.
+		try {
 			 UIManager.setLookAndFeel(new NimbusLookAndFeel() {
 
 			      @Override
@@ -91,14 +133,15 @@ public class FurmanOfficial implements java.io.Serializable{
 			}
 			MenuOptions.setUIType(false);
 		}
-		//if(MenuOptions.UIType){
-		//	official = nimbus;
-		//	officialAlpha = nimbusAlpha;
-		//}
-		//else{
-			official= bouzarthDarkPurple;
-			officialAlpha = bouzarthDarkWithAlpha(200);
-		//}
+		if(MenuOptions.UIType){
+			darkPurple = nimbusPurple;
+			lightPurple = nimbusAlpha;
+		}
+		else{
+			darkPurple= bouzarthDarkPurple;
+			lightPurple = bouzarthDarkWithAlpha(200);
+		}
+		buttonPurple = new Color(officialDarkPurpleRGB[0], officialDarkPurpleRGB[1], officialDarkPurpleRGB[2]);
 		UIManager.put("List.font",monospaced);
 		UIManager.put("TextArea.font",monospaced);
 	}
@@ -116,8 +159,11 @@ public class FurmanOfficial implements java.io.Serializable{
 		int red=bouzarthDarkPurple.getRed();
 		int blue=bouzarthDarkPurple.getBlue();
 		int green=bouzarthDarkPurple.getGreen();
-		return(new Color(red, green, blue, alpha));
-		
+		return(new Color(
+				rescale(red, alpha), 
+				rescale(green, alpha), 
+				rescale(blue, alpha)
+				));
 	}
 	
 	public static int rescale(int originalValue, int alpha){
@@ -127,23 +173,23 @@ public class FurmanOfficial implements java.io.Serializable{
 	}
 	public static Color lightPurple(int alpha){
 		return new Color(
-				rescale(lightPurpleRGB[0], alpha), 
-				rescale(lightPurpleRGB[1], alpha),
-				rescale(lightPurpleRGB[2], alpha)
+				rescale(officialLightPurpleRGB[0], alpha), 
+				rescale(officialLightPurpleRGB[1], alpha),
+				rescale(officialLightPurpleRGB[2], alpha)
 				);
 	}
 	public static Color darkPurple(int alpha){
 		return new Color(
-				rescale(darkPurpleRGB[0], alpha),
-				rescale(darkPurpleRGB[1], alpha),
-				rescale(darkPurpleRGB[2], alpha)
+				rescale(officialDarkPurpleRGB[0], alpha),
+				rescale(officialDarkPurpleRGB[1], alpha),
+				rescale(officialDarkPurpleRGB[2], alpha)
 				);
 	}
 	public static Color grey(int alpha){
 		return new Color(
-				rescale(greyRGB[0], alpha),
-				rescale(greyRGB[1], alpha),
-				rescale(greyRGB[2], alpha)
+				rescale(officialGreyRGB[0], alpha),
+				rescale(officialGreyRGB[1], alpha),
+				rescale(officialGreyRGB[2], alpha)
 				);
 	}
 	
@@ -167,6 +213,8 @@ public class FurmanOfficial implements java.io.Serializable{
 	public static Font getFont(int point){
 		return new Font("Helvatica", Font.PLAIN, point);
 	}
+	
+	
 	/**
 	 * Make a window showing all the different colors with different
 	 * alpha values.

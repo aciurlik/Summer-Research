@@ -336,7 +336,7 @@ public class Driver {
 		// will be set before other static code gets run.		
 		// If you omit this code, you'll get a nullPointerException before
 		// a schedule can display.
-		Color c = FurmanOfficial.grey;
+		Color c = FurmanOfficial.lightPurple;
 
 
 

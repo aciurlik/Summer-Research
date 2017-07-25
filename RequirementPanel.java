@@ -36,7 +36,6 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public static int shortStringLength = 25;
 
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
-	public static final Color background = FurmanOfficial.bouzarthDarkPurple;
 
 	public RequirementPanel(Requirement req, ScheduleGUI d, MajorPanel m){
 		super();
@@ -70,7 +69,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		};
 		this.addMouseListener(listener);
 
-		this.setBackground(FurmanOfficial.official);
+		this.setBackground(FurmanOfficial.darkPurple);
 
 		update(req, m);
 

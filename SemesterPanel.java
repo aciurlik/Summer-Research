@@ -211,7 +211,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	public Color semesterColor(Semester s){
 		if(s.studyAway){
-			return FurmanOfficial.grey;
+			return FurmanOfficial.officialGrey;
 		}
 		if(s.isTaken()){
 			return FurmanOfficial.grey(170);
@@ -418,7 +418,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	 */
 	public void setHilighted(boolean b){
 		if(b){
-			this.setBackground(FurmanOfficial.official);
+			this.setBackground(FurmanOfficial.darkPurple);
 		}
 		else{
 			this.setBackground(semesterColor(this.sem));

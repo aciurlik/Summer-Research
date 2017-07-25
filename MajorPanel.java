@@ -87,7 +87,7 @@ public class MajorPanel extends JPanel {
 			remove.setPreferredSize(new Dimension (20, 20));
 		}
 		remove.setForeground(Color.WHITE);
-		remove.setBackground(FurmanOfficial.official);
+		remove.setBackground(FurmanOfficial.darkPurple);
 		remove.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				removeSelf();
