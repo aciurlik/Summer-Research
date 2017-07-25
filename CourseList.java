@@ -146,19 +146,6 @@ public class CourseList implements java.io.Serializable  {
 	
 	
 	
-	
-	//TODO give this a blurb - probably should explain the
-	// difference between readAll() and loadAllCourses().
-	public static void loadAllCourses(){
-		listOfCourses = new ArrayList<Course>();
-		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
-		rawPrereqs = new Hashtable<Prefix, String>();
-		savedPrereqMeanings = new Hashtable<String, String>();
-		readAll();
-		FileHandler.loadPrereqMeanings(FileHandler.prereqMeaningsFile);
-	}
-
-
 
 
 	/////////////////////////
@@ -533,6 +520,13 @@ public class CourseList implements java.io.Serializable  {
 	@SuppressWarnings("unused")
 	private boolean ___GERStuff_________;
 
+	
+	/**
+	 * Go from degree type numbers to degree type strings, i.e.
+	 * 1 -> "BS"
+	 * @param i
+	 * @return
+	 */
 	public static String getDegreeTypeString(int i){
 		if(i == Major.BS){
 			return "BS";
@@ -548,6 +542,14 @@ public class CourseList implements java.io.Serializable  {
 
 
 
+	/**
+	 * Go from degree strings to degree numbers, i.e.
+	 * "BM" --> 1
+	 * 
+	 * s must be 2 characters
+	 * @param s
+	 * @return
+	 */
 	public static int getDegreeTypeNumber(String s){
 		if(s.equals("BM")){
 			return Major.BM;
@@ -911,20 +913,39 @@ public class CourseList implements java.io.Serializable  {
 	private boolean ___Reading_________;
 
 
-	public static void readAll(){
+	
+	/**
+	 * Initialize and load all the courses, prereqs, and static 
+	 * 		fields in CourseList.
+	 * Only needs to be called once per program initiation - 
+	 * 		called from Driver while loading files.
+	 *  
+	 */
+	public static void loadAllCourses(){
+		listOfCourses = new ArrayList<Course>();
+		GERRequirements = new Hashtable<String, HashSet<Prefix>>();
+		rawPrereqs = new Hashtable<Prefix, String>();
+		savedPrereqMeanings = new Hashtable<String, String>();
 		FileHandler.readAllCourses();
-
+		FileHandler.loadPrereqMeanings();
 	}
 
 
+	/**
+	 * Given a list of strings of the form found in a downloaded course catalog
+	 * (see the Course Catalogs folder in resources for an example)
+	 * convert this list into a list of courses.
+	 * 
+	 * last updated 7/25/2017
+	 * 
+	 * @param fileLines
+	 */
 	public static void addCoursesIn(ArrayList<String> fileLines){
 		String lastSectionNumber = "";
 		Course lastCourse = null;
 		Course duplicateCourse =null;
 
 		//skip the first line of field names
-
-
 
 		int index = 1;
 		//Read in each course

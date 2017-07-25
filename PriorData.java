@@ -263,6 +263,12 @@ public class PriorData implements Serializable{
 				
 				//Semester / term
 				SemesterDate takenDate = readSemesterDate(termString);
+				//takenDate may be null
+				if(takenDate != null){
+					if(takenDate.sNumber == SemesterDate.OTHER || takenDate.year < 1500 || takenDate.year > 2500){
+						throw new RuntimeException("Could not make the semester from string \""+ termString + "\"");
+					}
+				}
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);
@@ -320,6 +326,7 @@ public class PriorData implements Serializable{
 		try{
 			result = SemesterDate.readFromFurman(s);
 		} catch(Exception e){
+			//if this read fails, throw the exception
 			result = SemesterDate.fromFurman(s);
 		}
 		return result;
