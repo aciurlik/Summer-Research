@@ -152,19 +152,6 @@ public class MenuOptions implements java.io.Serializable{
 					public static final  String tryAgain = "Try Again";
 					public static final  String Cancel = "Cancel";//This is also used in Settings
 	
-			
-	///////////////////////////
-	///////File Handler
-	/////////////////////////
-	@SuppressWarnings("unused")
-	private int ______________File_Handler_________________;
-		public static final String resourcesFolder = "Resources" + File.separator;
-		public static final String savedScheduleFolder = MenuOptions.resourcesFolder + "SavedSchedule" + File.separator;
-		public static final String startUpFolder = MenuOptions.resourcesFolder + "StartUpSlides" + File.separator;
-		public static final String settingsDoc = "Resources" + File.separator + "Settings";
-
-		
-	
 	/////////////////
 	//Driver 
 	/////////////////

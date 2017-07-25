@@ -78,7 +78,7 @@ public class ScheduleGUI{
 	public ScheduleGUI(Schedule sch) {
 
 		//popUP = new JFrame();
-		icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
+		icon = FileHandler.getBelltowerImage();
 		l = FileHandler.getMajorsList();
 
 
@@ -588,7 +588,6 @@ public class ScheduleGUI{
 
 	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses) {
 		if(finalListOfCourses.length <= 0){
-			ImageIcon icon = new ImageIcon(MenuOptions.resourcesFolder + "BellTower(T).png");
 			JOptionPane.showMessageDialog(null, 
 					"There were no courses to choose from. \n"
 							+"If you have a course in mind, you can add a note to the semester,\n"

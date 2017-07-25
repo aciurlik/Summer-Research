@@ -38,38 +38,73 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+/**
+ * This class handles all file operations, including locating files and 
+ * reading from files. This way if we change how our data is stored at any point,
+ * as long as the underlying data is not changed, 
+ * one need only change this class in order to read all the new data correctly.
+ * 
+ * For example, if we put data on a webserver, this class could contain
+ * methods to check the server for new data and perform updates.
+ * 
+ * This class is in the FILE group of classes.
+ * 
+ * FileHandler should be the ONLY CLASS that imports or uses File. 
+ * If another class needs to get data of some sort, there should be a method
+ * in this class to find and collect the necessary data. FileHandler does not 
+ * need to process the data in any way.
+ * 
+ * FileHandler also stores the settings for the rest of the program in its
+ * Properties field.
+ * 
+ * TODO make it so other classes don't use file handler fields for image icons.
+ * 
+ *
+ */
 public class FileHandler{
-	static JFrame popUP = new JFrame();
-	public static final String bellTowerImageFile = MenuOptions.resourcesFolder + "bellTower.jpg";
-	public static final String fireworksImageFile = MenuOptions.resourcesFolder + "fireworks.jpg";
-	public static final String prereqMeaningsFile = MenuOptions.resourcesFolder + "PrereqMeanings.txt";
-	public static final String courseListFolder = MenuOptions.resourcesFolder + "CourseCatologs";
-	public static final String studentDataFile = MenuOptions.resourcesFolder + "SavedStudentData.txt";
-	private static Properties p;
+	public static final String resourcesFolder = "Resources" + File.separator;
+	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
+	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";
+	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
+	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
+	public static final String studentDataFile = resourcesFolder + "SavedStudentData.txt";
+
+	public static final String savedScheduleFolder = resourcesFolder + "SavedSchedule" + File.separator;
+	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
+	public static final String settingsDoc = resourcesFolder +  "Settings";
+	
+	
+	private static Properties properties;
 	static ListOfMajors listOfMajors = null;
 
+	
+	/**
+	 * This static block tries to load the existing settings
+	 * from the settingsDoc file.
+	 * 
+	 * If the file is not found, it makes a new settings
+	 * and saves a new file.
+	 */
 	static{
-		p = new Properties();
-		File file = new File(MenuOptions.settingsDoc);
-		boolean exists = file.exists();
-		if(!exists){
+		properties = new Properties();
+		File file = new File(settingsDoc);
+		if(!file.exists()){
+			//if the file isn't found, make one with
+			// the default settings
 			restoreDefaultSettings();
-			try(FileOutputStream output = new FileOutputStream(MenuOptions.settingsDoc);) {
-				
-				p.store(output, "New Settings");
+			try(FileOutputStream output = new FileOutputStream(settingsDoc);) {
+				properties.store(output, "New Settings");
 				output.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		else{
-			try(FileInputStream input = new FileInputStream(MenuOptions.settingsDoc);) {	
-				p.load(input);
+			// if the file is found, load the settings.
+			try(FileInputStream input = new FileInputStream(settingsDoc);) {	
+				properties.load(input);
 				input.close();
-
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -77,20 +112,19 @@ public class FileHandler{
 	}
 
 
+	
 	public static void propertySet(String setting, String value){
-		p.setProperty(setting, value);
-		try(FileOutputStream output = new FileOutputStream(MenuOptions.settingsDoc);) {
-			p.store(output, "Edited Settings");
+		properties.setProperty(setting, value);
+		try(FileOutputStream output = new FileOutputStream(settingsDoc);) {
+			properties.store(output, "Edited Settings");
 			output.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	
 	public static void GUICalledRestoreDefaultSettings(){
-		int n = JOptionPane.showConfirmDialog(popUP, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
+		int n = JOptionPane.showConfirmDialog(null, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
 		if(n==0){
 			FileHandler.restoreDefaultSettings();
 		}
@@ -98,7 +132,7 @@ public class FileHandler{
 	
 	
 	private static void restoreDefaultSettings() {
-		p.setProperty(MenuOptions.startUp, "true");
+		properties.setProperty(MenuOptions.startUp, "true");
 		
 	}
 	
@@ -160,7 +194,7 @@ public class FileHandler{
 		ArrayList<String> fullString = FileHandler.fileToStrings(file);
 		String[][] result = new String[fullString.size()][];
 		for(int i = 0; i < fullString.size() ; i ++){
-			ArrayList<String> splitLine = SaverLoader.parseCSVLine(fullString.get(i));
+			ArrayList<String> splitLine = SaverLoader.parseAdvisorImportCSVLine(fullString.get(i));
 			result[i] = splitLine.toArray(new String[splitLine.size()]);
 		}
 		return result;
@@ -183,7 +217,7 @@ public class FileHandler{
 	
 	
 	public static String propertyGet(String setting){
-		String value = p.getProperty(setting);
+		String value = properties.getProperty(setting);
 		return value;
 	}
 
@@ -210,17 +244,17 @@ public class FileHandler{
 			header = "Compare Schedules";
 		}
 		
-		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder);
+		ArrayList<String> scheduleNames = FileHandler.getScheduleNames(savedScheduleFolder);
 		if(!scheduleNames.isEmpty()){
 			String[] finalSchedNames = new String[scheduleNames.size()];
 			for(int i=0; i<finalSchedNames.length; i++){
 				finalSchedNames[i]=scheduleNames.get(i);
 			}
-			String chosenSched = (String) JOptionPane.showInputDialog(popUP, instruct, header, JOptionPane.PLAIN_MESSAGE, null, finalSchedNames, finalSchedNames[0]);	
+			String chosenSched = (String) JOptionPane.showInputDialog(null, instruct, header, JOptionPane.PLAIN_MESSAGE, null, finalSchedNames, finalSchedNames[0]);	
 			return chosenSched;
 		}
 		else{
-			JOptionPane.showMessageDialog(popUP, "You have no saved schedules");
+			JOptionPane.showMessageDialog(null, "You have no saved schedules");
 			return null; 
 		}
 	}
@@ -230,7 +264,7 @@ public class FileHandler{
 	public static Schedule openSchedule(){
 		String chosenSched = chooseSchedule("open");
 		if(chosenSched !=null){
-			try(FileInputStream fis = new FileInputStream(MenuOptions.savedScheduleFolder+File.separator+chosenSched);
+			try(FileInputStream fis = new FileInputStream(savedScheduleFolder+File.separator+chosenSched);
 					ObjectInputStream ois = new ObjectInputStream(fis);) {
 				Schedule result = (Schedule) ois.readObject();
 				ois.close();
@@ -246,24 +280,23 @@ public class FileHandler{
 
 	public static void saveSchedule(Schedule sch){
 		String fileName = null;
-		String schedName = (String)JOptionPane.showInputDialog(popUP, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
+		String schedName = (String)JOptionPane.showInputDialog(null, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
 		fileName=schedName;
 		if(fileName!= null){
-			if(FileHandler.getScheduleNames(MenuOptions.savedScheduleFolder).contains(fileName +".ser")){
+			if(FileHandler.getScheduleNames(savedScheduleFolder).contains(fileName +".ser")){
 				String[] options = {"Overwrite my old schedule", "Save both schedules"};
-				int overwrite = (int)JOptionPane.showOptionDialog(popUP, "Would you like to overwrite an already existing schedule, or rename your current schedule?", "Save Schedule", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int overwrite = (int)JOptionPane.showOptionDialog(null, "Would you like to overwrite an already existing schedule, or rename your current schedule?", "Save Schedule", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(overwrite==1){
-					String newName = (String)JOptionPane.showInputDialog(popUP, "Please choose a different name for your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
+					String newName = (String)JOptionPane.showInputDialog(null, "Please choose a different name for your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
 					fileName=newName;
 				}
 			}
 		}
 		if(fileName != null){
 			try{
-				saveObjectToFile(MenuOptions.savedScheduleFolder + File.separator + fileName + ".ser", sch);
+				saveObjectToFile(savedScheduleFolder + File.separator + fileName + ".ser", sch);
 			}catch (IOException e) {
-				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(popUP, "This schedule was not able to be saved. ");
+				JOptionPane.showMessageDialog(null, "This schedule was not able to be saved. ");
 				e.printStackTrace();
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -336,7 +369,7 @@ public class FileHandler{
 	}
 
 
-	public static final String majorsFile = MenuOptions.resourcesFolder + "Majors";
+	public static final String majorsFile = resourcesFolder + "Majors";
 
 
 
@@ -435,6 +468,12 @@ public class FileHandler{
 	}
 
 
+	
+	/**
+	 * Find all course files and tell CourseList
+	 * (the static class) to read the data in each 
+	 * of these files.
+	 */
 	public static void readAllCourses() {
 		File f = new File(courseListFolder);
 		for ( File semesterFile : f.listFiles(new FilenameFilter(){
@@ -452,9 +491,27 @@ public class FileHandler{
 		}
 
 	}
+	
+	public static ImageIcon getDialogImage(){
+		return new ImageIcon(resourcesFolder + "dioglogIcon.gif");
+	}
+	public static ImageIcon getBelltowerImage(){
+		return new ImageIcon(FileHandler.resourcesFolder + "BellTower(T).png");
+	}
 
 
-	public static void loadPrereqMeanings(String fileName){
+	/**
+	 * load the prereq meanings hashtable from 
+	 * the file, and set the appropriate 
+	 * static field in CourseList.
+	 * See CourseList savedPrereqMeanings
+	 * for an explanation of how prereqMeanings
+	 * are used.
+	 */
+	public static void loadPrereqMeanings(){
+		loadPrereqMeanings(prereqMeaningsFile);
+	}
+	private static void loadPrereqMeanings(String fileName){
 		File f = new File(fileName);
 		if(!f.exists()){
 			try{
@@ -497,12 +554,12 @@ public class FileHandler{
 	public static void deleteSchedule() {
 		String chosen = chooseSchedule("delete");
 		if(chosen != null){
-			int n = JOptionPane.showOptionDialog(popUP, "Are you sure you want to delete "+ chosen, "Delete Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.OK_CANCEL_OPTION, null, null, null);
+			int n = JOptionPane.showOptionDialog(null, "Are you sure you want to delete "+ chosen, "Delete Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.OK_CANCEL_OPTION, null, null, null);
 			if(n==0){
-				File toDelete = new File (MenuOptions.savedScheduleFolder + chosen);
+				File toDelete = new File (savedScheduleFolder + chosen);
 				boolean deleted = toDelete.delete();
 				if(!deleted){
-					JOptionPane.showMessageDialog(popUP, "Error: Unable to delete schedule");
+					JOptionPane.showMessageDialog(null, "Error: Unable to delete schedule");
 				}
 				
 			}
@@ -511,7 +568,7 @@ public class FileHandler{
 
 
 	public static ArrayList<ImageIcon> getInstructions() {
-		File folder = new File(MenuOptions.resourcesFolder + "StartUpSlides");
+		File folder = new File(resourcesFolder + "StartUpSlides");
 		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
 
 		for (File f: folder.listFiles(
