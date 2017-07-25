@@ -159,8 +159,8 @@ public class CourseList implements java.io.Serializable  {
 
 
 	/**
-	 * Make a requirement for all the prerequsites for this course.
-	 *      if p is null or the prefix has no requirement, then
+	 * find the prereq for the prefix p.
+	 *      if p is null or p has no requirement, then
 	 * 		return null.
 	 * @param p
 	 * @return

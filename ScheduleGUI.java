@@ -396,6 +396,7 @@ public class ScheduleGUI{
 	public void GUIPopUP(String s){
 		new MajorPopUpChooser(s, this, sch);
 	}
+	
 
 	/**
 	 * Show the user a webpage

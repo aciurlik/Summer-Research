@@ -9,19 +9,33 @@ import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
+/**
+ * This class stores default colors, fonts, and other style information.
+ * 
+ * It is similar to MenuOptions, but this class holds program-wide
+ * settings, while MenuOptions mainly holds strings.
+ * 
+ * Use the following website for the standards. If the website no longer exists,
+ * google "Furman graphic design guide" and look for "Official univerisity colors"
+ * and so on.
+ * http://www.furman.edu/sites/university-communications/brand-standards/Pages/graphic-design-guide.aspx
+ * 
+ */
 public class FurmanOfficial implements java.io.Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final Color lightPurple = new Color(76,42,135);
-	public static final int[] lightPurpleRGB = {76, 42, 135};
+	public static final int[] lightPurpleRGB = {76, 42, 135}; // official Furman light purple
 	public static final Color darkPurple = new Color(62,24,94);
-	public static final int[] darkPurpleRGB = {62, 24, 94};
+	public static final int[] darkPurpleRGB = {62, 24, 94}; //official Furman dark purple
 	public static final Color grey = new Color(91,91,91);
-	public static final int[] greyRGB = {91, 91, 91};
-	public static final Color nimbus = new Color(93,45, 133);
+	public static final int[] greyRGB = {91, 91, 91}; //official Furman grey
+	
+	
+	//The Nimbus UI lightens and darkens buttons.
+	// These two fields give the actual displayed 
+	public static final Color nimbus = new Color(93,45, 133); 
 	public static final Color nimbusAlpha = new Color(93, 45, 133, 200);
+	
 	public static Color official;
 	public static Color officialAlpha;
 	
@@ -37,16 +51,18 @@ public class FurmanOfficial implements java.io.Serializable{
 	public static final Font normalFont = getFont(12);
 	public static final Font monospaced = new Font("MONOSPACED", Font.PLAIN, 12);
 	
+	
+	
+	/**
+	 * This static block loads the UIManager, and should be called before
+	 * any Swing objects are created.
+	 */
 	static{
-
-		
 		UIManager.put("OptionPane.messageFont", getFont(12));
 		UIManager.put("OptionPane.font", getFont(12));
 		UIManager.put("OptionPane.buttonFont", getFont(12));
 		UIManager.put("ComboBox.font", monospaced);
-	
-	
-	
+		
 		try {
 		
 			// Set cross-platform Java L&F (also called "Metal")
@@ -75,20 +91,16 @@ public class FurmanOfficial implements java.io.Serializable{
 			}
 			MenuOptions.setUIType(false);
 		}
-		if(MenuOptions.UIType){
-			official = nimbus;
-			officialAlpha = nimbusAlpha;
-		}
-		else{
+		//if(MenuOptions.UIType){
+		//	official = nimbus;
+		//	officialAlpha = nimbusAlpha;
+		//}
+		//else{
 			official= bouzarthDarkPurple;
 			officialAlpha = bouzarthDarkWithAlpha(200);
-		}
-		
-		
+		//}
 		UIManager.put("List.font",monospaced);
 		UIManager.put("TextArea.font",monospaced);
-		
-
 	}
 	
 	
@@ -100,7 +112,6 @@ public class FurmanOfficial implements java.io.Serializable{
 	 * @param alpha
 	 * @return
 	 */
-	
 	public static Color bouzarthDarkWithAlpha(int alpha){
 		int red=bouzarthDarkPurple.getRed();
 		int blue=bouzarthDarkPurple.getBlue();

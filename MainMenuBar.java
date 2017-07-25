@@ -222,7 +222,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			FileHandler.showSetting();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
-			FileHandler.GUICalledRestoreDefaultSettings();
+			FileHandler.requestRestoreDefaultSettings();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.examineRequirementHelp)){
 			schGUI.showExamineRequirementHelp();

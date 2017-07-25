@@ -154,6 +154,7 @@ public class PriorData implements Serializable{
 		int courseStringIndex = -1;
 		int creditsIndex = -1;
 		int gradeIndex = -1;
+		int studentNameIndex = -1;
 		for(int i = 0; i < headers.length ; i ++){
 			if(headers[i].toUpperCase().equals("TERM")){
 				termIndex = i;
@@ -167,6 +168,9 @@ public class PriorData implements Serializable{
 			else if (headers[i].toUpperCase().equals("GRADE") || 
 					headers[i].toUpperCase().equals("FINAL GRADE")){
 				gradeIndex = i;
+			}
+			else if(headers[i].equals("NAME")){
+				studentNameIndex = i;
 			}
 		}
 
@@ -182,6 +186,9 @@ public class PriorData implements Serializable{
 		if(gradeIndex == -1){
 			throw new RuntimeException( "Course grade column not found in " + Arrays.toString(headers));
 		}	
+		if(studentNameIndex != -1){
+			studentName = s[1][studentNameIndex];
+		}
 
 
 
@@ -224,11 +231,27 @@ public class PriorData implements Serializable{
 				//Turn the strings into objects
 
 				//Prefix, title, and section number
+				// Will be in the form 
+				// ACC-101 01 Principles of ...
+				// or 
+				// ACC-101 Principles of ...
 				String title = null;
 				String section = null;
+				  //the prefix is all the stuff up until the first space.
 				int firstSpace = courseString.indexOf(" ");
 				String prefixString = courseString.substring(0, firstSpace);
 				Prefix p = Prefix.readFrom(prefixString);
+				  //the section number exists if the second space is 3 characters
+				  // after the first space.
+				int secondSpace = courseString.indexOf(" ", firstSpace + 1);
+				if(secondSpace == firstSpace + 3){
+					title = courseString.substring(secondSpace);
+					section = courseString.substring(firstSpace + 1, secondSpace);
+				}
+				else{
+					title = courseString.substring(firstSpace);
+				}
+				  //Check if this is a language prefix that would affect GER types.
 				String numString = p.getNumber();
 				boolean examineTitleForLanguagePrefix = false;
 				if(numString.contains("PL")){
@@ -242,15 +265,6 @@ public class PriorData implements Serializable{
 						}
 					}
 				}
-				int secondSpace = courseString.indexOf(" ", firstSpace + 1);
-				if(secondSpace == firstSpace + 2){
-					title = courseString.substring(secondSpace);
-					section = courseString.substring(firstSpace + 1, secondSpace);
-				}
-				else{
-					title = courseString.substring(firstSpace);
-				}
-
 				if(examineTitleForLanguagePrefix){
 					//Take the first instance of a number found in the title.
 					Matcher m = Pattern.compile("\\d+").matcher(title);
@@ -311,12 +325,10 @@ public class PriorData implements Serializable{
 				}
 				String courseString = Arrays.toString(row);
 				JOptionPane.showMessageDialog(null, 
-						    "We couldn't read in the course \n" 
+						    "<html><p style=\"width:" + Driver.defaultPixelWidth +"px;\">We couldn't read in the course <br>" 
 						+    courseString 
-						+ "\n due to something unexpected in the data. "
-						+ "\n If this course satisfies any requirements, you can drag"
-						+ "\n those requirements into the semester where you took this course.");
-
+						+ "<br>due to something unexpected in the data, "
+						+ "so it won't show up in your schedule.</p></html>");
 			}
 		}
 		data = s;
@@ -401,11 +413,20 @@ public class PriorData implements Serializable{
 		if(grade == null || grade.equals("")){
 			return true;
 		}
-		for(char c : grade.toCharArray()){
-			if("ABCDSP X".contains(c + "")){
-				return true;
+		//Should catch grades like A+, B-, so on,
+		// as well as a grade of " ".
+		if(grade.length() <=2 ){
+			for(char c : grade.toCharArray()){
+				if("ABCDS X".contains(c + "")){
+					return true;
+				}
 			}
 		}
+		//Catch "P" without catching "NP"
+		if(grade.equals("P") || grade.equals("PD")){
+			return true;
+		}
+
 		return false;
 	}
 	

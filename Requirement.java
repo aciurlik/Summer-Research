@@ -1032,6 +1032,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 			replacementFirst = replacementFirst.replace("credit hours", "credits");
 		}
 		String replacementMid = ",";
+		if(choices.size() <= 2){
+			replacementMid = sugars[1];
+		}
 		String replacementEnd = sugars[2];
 
 		sugars[0] = replacementFirst;

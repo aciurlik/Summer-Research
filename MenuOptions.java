@@ -1,5 +1,3 @@
-import java.io.File;
-
 
 
 
@@ -13,8 +11,9 @@ public class MenuOptions implements java.io.Serializable{
 	 * in the appropriate place. Add a comment in the appropriate location if you 
 	 * borrow a String that has already been written, this will act as a place holder. 
 	 * The spacing/structure of this class should mirror the location in the GUI. The more 
-	 * indented the String is the the farther it is down the tree (for example it is a submenu of a 
+	 * indented the String is the the farther it is down the tree (for example if it is a submenu of a 
 	 * submenu) Look to the outline to find the broader categories. 
+	 * 
 	 */
 	
 	
@@ -113,7 +112,7 @@ public class MenuOptions implements java.io.Serializable{
 				public static String examineRequirementHelp = "Requirement Help";
 				public static String findACourse = "Find a Course";
 	
-	///////////////////
+	////////////////////////
 	///// Only AdditionsPanel
 	////////////////////////
 	@SuppressWarnings("unused")
@@ -153,17 +152,25 @@ public class MenuOptions implements java.io.Serializable{
 					public static final  String Challenge = "Take the Challenge";
 					public static final  String tryAgain = "Try Again";
 					public static final  String Cancel = "Cancel";//This is also used in Settings
+					
+	///////////////////
+	////Popups
+	////////////////////			
+	@SuppressWarnings("unused")
+	private int _____________Popups_________________;	
+		
+		//Course chooser
+		public static final String showCourseFiltersText = "Show Filters";
+		public static final String hideCourseFiltersText = "Hide Filters";
 	
 	/////////////////
 	//Driver 
 	/////////////////
 	@SuppressWarnings("unused")
 	private int _____________Driver_________________;
-		public static boolean UIType;
+		public static boolean UIType; 
 
 		public static String confirm = "Yes, I understand";
-
-	
 
 	
 		
