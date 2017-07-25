@@ -1,6 +1,8 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,6 +24,15 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  * 
  */
 public class FurmanOfficial implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	
+	public static int defaultCharacterLength = 100; //Provides a uniform dialog box size for the whole program
+	static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	public static int defaultPixelWidth = (int) screenSize.getWidth()/3;//Sets the text in a dialog box
+	// based on the user screen size should be referenced by all dialog boxes in the program who have a large
+	//amount of context, that needs to be formatted to prevent the text from going off the screen. 
 	private static final long serialVersionUID = 1L;
 	
 	

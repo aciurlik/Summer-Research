@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -58,18 +59,26 @@ import javax.swing.JTabbedPane;
  * Properties field.
  * 
  * 
+ * Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
+ * color, fonts, formatting information. 
  *
  */
 public class FileHandler{
 	public static final String resourcesFolder = "Resources" + File.separator;
+	public static final String userDataFolder = "UserData" + File.separator;
+	
+
 	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
 	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";
 	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
-	public static final String studentDataFile = resourcesFolder + "SavedStudentData.txt";
-	public static final String savedScheduleFolder = resourcesFolder + "SavedSchedule" + File.separator;
+	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
+	public static final String savedScheduleFolder = userDataFolder + "SavedSchedule" + File.separator;
 	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
-	public static final String settingsDoc = resourcesFolder +  "Settings";
+	public static final String settingsDoc = userDataFolder +  "Settings";
+	
+	public static final String testScheduleSource = resourcesFolder +  "tutorial.ser";
+	public static final String testScheduleDestination = savedScheduleFolder + "tutorial.ser";
 	
 	
 	private static Properties properties;
@@ -86,6 +95,9 @@ public class FileHandler{
 	static{
 		properties = new Properties();
 		File file = new File(settingsDoc);
+		makeFolder(userDataFolder);
+		makeFolder(savedScheduleFolder);
+		
 		if(!file.exists()){
 			//if the file isn't found, make one with
 			// the default settings
@@ -298,7 +310,7 @@ public class FileHandler{
 		}
 		if(fileName != null){
 			try{
-				saveObjectToFile(savedScheduleFolder + File.separator + fileName + ".ser", sch);
+				saveObjectToFile(savedScheduleFolder + fileName + ".ser", sch);
 			}catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "This schedule was not able to be saved. ");
 				e.printStackTrace();
@@ -648,4 +660,36 @@ public class FileHandler{
 		// TODO Auto-generated method stub
 		return  new ImageIcon(fireworksImageFile);
 	}
+	public static void makeFolder(String folderName){
+		File folder = new File(folderName);
+		if(!folder.exists()){
+			folder.mkdir();
+			if(folderName.equals(savedScheduleFolder)){
+				copyFileUsingStream(new File(testScheduleSource), new File(testScheduleDestination));
+					
+				}
+			}
+		}
+
+	/**
+	 * This transfers one file from one destination to another. In this version it
+	 * clones and transfers the test.ser to the userData so that the program always has a schedule
+	 * to open when it originally open. The user will have the option to delete the tutorial. 
+	 * @param source
+	 * @param dest
+	 */
+	private static void copyFileUsingStream(File source, File dest) {
+		try(InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest);) {
+			byte [] buffer = new byte[1024];
+			int length;
+			while((length= is.read(buffer)) >0){
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}	
 }
