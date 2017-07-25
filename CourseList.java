@@ -442,7 +442,7 @@ public class CourseList implements java.io.Serializable  {
 
 		for(Course course : input){
 			if ( course.getSemester().compareTo(s.getDate()) == 0){
-
+				
 				SemesterList.add(course);
 			}
 		}
@@ -928,6 +928,7 @@ public class CourseList implements java.io.Serializable  {
 		savedPrereqMeanings = new Hashtable<String, String>();
 		FileHandler.readAllCourses();
 		FileHandler.loadPrereqMeanings();
+		
 	}
 
 
