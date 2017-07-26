@@ -101,7 +101,6 @@ public class MenuOptions {
 						public static String previous = "Previous";
 						public static String next = "Next";
 						public static String finish = "Finish";
-					
 					public static String restoreDefault = "Restore Default Settings";
 		
 

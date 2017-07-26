@@ -27,7 +27,7 @@ public class Schedule implements java.io.Serializable {
 
 
 	//transient is for Serializable purposes.
-	public transient ScheduleGUI d;
+	public transient ScheduleGUI schGUI;
 	CourseList masterList;
 	private int CLP;
 	private Prefix languagePrefix;
@@ -37,7 +37,7 @@ public class Schedule implements java.io.Serializable {
   
 
 
-	public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
+	//public static SemesterDate defaultFirstSemester; //TODO this should be removed after demos.
 	public SemesterDate currentSemester;
 	SemesterDate firstSemester;
 	public String studentName;
@@ -95,10 +95,9 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	public void setDriver(ScheduleGUI d){
-		this.d = d;
+	public void setScheduleGUI(ScheduleGUI schGUI){
+		this.schGUI = schGUI;
 	}
-
 
 	/**
 	 * May wipe all scheduleElements from the schedule!!!!
@@ -122,11 +121,15 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	public void readBlankPrior(){
-		if(defaultFirstSemester == null){
+		SemesterDate firstSemester = null;
+		if(FileHandler.propertyGet(FileHandler.startSemester) != null){
+			firstSemester = SemesterDate.readFrom(FileHandler.propertyGet(FileHandler.startSemester));
+		}
+		if( firstSemester == null){
 			throw new RuntimeException("Tried to make a blank schedule before a default first semester was chosen");
 		}
-		setFirstSemester(defaultFirstSemester);
-		setCurrentSemester(defaultFirstSemester);
+		setFirstSemester(firstSemester);
+		setCurrentSemester(firstSemester);
 		
 	}
 
@@ -677,8 +680,8 @@ public class Schedule implements java.io.Serializable {
 	private boolean ___GeneralErrorChecksForGUIEvents_________;
 	
 	public boolean userOverride(ScheduleError s){
-		if(this.d != null){
-			return(d.userOverrideError(s));
+		if(this.schGUI != null){
+			return(schGUI.userOverrideError(s));
 		}
 		else{
 			return true;
@@ -1212,7 +1215,7 @@ public class Schedule implements java.io.Serializable {
 		// So we should alert the user to this and ask them what they think.
 		ScheduleError optimismError = new ScheduleError(ScheduleError.optimisticSchedulerError);
 		optimismError.setOptimisticRequirement(r);
-		return (! d.userOverrideError(optimismError));
+		return (! schGUI.userOverrideError(optimismError));
 
 	}
 
@@ -1503,9 +1506,9 @@ public class Schedule implements java.io.Serializable {
 				throw new RuntimeException("I couldn't find the major for this requirement" + r);
 			}
 		}
-		if(this.d != null){
+		if(this.schGUI != null){
 			//Ask the user to pick for us.
-			return d.GUIResolveConflictingRequirements(reqs, majors, c);
+			return schGUI.GUIResolveConflictingRequirements(reqs, majors, c);
 		}
 		else{
 			//If we try to resolve conflicts on our own, this is where we would do it.
@@ -1600,8 +1603,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!d.getErrorString().equals("")){
-			result.append("<b> Scheduling Errors: </b> <br>" + d.getErrorString());
+		if(!schGUI.getErrorString().equals("")){
+			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h2>The Final Countdown: </h2>");
