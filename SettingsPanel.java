@@ -1,7 +1,9 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -134,16 +136,7 @@ public class SettingsPanel implements ActionListener {
 			checkUserInput();
 			
 		}
-	
 
-	}
-	protected static JComponent makeTextPanel(String text) {
-		JPanel panel = new JPanel(false);
-		JLabel filler = new JLabel(text);
-		filler.setHorizontalAlignment(JLabel.CENTER);
-		panel.setLayout(new GridLayout(1, 1));
-		panel.add(filler);
-		return panel;
 	}
 	@Override
 	//This ask the user to pick a start semester, and will only change the toChangeSemesterStart, if the user picks a valid option. 

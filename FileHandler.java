@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Properties;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -43,6 +45,11 @@ u * methods to check the server for new data and perform updates.
  * Properties field.
  * 
  * 
+ * 
+ *  Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
+ *   color, fonts, formatting information. 
+ * 
+ * 
  *
  */
 public class FileHandler{
@@ -55,10 +62,9 @@ public class FileHandler{
 	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
 	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
-	public static final String studentDataFile =  + "SavedStudentData.txt";
-	public static final String savedScheduleFolder =  + "SavedSchedule" + File.separator;
+	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
+	public static final String savedScheduleFolder =  userDataFolder + "SavedSchedule" + File.separator;
 	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
-
 	public static final String settingsDoc = userDataFolder +  "Settings";
 
 	public static final String testScheduleSource = resourcesFolder +  "tutorial.ser";
@@ -79,7 +85,7 @@ public class FileHandler{
 	 */
 	static{
 		properties = new Properties();
-		File file = new File(settingsDoc);e
+		File file = new File(settingsDoc);
 		makeFolder(userDataFolder);
 		makeFolder(savedScheduleFolder);
 
