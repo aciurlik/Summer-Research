@@ -1,8 +1,6 @@
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,6 +10,9 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 /**
+ * Blurb written: 7/25/2017
+ * Last updated: 7/26/2017
+ * 
  * This class stores default colors, fonts, and other style information.
  * 
  * It is similar to MenuOptions, but this class holds program-wide
@@ -24,15 +25,6 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  * 
  */
 public class FurmanOfficial implements java.io.Serializable{
-	/**
-	 * 
-	 */
-	
-	public static int defaultCharacterLength = 100; //Provides a uniform dialog box size for the whole program
-	static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	public static int defaultPixelWidth = (int) screenSize.getWidth()/3;//Sets the text in a dialog box
-	// based on the user screen size should be referenced by all dialog boxes in the program who have a large
-	//amount of context, that needs to be formatted to prevent the text from going off the screen. 
 	private static final long serialVersionUID = 1L;
 	
 	
@@ -133,7 +125,7 @@ public class FurmanOfficial implements java.io.Serializable{
 
 			     });
 			
-			MenuOptions.setUIType(true);
+			MenuOptions.setNimbusLoaded(true);
 		} 
 		catch (Exception e) {
 			try{UIManager.setLookAndFeel(
@@ -142,9 +134,9 @@ public class FurmanOfficial implements java.io.Serializable{
 			}catch(Exception e2){
 				e2.printStackTrace();
 			}
-			MenuOptions.setUIType(false);
+			MenuOptions.setNimbusLoaded(false);
 		}
-		if(MenuOptions.UIType){
+		if(MenuOptions.nimbusLoaded){
 			darkPurple = nimbusPurple;
 			lightPurple = nimbusAlpha;
 		}

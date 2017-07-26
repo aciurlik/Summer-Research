@@ -19,7 +19,7 @@ public class SemesterDate implements java.io.Serializable {
 		this.year = year;
 		this.sNumber = semesterNumber;
 	}
-	
+
 	public SemesterDate(String season, int year){
 		this.year = year;
 		this.sNumber = toSNumber(season);
@@ -58,9 +58,9 @@ public class SemesterDate implements java.io.Serializable {
 		}
 		int season = fromDNumToSeason[dNumber-  1];
 		return new SemesterDate(year, season);
-		
-		
-		
+
+
+
 	}
 	/**
 	 * Read from strings of the form Fall 2017 - Day
@@ -78,7 +78,7 @@ public class SemesterDate implements java.io.Serializable {
 		}
 		String yearString = m.group();
 		String semesterName = semesterString.substring(0, m.start());
-		
+
 		return new SemesterDate(Integer.parseInt(yearString), toSNumber(semesterName));
 	}
 
@@ -117,14 +117,14 @@ public class SemesterDate implements java.io.Serializable {
 			return new SemesterDate(this.year,(this.sNumber + 1) );
 		}
 	}
-	
+
 	public SemesterDate previous(){
 		if(this.sNumber == SPRING){
 			return new SemesterDate(this.year - 1, SemesterDate.SUMMERTWO);
 		}
 		return new SemesterDate(this.year, this.sNumber - 1);
 	}
-	
+
 	public String getUserString(){
 		String result = getSeason(sNumber);
 		if(result == null){
@@ -134,7 +134,7 @@ public class SemesterDate implements java.io.Serializable {
 		return result;
 	}
 
-	
+
 	public static String getSeason(int p){
 		String[] season = {null, "Spring", "MayX", "Summer Session One", "Summer Session Two", "Fall", "Other"};
 		return season[p];
@@ -179,28 +179,28 @@ public class SemesterDate implements java.io.Serializable {
 		}
 
 	}
-	
 
-public String toString(){
-	String result = "";
-	result= result +this.getSeason(sNumber)+ " " + this.year;
-	return result;
-}
-	
- @Override 
- public boolean equals(Object other){
-	 if(!(other instanceof SemesterDate)){
-		 return false;
-	 }
-	 SemesterDate o = (SemesterDate) other;
-	 if(o.compareTo(this)==0){
-		 return true;
-	 }
-	 else{
-		 return false;
-	 }
-	 
-	 
-	 
- }
+
+	public String toString(){
+		String result = "";
+		result= result +this.getSeason(sNumber)+ " " + this.year;
+		return result;
+	}
+
+	@Override 
+	public boolean equals(Object other){
+		if(!(other instanceof SemesterDate)){
+			return false;
+		}
+		SemesterDate o = (SemesterDate) other;
+		if(o.compareTo(this)==0){
+			return true;
+		}
+		else{
+			return false;
+		}
+
+
+
+	}
 }

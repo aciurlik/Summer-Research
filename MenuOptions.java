@@ -1,7 +1,7 @@
 
 
 
-public class MenuOptions implements java.io.Serializable{
+public class MenuOptions {
 	/**
 	 * Blurb written 7/18/2017
 	 * Last updated 7/18/2017
@@ -168,17 +168,17 @@ public class MenuOptions implements java.io.Serializable{
 	/////////////////
 	@SuppressWarnings("unused")
 	private int _____________Driver_________________;
-		public static boolean UIType; 
+		public static boolean nimbusLoaded; 
 
 		public static String confirm = "Yes, I understand";
 
 	
 		
-		public boolean isUIType() {
-			return UIType;
+		public static boolean isNimbusLoaded() {
+			return nimbusLoaded;
 		}
-		public static void setUIType(boolean uIType) {
-			UIType = uIType;
+		public static void setNimbusLoaded(boolean isLoaded) {
+			nimbusLoaded = isLoaded;
 		}
 	
 	}

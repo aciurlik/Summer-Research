@@ -1,10 +1,11 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 
 
 /**
+ * 
+ * blurb written: 7/23/2017
+ * last updated: 7/26/2017
+ * 
  * This class represents one actual offered course in furman's system,
  * including the section number and semester.
  * 
@@ -26,14 +27,10 @@ import java.util.HashSet;
  * 
  *  It is in the DATA group of classes.
  *  
- *  
- * 
- * This blurb written: 7/23/2017
- * last updated: 7/23/2017
  *
  *
  */
-public class Course implements HasCreditHours, java.io.Serializable{
+public class Course implements java.io.Serializable{
 	private static final long serialVersionUID = 1L;
 	protected int creditHours;
 	protected Prefix coursePrefix;
@@ -86,6 +83,20 @@ public class Course implements HasCreditHours, java.io.Serializable{
 	 */
 	public Course(Prefix prefix, String sectionNumber, String professor, int[] meetingDays, int creditHours, SemesterDate semester ){
 		this(prefix, semester, professor, meetingDays, creditHours, sectionNumber);
+	}
+	
+	
+	
+	
+	/**
+	 * A constructor used for temporary courses that aren't actually offered
+	 * (used in Requirements to test for completion).
+	 * @param p
+	 * @param creditHours
+	 */
+	public Course(Prefix p, int creditHours){
+		this.coursePrefix = p;
+		this.creditHours = creditHours;
 	}
 	
 	

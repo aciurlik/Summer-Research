@@ -1,28 +1,22 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Scanner;
-
-
-
+/**
+ * Blurb written 7/26/2017
+ * Last updated 7/26/2017
+ * 
+ * This class represents one major, defined by a major name
+ * and a list of Requirements for that major.
+ * 
+ * Majors can be read and saved in a user-friendly text format - see 
+ * the method readFrom(String) for an explanation.
+ * 
+ * Major is in the DATA group of classes.
+ * 
+ *
+ */
 public class Major implements java.io.Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	String name;
-	int groupNumber;
-	ArrayList<Requirement> reqList;
-	ArrayList<Integer> reqFriendGroups;
-	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
-	public int chosenDegree;
 	
-	public String notes;
-
-
 
 	public static final String NORMAL_MAJOR = "Major";
 	public static final String MINOR = "Minor";
@@ -32,10 +26,31 @@ public class Major implements java.io.Serializable{
 	public static final int BS = 2;
 	public static final int BM = 0;
 	public static final int None = 4;
+	
+	public static final int MajorDDNRange = 100;
+	
+	
+	String name; //the name of this major, like "Applied Math"
+	
+	ArrayList<Requirement> reqList; //The list of requirements that must be
+	// satisfied to complete this major.
+	
+	ArrayList<Integer> reqFriendGroups; //used when loading a major to 
+	// store which requirements are in the same friend group - see
+	// the method readEnemiesLine for the algorithm behind requirement friend groups.
+	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
+	//The possible degree types (BS, BA, BM) that the user can pick for this major.
+	
+	public int chosenDegree;
+	//The degree type (BS, BA, BM) that the user has chosen for this major when it is in
+	//the schedule.
+	
+	
+	public String notes;
+	//Notes displayed to the user each time that they add this major to their schedule,
+	//or when they check all errors.
 
 	String majorType;
-
-	public static final int MajorDDNRange = 100;
 
 	public Major(String name){
 		this.name = name;
@@ -86,16 +101,38 @@ public class Major implements java.io.Serializable{
 		return result;
 	}
 	
-	public void addDegreeType(String degreeType){
+	
+	
+	
+	////////////////////////
+	////////////////////////
+	/////Getters and Setters
+	////////////////////////
+	////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___GettersAndSetters_________;
+	
+	
+	/**
+	 * Add this degree type to the list of possible degrees for this major.
+	 * Returns false if the add was not successful.
+	 * @param degreeType
+	 * @return
+	 */
+	public boolean addDegreeType(String degreeType){
 		if(degreeType.equals("BM")){
 			this.degreeTypes.add(BM);
+			return true;
 		}
 		if(degreeType.equals("BS")){
 			this.degreeTypes.add(BS);
+			return true;
 		}
 		if(degreeType.equals("BA")){
 			this.degreeTypes.add(BA);
+			return true;
 		}
+		return false;
 	}
 
 
@@ -154,18 +191,28 @@ public class Major implements java.io.Serializable{
 		return true;
 	}
 	
+	
+	/**
+	 * Add this line (which should be one paragraph 
+	 * @param line
+	 */
 	public void addToNotes(String line){
 		notes += line + "\n";
 	}
-	public String getNodes(){
-		return this.notes;
-	}
+	
+	
+	////////////////////////
+	////////////////////////
+	/////Saving and reading
+	////////////////////////
+	////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___SavingReading_________;
+	
 
-
-
-
-
-
+	
+	
+	
 	public String saveString(){
 		StringBuilder result = new StringBuilder();
 		result.append(name + "\n");
@@ -231,10 +278,11 @@ public class Major implements java.io.Serializable{
 
 	/**
 	 * 
-	 * SYNTAX AND FORMAT OF MAJOR FILES.
+	 * MAJOR SAVING AND READING TUTORIAL
 	 * 
-	 * Example file:
+	 * Example Major file:
 	 * 
+	 ***************************************
 	 * Math-BS
 	 * Type: Major
 	 * Possible Degree(s): BA, BS
@@ -245,79 +293,147 @@ public class Major implements java.io.Serializable{
 	 * R4 MTH Electives:7 of (MTH-151, MTH-160, MTH-250, MTH-320, MTH-335, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, or MTH-504)
 	 * R5 MR: 1 of (MTH-150, 2 of (MTH 145, MTH 120) )
 	 * Collection of Requirement Enemies:
-	 * R1:R2
+	 * R0:R2,R5
 	 * R3:4
 	 * R4:4
+	 * R5:3
+	 * R1:ALL
+	 * R1:R2
+	 * Notes:
+	 * The GPA of all Math courses must be at least 2.00 for successful completion of the major.
+	 * See your advisor for details.
+	 ****************************************
+	 *
+	 *
+	 *EXPLANATION OF EXAMPLE FILE
+	 *
+	 *Spacing/newlines
+	 * 		In a major file, there are a lot of details about spaces and punctuation.
+	 * 		Sometimes spacing is ignored, sometimes it is not.
+	 * 		Read this tutorial to find out when.
+	 * 		Each line may be separated by as many newline characters as you want, but 
+	 * 		if any characters exist in the line it is considered to be a line.
+	 * 		    so, if '\n' means newline and you have a string of the form 
+	 * 		    "MYLINE  \n\n  \nMYNEXTLINE "
+	 * 		    which might look like
+	 * 		    "
+	 * 		    MYLINE__
+	 * 		    
+	 * 		    _
+	 * 		    MYNEXTLINE_"
+	 * 		    the invisible space above MYNEXTLINE would be counted as a line.
+	 * 
+	 * The file is organized into a number of sections. Each section is optional, excluding
+	 * 		NAME_SECTION and REQUIREMENTS_SECTION.
+	 * 
+	 * NAME_SECTION
+	 * TYPE_SECTION - defaults to Major
+	 * POSSIBLE_DEGREES_SECTION - defaults to no choices
+	 * REQUIREMENTS_SECTION
+	 * REQUIREMENT_ENEMIES_SECTION
+	 * NOTES_SECTION
 	 * 
 	 * 
 	 * 
 	 * 
+	 * other explanations:
 	 * 
-	 * 
-	 * 
-	 * 
-	 * Example file with explanations:
-	 * 
+	 ************************
+	 *-->NAME_SECTION
 	 * Math-BS   ---> This is the name of the major.
 	 * 
+	 * -->TYPE_SECTION
 	 * Type: Major ---> This optional line can specify Major, Minor, or Track. 
-	 * 			------>  The string 'Type: ' must be exact.
-	 * 
+	 * 			------> The string 'Type: ' must be exact, including the space
+	 * 			------>    after the colon.
+	 * -->POSSIBLE_DEGREES_SECTION
 	 * Possible Degree(s): BA, BS ---> This optional line can specify which GER 
-	 * 						--------->   types may be associated with this major. 
-	 * 						--------->  Values should be separated by commas, but it ignores spacing.
+	 * 						--------->     types may be associated with this major. 
+	 * 						---------> Values should be separated by commas, but it ignores spacing.
 	 * 						---------> The string "Possible Degree(s):" should be exact.
-	 * 
-	 * R0:(MTH-250)  --> This is one of the requirements for this major. See the Requirement class saving and reading tutorial
-	 *  		   ---->  for an explanation of valid requirements.
+	 * -->REQUIREMENTS_SECTION
+	 * R0:(MTH-250)  --> This is one of the requirements for this major. 
+	 *  			---> Each requirement must have an 'R' followed by a colon ':' followed by a requirement string.
+	 *  			--->    See the Requirement class saving and reading tutorial for an explanation of valid requirements strings.
+	 *  			---> Spacing after the colon is ignored, but spacing before the colon is important (see R4 below).
+	 *  			---> The number after the R is ignored, but you may want to include one for your convenience when dealing
+	 *  			--->     with requirement enemies (see "Collection of Requirement Enemies" below)
 	 *  
 	 * R1:(MTH-260)
 	 * R2:(MTH-350, MTH-450)
 	 * R3:(MTH-360, MTH-460)
 	 * R4 MTH Electives:7 of (MTH-151, MTH-160, MTH-250, MTH-320, MTH-335, MTH-337, MTH-340, MTH-341, MTH-350, MTH-360, MTH-420, MTH-435, MTH-450, MTH-451, MTH-460, MTH-461, or MTH-504)
-	 *     				------>This requirement has a name associated with it.
-	 *     				------> The name is defined to be all characters before the colon, but after the first space.
-	 *     				------>  So, "R5  MYNAME: VALIDREQUIREMENTSTRING"
-	 *     				------>  would make a requirement with a name ' MYNAME', not 'MYNAME'. 
+	 *     				------>The above requirement has a name associated with it.
+	 *     				------>The name is defined to be all characters before the colon, but after the first space.
+	 * 					------>So requirement R4 has name "MTH Electives".
+	 *     				------>  Notice that "R5   this Is My Requirements Name : VALID-REQUIREMENT-STRING"
+	 *     				------>  would make a requirement with a name "  this Is My Requirements Name ",
+	 *     				------>  which includes extra spaces in the beginning and end. 
+	 *     				------>  In addition, "R5 : VALID-REQUIREMENT-STRING" would make a requirement with name " ".
 	 *     
 	 * R5 MR: 1 of (MTH-150, 2 of (MTH 145, MTH 120) )
-	 * 					------> This requirement has a name of MR and has an unnamed sub-requirement.
-	 * 
-	 * Collection of Requirement Enemies: --> this string must be exact, and it marks the beginning of the 
+	 * 					------> This requirement has a name of MR and has an unnamed sub-requirement, 2 of (...)
+	 * 					------> Sub-requirements cannot be named, and sub-requirements cannot be made into enemies of other requirements.
+	 * -->REQUIREMENT_ENEMIES_SECTION
+	 * Collection of Requirement Enemies: --> this string must be exact (no spaces), and it marks the beginning of the 
 	 * 								-----> portion of the Requirement Graph stored by this major.
-	 * 								-----> The requirement graph specifies which requirements are enemies,
-	 * 								-----> meaning that a course satisfying one cannot also satisfy the other
+	 * 								-----> Edges of the requirement graph specify which requirements are enemies with each other,
+	 * 								-----> meaning that if a course satisfies one requirement then that course cannot also satisfy the other
 	 * 								-----> at the same time. For example, if r1 is "1 of (MTH-360, MTH 460)" and
-	 * 								-----> r2 is the MTH elective requirement, the course MTH 360 might satisfy both
-	 * 								-----> r1 and r2, but it is not allowed to do so. This means that r1 and r2 are 
-	 * 								-----> enemies.
+	 * 								-----> r2 is the MTH elective requirement, the course MTH 360 could theoretically satisfy both
+	 * 								-----> r1 and r2, but it is not allowed to do so. This means that r1 and r2 are  enemies.
 	 * 
-	 * R1:R2
-	 * R3:4 -----> Enemies may also be specified by friend groups. A requirement with a friend group
-	 * 		-----> is automatically enemies with any other requirement that has a friend group, unless 
-	 * 		-----> they are in the same friend group. In this example, the friend groups mean that
-	 * 		-----> R3 and R5 are enemies, R4 and R5 are enemies, but R3 and R4 are friends.
+	 * R0:R2,R5 --------> This line means that requirement 0 in this major (the first one listed) is enemies with 
+	 *       -------->     requirement 2 in this major (the third one listed) and requirement 5 in this major 
+	 *       -------->     (the sixth one listed). The numbers here (0, 2, and 5) refer to the
+	 *       -------->     requirement's place in the list, NOT to the numbers used in the first section. 
+	 *       --------> If you mis-number a requirement in the first section, for example writing:
+	 *       -------->     R4: VALID-REQUIREMENT-STRING
+	 *       -------->     R4: OTHER-VALID-REQUIREMENT-STRING 
+	 *       -------->     then the second requirement will still be treated as R5 in this section. Only
+	 *       -------->     the order matters, not the number used in the first section.
+	 *       -------->     If you delete a requirement (say, removing the entire line specifying R2) then all
+	 *       -------->     requirement reference numbers will decrement by one in this section, and you will need
+	 *       -------->     to rewrite the Collection of Requirement Enemies section.
+	 *       
+	 * R3:4 -----> Enemies may also be specified by their friend groups. If you omit all "R"s after the colon,
+	 *      ----->     then the program will assume you are specifying a friend group. Direct enemy specification requires
+	 *      ----->     the presence of the "R" before each number. 
+	 *      -----> Friend group 0 is reserved to mean 'no friend group', and should not be used in a file. 
+	 *      -----> Requirements with no friend group, or with group 0, can still be friends 
+	 *      ----->     with any requirement in a friend group.
+	 *      -----> A requirement with a friend group is automatically made enemies with any other requirement 
+	 *      ----->     that has a friend group, unless they are in the same friend group. In this example, 
+	 *      ----->     the friend groups mean that R3 and R5 are enemies, R4 and R5 are enemies, 
+	 *      ----->     but R3 and R4 are friends. In addition, R3 is still friends with R1 and R0.
+	 *      ----->     If not for the line "R0: R2, R5", then R5 would still be friends with R0,
+	 *      ----->     but because of that line R5 is not friends with R0.
 	 * R4:4
 	 * R5:3
-	 * R1:ALL----> If the string "ALL" is found, this requirement will be made a loner.
-	 * 		-----> Loners are enemies with all other requirements (including from other majors)
-	 * 		-----> except for those specified here.
+	 * R1:ALL----> If the string "ALL" is the only string on an enemy specification line (no spaces allowed), 
+	 *      ----->     then this requirement will be made a "loner."
+	 * 		-----> "Loners" are enemies with all other requirements (including requirements from other majors)
+	 * 		----->     The requirement graph takes on the opposite meaning for loners - if there is an edge between
+	 * 		----->     two requirements and one of them is a loner, then the requirements are friends, and if there is no
+	 * 		----->     edge between two requirements and one is a loner, then they requirements are enemies.
 	 * R1:R2 ----> In this example, R1 is enemies with every requirement other than R2.
 	 * 
+	 * -->NOTES_SECTION
+	 * Notes: ---> This line marks the start of the notes section.
+	 * 		-----> It must contain the string "notes:" (any capitalization) and will ignore the rest of the line.
+	 * 		-----> Each future line will be considered one note - each note is displayed as a bullet point to the user 
+	 * 		----->     when they see the notes for the major. 
+	 * 		-----> The "Notes:" line can be omitted, but everything line that is not in any of the previously mentioned sections
+	 * 		----->     is considered to be part of the notes section (so if you omit the "Notes:" line, notes may still exist.)
+	 * 		----->     That means that if you misspell this line, it will be considered to be a note and will be 
+	 * 		----->     displayed to the user.
+	 * 		-----> We use notes to convey information that the program cannot handle
+	 * 		----->     or that the program does not explain clearly.
 	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
+	 * The GPA of all Math courses must be at least 2.00 for successful completion of the major.
+	 * See your advisor for details.
+	 * 		-----> This major has 2 notes, each of which will be given a bullet point.
+	 ************************ 
 	 * 
 	 * 
 	 * 
@@ -325,10 +441,15 @@ public class Major implements java.io.Serializable{
 	 * @return
 	 */
 	public static Major readFrom(String saveString){
-		saveString = saveString.replaceAll("\\r", "\n");
+		saveString = saveString.replaceAll("\\r", "\n"); //windows adds \r to some newlines.
 		saveString = saveString.trim();
 		String[] lines = saveString.split("[\\n]+");
+		//Name
 		Major result = new Major(lines[0]);
+		
+		//startIndex is used until we have finished the header section and reach
+		// the section that specifies requirements.
+		//startIndex should then be index of the first requirement line.
 		int startIndex = 1;
 		if(lines[startIndex].contains(typeString)){
 			result.setType(lines[startIndex].substring(typeString.length()));
@@ -343,26 +464,26 @@ public class Major implements java.io.Serializable{
 			}
 			startIndex++;
 		}
+		//requirements section
 		int i = startIndex;
 		while(i < lines.length && lines[i].indexOf("R") == 0){
 			Requirement newRequirement = readRequirementLine(lines[i]);
 			result.addRequirement(newRequirement);
 			i++;
 		}
-		//Check if there are any reqGraph edges listed after.
+		//enemies section
 		if(i == lines.length){
 			return result;
 		}
-		if(!lines[i].equals(reqGraphString)){
-			throw new RuntimeException("The " + result.name + " file has an incorrect key string.\n"
-					+ "Should be " + reqGraphString );
-		}
-		i++;
-		while(i < lines.length && lines[i].indexOf("R") == 0){
-			result.readEnemiesLine(lines[i]);
+		if(lines[i].equals(reqGraphString)){
 			i++;
+			while(i < lines.length && lines[i].indexOf("R") == 0){
+				result.readEnemiesLine(lines[i]);
+				i++;
+			}
 		}
 		result.addEnemyEdgesFromFriendGroups();
+		//Notes section
 		if(i < lines.length){
 			result.notes = "";
 			//Skip the line saying "Notes:"
@@ -376,6 +497,12 @@ public class Major implements java.io.Serializable{
 		return result;
 	}
 
+	/**
+	 * Get the requirement specified by this line (assumed to be in the form
+	 * of a line in the REQUIREMENT section of a saved major.)
+	 * @param s
+	 * @return
+	 */
 	private static Requirement readRequirementLine(String s){
 		int colonIndex = s.indexOf(":");
 		int firstSpace = s.indexOf(" ");
@@ -389,9 +516,13 @@ public class Major implements java.io.Serializable{
 	}
 
 	/**
-	 * Given a line of the form "R3: R1, R2, R7 "
-	 *  or  "R3: 5"
-	 *  or "R3: ALL"
+	 * Update the Requirement Graph based on this string,
+	 * 		assumed to be of the form of a line in the 
+	 * 		REQUIREMENT_ENEMIES section of a major file.
+	 * 
+	 * so given "R3: R1, R2, R7 "
+	 *  	 or "R3: 5"
+	 *  	 or "R3: ALL"
 	 *  the first means to make r1, r2, and r7 enemies of r3.
 	 *   the middle means to put r3 in friend group 5
 	 *   the third means to make r3 a loner, so it is enemies with all requirements
@@ -420,6 +551,12 @@ public class Major implements java.io.Serializable{
 	private int parseReqNumber(String s){
 		return Integer.parseInt(s.split("R")[1]);
 	}
+	
+	/**
+	 * Look through the friend groups for this major's requirements.
+	 * If any two requirements have differing friend groups and neither one
+	 * has group 0, then put an enemy edge between them.
+	 */
 	private void addEnemyEdgesFromFriendGroups(){
 		for(int i = 0; i < reqList.size() ; i ++){
 			int groupNumber = reqFriendGroups.get(i);
@@ -427,7 +564,8 @@ public class Major implements java.io.Serializable{
 				continue;
 			}
 			for(int j = i+1 ; j < reqList.size() ; j ++){
-				if(reqFriendGroups.get(i)!=reqFriendGroups.get(j)){
+				int otherGroup = reqFriendGroups.get(j);
+				if(otherGroup != 0 && groupNumber != otherGroup){
 					RequirementGraph.putEdge(reqList.get(i), reqList.get(j));
 				}
 			}

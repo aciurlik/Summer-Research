@@ -1,29 +1,30 @@
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DropTargetListener;
-import java.io.IOException;
-
-import javax.swing.JComponent;
 import javax.swing.TransferHandler;
-import javax.swing.TransferHandler.DropLocation;
-import javax.swing.TransferHandler.TransferSupport;
 
 /**
- * PanelDropHandler and ComponentDragHandler work together.
+ * Blurb written: Long before 7/1/2017
+ * Last updated: 7/26/2017
+ * 
+ * PanelDropHandler and ComponentDragHandler work together. They
+ * make simple drag and drop operations easier to write by 
+ * creating default behavior for the TransferHandler class.
+ * 
  * PanelDropHandler can accept drops, while ComponentDragHandler 
  *   makes drops.
+ *   
  * PanelDropHandler must specify what happens to the receiving container
  *   when a drop occurs, and ComponentDragHandler must specify what happens to
  *   the moving component and the donating container.
  * 
- * To use PanelDropHandler, you should create a subclass handler 
- *   Your subclass should override the method 
- *     public void recievedDrop(Container receiver, Component draggedItem)
- *   This method will say what your panel (receiver) should do when a dragged item
- *   is dropped on it.
+ * To use PanelDropHandler, you should create a subclass handler.
+ *     Your subclass should override the method 
+ *         public void recievedDrop(Container receiver, Component draggedItem)
+ *     This method will say what your panel (the receiver) should do when
+ *         a dragged component is dropped on it.
  * 
- * Then, once you have an instance of your panel, just call the method
+ * Then, to give a panel the specified drop behavior, just call the method
  *   myPanel.setTransferHandler(mySubclassOfPanelDropHandler)
  *   
  * Here's an example:
@@ -52,22 +53,14 @@ public abstract class PanelDropHandler extends TransferHandler {
 	@Override
 	public boolean canImport(TransferSupport support)
 	{
-		if (!support.isDrop())
-		{
-			
+		if (!support.isDrop()){
 			return false;
 		}
-		
 		if(!support.isDataFlavorSupported(ComponentDragHandler.COMPONENT_FLAVOR)){
-			
 			return false;
 		}
-		
 		return true;
 	}
-	
-	public abstract boolean canImport(Component c);
-
 
 	/**
 	 * The actions that should happen when a draggable component
@@ -85,40 +78,21 @@ public abstract class PanelDropHandler extends TransferHandler {
 	 */
 	@Override
 	public boolean importData(TransferSupport support){
-		if (!canImport(support))
-		{
+		if (!canImport(support)){
 			return false;
 		}
-
 		Component dataComponent;
-
-		try
-		{
+		try{
 			Transferable t = support.getTransferable();
 			Object rawData = t.getTransferData(ComponentDragHandler.COMPONENT_FLAVOR);
 			dataComponent = (Component)rawData;
 		}
-		catch (Exception e)
-		{
+		catch (Exception e){
 			e.printStackTrace();
 			return false;
 		}
-
 		Container container = (Container)support.getComponent();
-		//container.add(dataComponent);
-		//      container.revalidate();
-		//      container.repaint();
-		//container.invalidate();
-		//container.getParent().revalidate();
-		//container.getParent().repaint();
-
-		//      JLabel label = (JLabel)component;
-		//DropLocation location = support.getDropLocation();
-		//      System.out.println(label.getText() + " + " + location.getDropPoint());
-		//dataComponent.setLocation( location.getDropPoint() );
-
 		recievedDrop(container, dataComponent);
-
 		return true;
 	}
 	

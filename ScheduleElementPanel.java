@@ -98,7 +98,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 		
 		remove.setOpaque(false);
 		JButton toRemove = new JButton(removeButtonText);
-		if(MenuOptions.UIType){
+		if(MenuOptions.nimbusLoaded){
 			toRemove.setPreferredSize(new Dimension(nimbusWidth, nimbusHeight));
 			toRemove.setMargin(new Insets(1,1,1,1));
 			

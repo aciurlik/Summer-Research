@@ -2,6 +2,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
+/**
+ * Blurb written: 7/26/2017
+ * Last updated: 7/26/2017
+ * 
+ * A class that represents a collection of intervals.
+ * 
+ * Main useage is the overlaps method.
+ * @author dannyrivers
+ *
+ * @param <T>
+ */
 public class Intervals<T extends Comparable<T>> implements java.io.Serializable{
 
 	/**
@@ -39,6 +50,25 @@ public class Intervals<T extends Comparable<T>> implements java.io.Serializable{
 				if(i.overlaps(j)){
 					return true;
 				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check object is in this intervals.
+	 * IncludeEndpoints deals with objects that
+	 * are equal to some endpoint but not strictly contained in any
+	 * interval. if includeEndpoints, this method will return
+	 * true in that case, otherwise it will return false.
+	 * @param object
+	 * @param includeEndpoints
+	 * @return
+	 */
+	public boolean contains(T object, boolean includeEndpoints){
+		for(Interval<T> i : this.intervals){
+			if(i.contains(object, includeEndpoints)){
+				return true;
 			}
 		}
 		return false;

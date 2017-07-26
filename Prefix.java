@@ -1,19 +1,20 @@
 
 /**
- * The essential elements of a course, without any time associated.
+ * This class represents the subject and number of a course, as in 
+ * "MTH-120" or "BUS-3320".
  * 
- * @author dannyrivers
+ * 
  *
  */
 public class Prefix implements Comparable<Prefix>, java.io.Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String subject;
-	private String courseNumber; //Became a string when we found a few strange courses.
+	private String courseNumber; //We made this field into
+	// a string when we found a few strange courses, like
+	// BUS-BLK (business block) and MUS-120A (unknown what this is).
 
 
+	
 	public Prefix(String subject, String courseNumber) {
 		this.subject = subject;
 		this.courseNumber = courseNumber;
@@ -35,6 +36,7 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 		return this.subject + "-" + this.courseNumber;
 	}
 
+	
 	public static Prefix readFrom(String prefixString){
 		String[] pair = prefixString.split("-");
 		return new Prefix (pair[0], pair[1]);
@@ -42,18 +44,10 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 
 	@Override
 	public boolean equals(Object o){
-		if(o==null){
-			return false;
-		}
 		if(!(o instanceof Prefix)){
 			return false;
 		}
-		return this.equals((Prefix)o);
-	}
-	public boolean equals(Prefix other){
-		if(other== null){
-			return false;
-		}
+		Prefix other = (Prefix)o;
 		return this.subject.equals(other.subject) && this.courseNumber.equals(other.courseNumber);
 	}
 
@@ -65,16 +59,10 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 
 	@Override
 	public int compareTo(Prefix other) {
-		int strDiff = this.subject .compareTo(other.subject);
-		if(strDiff!=0){
-			return strDiff;
+		int subjDiff = this.subject.compareTo(other.subject);
+		if(subjDiff!=0){
+			return subjDiff;
 		}
 		return this.courseNumber.compareTo(other.courseNumber);
 	}
-
-
-	public static Prefix readFromJSON(String s) {
-		return readFrom(SaverLoader.peel(s));
-	}
-
 }
