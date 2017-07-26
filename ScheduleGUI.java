@@ -43,10 +43,6 @@ public class ScheduleGUI{
 	ListOfMajors l;
 	BellTower b;
 	
-	
-
-
-
 
 
 
@@ -757,7 +753,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, Driver.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, FurmanOfficial.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -809,7 +805,7 @@ public class ScheduleGUI{
 
 		}
 
-		result = parseIntoReadable(result, Driver.defaultCharacterLength);
+		result = parseIntoReadable(result, FurmanOfficial.defaultCharacterLength);
 
 
 		return result;
