@@ -31,10 +31,15 @@ import javax.swing.JPanel;
  *
  */
 public class Driver {
+
 	static ArrayList<ScheduleGUI> listOfScheduleGUIs; //This allows multiple schedules to be opened 
 	//without them interacting with each other.
 	static StartUpMenu startUP = null;//This stores the startup object, because inital loading is time 
 	//consuming. 
+
+	
+	
+	
 
 	/**
 	 * When one creates a new Schedule through initial loading of the program,

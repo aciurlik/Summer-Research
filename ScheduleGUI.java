@@ -44,6 +44,13 @@ public class ScheduleGUI{
 	BellTower b;
 	
 	
+
+
+
+
+
+
+
 	public ScheduleGUI(Schedule sch) {
 		this.sch = sch;
 		sch.setScheduleGUI(this);
@@ -277,7 +284,9 @@ public class ScheduleGUI{
 		}
 		if(m.notes != null){
 			String title = "Notes for " + m.name + ":";
+
 			String toUser = htmlMajorNotes(m);
+
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
@@ -748,7 +757,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, FurmanOfficial.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, Driver.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -800,7 +809,7 @@ public class ScheduleGUI{
 
 		}
 
-		result = parseIntoReadable(result, FurmanOfficial.defaultCharacterLength);
+		result = parseIntoReadable(result, Driver.defaultCharacterLength);
 
 
 		return result;
@@ -851,6 +860,7 @@ public class ScheduleGUI{
 		boolean hasNotes = false;
 		for(Major m : sch.getMajors()){
 			if(m.notes != null){
+
 				hasNotes = true;
 				majorNotes = this.htmlMajorNotes(m);
 				

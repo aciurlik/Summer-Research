@@ -1,5 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,16 +43,19 @@ public class SettingsPanel implements ActionListener {
 	//if the user selects a null option, it does not change. 
 	
 	public SettingsPanel(){
+
 		//Background of the whole settingPanel, the tabs are placed on this. 
 		JPanel basePanel = new JPanel();
 		basePanel.setPreferredSize(new Dimension(400, 200));
 		basePanel.setLayout(new BorderLayout());
 		JTabbedPane tabbedPane = new JTabbedPane();
 		
+
 		showStartUp = new JCheckBox(MenuOptions.startUp);
 		if(FileHandler.propertyGet(MenuOptions.startUp).equals("true")){ //Sets the checkBox on the status of the current Settings doc. 
 			showStartUp.setSelected(true);
 		}
+
 		
 	
 		//  We wanted this to be in the middle of the panel. This is 
@@ -133,8 +135,16 @@ public class SettingsPanel implements ActionListener {
 			
 		}
 	
-	}
 
+	}
+	protected static JComponent makeTextPanel(String text) {
+		JPanel panel = new JPanel(false);
+		JLabel filler = new JLabel(text);
+		filler.setHorizontalAlignment(JLabel.CENTER);
+		panel.setLayout(new GridLayout(1, 1));
+		panel.add(filler);
+		return panel;
+	}
 	@Override
 	//This ask the user to pick a start semester, and will only change the toChangeSemesterStart, if the user picks a valid option. 
 	public void actionPerformed(ActionEvent e) {

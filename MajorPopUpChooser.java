@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 /**
  * Blurb written 7/24/2017
  * Last updated 7/24/2017
- * This class lets the user choose a Major(Minors/Track they
+ * This class lets the user choose a Major (or Minors or Track, they
  * all operate in a similar way) from a list of majors.
  * 
  *

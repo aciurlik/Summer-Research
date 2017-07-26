@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -31,7 +30,7 @@ import javax.swing.JOptionPane;
  * one need only change this class in order to read all the new data correctly.
  * 
  * For example, if we put data on a webserver, this class could contain
- * methods to check the server for new data and perform updates.
+u * methods to check the server for new data and perform updates.
  * 
  * This class is in the FILE group of classes.
  * 
@@ -44,22 +43,22 @@ import javax.swing.JOptionPane;
  * Properties field.
  * 
  * 
- * Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
- * color, fonts, formatting information. 
  *
  */
 public class FileHandler{
 	public static final String resourcesFolder = "Resources" + File.separator;
+
 	public static final String userDataFolder = "UserData" + File.separator;
 	public static String startSemester = "Set First Semester";
 
+
 	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
-	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";
-	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
+	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
-	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
-	public static final String savedScheduleFolder = userDataFolder + "SavedSchedule" + File.separator;
+	public static final String studentDataFile =  + "SavedStudentData.txt";
+	public static final String savedScheduleFolder =  + "SavedSchedule" + File.separator;
 	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
+
 	public static final String settingsDoc = userDataFolder +  "Settings";
 
 	public static final String testScheduleSource = resourcesFolder +  "tutorial.ser";
@@ -80,9 +79,10 @@ public class FileHandler{
 	 */
 	static{
 		properties = new Properties();
-		File file = new File(settingsDoc);
+		File file = new File(settingsDoc);e
 		makeFolder(userDataFolder);
 		makeFolder(savedScheduleFolder);
+
 		if(!file.exists()){
 			//if the file isn't found, make one with
 			// the default setting
@@ -302,7 +302,7 @@ public class FileHandler{
 		}
 		if(fileName != null){
 			try{
-				saveObjectToFile(savedScheduleFolder + fileName + ".ser", sch);
+				saveObjectToFile(savedScheduleFolder  + fileName + ".ser", sch);
 			}catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "This schedule was not able to be saved. ");
 				e.printStackTrace();
@@ -650,6 +650,7 @@ public class FileHandler{
 		// TODO Auto-generated method stub
 		return  new ImageIcon(fireworksImageFile);
 	}
+
 	public static void makeFolder(String folderName){
 		File folder = new File(folderName);
 		if(!folder.exists()){
@@ -682,4 +683,5 @@ public class FileHandler{
 			e1.printStackTrace();
 		}
 	}	
+
 }

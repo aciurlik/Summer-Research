@@ -17,6 +17,13 @@ public interface ScheduleElement {
 	 * and null if ScheduleElement has no prefix. 
 	 */
 	public Prefix getPrefix();
+	
+	/**
+	 * 
+	 * @return the number of credit hours gained by scheduling this
+	 * element
+	 */
+	public int getCreditHours();
 
 	/**
 	 * 
