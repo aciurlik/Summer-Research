@@ -55,7 +55,7 @@ import java.util.function.Function;
  *  
  *
  */
-public class Requirement implements ScheduleElement, Comparable<Requirement>, HasCreditHours,  java.io.Serializable{
+public class Requirement implements ScheduleElement, Comparable<Requirement>,  java.io.Serializable{
 	private static final long serialVersionUID = 1L;
 	public HashSet<Requirement> choices;
 	int numToChoose; //the number of classes that must be taken.
@@ -370,20 +370,21 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 				}
 				else{
 					//if any of your completed subrequirements uses it, you can add its credits.
-					if(e instanceof HasCreditHours){
-						int credits = ((HasCreditHours)e).getCreditHours();
-						boolean found = false;
+
+					int credits = e.getCreditHours();
+					boolean creditsCanBeAdded = false;
+					if(credits != 0){ //skip elements with 0 credit hours.
 						for(Requirement r : completedSubreqs){
 							if(r.isSatisfiedBy(e)){
-								found = true;
+								creditsCanBeAdded = true;
 								break;
 							}
 						}
-						if(found){
-							result -= credits;
-							if(result <= 0){
-								return 0;
-							}
+					}
+					if(creditsCanBeAdded){
+						result -= credits;
+						if(result <= 0){
+							return 0;
 						}
 					}
 				}
@@ -1569,6 +1570,7 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 	}
 
 	public static void generalTest(){
+		CourseList.loadAllCourses();
 		String[] tests = new String[]{
 				"MTH-110",
 				"(MTH 110)",
@@ -1662,7 +1664,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>, Ha
 
 
 	public static void main(String[] args){
-		testStringDisplays();
+		generalTest();
+		//testStringDisplays();
 	}
 
 

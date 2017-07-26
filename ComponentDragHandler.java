@@ -5,13 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -19,27 +15,34 @@ import javax.swing.TransferHandler;
 
 
 /**
- * PanelDropHandler and ComponentDragHandler work together.
+ * Blurb written: Long before 7/1/2017
+ * Last Updated: 7/26/2017
+ * 
+ * PanelDropHandler and ComponentDragHandler work together. They
+ * make simple drag and drop operations easier to write by 
+ * creating default behavior for the TransferHandler class.
+ * 
  * PanelDropHandler can accept drops, while ComponentDragHandler 
  *   makes drops.
+ *   
  * PanelDropHandler must specify what happens to the receiving container
  *   when a drop occurs, and ComponentDragHandler must specify what happens to
  *   the moving component and the donating container.
  *   
- * To use ComponentDragHandler, you should create a subclass handler.
- *   Your subclass should override the methods:
- *     public void initiateDrag(JComponent toBeDragged)
- *     public void afterDrop(Container source, JComponent dragged, boolean moveAction)
+ * To use ComponentDragHandler, you should create a subclass of ComponentDragHandler,
+ * 	   and have the component you want to drag call the method
+ * 	       myComp.setTransferHandler(mySubclass);
  * 
- * The former specifies actions that should happen as soon as a drag event starts.
- * The latter specifies actions that should happen after the drag event has completed. 
- *   if there is an error with the underlying DnD system, then 
- *    the argument 'dragged' may be null rather than the actual component.
- *   if moveAction is true, then this drag was specified by the user to be a move action.
- *     Most implementations decide that on a move action, the dragged component should be
- *     removed from the source container, but this is up to you.
- *   
- *   
+ *     Your subclass should override the methods:
+ *         public void initiateDrag(JComponent toBeDragged)
+ *         public void afterDrop(Container source, JComponent dragged, boolean moveAction)
+ * 
+ *     The former specifies actions that should happen as soon as a drag event starts.
+ *     The latter specifies actions that should happen after the drag event has completed. 
+ *         the argument 'dragged' may be null.
+ *     if moveAction is true, then this drag was specified by the user to be a move action.
+ *         Most implementations decide that on a move action, the dragged component should be
+ *         removed from the source container, but this is up to you.
  * 
  * 
  * @author dannyrivers
@@ -47,8 +50,10 @@ import javax.swing.TransferHandler;
  */
 
 public abstract class ComponentDragHandler extends TransferHandler {
-	private Image mouseImage;
 
+	private static final long serialVersionUID = 1L;
+	
+	private Image mouseImage;
 
 	public static final DataFlavor COMPONENT_FLAVOR;
 	static{
@@ -167,6 +172,20 @@ public abstract class ComponentDragHandler extends TransferHandler {
 
 	}
 
+	@Override
+	public void exportDone(JComponent source, Transferable data, int action)
+	{
+		JComponent dragged = null;
+		try{
+			Component holder = (Component) data.getTransferData(COMPONENT_FLAVOR);
+			dragged = (JComponent) holder;
+		} catch (Exception e){
+			// Auto-generated catch block
+			e.printStackTrace();
+		}
+		afterDrop(source, dragged, action == TransferHandler.MOVE);
+	}
+
 
 
 
@@ -190,33 +209,5 @@ public abstract class ComponentDragHandler extends TransferHandler {
 	 */
 	public abstract void afterDrop(Container source, JComponent dragged, boolean moveAction);
 
-
-	@Override
-	public void exportDone(JComponent source, Transferable data, int action)
-	{
-		JComponent dragged = null;
-		try{
-			Component holder = (Component) data.getTransferData(COMPONENT_FLAVOR);
-			dragged = (JComponent) holder;
-		} catch (Exception e){
-			// Auto-generated catch block
-			e.printStackTrace();
-		}
-		afterDrop(source, dragged, action == TransferHandler.MOVE);
-	}
-	/*
-	
-	@Override
-	public boolean importData(TransferSupport support){
-		boolean result = super.importData(support);
-		
-	}
-	
-	@Override
-	private static DropTargetListener getDropTargetListener() {
-		
-	}
-	*/
-	
 
 }

@@ -15,24 +15,32 @@ import javax.swing.border.MatteBorder;
 
 /**
  * Blurb written 7/24/2017
- * Last updated 7/24/2017
+ * Last updated 7/26/2017
  * 
- * This is the Panel that contains a single Major's requirements
- * the top part of the major holds all the information including
+ * This is the Panel that contains a single Major's requirements.
+ * 
+ * The top part of the MajorPanel holds all the information including
  * the name, the type it corresponds to (BA,BM,BS) and the 
- * estimated courses left unscheduled. It also has a button that 
+ * estimated courses left unscheduled for this major. It also has a button that 
  * allows the user to remove the major from the scheduleGUI. 
  *
  */
 public class MajorPanel extends JPanel {
 	
+	private static final long serialVersionUID = 1L;
 	public  Major major;
 	public ScheduleGUI schGUI;
 
+	
 	JPanel top;
 	JPanel bottom;
-	int nimbusWidth = 40;
-	int nibusHeight = 20;
+	
+	
+	int nimbusRemoveButtonWidth = 40;
+	int nibusRemoveButtonHeight = 20;
+	
+	int defaultRemoveButtonWidth = 20;
+	int defaultRemoveButtonHeight = 20;
 
 	public MajorPanel(Major m, ScheduleGUI schGUI){
 		super();
@@ -44,7 +52,7 @@ public class MajorPanel extends JPanel {
 	public void update (Major m){
 		ArrayList<Requirement> reqList = new ArrayList<Requirement>(m.reqList);
 		
-		//Calculate the requirements left in this major
+		//get the estimated number of courses needed to complete this major
 		int reqsLeft = 0;
 		for(Requirement r : reqList){
 			reqsLeft += r.getStoredCoursesLeft();
@@ -55,12 +63,14 @@ public class MajorPanel extends JPanel {
 
 		//Holds aspects of the Major on the top
 		top = new JPanel ();
+		   //These commands put a line underneath the top panel
 		top.setLayout(new BorderLayout());
 		top.setBorder(new CompoundBorder(new EmptyBorder(4, 4, 4, 4), new MatteBorder(0, 0, 1, 0, Color.BLACK)));
 		//Holds the things at the top left (currently major name, BS/BA, and # unscheduled)
 		JPanel topLeftPanel = new JPanel(); 
 		topLeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
+		//The string "(BA)" or "(BS)" next to the major name.
 		String degreeType = "";
 		if(m.chosenDegree != -1){
 			degreeType = "(" + CourseList.getDegreeTypeString(m.chosenDegree) + ")";
@@ -79,12 +89,14 @@ public class MajorPanel extends JPanel {
 		if(m.name.equals("GER") || m.name.equals("Prereqs")){
 			remove.setEnabled(false);
 		}
-		if(MenuOptions.UIType){//This must be adjusted so the text isn't cut off
+		if(MenuOptions.isNimbusLoaded()){
+			//If we're using nimbus, the remove button must be
+			// adjusted so the text isn't cut off
 			remove.setMargin(new Insets(1,1,1,1));
-			remove.setPreferredSize(new Dimension(nimbusWidth, nibusHeight));
+			remove.setPreferredSize(new Dimension(nimbusRemoveButtonWidth, nibusRemoveButtonHeight));
 		}
 		else{
-			remove.setPreferredSize(new Dimension (20, 20));
+			remove.setPreferredSize(new Dimension (defaultRemoveButtonWidth, defaultRemoveButtonHeight));
 		}
 		remove.setForeground(Color.WHITE);
 		remove.setBackground(FurmanOfficial.darkPurple);
@@ -103,7 +115,7 @@ public class MajorPanel extends JPanel {
 		bottom = new JPanel();
 		bottom.setLayout(new BorderLayout());
 		JPanel heightFlex = new JPanel();
-		//Adds a requirement panel for each listed in major file. 
+		//Adds a requirement panel for each requirement listed in the major. 
 		for(Requirement r : reqList){
 			heightFlex.add(new RequirementPanel(r,schGUI, this));
 		}
@@ -116,7 +128,4 @@ public class MajorPanel extends JPanel {
 		schGUI.GUIRemoveMajor(this);
 
 	}
-
-
-
 }

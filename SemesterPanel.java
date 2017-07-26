@@ -82,7 +82,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		JButton showSemester = new JButton(MenuOptions.showSemester);
 		showSemester.setActionCommand(MenuOptions.showSemester);
 		showSemester.setToolTipText("Show Semester");
-		if(MenuOptions.UIType){
+		if(MenuOptions.nimbusLoaded){
 			showSemester.setPreferredSize(new Dimension(NimbusWidth+2, NimbusHeight));
 			showSemester.setMargin(new Insets(1,1,1,1));
 		}
@@ -114,7 +114,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		hideSem.setToolTipText("Hide Semester");
 		hideSem.setPreferredSize(new Dimension(15,15));
 		hideSem.addActionListener(this);
-		if(MenuOptions.UIType){
+		if(MenuOptions.nimbusLoaded){
 			deleteSemesterButton.setPreferredSize(new Dimension(NimbusWidth, NimbusHeight));
 			deleteSemesterButton.setMargin(new Insets(1,1,1,1));
 			hideSem.setPreferredSize(new Dimension(NimbusWidth, NimbusHeight));
@@ -472,19 +472,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 				ScheduleElementPanel p = (ScheduleElementPanel) draggedItem;
 				addElement(p);
 			}
-
-		}
-
-
-		@Override
-		public boolean canImport(Component c) {
-			if(c instanceof RequirementPanel){
-				return true;
-			}
-			else if(c instanceof ScheduleElementPanel){
-				return true;
-			}
-			return false;
 		}
 	}
 

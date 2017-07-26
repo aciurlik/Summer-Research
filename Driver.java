@@ -21,7 +21,11 @@ public class Driver {
 	static StartUpMenu startUP = null;
 	
 	
-
+	public static int defaultCharacterLength = 100; //Provides a uniform dialog box size for the whole program
+	static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	public static int defaultPixelWidth = (int) screenSize.getWidth()/3;//Sets the text in a dialog box
+	// based on the user screen size should be referenced by all dialog boxes in the program who have a large
+	//amount of context, that needs to be formatted to prevent the text from going off the screen. 
 
 
 	public static void addScheduleGUI(Schedule s){

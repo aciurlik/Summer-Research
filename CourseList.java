@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
 /**
+ * Blurb written: 7/24/2017
+ * Last updated: 7/26/2017
+ * 
  * This is a static class that can hold and filter the full list of courses. 
  * All actual Furman courses used by the program should be in listOfCourses.
  * 
@@ -21,7 +24,7 @@ import java.util.Scanner;
  * getPrereq(prefix) and addToPrereqMeanings(), and possibly the whole section 
  * prereqUtilityMethods.
  * 
- * CourseList is in the DATA group of classes.
+ * CourseList is in the DATA group of classes, and interfaces with the FILE group.
  * 
  * 
  *
@@ -442,7 +445,7 @@ public class CourseList implements java.io.Serializable  {
 
 		for(Course course : input){
 			if ( course.getSemester().compareTo(s.getDate()) == 0){
-				
+
 				SemesterList.add(course);
 			}
 		}
@@ -928,7 +931,6 @@ public class CourseList implements java.io.Serializable  {
 		savedPrereqMeanings = new Hashtable<String, String>();
 		FileHandler.readAllCourses();
 		FileHandler.loadPrereqMeanings();
-		
 	}
 
 

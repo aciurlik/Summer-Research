@@ -170,13 +170,8 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 
 	private boolean checkReplaceOverload(ScheduleElement newElement, ScheduleElement oldElement) {
 		int totalHours = 0;
-		if(oldElement instanceof HasCreditHours){
-			totalHours=totalHours- ((HasCreditHours) oldElement).getCreditHours();
-		}
-
-		if(newElement instanceof HasCreditHours){
-			totalHours= totalHours + ((HasCreditHours) newElement).getCreditHours();
-		}
+		totalHours=totalHours- oldElement.getCreditHours();
+		totalHours= totalHours + newElement.getCreditHours();
 
 		totalHours = totalHours + getCreditHours();
 		if(totalHours > OverloadLimit){

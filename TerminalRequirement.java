@@ -14,7 +14,7 @@ import java.util.Stack;
  * 
  *
  */
-public class TerminalRequirement extends Requirement implements HasCreditHours, java.io.Serializable {
+public class TerminalRequirement extends Requirement implements  java.io.Serializable {
 	/**
 	 * 
 	 */
@@ -334,8 +334,9 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 	public boolean alsoCompletes(Requirement r){
 		if(this.isExact()){
+			//see if r is complete by the list of elements {this}
 			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-			taken.add(new PrefixHours(this.p, this.getCreditHours()));
+			taken.add(new ScheduleCourse(new Course(this.p,this.getCreditHours()), null));
 			return r.isComplete(taken, false);
 		}
 		else{
@@ -572,6 +573,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 
 	public static void testTerminalRequirements(){
+		CourseList.loadAllCourses();
 		String[] test = { 
 				"MTH-150",
 				"MTH-001",
@@ -589,7 +591,7 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 		};
 
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-		taken.add(new PrefixHours(new Prefix("MTH", 150), 4));
+		taken.add(new TerminalRequirement(new Prefix("MTH", 150)));
 		//taken.add(new Prefix("MTH", 120));
 
 
@@ -649,7 +651,8 @@ public class TerminalRequirement extends Requirement implements HasCreditHours, 
 
 
 	public static void main(String[] args){
-		testTerminalsEquality();
+		//testTerminalRequirements();
+		//testTerminalsEquality();
 	}
 
 }

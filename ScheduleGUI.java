@@ -70,6 +70,13 @@ public class ScheduleGUI{
 	BellTower b;
 	//PrintWriter pW;
 	
+
+
+
+
+
+
+
 	public ScheduleGUI(Schedule sch) {
 
 		//popUP = new JFrame();
@@ -307,7 +314,7 @@ public class ScheduleGUI{
 			String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
 			String title = "Notes for " + m.name + ":";
 		
-			String bulletedList = "<ul width =" + FurmanOfficial.defaultPixelWidth + ">";
+			String bulletedList = "<ul width =" + Driver.defaultPixelWidth + ">";
 			String [] toAddBullets = m.notes.split("\n");
 			for(String s: toAddBullets){
 				bulletedList += "<li>" + s + "</li>";
@@ -766,7 +773,7 @@ public class ScheduleGUI{
 			instruct = s.elementList[0].getDisplayString() + " duplicates " +s.elementList[1].getDisplayString();
 		}
 		Object[] options = {"Ignore", "Cancel"};
-		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, FurmanOfficial.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
+		int n = JOptionPane.showOptionDialog(null, parseIntoReadable(instruct, Driver.defaultCharacterLength) , header, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, options[0]);
 		return (n==JOptionPane.OK_OPTION);
 
 	}
@@ -818,7 +825,7 @@ public class ScheduleGUI{
 
 		}
 
-		result = parseIntoReadable(result, FurmanOfficial.defaultCharacterLength);
+		result = parseIntoReadable(result, Driver.defaultCharacterLength);
 
 
 		return result;
@@ -871,7 +878,7 @@ public class ScheduleGUI{
 			if(m.notes != null){
 				majorNotes += "Notes for " + m.name + "\n";
 				majorNotes += m.notes + "\n\n";
-				majorNotes = parseIntoReadable(majorNotes, FurmanOfficial.defaultCharacterLength);
+				majorNotes = parseIntoReadable(majorNotes, Driver.defaultCharacterLength);
 				hasNotes = true;
 
 			}
