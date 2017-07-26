@@ -27,7 +27,7 @@ public class StartUpMenu implements ActionListener {
 	JButton finish;
 	JCheckBox noMore;
 	JButton cancel;
-	boolean showStartUp = true;
+
 
 
 	public StartUpMenu(){
@@ -99,9 +99,8 @@ public class StartUpMenu implements ActionListener {
 	}
 
 
-	public void showStartUp(boolean showStartUp){
+	public void showStartUp(){
 		counter = 0;
-		this.showStartUp = showStartUp;
 		update(counter);
 		frame.setVisible(true);
 	}
@@ -129,10 +128,7 @@ public class StartUpMenu implements ActionListener {
 			update(counter);
 		}
 		if(a.getActionCommand().equals(MenuOptions.Cancel)){
-			frame.dispose();
-			if(showStartUp){
-				Driver.addScheduleGUI(Schedule.testSchedule());
-			}
+			frame.dispose();		
 		}
 
 	}

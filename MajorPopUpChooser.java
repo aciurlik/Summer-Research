@@ -22,7 +22,7 @@ public class MajorPopUpChooser {
 	Schedule s;
 	JFrame frame = new JFrame();
 	ArrayList <Major> displayThings;
-	ImageIcon icon = FileHandler.getDialogImage();
+	ImageIcon icon = FileHandler.getBelltowerImage();
 
 
 

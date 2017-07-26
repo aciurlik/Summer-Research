@@ -17,14 +17,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
-
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,82 +33,55 @@ import javax.swing.text.BadLocationException;
 
 
 public class ScheduleGUI{ 
-
-	/**
-	 * This is in charge of handling all of the GUI. It is the only 
-	 * aspect of the GUI that sends information to the schedule. 
-	 * 
-	 */
-
 	Schedule sch;
 	SchedulePanel schP;
 	RequirementListPanel reqs;
-
-	int season;
-
-	JList<Integer> pickYears;
-	String seasonName;
-	//Integer[] yearsDialog;
 	static ImageIcon icon;
-
 	String instructYear = "Please pick a year you would like to add a ";
 	String headInstructYear = "Pick a year";
-	String instructCourse = "Please pick the course you would like to add to your ";
-	String headInstructCourse = "Pick a course";
-	String summerOverload = "You need to delete a course before you can add another";
-	JFrame frame; 
-
-	Course[] coursesDialog;
-
-	ScheduleElement beingDragged;
-	
-	
+	JFrame frame;
 	ListOfMajors l;
 	BellTower b;
-	//PrintWriter pW;
+	
 	
 	public ScheduleGUI(Schedule sch) {
-
-		//popUP = new JFrame();
+		this.sch = sch;
+		sch.setScheduleGUI(this);
+	
 		icon = FileHandler.getBelltowerImage();
 		l = FileHandler.getMajorsList();
 
-
-
-		this.sch = sch;
-		sch.setDriver(this);
-
 		frame = new JFrame();
-		frame.setTitle(sch.studentName);
+		
 		//Adds the menu bar
 		MainMenuBar menu = new MainMenuBar(this);
 		menu.setFont(FurmanOfficial.normalFont); 
 		frame.setJMenuBar(menu);
 		
 
-		JPanel stackPanel = new JPanel();
-		stackPanel.setLayout(new BorderLayout());
+		JPanel layeredPanel = new JPanel();
+		layeredPanel.setLayout(new BorderLayout());
 
 
-		//Adds Additions Panel and belltower
-		AdditionsPanel extras = new AdditionsPanel(this);
+		//Adds Additions Panel and Belltower
+		AdditionsPanel highImpactPanel = new AdditionsPanel(this);
 		JPanel left = new JPanel();
 		left.setBackground(FurmanOfficial.bouzarthGrey);
 		BellTower belltowerLabel = new BellTower(sch);
 		this.b=belltowerLabel;
 		left.add(belltowerLabel);
-		left.add(extras);
-		stackPanel.add(left, BorderLayout.WEST);
+		left.add(highImpactPanel);
+		layeredPanel.add(left, BorderLayout.WEST);
 
 		schP = new SchedulePanel(sch, this);
 		//schP.setPreferredSize(new Dimension(500, 500));
 
-		stackPanel.add(schP, BorderLayout.NORTH);
+		layeredPanel.add(schP, BorderLayout.NORTH);
 		reqs = new RequirementListPanel(sch, this);
-		stackPanel.add(reqs, BorderLayout.CENTER);
+		layeredPanel.add(reqs, BorderLayout.CENTER);
 
 		JScrollPane scroll = new JScrollPane();
-		scroll.getViewport().add(stackPanel);
+		scroll.getViewport().add(layeredPanel);
 		//scroll.setPreferredSize(new Dimension(stackPanel.getPreferredSize()));
 		frame.add(scroll);
 
@@ -138,10 +108,14 @@ public class ScheduleGUI{
 	 */
 	public void GUINewSchedule(String actionCommand) {
 		Schedule current;
+		int n = Driver.saveScheduleReminder();
+		if(n == 0){
+			GUISaveSchedule();
+		}
 		//CourseList l = sch.masterList;
 		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
 		if(actionCommand.equals(MenuOptions.newBlankSchedule)){
-			if(Schedule.defaultFirstSemester == null && Driver.tryPickStartDate() == null){
+			if(FileHandler.propertyGet(FileHandler.startSemester) == null && Driver.tryPickStartDate() == null){
 				return;
 			}
 			else{
@@ -158,7 +132,7 @@ public class ScheduleGUI{
 
 	public void setSchedule(Schedule current) {
 		sch=current;
-		this.sch.setDriver(this);
+		this.sch.setScheduleGUI(this);
 		this.b.setSchedule(current);
 	}
 
@@ -302,21 +276,8 @@ public class ScheduleGUI{
 			}
 		}
 		if(m.notes != null){
-			//show the user the notes, and let them know that this is the last time they'll see 
-			// these notes.
-			String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
 			String title = "Notes for " + m.name + ":";
-		
-			String bulletedList = "<ul width =" + FurmanOfficial.defaultPixelWidth + ">";
-			String [] toAddBullets = m.notes.split("\n");
-			for(String s: toAddBullets){
-				bulletedList += "<li>" + s + "</li>";
-			}
-			bulletedList += "</ul>";
-			
-			String toUser = "<html>" + message+ "<br><br>" + bulletedList + "</html>";
-			//String toUser =  parseIntoReadable(  message + "\n\n" + bulletedList , defaultCharacterLength );
-			//toUser = "<html>" + toUser + "</html>";
+			String toUser = htmlMajorNotes(m);
 			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
 
 		}
@@ -325,6 +286,27 @@ public class ScheduleGUI{
 	}
 
 
+	public String htmlMajorNotes(Major m){
+		//TODO create html major notes method
+		
+		//show the user the notes, and let them know that this is the last time they'll see 
+		// these notes.
+		String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
+		
+	
+		String bulletedList = "<ul width =" + FurmanOfficial.defaultPixelWidth + ">";
+		String [] toAddBullets = m.notes.split("\n");
+		for(String s: toAddBullets){
+			bulletedList += "<li>" + s + "</li>";
+		}
+		bulletedList += "</ul>";
+		
+		String toUser = "<html>" + message+ "<br><br>" + bulletedList + "</html>";
+		return toUser;
+	}
+	
+	
+	
 	/**
 	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
 	 * this lets the user choose a type.
@@ -865,19 +847,17 @@ public class ScheduleGUI{
 		JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
 
 
-		String majorNotes = "";
+		String majorNotes = null;
 		boolean hasNotes = false;
 		for(Major m : sch.getMajors()){
 			if(m.notes != null){
-				majorNotes += "Notes for " + m.name + "\n";
-				majorNotes += m.notes + "\n\n";
-				majorNotes = parseIntoReadable(majorNotes, FurmanOfficial.defaultCharacterLength);
 				hasNotes = true;
-
+				majorNotes = this.htmlMajorNotes(m);
+				
 			}
 		}
 
-		majorNotes.replaceAll("\n", "<br>");
+		
 		if(hasNotes && displayPopUp){
 			JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -949,7 +929,12 @@ public class ScheduleGUI{
 	}
 
 	public void updateAll(){
-		frame.setTitle(sch.studentName);
+		if(sch.studentName != null){
+			frame.setTitle("Academic Pathways Planner - " + sch.studentName);
+		}
+		else{
+			frame.setTitle("Academic Pathways Planner");
+		}
 		schP.update(sch);
 		reqs.update(sch);
 		b.update();
@@ -999,10 +984,19 @@ public class ScheduleGUI{
 		String finalPrint = new String();
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 		LocalDate localDate = LocalDate.now();
+		if(sch.studentName != null){
+			finalPrint = sch.studentName;
+		}
 
-
-		finalPrint = sch.studentName + "<br>" + dtf.format(localDate) + "<br>";
-		JOptionPane.showMessageDialog(null, options);
+		finalPrint = "<br>" + dtf.format(localDate) + "<br>";
+		
+		
+		int userSelection = (int) JOptionPane.showOptionDialog(null, options, "Format", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		System.out.println(userSelection);
+		if(userSelection == 2 || userSelection == -1){//Cancel button, or "X"
+			return;
+		}
+		//JOptionPane.showMessageDialog(null, options);
 		boolean selectedScheduleLayout = userOptions.get(1).isSelected();
 		boolean selectedReqLayout = userOptions.get(0).isSelected();
 
