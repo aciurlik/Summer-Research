@@ -1,11 +1,24 @@
 import java.util.ArrayList;
 
-
+/**
+ * Blurb written: 7/26/2017
+ * Last updated: 7/26/2017
+ * 
+ * This class represents a prerequisite for one course.
+ * 
+ * The actual prerequisite is stored as a requirement, and the course
+ * that needs it is referenced by the prefix p.
+ * 
+ * The Schedule class should handle deciding which ScheduleElements count as being
+ * taken 'before' p. Once this list is collected, it can call the method 
+ * updateOn(takenElements) to check whether the prereq has been satisfied
+ * (to check if the prereq is satisfied, use getRequirement().storedIsComplete(). )
+ * 
+ * Prereq is part of the DATA group of classes.
+ *
+ */
 public class Prereq implements java.io.Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Requirement r;
 	private Prefix p;

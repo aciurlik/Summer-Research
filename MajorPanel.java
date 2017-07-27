@@ -117,7 +117,7 @@ public class MajorPanel extends JPanel {
 		JPanel heightFlex = new JPanel();
 		//Adds a requirement panel for each requirement listed in the major. 
 		for(Requirement r : reqList){
-			heightFlex.add(new RequirementPanel(r,schGUI, this));
+			heightFlex.add(new RequirementPanel(r,schGUI));
 		}
 		bottom.add(heightFlex, BorderLayout.WEST);
 		this.add(bottom, BorderLayout.CENTER);

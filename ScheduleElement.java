@@ -2,10 +2,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
+ * Blurb written: 7/26/2017
+ * Last updated: 7/26/2017
  * 
- * @author drivers, aciurlik
- * An interface that describes the operations of any element of a schedule
- * This includes Requirement, course, prefix, 
+ * An interface that describes the operations of any anything that can be put
+ * into a semester as a planned course.
+ * 
+ * This currently includes Requirement, ScheduleCourse, and Prefix 
  *
  */
 

@@ -7,18 +7,20 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 
-/**
+/**Blurb written: 7/21/2017
+ * Last Updated: 7/26/2017
  * 
  * This class holds all the prior data about a student that we might get from myFurman.
  * 
  * The two main methods are readFromWebsiteDraggedData and readFromCSV. 
  * General use is:
  * 	PriorData p = new PriorData();
- *  p.readFromWebsiteDraggedData(a string with data dragged in from furman's website.);
+ *  p.readFromWebsiteDraggedData(a string containing data
+ *            dragged in from furman's website.);
  *  schedule.readPrior(p);
  * 
  * 
- * It is a FILE side class, as opposed to DATA or GUI. 
+ * PriorData is in the FILE group of classes, and interfaces with the DATA group.
  *
  */
 public class PriorData implements Serializable{
@@ -304,7 +306,7 @@ public class PriorData implements Serializable{
 					c = new Course(p, takenDate, null, null, credits, section);
 				}
 				else{
-					c = new Course(p, earliestDate.previous(), null, null, credits, section);
+					c = new Course(p, earliestDate.previousSemester(), null, null, credits, section);
 				}
 				c.setName(title);
 				

@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -20,17 +19,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
+/**
+ * This class is the panel that represents a semester, which (in the GUI) is the thing that 
+ * requirements can be dropped into
+ *
+ */
 public class SemesterPanel extends JPanel implements ActionListener, DocumentListener, MouseListener, java.io.Serializable{
 
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private int classCounter = 0;
-	private int requirementNumber=0;
-	private int columnNumber = 9; //This classTitle, semesterTitle, 6 classes, button
+	
+	private int classCounter; //counts the number of classes in this semester
+	// so that the layouts work well.
+	private int defaultNumRows = 9; //This classTitle, semesterTitle, 6 classes, button
 	private int normalNumberofClasses = 4;
 	private String addAClass = "Drop a requirement here";
 	JPanel defaultPanel = new JPanel();
@@ -61,16 +61,15 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		this.schGUI = d;
 
 		this.addMouseListener(this);
-
-
-
+		
+		classCounter = 0;
 
 		this.notes  = new JTextArea();
 
 
 		//Setup the defaultPanel, the panel which is visible whenever this
 		// semester is not hidden.
-		defaultPanel.setLayout(new GridLayout(columnNumber, 1, 5, 5));
+		defaultPanel.setLayout(new GridLayout(defaultNumRows, 1, 5, 5));
 		defaultPanel.setTransferHandler(new SemesterPanelDropHandler());
 
 
@@ -188,11 +187,6 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	public Semester getSemester(){
 		return sem;
-	}
-
-
-	public int getRequirementNumber() {
-		return requirementNumber;
 	}
 
 
@@ -322,7 +316,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 
 		}
-		if(sem.hasNotes){
+		if(sem.hasNotes()){
 			//defaultPanel.add(notes);
 			notes.setText(sem.notes);
 			JScrollPane scrollPane = new JScrollPane(notes); 
@@ -335,7 +329,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		defaultPanel.setBackground(this.semesterColor(this.sem));
 
 
-		if(this.sem.isAP){
+		if(this.sem.isPriorSemester){
 			fallSpring.setText("Prior Courses");
 			topPanel.remove(menuPanel);
 		}
@@ -455,8 +449,14 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 	}
 	public boolean canTake(Requirement r){
-		ArrayList<ScheduleCourse> coursesSatisfying = this.sem.getCoursesSatisfying(r);
-		coursesSatisfying.removeAll(sem.elements);
+		ArrayList<Course> coursesSatisfying = CourseList.getCoursesSatisfying(
+				CourseList.inSemester(this.sem)
+				.and(CourseList.satisfiesRequirement(r))
+				.and( CourseList.inSchedule(this.sem.schedule).negate() )
+				);
+		ArrayList<ScheduleCourse> scheduleCoursesSatisfying = 
+				ScheduleCourse.toScheduleCourses(coursesSatisfying, this.sem.schedule);
+		//scheduleCoursesSatisfying.removeAll(sem.elements);
 		return !coursesSatisfying.isEmpty();
 	}
 

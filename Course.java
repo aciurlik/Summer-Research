@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * 		
  * 		
  * 
- *  It is in the DATA group of classes.
+ *  It is in the FILE group of classes.
  *  
  *
  *
@@ -39,7 +39,7 @@ public class Course implements java.io.Serializable{
 	protected String name; //course title, like "Principles of Accounting"
 	String professor;
 	
-	protected SemesterDate semester;
+	protected SemesterDate semesterDate;
 	protected int[] meetingDays; //specified by the constants in the Time class, 
 	//  as in Time.SUNDAY.
 	protected Time[] meetingTime; //two times where the day, month, and year will be unused.
@@ -69,7 +69,7 @@ public class Course implements java.io.Serializable{
 			int creditHours, String sectionNumber ){
 		this.creditHours=creditHours;
 		this.coursePrefix=prefix;
-		this.semester = semester;
+		this.semesterDate = semester;
 		this.professor = professor;
 		this.meetingDays = meetingDays;
 		this.sectionNumber = sectionNumber;
@@ -139,8 +139,8 @@ public class Course implements java.io.Serializable{
 	}
 
 
-	public SemesterDate getSemester() {
-		return this.semester;
+	public SemesterDate getSemesterDate() {
+		return this.semesterDate;
 	}
 
 	
@@ -183,8 +183,8 @@ public class Course implements java.io.Serializable{
 	 */
 	public void setMeetingTime(int hours, boolean AM, int minutes, int durationMinutes){
 		Time startTime = new Time(hours, AM, minutes, 0);
-		startTime.setYear(semester.getYear());
-		startTime.setMonth(this.semester.getStartMonth());
+		startTime.setYear(semesterDate.getYear());
+		startTime.setMonth(this.semesterDate.getStartMonth());
 		this.meetingTime = new Time[] {startTime, startTime.addMinutes(durationMinutes)};
 	}
 	public void setMeetingTime(Time[] t){

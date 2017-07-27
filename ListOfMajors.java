@@ -120,7 +120,6 @@ public class ListOfMajors {
 			if (m.isType(Major.TRACK)){
 				trackGUI.add(m);
 			}
-
 		}
 		return trackGUI;
 	}

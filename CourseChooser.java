@@ -245,7 +245,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		
 		
 		//Reqs that this course fulfills
-		ArrayList<Requirement> reqsFulfilled = c.getRequirementsFulfilled(reqs, false);
+		ArrayList<Requirement> reqsFulfilled = c.filterEnemyRequirements(reqs, false);
 		
 		//Special case for NW and NWL
 		for(int i = 0; i < reqsFulfilled.size() ; i ++){

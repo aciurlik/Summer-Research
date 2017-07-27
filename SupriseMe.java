@@ -56,7 +56,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 	JButton want = new JButton("I Want it!");
 
-	String delims = "[,]";
+	//String delims = "[,]";
 
 	String[] tokens;
 
@@ -158,10 +158,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 			ScheduleCourse cc = new ScheduleCourse(c, sch);
 
-			String string = cc.supriseString();
-
-
-			tokens = string.split(delims);
+			tokens = cc.supriseMePieces();
 		}
 
 

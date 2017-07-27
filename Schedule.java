@@ -1,14 +1,10 @@
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class Schedule implements java.io.Serializable {
@@ -110,12 +106,12 @@ public class Schedule implements java.io.Serializable {
 		//Semesters
 		this.semesters = new ArrayList<Semester>();
 		//Set prior semester 
-		priorSemester = new Semester (firstSemester.previous(), this);
-		priorSemester.isAP = true;
+		priorSemester = new Semester (firstSemester.previousSemester(), this);
+		priorSemester.isPriorSemester = true;
 		SemesterDate s = firstSemester;
 		for(int i = 0; i < 8 ; i ++){
 			this.semesters.add(new Semester(s, this));
-			s = s.next();
+			s = s.nextSemester();
 		}
 		this.firstSemester = firstSemester;
 	}
@@ -173,8 +169,8 @@ public class Schedule implements java.io.Serializable {
 		//Add the courses
 		for(Course c : pd.getAllCourses()){
 			ScheduleCourse cc = new ScheduleCourse(c, this);
-			if(!this.directAddScheduleElement(cc, c.semester)){
-				throw new RuntimeException("Could neither find nor make the semester for the course \n" + cc.getDisplayString() +"," + c.semester);
+			if(!this.directAddScheduleElement(cc, c.semesterDate)){
+				throw new RuntimeException("Could neither find nor make the semester for the course \n" + cc.getDisplayString() +"," + c.semesterDate);
 			}
 		}
 		MainMenuBar.addImportScheduleOption();
@@ -249,7 +245,7 @@ public class Schedule implements java.io.Serializable {
 	
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
-		Semester next = new Semester(last.next(), this);
+		Semester next = new Semester(last.nextSemester(), this);
 		this.semesters.add(next);
 		return next;
 	}
@@ -1456,11 +1452,10 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
+	//TODO use streams
 	public ArrayList<Major> filterAlreadyChosenMajors(ArrayList<Major> collectionOfMajors ) {
 		collectionOfMajors.removeAll(this.getMajors());
 		return collectionOfMajors;
-
 	}
 
 	public ArrayList<ScheduleCourse> filterAlreadyChosenCourses(ArrayList<ScheduleCourse> collectionOfCourses){
@@ -1521,12 +1516,12 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
 		//Don't check for errors in PriorSemester
 		for(Semester s: this.semesters){
-			if(s.checkAllOverlap()!=null){
+			ArrayList<ScheduleError> overlap = s.checkAllOverlap();
+			if(overlap!=null){
 				allErrors.addAll(s.checkAllOverlap());
 			}
-			if(s.checkOverload(true, null)==true){
-				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
-				overload.setOffendingSemester(s);
+			ScheduleError overload = s.checkOverload(null);
+			if(overload != null){
 				allErrors.add(overload);	
 			}
 		}
@@ -1574,7 +1569,7 @@ public class Schedule implements java.io.Serializable {
 		//Adds all the scheduleElements from each major
 		for(Semester s: this.getAllSemestersSorted()){
 			result.append("\n");
-			if(s.isAP){
+			if(s.isPriorSemester){
 				result.append("<b>Prior Courses: </b>" + "\n");
 			}
 			else{
@@ -1596,7 +1591,7 @@ public class Schedule implements java.io.Serializable {
 			if(s.elements.isEmpty()){
 				result.append("Nothing scheduled for this semester \n");
 			}
-			if(s.hasNotes){
+			if(s.hasNotes()){
 				result.append("<b> Notes: </b>" +  s.notes + "\n");
 			}
 
@@ -1630,7 +1625,7 @@ public class Schedule implements java.io.Serializable {
 		for(Semester s: this.getAllSemestersSorted()){
 			for(ScheduleElement se: s.elements){
 				allOrderedElements.add(se);
-				if(s.isAP){
+				if(s.isPriorSemester){
 					coorespondingDates.add(defaultPrior);
 
 				}
