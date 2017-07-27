@@ -18,8 +18,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -306,39 +308,6 @@ public class FileHandler{
 	}
 
 
-
-
-
-
-	private static void saveToFile(String fileName, String data){
-		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
-			b.write(data);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-
-	}
-
-	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
-		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
-				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
-			save.writeObject(data);	
-			save.close();
-			saveFile.close();
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-
-	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
-		try(FileInputStream fis = new FileInputStream(fileName);
-				ObjectInputStream ois = new ObjectInputStream(fis);) {
-			Object result = ois.readObject();
-			ois.close();
-			return result;
-		}
-	}
 
 	public static ArrayList<String> getScheduleNames(String FolderName){
 		ArrayList<String> scheduleNames = new ArrayList<String>();
@@ -635,15 +604,33 @@ public class FileHandler{
 
 
 	}
+	
+	/////////////////////////////////
+	/////////////////////////////////
+	///// Image Loading
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___ImageLoading_________;
 
 	public static ImageIcon makeBellTower() {
 		return new ImageIcon(bellTowerImageFile);
 	}
 
 	public static ImageIcon makeFireWorks() {
-		// TODO Auto-generated method stub
 		return  new ImageIcon(fireworksImageFile);
 	}
+	
+	/////////////////////////////////
+	/////////////////////////////////
+	///// Utility methods
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___UtilityMethods_________;
+	
+	
+	
 	public static void makeFolder(String folderName){
 		File folder = new File(folderName);
 		if(!folder.exists()){
@@ -652,6 +639,39 @@ public class FileHandler{
 				copyFileUsingStream(new File(testScheduleSource), new File(testScheduleDestination));
 
 			}
+		}
+	}
+	
+	
+
+
+	private static void saveToFile(String fileName, String data){
+		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
+			b.write(data);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
+		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
+				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
+			save.writeObject(data);	
+			save.close();
+			saveFile.close();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+
+	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
+		try(FileInputStream fis = new FileInputStream(fileName);
+				ObjectInputStream ois = new ObjectInputStream(fis);) {
+			Object result = ois.readObject();
+			ois.close();
+			return result;
 		}
 	}
 
@@ -676,6 +696,93 @@ public class FileHandler{
 			e1.printStackTrace();
 		}
 	}	
+	
+
+	/////////////////////////////////
+	/////////////////////////////////
+	///// CSV parsing
+	/////////////////////////////////
+	/////////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___CSVParsing_________;
+	
+	/**
+	 * Split this string based on its commas, ignoring commas inside
+	 * quotes.
+	 * 
+	 * Most of the code was found online, we added the hash set of ignore characters.
+	 * @param CSVText
+	 * @return
+	 */
+	public static ArrayList<String> parseCSVLine(String csvLine, HashSet<Character> ignoreCharacters){
+		ArrayList<String> result = new ArrayList<>();
+		if (csvLine == null || csvLine.isEmpty()) {
+			return result;
+		}
+		StringBuilder chunk = new StringBuilder();
+		boolean inQuotes = false;
+		char prevChar = 0; //could be used to check if you have a '/' inside quotes.
+
+		for (char ch : csvLine.toCharArray()) {
+			if (inQuotes) {
+				if (ch == '"') {
+					inQuotes = false;
+				} 
+				else {
+					chunk.append(ch);
+					prevChar = ch;
+				}
+			} else { //if you're not in quotes
+				if (ch == '"') {
+                    inQuotes = true;
+                } 
+				else if (ch == ',') {
+                    result.add(chunk.toString());
+                    chunk = new StringBuilder();
+                } 
+				else if (ignoreCharacters.contains(ch)) {
+                    //ignore LF characters
+                    continue;
+                }
+				else if (ch == '\n') {
+                    //the end, break!
+                    break;
+                } 
+				else {
+                    chunk.append(ch);
+                }
+            }
+        } 
+        result.add(chunk.toString());
+        return result;
+    }
+	
+	/**
+	 * Convert a line in a CSV file into an arrayList of strings.
+	 */
+	public static ArrayList<String> parseCSVLine(String csvLine){
+		HashSet<Character> ignoreCharacters = new HashSet<Character>();
+		ignoreCharacters.add('\r');
+		return parseCSVLine(csvLine, ignoreCharacters);
+	}
+	
+	/**
+	 * Almost the same as parsing as CSV, but you have to ignore an '=' just
+	 * before quotations in some cases. Might see data of the form:
+	 * 
+	 * data, data, ="9999", "data", data, ="2016", data
+	 * 
+	 * @param csvLine
+	 * @return
+	 */
+	public static ArrayList<String> parseAdvisorImportCSVLine(String csvLine){
+		HashSet<Character> ignoreCharacters = new HashSet<Character>();
+		ignoreCharacters.add('\r');
+		ignoreCharacters.add('='); //some lines are of the form :
+		// ="99999", ="2017D2","asdfas","asdfasd"
+		return parseCSVLine(csvLine, ignoreCharacters);
+	}
+
 }
 
 

@@ -35,7 +35,7 @@ public class StartUpMenu implements ActionListener {
 		layer.setLayout(new BorderLayout());
 
 		if(instructions == null){
-			instructions = FileHandler.getStartupHelpImages();
+			instructions = FileHandler.getInstructions();
 		}
 		counter=0;
 		label = new JLabel(instructions.get(0));
