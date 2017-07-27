@@ -536,53 +536,6 @@ public class FileHandler{
 	}
 
 
-	public static ArrayList<ImageIcon> getInstructions() {
-		File folder = new File(resourcesFolder + "StartUpSlides");
-		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
-
-		for (File f: folder.listFiles(
-
-				new FileFilter(){
-
-					@Override
-
-					public boolean accept(File pathname) {
-
-						String fullName = pathname.getAbsolutePath();
-						int i = fullName.lastIndexOf('.');
-						if(i <= 0){
-							return false;
-						}
-
-						return pathname.isFile();
-					}
-
-				}
-				)){
-
-			try{
-				ImageIcon image = new ImageIcon(f.toString());
-				Image img = image.getImage();
-				double scalar = 2;
-				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
-				image = new ImageIcon(newimg);
-
-
-				result.add(image);
-
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				System.out.println("I'm skipping  " + f.getName());
-			}
-
-
-		}
-
-
-		return result;
-	}
-
 
 	public static void showSetting() {
 		SettingsPanel sp = new SettingsPanel();
@@ -612,14 +565,93 @@ public class FileHandler{
 	/////////////////////////////////
 	@SuppressWarnings("unused")
 	private boolean ___ImageLoading_________;
+	
+	private static ArrayList<ImageIcon> instructions;
+	private static ImageIcon bellTower;
+	private static ImageIcon fireworks;
+	
 
-	public static ImageIcon makeBellTower() {
-		return new ImageIcon(bellTowerImageFile);
+	public static ArrayList<ImageIcon> getInstructions() {
+		if(instructions == null){
+			return loadInstructions();
+		}
+		return instructions;
+	}
+	
+	public static ImageIcon getBellTower(){
+		if(bellTower == null){
+			return loadBellTower();
+		}
+		return bellTower;
+	}
+	
+	public static ImageIcon getFireworks(){
+		if(fireworks == null){
+			return loadFireworks();
+		}
+		return fireworks;
+	}
+	
+	public void loadImages(){
+		loadBellTower();
+		loadFireworks();
+		loadInstructions();
+	}
+	
+	
+	private static ImageIcon loadBellTower() {
+		ImageIcon original = new ImageIcon(bellTowerImageFile);
+		Image image = original.getImage();
+		Image newImage = image.getScaledInstance(
+				BellTower.imageWidth, 
+				BellTower.imageHeight ,
+				java.awt.Image.SCALE_SMOOTH);
+		bellTower = new ImageIcon(newImage);
+		return bellTower;
 	}
 
-	public static ImageIcon makeFireWorks() {
-		return  new ImageIcon(fireworksImageFile);
+	private static ImageIcon loadFireworks() {
+		fireworks =  new ImageIcon(fireworksImageFile);
+		return fireworks;
 	}
+		
+		
+	private static ArrayList<ImageIcon> loadInstructions(){
+		File folder = new File(resourcesFolder + "StartUpSlides");
+		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
+		for (File f: folder.listFiles(
+				new FileFilter(){
+					@Override
+					public boolean accept(File pathname) {
+						String fullName = pathname.getAbsolutePath();
+						int i = fullName.lastIndexOf('.');
+						if(i <= 0){
+							return false;
+						}
+						return pathname.isFile();
+					}
+				}
+				)){
+			try{
+				ImageIcon image = new ImageIcon(f.toString());
+				Image img = image.getImage();
+				double scalar = 2;
+				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
+				image = new ImageIcon(newimg);
+				result.add(image);
+
+			}
+			catch(Exception e){
+				e.printStackTrace();
+				System.out.println("I'm skipping  " + f.getName());
+			}
+		}
+		instructions = result;
+		return result;
+	}
+
+
+	
 	
 	/////////////////////////////////
 	/////////////////////////////////

@@ -18,7 +18,7 @@ public class AdditionsPanel extends JPanel implements ActionListener{
  	 * always be visible (as opposed to buttons being hidden in a menu, 
  	 * or only becoming visible after some other action).
  	 * 
- 	 * As of 7/18/2017, it is the panel on the left of the GUI and includes
+ 	 * As of 7/21/2017, it is the panel on the left of the GUI and includes
  	 * 	add a Major/Track/Minor, add MayX or Summer, and explore other
  	 *  options from the Furman Advantage (these last just open webpages.)
  	 *   
@@ -129,19 +129,24 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		String command = e.getActionCommand();
 		//For add Major, Minor, Track
-		if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor)|| e.getActionCommand().equals(MenuOptions.addTrack)){
-			schGUI.addMajor(e.getActionCommand());
+
+		if(.equals(MenuOptions.addMajor) || .equals(MenuOptions.addMinor)|| .equals(MenuOptions.addTrack)){
+			schGUI.addMajor();
+
 		}
 		//Explore Buttons, goes to outside links
-		if((e.getActionCommand().equals(MenuOptions.exploreInternship)) || (e.getActionCommand().equals(MenuOptions.addResearch))||(e.getActionCommand().equals(MenuOptions.exploreStudyAway))){
+		if((command.equals(MenuOptions.exploreInternship)) || (command.equals(MenuOptions.addResearch))||(command.equals(MenuOptions.exploreStudyAway))){
 
-			schGUI.linkToWebpage(e.getActionCommand());
+
+			schGUI.linkToWebpage();
+
 		}
-		if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
+		if(command.equals(MenuOptions.addSummerClass)){
 			schGUI.addSummerSession();
 		}
-		if(e.getActionCommand().equals(MenuOptions.addMayX)){
+		if(command.equals(MenuOptions.addMayX)){
 			schGUI.addMayX();
 		}
 

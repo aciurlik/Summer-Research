@@ -1562,9 +1562,8 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 			testStrings(r, true);
 			System.out.println("\n\n");
 		}
-
-
 	}
+	
 	private static void testStrings(Requirement r, boolean autoPrint){
 		if(autoPrint){
 			System.out.println("Save string:\t\t" + r.saveString());

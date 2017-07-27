@@ -198,6 +198,14 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
 		sorter.setSortKeys(sortKeys);
 		
+		//Set column widths.
+		// Must occur after the above code that sets the columnModel.
+		visibleCoursesTable.getColumnModel().getColumn(2).setPreferredWidth(200); //title
+		visibleCoursesTable.getColumnModel().getColumn(3).setPreferredWidth(150); //professor
+		//visibleCoursesTable.getColumnModel().getColumn(5).setPreferredWidth(50);
+		
+		
+		
 		
 		
 		JScrollPane scrollPane = new JScrollPane(visibleCoursesTable);
@@ -507,7 +515,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			subjField.setColumns(4);
 			subjField.setText("");
 			subjField.addActionListener(this);
-			subjFieldPanel.add(new JLabel("Subject"));
+			subjFieldPanel.add(new JLabel("Subject (3 letters)"));
 			subjFieldPanel.add(subjField);
 			//this.add(subjFieldPanel);
 			
@@ -545,7 +553,6 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 			applyButton.addActionListener(this); //revalidate when pressed
 			applyPanel.add(applyButton);
 			this.add(applyPanel);
-			
 		}
 		
 		

@@ -8,10 +8,10 @@ import javax.swing.JPopupMenu;
 
 /**
  * Blurb written 7/24/2017
- * Last updated 7/24/2017
+ * Last updated 7/27/2017
  * 
  *This is the main menu bar that is on the north section of the JFrame.  
- *The class is structured to mirror the look of the menubar, the more indented
+ *The class is indented to mirror the look of the menubar, the more indented
  *the more menus the user must click through to reach the menuItem. 
  *
  */
@@ -24,15 +24,23 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 	static JMenuItem importPriorSchedule; // because they can be updated 
 	static JMenuItem blankSchedule;//based on the scheduleGUI's status
 
+	
+	static boolean testing = false;
 
 	public MainMenuBar(ScheduleGUI schGUI) {
 		super();
 		this.schGUI=schGUI;
-		JMenu menu, submenu, subTwomenu; //The branch of the tree,
-		// the longer the name the more menues connect it with the menubar 
+		JMenu menu, submenu, subTwomenu; //The length
+		// of this name tells how deep in the menu tree this
+		// menu is. A menu is visible without clicking anything,
+		// a submenu is visible on one click, and a subTwoMenu requires
+		// two or more clicks to be visible to the user. None of these
+		// objects may be leaves in the menu tree.
 		JMenuItem menuItem;//The leaf of the tree where the actionListener is
 
 		
+		
+		//Build the "The Furman Advantage" menu
 		menu = new JMenu(MenuOptions.FurmanAdvantage);
 			submenu = new JMenu(MenuOptions.MayX);
 				menuItem = new JMenuItem(MenuOptions.exploreMayX);
@@ -57,7 +65,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		this.add(menu);
 
 		
-		//Build the file menu-> Add/Save Schedule
+		//Build the "File" menu-> Add/Save Schedule
 		menu = new JMenu(MenuOptions.file);
 			newSchedule = new JMenu(MenuOptions.newSchedule);
 				blankSchedule = new JMenuItem(MenuOptions.newBlankSchedule);
@@ -127,6 +135,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		}
 		this.add(menu);
 		
+		//Build the Edit menu
 		menu = new JMenu(MenuOptions.Edit);
 			menuItem = new JMenuItem(MenuOptions.addMajor);
 			menuItem.addActionListener(this);
@@ -137,8 +146,9 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			menuItem = new JMenuItem(MenuOptions.addTrack);
 			menuItem.addActionListener(this);
 		menu.add(menuItem);
-		this.add(menu);
+		this.add(menu)
 		
+		//Build the Settings menu
 		menu = new JMenu(MenuOptions.settings);
 			menuItem = new JMenuItem(MenuOptions.changeSettings);
 			menuItem.addActionListener(this);
@@ -148,6 +158,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 		menu.add(menuItem);
 		this.add(menu);
 
+		//Build the Help menu
 		menu = new JMenu(MenuOptions.help);
 			menuItem = new JMenuItem(MenuOptions.viewStartUp);
 			menuItem.addActionListener(this);
@@ -168,77 +179,93 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			newSchedule.removeAll();
 			newSchedule.add(blankSchedule);
 			newSchedule.add(importPriorSchedule);
-
 		}
 	}
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.exploreInternship)){
-			schGUI.linkToWebpage(e.getActionCommand());
+
+		if(.equals(MenuOptions.exploreMayX) || .equals(MenuOptions.exploreStudyAway) ||.equals(MenuOptions.exploreInternship)){
+			schGUI.linkToWebpage();
+
+		String command = e.getActionCommand();
+		if(testing){
+			System.out.println("Clicked on " + command);
+
 		}
-		else if(e.getActionCommand().equals(MenuOptions.addMayX)){
+		
+		if(command.equals(MenuOptions.exploreMayX) || command.equals(MenuOptions.exploreStudyAway) || command.equals(MenuOptions.exploreInternship)){
+			schGUI.GUIOutsideLink(command);
+		
+		else if(command.equals(MenuOptions.addMayX)){
 			schGUI.addMayX();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.addSummerClass)){
+		else if(command.equals(MenuOptions.addSummerClass)){
 			schGUI.addSummerSession();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
+
+		else if(.equals(MenuOptions.addMajor) || .equals(MenuOptions.addMinor) || (.equals(MenuOptions.addTrack))){
 			schGUI.addMajor(e.getActionCommand());
+
 		}
-		else if(e.getActionCommand().equals(MenuOptions.newBlankSchedule) || e.getActionCommand().equals(MenuOptions.newLoadedSchedule)){
-			schGUI.GUINewSchedule(e.getActionCommand());
+		else if(command.equals(MenuOptions.newBlankSchedule) || command.equals(MenuOptions.newLoadedSchedule)){
+			schGUI.GUINewSchedule(command);
 		}
-		else if(e.getActionCommand().equals(MenuOptions.openSchedule)){
+		else if(command.equals(MenuOptions.openSchedule)){
 			Driver.openSchedule();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.saveSchedule)){
+		else if(command.equals(MenuOptions.saveSchedule)){
 			schGUI.GUISaveSchedule();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.printSchedule)){
+		else if(command.equals(MenuOptions.printSchedule)){
 
 			schGUI.GUIPrintSchedule();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.viewStartUp)){
+		else if(command.equals(MenuOptions.viewStartUp)){
 			Driver.startUpMessage();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
+		else if(command.equals(MenuOptions.checkAllErrors)){
 			schGUI.GUICheckAllErrors();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.studentDnD) ){
+		else if(command.equals(MenuOptions.studentDnD) ){
 			schGUI.importPriorCourses(true);
 		}
-		else if(e.getActionCommand().equals(MenuOptions.advisorDnD) ){
+		else if(command.equals(MenuOptions.advisorDnD) ){
 			schGUI.importPriorCourses(false);
 		}
-		else if (e.getActionCommand().equals(MenuOptions.downloadcsv)){
+		else if (command.equals(MenuOptions.downloadcsv)){
 			schGUI.tryImportPriorCoursesViaFile();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.deleteSchedule)){
+		else if(command.equals(MenuOptions.deleteSchedule)){
 			FileHandler.deleteSchedule();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.changeSettings)){
+		else if(command.equals(MenuOptions.changeSettings)){
 			FileHandler.showSetting();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.restoreDefault)){
+		else if(command.equals(MenuOptions.restoreDefault)){
 			FileHandler.requestRestoreDefaultSettings();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.examineRequirementHelp)){
+		else if(command.equals(MenuOptions.examineRequirementHelp)){
 			schGUI.showExamineRequirementHelp();
 		}
-		else if(e.getActionCommand().equals(MenuOptions.findACourse)){
+		else if(command.equals(MenuOptions.findACourse)){
 			schGUI.showFindACourseHelp();
 		}
-		else if(e.getActionCommand().equals("Compare")){
+		else if(command.equals("Compare")){
 			Driver.chooseSchedulesToCompare();
 		}
 	}
+
+
+	/**
+	 * Test
+	 * Make sure every menuItem is activated when clicked. 
+	 */
+	public static void test(){
+		testing = true;
+	}
 }
 
-/**
- * Test
- * Make sure every menuItem is activated when clicked. If it does act as expected problem
- * resides in other class. 
- */
+
 

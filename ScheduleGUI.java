@@ -428,11 +428,11 @@ public class ScheduleGUI{
 
 		//Creates the schedule/reqs printout. 
 		if(ScheduleLayout.isSelected()){
-			finalPrint = finalPrint + sch.printScheduleString() + "<br>";
+			finalPrint = finalPrint + sch.getPrintScheduleString() + "<br>";
 
 		}
 		if(ReqLayout.isSelected()){
-			finalPrint = finalPrint + sch.printRequirementString() + "<br>";
+			finalPrint = finalPrint + sch.getPrintRequirementString() + "<br>";
 		}
 
 
@@ -1466,9 +1466,41 @@ public class ScheduleGUI{
 	
 
 	/**
+
 	 * Used by driver to add a WindowListener to this schGUI. 
-	 * @param w
+
+	 * Ask the user which course in this semester they want to add.
+	 * Used by MayX or Summer semesters, or the addCourse button of
+	 * a semester.
+	 * 
+	 * Does not perform the actual addition of the course to the semester
+	 * @param s
 	 */
+	public ScheduleCourse addCourseDialogBox(Semester s){	
+		//All courses in this semester that are not already scheduled.
+		ArrayList<Course> addCourses = CourseList.getCoursesSatisfying(
+				CourseList.inSemester(s)
+				.and(CourseList.inSchedule(this.sch).negate()) 
+				);
+		//Convert to a list of schedule courses for displaying
+		ArrayList<ScheduleCourse> toFinal =ScheduleCourse.toScheduleCourses(addCourses, this.sch);
+		ScheduleCourse[] finalCourseList = new ScheduleCourse[toFinal.size()];
+		for(int i = 0; i<toFinal.size(); i++){
+			finalCourseList[i] = toFinal.get(i);
+		}
+		//choose the course
+		ScheduleCourse c = GUIChooseCourse(finalCourseList);
+		return c;
+	}
+	
+	/**
+	 * Add a new course to s.
+	 * 
+	 * Uses addCourseDialogBox to pick the course.
+	 * @param s
+
+	 */
+  
 	public void addWindowListener(WindowListener w){
 		frame.addWindowListener(w);
 	}
