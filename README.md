@@ -1,4 +1,10 @@
 # Summer-Research
+
+Quick start for a coder:
+    Check out the code, there should be reasonably good comments. If you want to turn the java code into a .jar file, we used
+    eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
+    turn code into a .jar, you can use that.
+
 I. Introduction
   a. Purpose 
      This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
