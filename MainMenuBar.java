@@ -185,7 +185,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			schGUI.addSummerSession();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
-			schGUI.GUIPopUP(e.getActionCommand());
+			schGUI.GUIMajorPopUP(e.getActionCommand());
 		}
 		else if(e.getActionCommand().equals(MenuOptions.newBlankSchedule) || e.getActionCommand().equals(MenuOptions.newLoadedSchedule)){
 			schGUI.GUINewSchedule(e.getActionCommand());
@@ -204,7 +204,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			Driver.startUpMessage();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			schGUI.GUICheckAllErrors(true);
+			schGUI.GUICheckAllErrors();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.studentDnD) ){
 			schGUI.importPriorCourses(true);

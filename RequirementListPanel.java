@@ -27,11 +27,12 @@ import javax.swing.JScrollPane;
  */
 
 public class RequirementListPanel extends JPanel implements ActionListener{
-	private static final long serialVersionUID = 1L;
+
 	
 	public JPanel inner; //holds the major panels
 	public JScrollPane scroll; //holds inner
 	
+
 	public ScheduleGUI schGUI;
 	
 
@@ -51,8 +52,10 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	//public JLabel clpLeftLabel;
 	//public String clpText =  "     CLPs Left:   ";
 	//public Schedule schedule;
+
 	
 	public RequirementListPanel(Schedule s, ScheduleGUI schGUI){
+
 		//this.schedule = s;
 		this.schGUI = schGUI;
 		this.setBackground(FurmanOfficial.grey(60));
@@ -141,7 +144,9 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			schGUI.GUICheckAllErrors(true);
+
+			schGUI.GUICheckAllErrors();
+
 		}
 	}
 	

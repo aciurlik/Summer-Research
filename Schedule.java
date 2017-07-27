@@ -1565,7 +1565,7 @@ public class Schedule implements java.io.Serializable {
 			result.append("</table>");
 		}
 
-		result.append("<center> <h1> Schedule </h1> </center> ");
+		result.append("<center> <h2> Schedule </h2> </center> ");
 		//Adds all the scheduleElements from each major
 		for(Semester s: this.getAllSemestersSorted()){
 			result.append("\n");
@@ -1602,8 +1602,7 @@ public class Schedule implements java.io.Serializable {
 			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorString());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
-		result.append("\n <h2>The Final Countdown: </h2>");
-		result.append("<b> CLPs Left: </b> " + Math.max(0, 32 - this.getCLP()) + "\n");
+		result.append("\n <h3>The Final Countdown: </h3>");
 		result.append("<b> Estimated Courses Left: </b> " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
 		result.append("<b> Credit Hours Left:</b> " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
 

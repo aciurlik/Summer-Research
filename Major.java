@@ -22,10 +22,11 @@ public class Major implements java.io.Serializable{
 	public static final String MINOR = "Minor";
 	public static final String TRACK = "Track";
 	
+	//GER will pick the highest number given. 
 	public static final int BA = 1;
 	public static final int BS = 2;
 	public static final int BM = 0;
-	public static final int None = 4;
+	public static final int None = -1;
 	
 	public static final int MajorDDNRange = 100;
 	
@@ -604,6 +605,10 @@ public class Major implements java.io.Serializable{
 		//ListOfMajors m = ListOfMajors.testList();
 		//System.out.println(m.getCompleteMajorsList().get(1).saveString());
 
+	}
+
+	public boolean isNormalMajor() {
+		return(this.majorType.equals(Major.NORMAL_MAJOR));
 	}
 
 

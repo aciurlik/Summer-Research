@@ -1,4 +1,5 @@
 
+
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,10 +18,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -33,7 +32,7 @@ import javax.swing.JOptionPane;
  * one need only change this class in order to read all the new data correctly.
  * 
  * For example, if we put data on a webserver, this class could contain
-u * methods to check the server for new data and perform updates.
+ * methods to check the server for new data and perform updates.
  * 
  * This class is in the FILE group of classes.
  * 
@@ -46,25 +45,21 @@ u * methods to check the server for new data and perform updates.
  * Properties field.
  * 
  * 
- * 
- *  Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
- *   color, fonts, formatting information. 
- * 
- * 
+ * Note: File names are in FileHandler, Button Names are in MenuOptions, and FurmanOffical holds
+ * color, fonts, formatting information. 
  *
  */
 public class FileHandler{
 	public static final String resourcesFolder = "Resources" + File.separator;
-
 	public static final String userDataFolder = "UserData" + File.separator;
 	public static String startSemester = "Set First Semester";
 
-
 	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
-	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
+	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";
+	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
-	public static final String savedScheduleFolder =  userDataFolder + "SavedSchedule" + File.separator;
+	public static final String savedScheduleFolder = userDataFolder + "SavedSchedule" + File.separator;
 	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
 	public static final String settingsDoc = userDataFolder +  "Settings";
 
@@ -77,22 +72,18 @@ public class FileHandler{
 
 
 	/**
-	 * This static block checks for the existence of the user data,
-	 * which consists of the saved schedules, last import, and 
-	 * settings.
+	 * This static block tries to load the existing settings
+	 * 
+	 * from the settingsDoc file.
+	 * 
+	 * If the file is not found, it makes a new settings
+	 * and saves a new file.
 	 */
 	static{
 		properties = new Properties();
-		
-		makeFolder(userDataFolder);
-		if(makeFolder(savedScheduleFolder)){
-			copyFileUsingStream(
-					new File(testScheduleSource), 
-					new File(testScheduleDestination));
-		}
-		
-		
 		File file = new File(settingsDoc);
+		makeFolder(userDataFolder);
+		makeFolder(savedScheduleFolder);
 		if(!file.exists()){
 			//if the file isn't found, make one with
 			// the default setting
@@ -109,13 +100,6 @@ public class FileHandler{
 			}
 		}
 	}
-
-
-
-
-
-
-
 
 
 	/**
@@ -148,12 +132,6 @@ public class FileHandler{
 		}
 	}
 
-	/**
-	 * Get the priorData from the last import
-	 * 
-	 * return null if it can't be found or if there is an error.
-	 * @return
-	 */
 	public static PriorData getSavedStudentData(){
 		File f = new File(studentDataFile);
 		if(!f.exists()){
@@ -169,7 +147,6 @@ public class FileHandler{
 		}
 	}
 
-	
 	public static void writeStudentData(PriorData d){
 		try{
 			FileHandler.saveObjectToFile(studentDataFile, d);
@@ -185,7 +162,6 @@ public class FileHandler{
 	 * @return
 	 */
 	public static String[][] importCSVStudentData(){
-		//let the user choose a .csv file
 		JFileChooser fc = new JFileChooser(
 				Paths.get(".").toAbsolutePath().normalize().toString()){
 			private static final long serialVersionUID = 1L;
@@ -195,21 +171,43 @@ public class FileHandler{
 			}
 		};
 		int userChoice = fc.showOpenDialog(null);
+		javax.swing.filechooser.FileFilter f = new javax.swing.filechooser.FileFilter(){
+			@Override
+			public boolean accept(File f){
+				return f.isFile() && ".csv".equals(getExtension(f));
+			}
+			@Override
+			public String getDescription() {
+				return "csv files";
+			}
+		};
+		fc.addChoosableFileFilter(f);
+		fc.setFileFilter(f);
 		if(userChoice != JFileChooser.APPROVE_OPTION){
 			return null;
 		}
-		//Collect the data in the .csv file and
-		//turn it into a clean String[][].
 		File file = fc.getSelectedFile();
-		ArrayList<String> dataStrings = FileHandler.fileToStrings(file);
-		String[][] result = new String[dataStrings.size()][];
-		for(int i = 0; i < dataStrings.size() ; i ++){
-			ArrayList<String> splitLine = parseAdvisorImportCSVLine(dataStrings.get(i));
+		ArrayList<String> fullString = FileHandler.fileToStrings(file);
+		String[][] result = new String[fullString.size()][];
+		for(int i = 0; i < fullString.size() ; i ++){
+			ArrayList<String> splitLine = SaverLoader.parseAdvisorImportCSVLine(fullString.get(i));
 			result[i] = splitLine.toArray(new String[splitLine.size()]);
 		}
 		return result;
+
 	}
 
+	public static String getExtension(File f){
+		if(!f.isFile()){
+			return null;
+		}
+		String name = f.getName();
+		int i = name.lastIndexOf('.');
+		if(i == -1){
+			throw new RuntimeException("File " + name + " has no extension");
+		}
+		return name.substring(i);
+	}
 
 
 
@@ -221,14 +219,6 @@ public class FileHandler{
 
 
 
-	/**
-	 * TODO should this use GUIChooseAmong?
-	 * Choose a schedule from the list of saved schedule files.
-	 * s helps determine the message and title to display to the user.
-	 * Return the name of the file that was choosen.
-	 * @param s
-	 * @return
-	 */
 	public static String chooseSchedule(String s){
 		String header = "";
 		String instruct = "";
@@ -306,7 +296,7 @@ public class FileHandler{
 		}
 		if(fileName != null){
 			try{
-				saveObjectToFile(savedScheduleFolder  + fileName + ".ser", sch);
+				saveObjectToFile(savedScheduleFolder + fileName + ".ser", sch);
 			}catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "This schedule was not able to be saved. ");
 				e.printStackTrace();
@@ -318,6 +308,37 @@ public class FileHandler{
 
 
 
+
+
+	private static void saveToFile(String fileName, String data){
+		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
+			b.write(data);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
+		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
+				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
+			save.writeObject(data);	
+			save.close();
+			saveFile.close();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+
+	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
+		try(FileInputStream fis = new FileInputStream(fileName);
+				ObjectInputStream ois = new ObjectInputStream(fis);) {
+			Object result = ois.readObject();
+			ois.close();
+			return result;
+		}
+	}
 
 	public static ArrayList<String> getScheduleNames(String FolderName){
 		ArrayList<String> scheduleNames = new ArrayList<String>();
@@ -474,7 +495,7 @@ public class FileHandler{
 	}
 
 
-	public static ImageIcon getBelltowerImage(){
+	public static ImageIcon getDialogBoxImage(){
 		return new ImageIcon(FileHandler.resourcesFolder + "FurmanOfficialAcademicLogo.jpg");
 	}
 
@@ -546,34 +567,40 @@ public class FileHandler{
 	}
 
 
-	/**
-	 * Return the list of images that the user would see
-	 * when they view the startup guide.
-	 * @return
-	 */
-	public static ArrayList<ImageIcon> getStartupHelpImages() {
+	public static ArrayList<ImageIcon> getInstructions() {
 		File folder = new File(resourcesFolder + "StartUpSlides");
 		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
+
 		for (File f: folder.listFiles(
+
 				new FileFilter(){
+
 					@Override
+
 					public boolean accept(File pathname) {
+
 						String fullName = pathname.getAbsolutePath();
 						int i = fullName.lastIndexOf('.');
 						if(i <= 0){
 							return false;
 						}
+
 						return pathname.isFile();
 					}
+
 				}
 				)){
+
 			try{
 				ImageIcon image = new ImageIcon(f.toString());
 				Image img = image.getImage();
 				double scalar = 2;
 				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
 				image = new ImageIcon(newimg);
+
+
 				result.add(image);
+
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -590,7 +617,12 @@ public class FileHandler{
 
 	public static void showSetting() {
 		SettingsPanel sp = new SettingsPanel();
+
 	}
+
+
+
+
 
 	public void saveMe(Major m, File f){
 
@@ -603,87 +635,25 @@ public class FileHandler{
 
 
 	}
-	
-	/////////////////////////////////
-	/////////////////////////////////
-	///// Image Loading
-	/////////////////////////////////
-	/////////////////////////////////
-	@SuppressWarnings("unused")
-	private boolean ___ImageLoading_________;
 
 	public static ImageIcon makeBellTower() {
 		return new ImageIcon(bellTowerImageFile);
 	}
 
 	public static ImageIcon makeFireWorks() {
+		// TODO Auto-generated method stub
 		return  new ImageIcon(fireworksImageFile);
 	}
-
-	
-	/////////////////////////////////
-	/////////////////////////////////
-	///// Utility methods
-	/////////////////////////////////
-	/////////////////////////////////
-	@SuppressWarnings("unused")
-	private boolean ___UtilityMethods_________;
-	
-	public static String getExtension(File f){
-		if(!f.isFile()){
-			return null;
-		}
-		String name = f.getName();
-		int i = name.lastIndexOf('.');
-		if(i == -1){
-			throw new RuntimeException("File " + name + " has no extension");
-		}
-		return name.substring(i);
-	}
-
-	private static void saveToFile(String fileName, String data){
-		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
-			b.write(data);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-
-	}
-
-	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
-		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
-				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
-			save.writeObject(data);	
-			save.close();
-			saveFile.close();
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-
-	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
-		try(FileInputStream fis = new FileInputStream(fileName);
-				ObjectInputStream ois = new ObjectInputStream(fis);) {
-			Object result = ois.readObject();
-			ois.close();
-			return result;
-		}
-	}
-	
-	/**
-	 * Check if the folder exists, and if not make it.
-	 * @param folderName
-	 */
-	public static boolean makeFolder(String folderName){
+	public static void makeFolder(String folderName){
 		File folder = new File(folderName);
 		if(!folder.exists()){
 			folder.mkdir();
-			return true;
+			if(folderName.equals(savedScheduleFolder)){
+				copyFileUsingStream(new File(testScheduleSource), new File(testScheduleDestination));
+
+			}
 		}
-		return false;
 	}
-	
 
 	/**
 	 * This transfers one file from one destination to another. In this version it
@@ -706,95 +676,8 @@ public class FileHandler{
 			e1.printStackTrace();
 		}
 	}	
-	
-	
-	
-	
-
-	/////////////////////////////////
-	/////////////////////////////////
-	///// CSV parsing
-	/////////////////////////////////
-	/////////////////////////////////
-	@SuppressWarnings("unused")
-	private boolean ___CSVParsing_________;
-	
-	/**
-	 * Split this string based on its commas, ignoring commas inside
-	 * quotes.
-	 * 
-	 * Most of the code was found online, we added the hash set of ignore characters.
-	 * @param CSVText
-	 * @return
-	 */
-	public static ArrayList<String> parseCSVLine(String csvLine, HashSet<Character> ignoreCharacters){
-		ArrayList<String> result = new ArrayList<>();
-		if (csvLine == null || csvLine.isEmpty()) {
-			return result;
-		}
-		StringBuilder chunk = new StringBuilder();
-		boolean inQuotes = false;
-		char prevChar = 0; //could be used to check if you have a '/' inside quotes.
-
-		for (char ch : csvLine.toCharArray()) {
-			if (inQuotes) {
-				if (ch == '"') {
-					inQuotes = false;
-				} 
-				else {
-					chunk.append(ch);
-					prevChar = ch;
-				}
-			} else { //if you're not in quotes
-				if (ch == '"') {
-                    inQuotes = true;
-                } 
-				else if (ch == ',') {
-                    result.add(chunk.toString());
-                    chunk = new StringBuilder();
-                } 
-				else if (ignoreCharacters.contains(ch)) {
-                    //ignore LF characters
-                    continue;
-                }
-				else if (ch == '\n') {
-                    //the end, break!
-                    break;
-                } 
-				else {
-                    chunk.append(ch);
-                }
-            }
-        } 
-        result.add(chunk.toString());
-        return result;
-    }
-	
-	/**
-	 * Convert a line in a CSV file into an arrayList of strings.
-	 */
-	public static ArrayList<String> parseCSVLine(String csvLine){
-		HashSet<Character> ignoreCharacters = new HashSet<Character>();
-		ignoreCharacters.add('\r');
-		return parseCSVLine(csvLine, ignoreCharacters);
-	}
-	
-	/**
-	 * Almost the same as parsing as CSV, but you have to ignore an '=' just
-	 * before quotations in some cases. Might see data of the form:
-	 * 
-	 * data, data, ="9999", "data", data, ="2016", data
-	 * 
-	 * @param csvLine
-	 * @return
-	 */
-	public static ArrayList<String> parseAdvisorImportCSVLine(String csvLine){
-		HashSet<Character> ignoreCharacters = new HashSet<Character>();
-		ignoreCharacters.add('\r');
-		ignoreCharacters.add('='); //some lines are of the form :
-		// ="99999", ="2017D2","asdfas","asdfasd"
-		return parseCSVLine(csvLine, ignoreCharacters);
-	}
-
-
 }
+
+
+
+

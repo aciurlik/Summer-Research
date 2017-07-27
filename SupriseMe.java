@@ -91,7 +91,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 		if(CourseList.getCoursesIn(s).size()==0){
 
-			ImageIcon icon = FileHandler.getBelltowerImage();
+			ImageIcon icon = FileHandler.getDialogBoxImage();
 
 			JOptionPane.showMessageDialog(frame, "Classes have not yet been added to the "+ s.semesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
 
@@ -141,7 +141,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 					c = getReady.get(rand.nextInt(getReady.size()));
 				}
 				else{
-					ImageIcon icon = FileHandler.getBelltowerImage();
+					ImageIcon icon = FileHandler.getDialogBoxImage();
 
 					JOptionPane.showMessageDialog(frame, "There are no classes in this semester that satisfy the " + gerChoice + " requirement ", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
 
