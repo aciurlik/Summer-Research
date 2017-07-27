@@ -1,7 +1,9 @@
 # Summer-Research
 I. Introduction
-  a. Purpose (Add line number when finalized)
-  b. Requirements
+  a. Purpose 
+     This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
+     and more time planning life pathways.
+  b. Goals
     Usable by faculty and students 
       including the old professors who are scared of computers
       Easy and quick - make a schedule from scratch in 5 min or less
@@ -23,97 +25,75 @@ I. Introduction
     Allow the user to focus on future semesters
     Display remaining course requirements easily
     Easily find classes satisfying a requirement
-    Should be able to specify a spot in a schedule as "any GER", "any TA," "HST 141," or "HST 141-02"
-      different levels of generality.
+    Should be able to specify a placeholder in a schedule using different levels of generality, 
+        as in "any GER", "any TA," "HST 141," or "HST 141-02"
 II. Background
-III. Main Object Descriptions
-  a. Course (extends Prefix)
-    An offered course that can be taken.
-    Any of the fields other than prefix, sectionNumber, and semester may be unspecified (null).
-    Main Constructors:
-      Course(String line) - read the course information from one line of a file
-      Course(Prefix prefix, Semester semester, String professor, int[] meetingDays, 
-          Time labTime, Time examTime, int creditHours)
-    Fields:
-      Prefix prefix - the subject and number
-        //To find prerequsites, use CourseList.getPrereqs(prefix)
-      int sectionNumber
-      int creditHours
-      Semester semester
-      
-      int[] meetingDays - specified using the constants in the Time class, SUNDAY = 0
-      Time labTime
-      Time examTime
-      String professor - the professor(s) teaching the course
-      Other fields - (What else is there again?)
-    Methods:
-      overlaps(Course other) - returns true if this course and the other course are offered at the same time.
-      displayString() - return the string that would be displayed to represent this course in a dropdown bar in the SchedulePanel
-   i. Any superclasses or subclasses i.e. prefix 
-     Prefix
-       a class for keeping track of subject, number, and prerequsites of a course.
-       Fields:
-       String subject - for example, "MTH"
-       int number - for example, "220"
-       Prefix[] prerequsites
-  b. CourseList
-    Keeps track of all offered courses.
-    Also keeps track of course prefixes and their prerequsites - ensures that you don't have two prefixes with the same number
-      and subject but different prerequsites.
-    Main Constructor: Reads in a file of all courses known to be offered (describe what you're doing rather than how.)
-    Fields:
-      courseList
-      prefixPrerequsites - stores any prerequsites for a prefix
-    Methods:
-      add(Course c) - adds course to the end of the CourseList
-      addAt(Course c, int i)-adds course to a specified location in CourseList
-      removeCourse(Course c)-removes a speficifed course, returns course removed
-      removeAtIndex(removes the course and specified index, returns that course)
-      getSemester(int s)-goes through courseList and copies courses that are in given semster
-      getGER(String[]) goes through courseList and copies courses that forfill that given GER
-      setPrerequsites(Prefix p, Prefix[] prereqs) - update prefixPrerequeistes so future calls to getPrerqs will be accurate.
-      getPrereqs(Prefix p) - find the prerequsites for this prefix
-  
+    The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
+    Data objects handle the actual schedule - the main class in this group is the Schedule class. This group includes classes
+        like Requirement, ScheduleElement, and Schedule. Only Schedule should be allowed to request user events from
+        the GUI group, other classes should simply inform Schedule that user intervention may be required.
+    File groups handle collection of raw data from furman. Currently they use files to do so. File classes should be 
+         the ONLY classes that use files in any way - all other classes can only use strings provided by file classes.
+         The main class in this group is the FileHandler class, but it includes other classes like CourseList and
+         ListOfMajors.
+    GUI objects handle interactions with the user, and the drawing of the GUI. The ScheduleGUI class is the main class in this 
+        group, but a close second is Driver (the class that contains the main method for the program). Most classes in this group
+        are directly linked to some class in thg DATA group, and rely on getters from the data classes. 
+        WARNING - WARNING -  NO MEMBER OF THIS GROUP may directly modify any member of the DATA group - WARNING - WARNING
+        all modifications to the schedule should be passed to the SchdeuleGUI, which
+        may then inform schedule that a user has requested a change.
+III. Data Group Object Descriptions
+  a. Schedule
+    A list of available semesters, each of which contains ScheduleElements
+    Also holds the list of majors that the user has chosen, and handles GER requirements.
+    This class is the go-between for the Data side and the GUI side
+
+  b. ScheduleElement
+    Anything that can be added to a semester's plans.
+    Includes Course, Prefix, and Requirement.
+    
   c. Major
-    A fixed collection of requirements
-    Main Constructors:
-      Major(String lines) - read a saved major in from the lines of a file
-        this may be replaced by Major(String fileName)
-    Fields:
-      String Name - the name of the major, for example "Applied Mathematics"
-      ArrayList<Requirement> requirements
-    Methods:
-      getRequirements()
+    A fixed collection of requirements.
+    Tracks, GERs, Minors, and the collection of unsatisfied Prereqs are all represented with Major objects.
       
   d. Requirement
-    A requirement for courses necessary to a major, minor, GER, or other.
-    Fields:
-      int numberNeeded - if this is a "pick 2" or "pick 3 of" requirement, numberNeeded specifies how many. Otherwise, numberNeeded is 1.
-      ArrayList<Prefix> satisfiers - the prefixes of the courses that can satisfy this requirement
-      boolean[] taken - keeps track of which of the satisfiers have actually been taken
-    Methods:
-      isSatisfiedBy(Prefix) - check if satisfiers contains this prefix
-      clearTaken() - set all the values in the taken array to false
-      took(Prefix) - set the correct value in the taken array. If Prefix is not in satisfiers, do nothing.
+    Represents a collection of needed courses by the course's prefixes (i.e., "MTH-120")
+    Every requirement has a number to choose, and a list of choices. The choices may themselves be requirements.
+    There is a subclass TerminalRequirement that represents a requirement with only 1 choice.
+    Requirements have their own specification language that includes strings like "MTH-150", "3 of (MTH-110, MTH-120, MTH-130),"
+    and "1 of (2 of (MTH-145, MTH-120), MTH-150)." For a more detailed explanation, see the saving and reading tutorials in
+    the Requirement class and the TerminalRequirement class.
+    Requirements can determine their completion status given a list of ScheduleElements.
+    
+    
 
       
-  e. Schedule
-    A list of available semesters with courses, prefixes, or requirements in those semesters. 
-    Methods:
-      CheckSatisfied(ArrayList<Requirement> reqs) - figure out which of these requirements are satisfied by this schedule
-        be careful about the order in which you do this - if you took MTH360, and you have a requirement for
-        360 or 460, we don't want to claim that 360 is satisfying one of your electives requirements, we want it to satisfy
-        the 360/460 requirement.
-      CheckOverlap() - check if any of the courses in the schedule overlap
-      CheckDuplicates() - check if any of the courses are duplicates
-      add(Course course, Semester semester)
-      add(Prefix prefix, Semester semester) - this should also check if any courses fitting that prefix are offered that semester
-      add(Requirement r, Semester semester) - this should also check if any courses fitting that requirement are offered tha semester
-      
+ 
   
-IV. GUI Description
-  The main window of the GUI is used to create a schedule based on requirements
-  There is an area for viewing the current schedule, an area for viewing requirements left to satisfy, and an area for 
-    additional functions (adding a major/minor, declaring a semester for study away, so on)
+IV. GUI group object descriptions
+  a. ScheduleGUI 
+      Communicates with the Data group via a Schedule object.
+      Represents one open window.
+      Handles updating all subcomponents based on the Schedule's data, by using the update() method.
+  b. SchedulePanel
+      Represents the top part of the GUI, where semesters are displayed.
+  c. MajorListPanel
+      Represents the bottom right part of the GUI, where majors are listed out.
+  d. AdditionsPanel / BellTower
+      The two panels to the left of the MajorListPanel, one which is a picture of the belltower and fills as you 
+      complete your requirements, the other which includes lots of high-impact buttons for freshman
+  e. MainMenuBar
+      The MenuBar at the top of the program.
+    
+V. File group object descriptions
+  a. FileHandler
+      Handles all files and collecting data, including images, course catalogs, saved schedules, and major files.
+      All data is currently stored in the two folder "Resources" and "UserData."
+  b. CourseList
+      The list of available courses. May be replaced with a database system later. Includes methods to filter the course list
+      (getCoursesSatisfying(Predicate<Course>) is the most general)
+  c. ListOfMajors
+      The list of all available majors.
   
-V. Optimization
+VI. Optimization
+
