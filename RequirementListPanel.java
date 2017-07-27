@@ -16,103 +16,90 @@ import javax.swing.JScrollPane;
 
 
 /**
- * This panel is the list of requirements that can be added to the
- * schedule.
+ * Blurb Written: before 7/1/2017
+ * Last Updated: 7/26/2017
  * 
- * The requirementsList will be given to it by a schedule
- *   rather than have the requirementList stored in two places.
+ * This panel holds all the major panels, the credit hours countdown, and
+ * the checkAllErrors button.
  * 
- * @author dannyrivers
- *
+ * RequirementListPanel is in the GUI group of classes.
+ * 
  */
+
 public class RequirementListPanel extends JPanel implements ActionListener{
-	public JScrollPane scroll;
-	public JPanel inner;
-	public ScheduleGUI d;
+	private static final long serialVersionUID = 1L;
+	
+	public JPanel inner; //holds the major panels
+	public JScrollPane scroll; //holds inner
+	
+	public ScheduleGUI schGUI;
 	
 
 	JPanel scrollPanel = new JPanel();
-	JPanel infoPanel; //reqs left, credit hours, and CLPs
-	public JLabel creditHoursLabel;
-	public String cHText = "        Credit Hours: ";
-	public String chInformText = " planned of 128";
-	public JLabel reqsLeftLabel;
+	JPanel creditsCountdownPanel; 
+	public JLabel creditsCountdownLabel;
+	public static String cHText = "        Credit Hours: ";
+	public static String chInformText = " planned of 128";
+	
+	//These were once placed near the creditsCountdown panel, but got
+	//    removed once we discovered how difficult it can be to get an
+	//    accurate estimate of the number of courses needed to take.
+	//It was mentioned that it would be nice to put them back in because
+	//    students seemed to enjoy seeing the countdown of courses too.
+	//public JLabel reqsLeftLabel;
 	//public String reqsText = "Estimated Courses Left: ";
 	//public JLabel clpLeftLabel;
 	//public String clpText =  "     CLPs Left:   ";
 	//public Schedule schedule;
-
-
-	public int layoutCounter;
-	public static final int gridHeight = 3;
-	// the layout locations handle the first few requirementpanels.
-	// it may be safely changed, so long as the last entry is at the end of a column.
-
-	public RequirementListPanel(Schedule s, ScheduleGUI d){
-		
-		
+	
+	public RequirementListPanel(Schedule s, ScheduleGUI schGUI){
 		//this.schedule = s;
-		this.d = d;
+		this.schGUI = schGUI;
 		this.setBackground(FurmanOfficial.grey(60));
-		//Put the main RequirementList panel, called inner, inside a scroll pane.
+		
+		//Put the panel that holds majorPanels, called inner, inside a scroll pane.
 		this.inner = new JPanel();
 		this.inner.setLayout(new GridBagLayout());
 		this.inner.setBackground(Color.white);
-		this.setPreferredSize(new Dimension(700, 150));
-		//inner.setPreferredSize(new Dimension(700, 150));
 		this.scroll = new  JScrollPane(inner);
-
 		this.setLayout(new BorderLayout());
 
-	
-		//put all the requirement panels into inner.
 
-		
+		this.setPreferredSize(new Dimension(700, 150));
+		//inner.setPreferredSize(new Dimension(700, 150));
 		//scroll.setPreferredSize(new Dimension(700,150));
+		
 		this.add(scroll, BorderLayout.CENTER);
 
 		
-		this.infoPanel = new JPanel();
-		infoPanel.setLayout(new BorderLayout());
-		creditHoursLabel = new JLabel();
-		creditHoursLabel.setFont(FurmanOfficial.smallHeaderFont);
+		this.creditsCountdownPanel = new JPanel();
+		creditsCountdownPanel.setLayout(new BorderLayout());
+		creditsCountdownLabel = new JLabel();
+		creditsCountdownLabel.setFont(FurmanOfficial.smallHeaderFont);
 		//reqsLeftLabel = new JLabel();
 		//reqsLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
 		//clpLeftLabel = new JLabel();
 		//clpLeftLabel.setFont(FurmanOfficial.bigHeaderFont);
-		JButton checkAllErrors = new JButton(MenuOptions.checkAllErrors);
-		checkAllErrors.addActionListener(this);
+		JButton checkAllErrorsButton = new JButton(MenuOptions.checkAllErrors);
+		checkAllErrorsButton.addActionListener(this);
 		
 		
 		//this.infoPanel.add(reqsLeftLabel);
-		this.infoPanel.add(creditHoursLabel);
+		this.creditsCountdownPanel.add(creditsCountdownLabel);
 		//this.infoPanel.add(clpLeftLabel);
-		this.infoPanel.add(checkAllErrors, BorderLayout.EAST);
+		this.creditsCountdownPanel.add(checkAllErrorsButton, BorderLayout.EAST);
 		
-		this.infoPanel.setBackground(this.getBackground());
-		this.add(infoPanel, BorderLayout.NORTH);
+		this.creditsCountdownPanel.setBackground(this.getBackground());
+		this.add(creditsCountdownPanel, BorderLayout.NORTH);
 		
 		
 		update(s);
 	}
-	
-	
-	
+
 
 	/**
-	 * Find the next location to place a component in the gridbag.
-	 * @return
-	 */
-	public int[] nextLocation(){
-		int[] result = {layoutCounter/3,layoutCounter%3};
-		layoutCounter ++;
-		return result;
-
-	}
-
-	/**
-	 * Update the requirementPanels displayed based on 
-	 * the the majors in the schedule. 
+	 * Update the major panels and 
+	 * the credits counter
 	 */
 	public void update(Schedule schedule){
 		
@@ -131,7 +118,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		ArrayList<Major> majors = schedule.getMajors();
 		int heightCounter = 1;
 		for(Major m : majors){
-			MajorPanel majorPanel = new MajorPanel(m, d);
+			MajorPanel majorPanel = new MajorPanel(m, schGUI);
 			gbc.gridx = 0;
 			gbc.gridy = heightCounter;
 			heightCounter++;
@@ -139,13 +126,12 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		
 		}
 		
-		this.creditHoursLabel.setText(this.cHText + Math.max(0, schedule.getCreditHoursComplete()) + this.chInformText);
+		String creditsCountdownText = RequirementListPanel.cHText 
+				+ Math.max(0, schedule.getCreditHoursComplete()) 
+				+ RequirementListPanel.chInformText;
+		this.creditsCountdownLabel.setText(creditsCountdownText);
 		//this.reqsLeftLabel.setText(this.reqsText + Math.max(0, schedule.estimatedCoursesLeft()));
 		//this.clpLeftLabel.setText(this.clpText + Math.max(0, 32 - schedule.getCLP()));
-		
-		
-		
-		
 	}
 	
 	
@@ -155,7 +141,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			d.GUICheckAllErrors(true);
+			schGUI.GUICheckAllErrors(true);
 		}
 	}
 	

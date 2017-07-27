@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
+import java.util.function.Predicate;
 /**
  * Blurb written: 7/24/2017
  * Last updated: 7/26/2017
@@ -433,71 +434,107 @@ public class CourseList implements java.io.Serializable  {
 	//////////////////////////////
 	@SuppressWarnings("unused")
 	private boolean ___FilterMethods_________;
+	// The filter methods return subsets of courseList.
+	//
+	// No filter method should return null - use an empty list instead.
+	//
+	//
 
-	/**
-	 * Return only those members of input which are in the given semester.
-	 * @param input
-	 * @param s
-	 * @return
-	 */
-	public static ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
-		ArrayList<Course> SemesterList = new ArrayList<Course>();
-
-		for(Course course : input){
-			if ( course.getSemester().compareTo(s.getDate()) == 0){
-
-				SemesterList.add(course);
+	public static ArrayList<Course> filter(Iterable<Course> input, Predicate<Course> p){
+		ArrayList<Course> result = new ArrayList<Course>();
+		for(Course c : input){
+			if(p.test(c)){
+				result.add(c);
 			}
 		}
-		return SemesterList;
+		return result;
+	}
+	
+	public static ArrayList<Course> getCoursesSatisfying(Predicate<Course> p){
+		return filter(listOfCourses, p);
+	}
+
+	
+	public static ArrayList<Course> onlyThoseIn(Iterable<Course> input, Semester s){
+		return filter(input, c -> c.getSemesterDate().compareTo(s.getDate()) == 0);
 	}
 
 	public static  ArrayList<Course> getCoursesIn(Semester s){
-		if(s.isAP){
+		if(s.isPriorSemester){
 			return new ArrayList<Course>();
 		}
-		ArrayList<Course> result =  onlyThoseIn(listOfCourses,s);
-		return result;
+		return onlyThoseIn(listOfCourses,s);
 	}
 
 	public static ArrayList<Course> onlyThoseSatisfying(Iterable<Course> input, Requirement r){
-		ArrayList<Course> result = new ArrayList<Course>();
-		for(Course c : input){
-			if(r.isSatisfiedBy(c.getPrefix())){
-				result.add(c);
-			}
-		}
-		return result;
+		return filter(input, c -> r.isSatisfiedBy(c.getPrefix()));
 	}
+	
+	
 	public  static ArrayList<Course> getCoursesSatisfying(Requirement r){
 		return onlyThoseSatisfying(listOfCourses,r);
 	}
+	
+	public static ArrayList<Course> onlyThoseWithPrefix(Iterable<Course> input, Prefix p){
+		return filter(input, c -> c.getPrefix() != null && c.getPrefix().equals(p));
+	}
 
-	/**
-	 * Returns an empty list if 
-	 * @param input
-	 * @param p
-	 * @return
-	 */
-	public static ArrayList<Course> onlyThoseSatisfyingPrefix(Iterable<Course> input, Prefix p){
+	public static ArrayList<Course> getCoursesWithPrefix(Prefix p){
+		return onlyThoseWithPrefix(listOfCourses, p);
+	}
 
-		ArrayList<Course> result = new ArrayList<Course>();
-		for(Course c: input){
-
-			if(c.getPrefix()!= null && c.getPrefix().equals(p)){
-
-				result.add(c);
+	//////////////////////////////
+	//////////////////////////////
+	/////  Nice Predicates
+	//////////////////////////////
+	//////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___NicePredicates_________;
+	// These methods make predicates over courses using the specified data.
+	//
+	public static Predicate<Course> inSemester(Semester s){
+		return inSemester(s.getDate());
+	}
+	
+	public static Predicate<Course> inSemester(SemesterDate d){
+		final SemesterDate date = d;
+		if(date == null){
+			return (Course c) -> false;
+		}
+		else{
+			return (Course c) -> date.equals(c.getSemesterDate());
+		}
+	}
+	
+	public static Predicate<Course> inSchedule(Schedule s){
+		HashSet<Course> currentCourses = new HashSet<Course>();
+		for(ScheduleElement e : s.getAllElementsSorted()){
+			if(e instanceof ScheduleCourse){
+				currentCourses.add(((ScheduleCourse)e).c);
 			}
 		}
-		return result;
+		final HashSet<Course> fixedCourses = new HashSet<Course>(currentCourses);
+		return (Course c)-> fixedCourses.contains(c);
 	}
-
-	public static ArrayList<Course> getCoursesSatisfying(Prefix p){
-		return onlyThoseSatisfyingPrefix(listOfCourses, p);
+	public static Predicate<Course> satisfiesRequirement(Requirement r){
+		return (Course c) -> r.isSatisfiedBy(c.getPrefix());
 	}
+	
+	
 
+	//////////////////////////////
+	//////////////////////////////
+	/////  Credit Hours for Prefix
+	//////////////////////////////
+	//////////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___creditHours_________;
+	
+	
 	/**
-	 * Return the 
+	 * Return the number of credit hours needed for this prefix.
+	 * If it's a placement prefix, return 0.
+	 * If the prefix can't be found, return defaultCreditHours.
 	 * @param p
 	 * @return
 	 */
@@ -505,10 +542,10 @@ public class CourseList implements java.io.Serializable  {
 		if(p!= null && p.getNumber().contains("PL.")){ //Placement courses don't give credits
 			return 0;
 		}
-		if(getCoursesSatisfying(p).isEmpty()){
+		if(getCoursesWithPrefix(p).isEmpty()){
 			return defaultCreditHours;
 		}
-		return getCoursesSatisfying(p).get(0).creditHours;
+		return getCoursesWithPrefix(p).get(0).creditHours;
 	}
 
 
@@ -953,7 +990,7 @@ public class CourseList implements java.io.Serializable  {
 		int index = 1;
 		//Read in each course
 		while(index < fileLines.size()){
-			ArrayList<String> data = SaverLoader.parseCSVLine(fileLines.get(index));
+			ArrayList<String> data = FileHandler.parseCSVLine(fileLines.get(index));
 			String sectionNumber = data.get(1);
 			//Check if we've found a new course
 			if(! sectionNumber.equals( lastSectionNumber)){
@@ -975,7 +1012,7 @@ public class CourseList implements java.io.Serializable  {
 							}
 							duplicateCourse=newDuplicateCourse;
 						}
-						duplicateCourse.semester = new SemesterDate(duplicateCourse.semester.year, SemesterDate.SUMMERTWO);
+						duplicateCourse.semesterDate = new SemesterDate(duplicateCourse.semesterDate.year, SemesterDate.SUMMERTWO);
 
 					}
 				}

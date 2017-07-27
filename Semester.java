@@ -4,19 +4,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-
+/**
+ * Blurb written 7/26/2017
+ * Last updated 7/26/2017
+ * 
+ * A single semester which holds ScheduleElements.
+ * 
+ * 
+ */
 public class Semester implements Comparable<Semester>, java.io.Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public SemesterDate semesterDate;
+	
+	public SemesterDate semesterDate; //the year and season for this semester
 	public ArrayList<ScheduleElement> elements;
 	public Schedule schedule;
-	private int OverloadLimit;
-	public boolean hasNotes = false;
-	String notes = "";
-	boolean isAP = false;
+	
+	private int overloadLimit; // the number of credits allowed in this semester
+	
+	String notes; // if this is not null, then the notes panel will show up when 
+	// a semester panel updates.
+	
+	boolean isPriorSemester = false; //true if this semester is the semester that holds
+	//courses taken before starting Furman, like AP classes or placement courses.
 	public boolean studyAway = false;
 	 
 
@@ -31,15 +43,24 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		this.semesterDate = sD;
 		this.schedule = s;
 		if(this.semesterDate.sNumber == SemesterDate.FALL || this.semesterDate.sNumber == SemesterDate.SPRING){
-			OverloadLimit = 20;
+			overloadLimit = 20;
 		}
 		if(this.semesterDate.sNumber == SemesterDate.SUMMERONE|| this.semesterDate.sNumber == SemesterDate.SUMMERTWO){
-			OverloadLimit = 8;
+			overloadLimit = 8;
 		}
 		if(this.semesterDate.sNumber == SemesterDate.MAYX ){
-			OverloadLimit = 2;
+			overloadLimit = 2;
 		}
 	}
+	
+	/////////////////////////
+	/////////////////////////
+	////Getters and setters
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___GettersAndSetters_________;
+
 
 	public ArrayList<ScheduleElement> getElements(){
 		return elements;
@@ -48,15 +69,79 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	public SemesterDate getDate(){
 		return semesterDate;
 	}
+	
+	/**
+	 * Return the total number of credit hours scheduled in this semester
+	 * @return
+	 */
+	public int getCreditHours(){
+		int totalHours = 0;
+		for(ScheduleElement e : this.elements){
+			totalHours += e.getCreditHours();
+		}
+		return totalHours;
+	}
+	
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+	
+
+	public boolean hasNotes() {
+		return this.notes != null;
+	}
+
+	public boolean isStudyAway() {
+		return studyAway;
+	}
+
+	public void setStudyAway(boolean studyAway) {
+		this.studyAway = studyAway;
+	}
+	
+
+	public int getOverloadLimit() {
+		return overloadLimit;
+	}
+
+	public void setOverloadLimit(int overloadLimit) {
+		this.overloadLimit = overloadLimit;
+	}
+	
 
 	/**
-	 * Check for any overlap in this semester with the new element.
-	 * 
+	 * Check whether this is a 'taken' semester, meaning
+	 * it cannot be edited.
+	 * @return
+	 */
+	public boolean isTaken() {
+		if(this.semesterDate.compareTo(this.schedule.currentSemester)<0){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	/////////////////////////
+	/////////////////////////
+	////Overlap
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Overlap_________;
+
+
+	/**
+	 * Check if addition overlaps with any elements in this semester
 	 * true if overlap is found.
 	 * 
 	 * @param addition
 	 */
-
 	public boolean checkOverlap(ScheduleElement addition){
 		//only courses can have overlap.
 
@@ -74,6 +159,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		}
 		return false;
 	}
+	
 
 	/**
 	 * Check all courses in this semester for overlap issues.
@@ -93,16 +179,6 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 			}
 		}
 		return overlaps;
-	}
-
-	private ArrayList<ScheduleCourse> allCourses(){
-		ArrayList<ScheduleCourse> courses = new ArrayList<ScheduleCourse>();
-		for (ScheduleElement e : this.elements){
-			if(e instanceof ScheduleCourse){
-				courses.add((ScheduleCourse)e);
-			}
-		}
-		return courses;
 	}
 
 	/**
@@ -130,82 +206,98 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		}
 		return result;
 	}
+	
+	/**
+	 * Find the courses (not other schedule elements) in this.elements
+	 * @return
+	 */
+	private ArrayList<ScheduleCourse> allCourses(){
+		ArrayList<ScheduleCourse> courses = new ArrayList<ScheduleCourse>();
+		for (ScheduleElement e : this.elements){
+			if(e instanceof ScheduleCourse){
+				courses.add((ScheduleCourse)e);
+			}
+		}
+		return courses;
+	}
 
+	
 
+	/////////////////////////
+	/////////////////////////
+	////Overload
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Overload_________;
 
 	/**
-	 * Check if adding addition would make an overload
-	 * This is able to take a null input. 
-	 * @param forAll true if checking all errors, false otherwise
-	 * @param addition the schedule Element you are adding to your semester
-	 * @return true if there is an error in the case of for all, false if no error, and user dependented true/false otherwise
+	 * Check if adding addition would make an overload error.
+	 *  If addition is null, check if the semester already surpasses its overload limit.
+	 *  If addition is not null, check if addition itself causes the 
+	 *      semester to surpass its overload limit.
+	 * @param skipUserOverride  don't make any popups.
+	 * @param addition  the ScheduleElement you are adding to your semester. May be null.
+	 * @return null for no error, or else the error.
 	 */
-	public boolean checkOverload(boolean forAll,ScheduleElement addition){
-			int totalHours = 0;
-			if(addition instanceof ScheduleCourse){
-				ScheduleCourse toAdd = (ScheduleCourse) addition;
-				totalHours= totalHours + toAdd.getCreditHours();
+	public ScheduleError checkOverload(ScheduleElement addition){
+		int totalHours = getCreditHours();
+		if(addition == null){
+			if(totalHours > overloadLimit){
+				return makeOverloadError(addition);
 			}
-			if(addition instanceof Requirement){
-				Requirement toAdd = (Requirement) addition;
-				totalHours = totalHours + toAdd.getCreditHours();
+			else{
+				return null;
 			}
-			totalHours = totalHours + getCreditHours();
-			if(totalHours > OverloadLimit){
-				ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
-				overload.setOverloadLimit(this.OverloadLimit);
-				overload.setOffendingCourse(addition);
-				overload.setOffendingSemester(this);
-				//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
-				if(forAll == false){
-					return (!this.schedule.userOverride(overload));
-				}
-				if(forAll == true){
-					return true;
-				}
+		}
+		else{
+			//if addition caused the overload limit to be exceeded
+			if(totalHours <= overloadLimit 
+					&& totalHours + addition.getCreditHours() > overloadLimit){
+				return makeOverloadError(addition);
 			}
-	
-		return false;
+			else{
+				return null;
+			}
+		}
 	}
 
-	private boolean checkReplaceOverload(ScheduleElement newElement, ScheduleElement oldElement) {
-		int totalHours = 0;
-		totalHours=totalHours- oldElement.getCreditHours();
+	/**
+	 * Check if this replacement causes an overload error.
+	 * Does not accept null arguments.
+	 * If the replacement causes no overload issues, this method returns null.
+	 * @param newElement
+	 * @param oldElement
+	 * @return
+	 */
+	private ScheduleError checkReplaceOverload(
+			ScheduleElement newElement, 
+			ScheduleElement oldElement) {
+		int totalHours = getCreditHours() - oldElement.getCreditHours();
+		if(totalHours > overloadLimit){
+			return null;
+		}
 		totalHours= totalHours + newElement.getCreditHours();
-
-		totalHours = totalHours + getCreditHours();
-		if(totalHours > OverloadLimit){
-			ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
-			overload.setOverloadLimit(this.OverloadLimit);
-			overload.setOffendingCourse(newElement);
-			//	overload.setInstructions("Adding " + addition.getDisplayString() + " exceeds this semester's overload limit of " + this.OverloadLimit );
-
-			return (!this.schedule.userOverride(overload));
-
+		if(totalHours > overloadLimit){
+			return  makeOverloadError(newElement);
 		}
-		return false;
+		return null;
 	}
-
-
-	public int getCreditHours(){
-		int totalHours = 0;
-		for(ScheduleElement e : this.elements){
-
-			if(e instanceof ScheduleCourse){
-			
-				totalHours = totalHours + ((ScheduleCourse) e).getCreditHours();
-
-
-			}
-
-			if(e instanceof Requirement){
-				totalHours = totalHours + ((Requirement) e).getCreditHours();
-
-			}
+	
+	private ScheduleError makeOverloadError(ScheduleElement e){
+		ScheduleError overload = new ScheduleError(ScheduleError.overloadError);
+		overload.setOverloadLimit(this.overloadLimit);
+		if(e != null){
+			overload.setOffendingCourse(e);
 		}
-		return totalHours;
-
+		overload.setOffendingSemester(this);
+		return overload;
 	}
+	
+	
+
+
+
 
 
 
@@ -214,6 +306,15 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	}
 
 
+	
+	/////////////////////////
+	/////////////////////////
+	//// Stateful Modifiers
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___AddRemoveReplace_________;
+	
 	/**
 	 * Add a schedule element to this semester.
 	 * This method should only be called by Schedule.
@@ -221,7 +322,8 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	 * @return
 	 */
 	public boolean add(ScheduleElement e){
-		if(!this.checkOverload(false, e)){
+		ScheduleError overloadError = this.checkOverload(e);
+		if(overloadError == null || this.schedule.userOverride(overloadError)){
 			this.elements.add(e);
 			return true;
 		}
@@ -255,27 +357,27 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 
 
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement){
-		if(!this.checkReplaceOverload(newElement, oldElement)){
-			
-
-			int i = this.elements.indexOf(oldElement);
-		
-			this.elements.set(i, newElement);
-
-			return true;
-		}
-		else{
+		ScheduleError overload = this.checkReplaceOverload(newElement, oldElement);
+		if(overload != null && (!this.schedule.userOverride(overload))){
 			return false;
 		}
-
-		//this.schedule.checkErrorsWhenAdding(newElement, this);
-		//this.schedule.checkErrorsWhenRemoving(oldElement, this);
-
+		else{
+			int i = this.elements.indexOf(oldElement);
+			this.elements.set(i, newElement);
+			return true;
+		}
 	}
 
 
 
 
+	/**
+	 * Find the list of all courses with this semesterDate that also 
+	 * satisfy r
+	 * @param r
+	 * @return
+	 */
+	/*
 	public ArrayList<ScheduleCourse> getCoursesSatisfying(Requirement r){
 		ArrayList<Course> semesterCourses =CourseList.getCoursesIn(this);
 		ArrayList<Course> finalCourse = CourseList.onlyThoseSatisfying(semesterCourses, r);
@@ -286,42 +388,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		}
 		return coursesSatisfying;
 	}
-
-
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
-
-	public boolean isHasNotes() {
-		return hasNotes;
-	}
-
-	public void setHasNotes(boolean hasNotes) {
-		this.hasNotes = hasNotes;
-	}
-
-	public boolean isStudyAway() {
-		return studyAway;
-	}
-
-	public void setStudyAway(boolean studyAway) {
-		this.studyAway = studyAway;
-	}
-
-
-
-
-	public int getOverloadLimit() {
-		return OverloadLimit;
-	}
-
-	public void setOverloadLimit(int overloadLimit) {
-		OverloadLimit = overloadLimit;
-	}
+*/
 
 	@Override
 	public boolean equals(Object other){
@@ -337,14 +404,6 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		}
 	}
 
-	public boolean isTaken() {
-		if(this.semesterDate.compareTo(this.schedule.currentSemester)<0){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
 
 
 

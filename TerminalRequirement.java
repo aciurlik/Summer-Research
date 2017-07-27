@@ -4,13 +4,24 @@ import java.util.Stack;
 
 
 /**
- * Each terminal requirements represents a requirement that can be
- * satisfied by 1 course in furman's system.
+ * Blurb written: 7/24/2016
+ * Last updated: 7/27/2017
  * 
- * For example, a terminal requirement might represent MTH - 150.
+ * In our program, requirements have a number of things to choose from,
+ * and those choices may themselves be requirements. A terminal requirement
+ * is a requirement that doesn't have any sub-requirements, and so 
+ * ends the recursion.
  * 
- * It might also represent strange things like BusinessBlock, or
- * 		any MTH greater than 200.
+ * To start, you can imagine that each terminal requirements represents a 
+ *     requirement that can be satisfied by just 1 course in furman's system.
+ *     For example, a terminal requirement might represent "you need MTH-150".
+ * 
+ * in reality, a terminal requirement can represent any prefix (see the Prefix class)
+ * and may represent complex statements like "any MTH > 200." 
+ * 
+ * See the terminal requirement tutorial in the ReadingSaving section for a full explanation of 
+ * what can be a terminal requirement.
+ * 
  * 
  *
  */
@@ -44,27 +55,17 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 		this(p);
 	}
 
-	public int calculateCreditHours(){
-		if(this.isExact()){
-			return CourseList.getCoursesCreditHours(p);
-		}
-		else{
-			return defaultCreditHours;
-		}
-	}
+	
+	
 
-	public int getCreditHours(){
-		if(this.storedCreditHours == -1){
-			this.storedCreditHours = calculateCreditHours();
-		}
-		return this.storedCreditHours;
-	}
 
 	/////////////////////
 	/////////////////////
-	///// Adding comparison pieces
+	///// Making a terminal requirement into a >, < or between requirement.
 	/////////////////////
 	/////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___makingInexact_________;
 
 
 	private void allNumbersLEQ(int max){
@@ -108,18 +109,49 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 
 	/////////////////////
 	/////////////////////
-	///// Reading / saving
+	///// Reading and saving
 	/////////////////////
 	/////////////////////
-
+	@SuppressWarnings("unused")
+	private boolean ___ReadingSaving_________;
 
 
 	/**
-	 * Takes a string of the form MTH-140 or MTH140 
+	 * TERMINAL REQUIREMENT SAVING AND READING
 	 * 
-	 * If no '-' is in the string, it looks for the first switch between an alpha
-	 * character and a numeric character. This means that, for example, ACC-BLK has to 
-	 * contain its '-'.
+	 * When reading a string, terminal requirements ignore spaces.
+	 * You can always differentiate between terminal requirements and requirements, 
+	 * because a terminal requirement has no parenthesis. (If a user examines a
+	 * requirement, some syntactical operations remove the parenthesis, but the
+	 * parenthesis rule applies to all strings that a requirement can be read from.)
+	 * 
+	 * Terminal requirements come in three forms:
+	 * 		standard (exact)  	: "MTH-110"
+	 * 		inequality 			: "MTH>110", "MTH>110 < 200"
+	 * 		numToChoose (must include an inequality)
+	 * 							: "4 of MTH>110", "2 of MTH < 500"
+	 * 
+	 * exact:
+	 * 		An exact terminal requirement is a requirement for just one prefix.
+	 * 		The prefix may be specified in a number of syntaxes: if the string 
+	 * 			contains a '-', then it will use the Prefix readFrom method.
+	 * 			Otherwise it will look for the first switch from letters
+	 * 			to numbers, and assume that this is the break in the subject
+	 * 			and number.
+	 * inequality:
+	 * 		A terminal requirement may use any of '>', '<', '>=', or '<=' in place
+	 * 			of the '-'. In addition, one extra inequality symbol and number
+	 * 			may come after the first number. This allows for strings of the form
+	 * 			"MTH>110",  "MTH > 110 <= 235", and "MTH <= 100 > 300". Notice that this
+	 * 			last is a terminal requirement, but nothing can satisfy it.
+	 * 
+	 * numToChoose:
+	 * 		Normal Requirements can't have more to choose than they have choices. Due to 
+	 * 			this, it can be difficult to write requirements of the form "4 math classes
+	 * 			numbered at least 200." In order to handle this case, TerminalRequirements 
+	 * 			still respect their numberToChoose. You may write a TerminalRequirements of 
+	 * 			the form "4 of MTH > 200", where the 'of' is necessary. 
+	 *
 	 * 
 	 * @param s
 	 * @return
@@ -261,6 +293,8 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 	/////////////////////
 	//See Requirement class for explanation of which methods need to
 	// be overwritten
+	@SuppressWarnings("unused")
+	private boolean ___MethodsFromRequirement_________;
 
 	@Override 
 	protected int minMoreNeeded(ArrayList<ScheduleElement> taken){
@@ -320,58 +354,110 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 		return false;
 	}
 
-	public boolean isSatisfiedBy(TerminalRequirement t){
-		return t.isSubset(this);
+
+
+
+
+
+
+
+
+	@Override
+	public boolean isTerminal(){
+		return true;
+	}
+	@Override
+	public TerminalRequirement getTerminal(){
+		return this;
 	}
 
+	
 
-	//TODO is this method ever used?
-	public boolean isCompletedBy(ArrayList<ScheduleElement> taken){
-		return minMoreNeeded(taken) <= 0;
-	}
-
-
-
-	public boolean alsoCompletes(Requirement r){
-		if(this.isExact()){
-			//see if r is complete by the list of elements {this}
-			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
-			taken.add(new ScheduleCourse(new Course(this.p,this.getCreditHours()), null));
-			return r.isComplete(taken, false);
+	@Override
+	public int compareTo(Requirement o) {
+		if(!(o instanceof TerminalRequirement)){
+			//Terminal requirements are less than other types of requirements.
+			return -1;
 		}
-		else{
+		TerminalRequirement other = (TerminalRequirement)o;
+		return this.saveString().compareTo(other.saveString());
+	}
+
+
+	//INFINITELOOPHAZARD
+	@Override
+	public boolean equals(Requirement r){
+		//If r isn't a terminal, we can quickly recurse with a
+		// terminal or else say no.
+		if(!(r instanceof TerminalRequirement)){
 			if(r.isTerminal()){
-				TerminalRequirement t = r.getTerminal();
-				return t.completedBy(this);
+				return this.equals(r.getTerminal());
 			}
-			//TODO what if this isn't exact, and r is a full blown requirement?
+			else{
+				return false;
+			}
+		}
+		//after recursion, r is a terminal.
+		TerminalRequirement other = (TerminalRequirement)r;
+
+		//check if they complete each other
+		if(! (this.completedBy(other) && other.completedBy(this) )){
 			return false;
 		}
-
+		//check that numToChoose is the same for both
+		if(! (this.numToChoose == other.numToChoose)){
+			return false;
+		}
+		//check name equality
+		if(this.name!=null && !this.name.equals(other.name)){
+			return false;
+		}
+		if(other.name != null && !other.name.equals(this.name)){
+			return false;
+		}
+		//We're good!
+		return true;
 	}
 
-
-	/**
-	 * test whether this requirement uses min or max, or instead
-	 * is an exact requirement (a requirement for exactly one prefix)
-	 * @return
-	 */
-	public boolean isExact(){
-		return ((!usesMin) && (!usesMax));
+	//INFINITELOOPHAZARD
+	@Override 
+	public int hashCode(){
+		int result = this.p.hashCode();
+		if(usesMin){
+			result += 10;
+			result += min;
+		}
+		if(usesMax){
+			result += 10;
+			result += max;
+		}
+		return result;
 	}
-
-
-
-
-
-
-
-
+	
+	
 	/////////////////////
 	/////////////////////
 	///// Methods from ScheduleElement
 	/////////////////////
 	/////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___MethodsFromScheduleElement_________;
+
+	@Override
+	public int getCreditHours(){
+		if(this.storedCreditHours == -1){
+			this.storedCreditHours = calculateCreditHours();
+		}
+		return this.storedCreditHours;
+	}
+	private int calculateCreditHours(){
+		if(this.isExact()){
+			return CourseList.getCoursesCreditHours(p);
+		}
+		else{
+			return defaultCreditHours;
+		}
+	}
 
 	@Override
 	public Prefix getPrefix() {
@@ -439,33 +525,54 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 	}
 
 
+	
+	
+	
+	/////////////////////
+	/////////////////////
+	///// Utilities
+	/////////////////////
+	/////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Utilities_________;
+	
+
+	public boolean isSatisfiedBy(TerminalRequirement t){
+		return t.isSubset(this);
+	}
 
 
-
-	@Override
-	public int compareTo(Requirement o) {
-		if(!(o instanceof TerminalRequirement)){
-			//Terminal requirements are less than other types of requirements.
-			return -1;
+	/**
+	 * test whether this requirement uses min or max, or instead
+	 * is an exact requirement (a requirement for exactly one prefix)
+	 * @return
+	 */
+	public boolean isExact(){
+		return ((!usesMin) && (!usesMax));
+	}
+	
+	/**
+	 * Check if every way of completing this terminal also completes r
+	 * @param r
+	 * @return
+	 */
+	public boolean alsoCompletes(Requirement r){
+		if(this.isExact()){
+			//see if r is complete by the list of elements {this}
+			ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
+			taken.add(new ScheduleCourse(new Course(this.p,this.getCreditHours()), null));
+			return r.isComplete(taken, false);
 		}
-		TerminalRequirement other = (TerminalRequirement)o;
-		return this.saveString().compareTo(other.saveString());
+		else{
+			if(r.isTerminal()){
+				TerminalRequirement t = r.getTerminal();
+				return t.completedBy(this);
+			}
+			//TODO what if this isn't exact, and r is a full blown requirement?
+			return false;
+		}
 	}
-
-
-	@Override
-	public boolean isTerminal(){
-		return true;
-	}
-	@Override
-	public TerminalRequirement getTerminal(){
-		return this;
-	}
-
-
-
-
-
+	
 	/**
 	 * Check if satisfying t definitely satisfies this.
 	 * @param t
@@ -518,58 +625,16 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 		return ourInterval.contains(theirInterval, true);
 	}
 
+	
+	
 
-	//INFINITELOOPHAZARD
-	@Override
-	public boolean equals(Requirement r){
-		//If r isn't a terminal, we can quickly recurse with a
-		// terminal or else say no.
-		if(!(r instanceof TerminalRequirement)){
-			if(r.isTerminal()){
-				return this.equals(r.getTerminal());
-			}
-			else{
-				return false;
-			}
-		}
-		//after recursion, r is a terminal.
-		TerminalRequirement other = (TerminalRequirement)r;
-
-		//check if they complete each other
-		if(! (this.completedBy(other) && other.completedBy(this) )){
-			return false;
-		}
-		//check that numToChoose is the same for both
-		if(! (this.numToChoose == other.numToChoose)){
-			return false;
-		}
-		//check name equality
-		if(this.name!=null && !this.name.equals(other.name)){
-			return false;
-		}
-		if(other.name != null && !other.name.equals(this.name)){
-			return false;
-		}
-		//We're good!
-		return true;
-	}
-
-	//INFINITELOOPHAZARD
-	@Override 
-	public int hashCode(){
-		int result = this.p.hashCode();
-		if(usesMin){
-			result += 10;
-			result += min;
-		}
-		if(usesMax){
-			result += 10;
-			result += max;
-		}
-		return result;
-	}
-
-
+	/////////////////////
+	/////////////////////
+	///// Testing
+	/////////////////////
+	/////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Testing_________;
 
 
 	public static void testTerminalRequirements(){
@@ -599,16 +664,10 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 
 		for(String s : test){
 			TerminalRequirement t = readFrom(s);
-			boolean sat =  t.isCompletedBy(taken);
+			//boolean sat =  t.isCompletedBy(taken);
 			int minMore =  t.minMoreNeeded(taken);
 			double percent = t.percentComplete(taken, false);
 			boolean show = false;
-			if(sat && (percent < 1.0 - tol || minMore > 0)){
-				show = true;
-			}
-			if((!sat) && (percent > 1.0-tol || minMore <= 0)){
-				show = true;
-			}
 			if(percent > 1.0-tol && minMore >0){
 				show = true;
 			}
@@ -618,7 +677,7 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 
 			//show = true;
 			if(show){
-				System.out.println(t.saveString()+ " choose:" + t.numToChoose + ",\t" + sat
+				System.out.println(t.saveString()+ " choose:" + t.numToChoose
 						+ ",\t" +minMore + ",\t" + percent);
 			}
 		}

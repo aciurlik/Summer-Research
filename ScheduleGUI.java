@@ -700,7 +700,7 @@ public class ScheduleGUI{
 	}
 
 	public void GUIaddNotes(Semester sem) {
-		sem.setHasNotes(true);
+		sem.setNotes("");
 		this.update();
 
 	}
@@ -715,8 +715,7 @@ public class ScheduleGUI{
 	}
 
 	public void GUIremoveNotes(Semester sem) {
-		sem.setHasNotes(false);
-		sem.setNotes("");
+		sem.setNotes(null);
 		this.update();
 
 	}

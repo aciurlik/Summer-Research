@@ -20,24 +20,23 @@ import javax.swing.JPanel;
 
 
 public class ScheduleElementPanel extends JPanel implements java.io.Serializable{
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	private int updateCount = 0;
 	private ScheduleElement s;
 	public SemesterPanel container;
 	private Dimension buttonSize = new Dimension(20, 20);
 	private String removeButtonText = "x";
-	public ScheduleElementPanel reference = this;
 	int nimbusWidth = 40;
 	int nimbusHeight = 20;
-	JPanel remove = new JPanel();
+	JPanel removePanel = new JPanel();
+	ScheduleCourse[] coursesToChooseFrom; //used if this panel represents a requirement
+	// and the user wants to choose a course satisfying it.
 
 
 	//	Driver coursesSatisfy = new Driver();
 	JComboBox<ScheduleElement>  requirementDropDown;
-	JButton addCourse = new JButton (MenuOptions.addCourseWithRequirement);
+	JButton addCourse;
 
 
 
@@ -46,27 +45,28 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 		super();
 		this.s=s;
-		this.reference=this;
 		this.container = container;
 		this.setBackground(FurmanOfficial.grey(30));
 		this.setLayout(new BorderLayout());
 
 
-
+		addCourse = new JButton (MenuOptions.addCourseWithRequirement);
+		addCourse.setPreferredSize(new Dimension(130,20));
+		addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
+		addCourse.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				chooseACourse();
+			}
+		});
+		
 
 		if(s instanceof ScheduleCourse){
 			if(((ScheduleCourse) s).getSemester().compareTo(container.schGUI.sch.currentSemester)<0){
 				return;
 			}
-
 		}
 		this.setTransferHandler(new SEPDragHandler());
 		this.addMouseListener(ComponentDragHandler.getDragListener());
-
-
-
-
-
 	}
 
 	public ScheduleElement getElement(){
@@ -96,13 +96,11 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 
 		//Adds the remove Button
 		
-		remove.setOpaque(false);
+		removePanel.setOpaque(false);
 		JButton toRemove = new JButton(removeButtonText);
 		if(MenuOptions.nimbusLoaded){
 			toRemove.setPreferredSize(new Dimension(nimbusWidth, nimbusHeight));
 			toRemove.setMargin(new Insets(1,1,1,1));
-			
-
 		}
 		else{
 			toRemove.setPreferredSize(buttonSize);
@@ -124,8 +122,8 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 			}
 		});
 
-		remove.add(toRemove);
-		this.add(remove, BorderLayout.EAST);
+		removePanel.add(toRemove);
+		this.add(removePanel, BorderLayout.EAST);
 	}
 
 
@@ -137,23 +135,28 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	 * It makes the button that either says "Add a course" or "No courses available."
 	 */
 	public void updateDropDown(){
-		ArrayList<ScheduleCourse> listOfCourses = container.getSemester().getCoursesSatisfying((Requirement)s);
-		ArrayList<ScheduleCourse> finallistOfCourses = container.sem.schedule.filterAlreadyChosenCourses(listOfCourses);
-		final ScheduleCourse[] allPossibleCourses = finallistOfCourses.toArray(new ScheduleCourse[finallistOfCourses.size()]);
-		if(finallistOfCourses.size()>0){
-			addCourse.setActionCommand(MenuOptions.addCourseWithRequirement);
-			addCourse.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e){
-					ScheduleCourse c = container.schGUI.GUIChooseCourse(allPossibleCourses);
-					if(c != null){
-						container.schGUI.GUIElementChanged(container, reference , c);
-					}
-				}
-			});
+		Semester thisSemester = container.getSemester();
+		SemesterDate date = thisSemester.getDate();
+		Requirement r = (Requirement)s;
+		//collect all the courses that:
+		// haven't been taken, 
+		// are in this semester,
+		// and satisfy this requirement.
+		ArrayList<Course> listOfCourses = CourseList.getCoursesSatisfying(
+				CourseList.inSemester(date)
+				.and(CourseList.satisfiesRequirement(r))
+				.and( CourseList.inSchedule(thisSemester.schedule).negate() )
+				);
+		ArrayList<ScheduleCourse> finalList = ScheduleCourse.toScheduleCourses(listOfCourses, thisSemester.schedule);
+		//TODO is this necessary? finalList = thisSemester.schedule.filterAlreadyChosenCourses(finalList);
+		coursesToChooseFrom = finalList.toArray(new ScheduleCourse[finalList.size()]);
+		//Change what the user sees based on the size of coursesToChooseFrom
+		//TODO do we ever take things out of removePanel?
+		if(coursesToChooseFrom.length>0){
+			//TODO what is stack doing?
 			JPanel stack = new JPanel();
 			stack.setBackground(this.getBackground());
-			addCourse.setPreferredSize(new Dimension(130,20));
-			remove.add(addCourse);
+			removePanel.add(addCourse);
 			this.add(stack, BorderLayout.CENTER);
 		}	
 		else{
@@ -162,14 +165,23 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 			noCourse.setBackground(FurmanOfficial.darkPurple);
 			noCourse.setOpaque(true);
 			noCourse.setForeground(Color.white);
-			remove.add(noCourse);
-
+			removePanel.add(noCourse);
 		}
 	}
-
+	
+	/**
+	 * called when the user clicks 'choose a course'
+	 */
+	public void chooseACourse(){
+		ScheduleCourse c = container.schGUI.GUIChooseCourse(coursesToChooseFrom);
+		if(c != null){
+			container.schGUI.GUIElementChanged(container,this, c);
+		}
+	}
 	public void removeSelf(){
 		container.removeElement(this);
 	}
+	
 
 
 	public class SEPDragHandler extends ComponentDragHandler{

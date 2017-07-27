@@ -202,6 +202,11 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 		return usesCreditHours;
 	}
 
+	/**
+	 * make this requirement into a credit hours requirement, and 
+	 * set its number of hours needed to hours.
+	 * @param hours
+	 */
 	public void setHoursNeeded(int hours){
 		this.numToChoose = hours;
 		this.usesCreditHours = true;

@@ -1,7 +1,12 @@
 
 /**
+ * Blurb written: 7/26/2017
+ * Last updated: 7/26/2017
+ * 
  * This class represents the subject and number of a course, as in 
  * "MTH-120" or "BUS-3320".
+ * 
+ * It is part of the DATA group of classes.
  * 
  * 
  *
