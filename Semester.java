@@ -211,7 +211,7 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 	 * Find the courses (not other schedule elements) in this.elements
 	 * @return
 	 */
-	private ArrayList<ScheduleCourse> allCourses(){
+	public ArrayList<ScheduleCourse> allCourses(){
 		ArrayList<ScheduleCourse> courses = new ArrayList<ScheduleCourse>();
 		for (ScheduleElement e : this.elements){
 			if(e instanceof ScheduleCourse){
