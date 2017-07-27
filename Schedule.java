@@ -773,8 +773,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!schGUI.getErrorString().equals("")){
-			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorString());
+		if(!schGUI.getErrorStrings().equals("")){
+			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorStrings());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h3>The Final Countdown: </h3>");
@@ -1877,27 +1877,6 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-
-	public  ArrayList<ScheduleError> checkAllErrors(){
-		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
-		//Don't check for errors in PriorSemester
-		for(Semester s: this.semesters){
-			ArrayList<ScheduleError> overlap = s.checkAllOverlap();
-			if(overlap!=null){
-				allErrors.addAll(s.checkAllOverlap());
-			}
-			ScheduleError overload = s.checkOverload(null);
-			if(overload != null){
-				allErrors.add(overload);	
-			}
-		}
-		allErrors.addAll(this.checkAllPrerequsites());
-		allErrors.addAll(this.checkAllDuplicates());
-		return allErrors;
-	}
-
-
-
 	public ArrayList<ScheduleCourse> getCoursesInSemester(Semester s) {
 		ArrayList<Course> toFinal = CourseList.getCoursesIn(s);
 		ArrayList<ScheduleCourse> scheduleCoursesInSemester = new ArrayList<ScheduleCourse>();
@@ -1984,55 +1963,6 @@ public class Schedule implements java.io.Serializable {
 
 
 
-	public String printRequirementString(){
-		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
-		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
-		ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
-		for(Semester s: this.getAllSemestersSorted()){
-			for(ScheduleElement se: s.elements){
-				allOrderedElements.add(se);
-				if(s.isPriorSemester){
-					coorespondingDates.add(defaultPrior);
-
-				}
-				else {
-					coorespondingDates.add(s.semesterDate);
-				}
-			}
-		}
-		StringBuilder result = new StringBuilder();
-		result.append("<h2><center> Degree Checklist \n </center></h2>");
-		result.append("<b> General Education Requirements </b>");
-
-		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
-		for(ScheduleElement e : this.getAllElementsSorted()){
-			elementsSatisfy.put(e, new HashSet<Requirement>(e.filterEnemyRequirements(this.getAllRequirements())));
-		}
-		for(Major m: this.getMajors()){
-			result.append("\n");
-			result.append("<b>" + m.name + "</b>");
-			ArrayList<Requirement> sortedReq = new ArrayList<Requirement>(m.reqList);
-			Collections.sort(sortedReq);
-			for(Requirement r: sortedReq){
-				String rDisplay = r.shortString(10000) + " -";
-				if(rDisplay.length()<=30){
-					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
-					rDisplay = rDisplay + spaces;
-
-				}
-				result.append("\n <b>" +  rDisplay + "</b>" );
-
-				boolean isComplete = r.getStoredIsComplete();
-				if(!isComplete){
-					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
-					if(coursesNeeded == 1){
-						result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Course Needed </b></font>	\n");
-					}
-					if(coursesNeeded >1){
-						result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Courses Needed </b></font> \n");
-					}
-				}
-				int counter = 0;
 
 
 

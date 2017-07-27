@@ -818,7 +818,7 @@ public class ScheduleGUI{
 	 * @param s
 	 */
 	public void addCourseTo(Semester s){
-		ScheduleCourse c = formatCoursesInSemesterforChooser(s);
+		ScheduleCourse c = chooseCourseIn(s);
 		if(c != null){
 			sch.addScheduleElement(c, s);
 		}
@@ -830,16 +830,18 @@ public class ScheduleGUI{
 	//////////////////////////////////////////////////////////////
 	
 	/**
-	 * Used by add Course to format the courses in a Semester in an approprate way for 
-	 * the GUIChooseCourse to use. 
+	 * Choose a course not in
 	 * 
 	 * Does not perform the actual addition of the course to the semester
 	 * @param s
 	 */
-	public ScheduleCourse formatCoursesInSemesterforChooser(Semester s){	
-		ArrayList<ScheduleCourse> addCourses = new ArrayList<ScheduleCourse>();
-		addCourses = sch.getCoursesInSemester(s);
-		ArrayList<ScheduleCourse> toFinal =sch.filterAlreadyChosenCourses(addCourses);
+	public ScheduleCourse chooseCourseIn(Semester s){	
+		
+		ArrayList<Course> addCourses = CourseList.getCoursesSatisfying(
+				CourseList.inSemester(s)
+				.and(CourseList.inSchedule(sch).negate())
+				);
+		ArrayList<ScheduleCourse> toFinal = ScheduleCourse.toScheduleCourses(addCourses, sch);
 		ScheduleCourse[] finalCourseList = new ScheduleCourse[toFinal.size()];
 		for(int i = 0; i<toFinal.size(); i++){
 			finalCourseList[i] = toFinal.get(i);
