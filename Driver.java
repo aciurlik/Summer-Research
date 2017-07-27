@@ -50,6 +50,7 @@ public class Driver {
 	 * @param s Schedule that one wants to open. 
 	 */
 	public static void addScheduleGUI(Schedule s){
+		
 		ScheduleGUI schGUI = new ScheduleGUI(s);
 		//The window listeners keep the closure of one window from causing the others to close. 
 		schGUI.addWindowListener(new WindowListener(){
@@ -146,24 +147,21 @@ public class Driver {
 
 
 	/**
-	 * Given these objects, and this list of strings,
-	 * let the user pick one  with a dialog box. (Utility method) 
+	 * This displays a list of string to the user, and lets the user choose among them.
+	 * This returns the index of the chosen string, -1 if none chosen. Strings should be unique, if not the first
+	 * will be chosen. 
 	 * @return the integer pointing to the user selection. 
 	 */
-	public static int GUIChooseAmong(ArrayList<Object> choicesList, ArrayList<String> displaysList, String message, String title){
-		Object[] choices = choicesList.toArray(new Object[choicesList.size()]);
+	public static int GUIChooseAmong(ArrayList<String> displaysList, String message, String title){
 		Object[] displays = displaysList.toArray(new String[displaysList.size()]);
-		if(choices.length != displays.length){
-			throw new RuntimeException("Wrong sizes for choices and displays in GUICHooseAmong" + choices.length + "," + displays.length);
-		}
 		String chosenString = (String)JOptionPane.showInputDialog(null, message , title , JOptionPane.PLAIN_MESSAGE, null, displays, "Cats");
 		int chosenIndex = 0;
 		for(; chosenIndex < displays.length ; chosenIndex ++){
-			if(displays[chosenIndex] == chosenString){
+			if(displays[chosenIndex].equals(chosenString)){
 				break;
 			}
 		}
-		if(chosenIndex >= choices.length){
+		if(chosenIndex >= displays.length){
 			return -1;
 		}
 		return chosenIndex;
@@ -185,7 +183,7 @@ public class Driver {
 			semesterStrings.add(d.getUserString());
 			semesterObjects.add(d);
 		}
-		int index = GUIChooseAmong(semesterObjects, semesterStrings, "Which was your first semester at Furman? ", "Pick a semester");
+		int index = GUIChooseAmong(semesterStrings, "Which was your first semester at Furman? ", "Pick a semester");
 		if(index != -1){
 			return semesters.get(index);
 		}

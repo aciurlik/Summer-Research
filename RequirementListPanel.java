@@ -28,7 +28,7 @@ import javax.swing.JScrollPane;
 public class RequirementListPanel extends JPanel implements ActionListener{
 	public JScrollPane scroll;
 	public JPanel inner;
-	public ScheduleGUI d;
+	public ScheduleGUI schGUI;
 	
 
 	JPanel scrollPanel = new JPanel();
@@ -48,11 +48,11 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	// the layout locations handle the first few requirementpanels.
 	// it may be safely changed, so long as the last entry is at the end of a column.
 
-	public RequirementListPanel(Schedule s, ScheduleGUI d){
+	public RequirementListPanel(Schedule s, ScheduleGUI schGUI){
 		
 		
 		//this.schedule = s;
-		this.d = d;
+		this.schGUI = schGUI;
 		this.setBackground(FurmanOfficial.grey(60));
 		//Put the main RequirementList panel, called inner, inside a scroll pane.
 		this.inner = new JPanel();
@@ -131,7 +131,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 		ArrayList<Major> majors = schedule.getMajors();
 		int heightCounter = 1;
 		for(Major m : majors){
-			MajorPanel majorPanel = new MajorPanel(m, d);
+			MajorPanel majorPanel = new MajorPanel(m, schGUI);
 			gbc.gridx = 0;
 			gbc.gridy = heightCounter;
 			heightCounter++;
@@ -155,7 +155,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
-			d.GUICheckAllErrors(true);
+			schGUI.GUICheckAllErrors();
 		}
 	}
 	

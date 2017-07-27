@@ -102,7 +102,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 				else{
 					JOptionPane.showMessageDialog(null, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.schGUI.icon);
 
-					sch.schGUI.GUICheckAllErrors(true);
+					sch.schGUI.GUICheckAllErrors();
 				}
 			}
 		}

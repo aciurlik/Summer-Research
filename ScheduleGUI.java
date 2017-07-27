@@ -10,8 +10,6 @@ import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +49,7 @@ public class ScheduleGUI{
 		this.sch = sch;
 		sch.setScheduleGUI(this);
 	
-		icon = FileHandler.getBelltowerImage();
+		icon = FileHandler.getDialogBoxImage(); //Sets the image that appears in the dialog boxes. 
 		l = FileHandler.getMajorsList();
 
 		frame = new JFrame();
@@ -61,7 +59,7 @@ public class ScheduleGUI{
 		menu.setFont(FurmanOfficial.normalFont); 
 		frame.setJMenuBar(menu);
 		
-
+		
 		JPanel layeredPanel = new JPanel();
 		layeredPanel.setLayout(new BorderLayout());
 
@@ -70,54 +68,139 @@ public class ScheduleGUI{
 		AdditionsPanel highImpactPanel = new AdditionsPanel(this);
 		JPanel left = new JPanel();
 		left.setBackground(FurmanOfficial.bouzarthGrey);
+		
+		
 		BellTower belltowerLabel = new BellTower(sch);
 		this.b=belltowerLabel;
 		left.add(belltowerLabel);
 		left.add(highImpactPanel);
+		
+		
 		layeredPanel.add(left, BorderLayout.WEST);
 
+		//Creates, adds schedulePanel the panel, that holds all the semesters
 		schP = new SchedulePanel(sch, this);
-		//schP.setPreferredSize(new Dimension(500, 500));
-
 		layeredPanel.add(schP, BorderLayout.NORTH);
+		//Creates/adds the RequirementList Panel which holds the major/Ger requirements 
 		reqs = new RequirementListPanel(sch, this);
 		layeredPanel.add(reqs, BorderLayout.CENTER);
 
+		//Sets all of this inside a scroll panel so the user can see the whole program regardless of screen size. 
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(layeredPanel);
-		//scroll.setPreferredSize(new Dimension(stackPanel.getPreferredSize()));
+		
+		
 		frame.add(scroll);
-
 		this.update();
-
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		frame.pack();
 		frame.setVisible(true);
-		/**
-		 * 
-		 * 	System.out.println("Time intervals");
-		System.out.println(two-one);
-		System.out.println(three-two);
-		System.out.println(four-three);
-		 * 
-		 */
 
 	}
 
 
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	/////////Addition Panel (And MenuBar) Listed in the order they appear in the GUI
+	/////////////////////////////////////////////////////////////////////////////////	
 	/**
-	 * Create a new, blank schedule to work from.
+	 * Show the user a Webpage in another Window. 
+	 * @param websiteType
 	 */
-	public void GUINewSchedule(String actionCommand) {
+	public void GUIOutsideLink(String websiteType) {
+		try{
+			if(websiteType.equals(MenuOptions.exploreInternship)){
+				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/internship/FindingInternships/Pages/default.aspx").toURI());
+			}
+			if(websiteType.equals(MenuOptions.exploreStudyAway)){
+				Desktop.getDesktop().browse(new URL("https://studyaway.furman.edu/index.cfm?FuseAction=Programs.SimpleSearch").toURI());
+			}
+			if(websiteType.equals(MenuOptions.addResearch)){
+				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/ur/Pages/default.aspx").toURI());
+			}
+			if(websiteType.equals(MenuOptions.exploreMayX)){
+				Desktop.getDesktop().browse(new URL("http://www.furman.edu/academics/may-experience/Pages/default.aspx").toURI());
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();	
+		}
+	}
+
+	
+	/**
+	 * This asks the user what year they would 
+	 * like to add a MayX, and then provides them
+	 * with a list of courses available at that time. 
+	 * It then adds the user's choice to that semester.
+	 * 
+	 *  Does not allow the user to choose a year where a MayX already exists.
+	 */
+	public void addMayX(){
+		Integer year = this.createYearDialogBox(getAvaliableYears(SemesterDate.MAYX), MenuOptions.addMayX);
+		if(year == null){
+			return;
+		}
+		Semester addedSemester = sch.addNewSemesterInsideSch(year, SemesterDate.MAYX); //Adds semester in schedule
+		addCourseTo(addedSemester);//Ask user for which course they would like to add to that semester, if any available
+	}
+
+
+
+	/**
+	 * First asks the user to pick the appropriate summer session.
+	 * Then asks them what year they would like to add. 
+	 * It then displays list of classes that the user can choose
+	 * to add. 
+	 */
+	public void addSummerSession(){
+		//Choose Summer Session One or Two
+		int season = GUIChooseSummerSession();
+		if(season == SemesterDate.OTHER){
+			return;//If not valid. 
+		}
+		//What year you'd like this summer class
+		Integer year = this.createYearDialogBox(getAvaliableYears(season), "Add Summer");
+		if(year == null){
+			return;//If not valid
+		}
+		Semester addedSemester = sch.addNewSemesterInsideSch(year, season);
+		addCourseTo(addedSemester);//Choose a course. 
+	}
+
+	/**
+	 * A method for letting the user choose among a list of majors.
+	 * The string determines whether it chooses between actual majors,
+	 * minors, or tracks.
+	 * @param s
+	 */
+	public void GUIMajorPopUP(String s){
+		ListOfMajors majors = l; //Links to test Major
+		ArrayList<Major> collectionOfMajors =  majors.getGUIMajors();
+		ArrayList <Major> displayThings = sch.filterAlreadyChosenMajors(collectionOfMajors);
+		createMajorDiaologBox(s, displayThings);
+	}
+	
+	
+	////////////////////////////////////////////////////////////////
+	///////// Main Menu Bar (Not Additions Panel)////////////////// 
+	//////////////////////////////////////////////////////////////
+	
+	
+	//The Furman Advantage Tab is all covered above. 
+	
+	/**
+	 * Create a new schedule to work from. It either pulls from the last imported schedule
+	 * or creates a blank one using the prior schedule's CourseList, and the start date saved in settings
+	 */
+	public void GUINewSchedule(String typeOfSchedule) {
 		Schedule current;
+		//Gives the user the option to save his/her schedule before opening new schedule. 
 		int n = Driver.saveScheduleReminder();
 		if(n == 0){
 			GUISaveSchedule();
 		}
-		//CourseList l = sch.masterList;
-		//This creates a Semester with that matches the current schedule Course List and starting Semester Date
-		if(actionCommand.equals(MenuOptions.newBlankSchedule)){
+		
+		//This creates a schedule that matches the current schedules Course List and starting Semester Date
+		if(typeOfSchedule.equals(MenuOptions.newBlankSchedule)){
 			if(FileHandler.propertyGet(FileHandler.startSemester) == null && Driver.tryPickStartDate() == null){
 				return;
 			}
@@ -126,73 +209,327 @@ public class ScheduleGUI{
 			}
 		}
 		else{
-			current = new Schedule(FileHandler.getSavedStudentData());
+			current = new Schedule(FileHandler.getSavedStudentData());//Opens a user imported schedule. 
 		}
-		//TODO make sure nothing else needs to be set
 		setSchedule(current);
 		this.update();
 	}
+	
+	//Driver open the schedule. 
 
-	public void setSchedule(Schedule current) {
-		sch=current;
-		this.sch.setScheduleGUI(this);
-		this.b.setSchedule(current);
+	/**
+	 * Relays the saveSchedule message to File Handler
+	 * who deals with it because it involves writing the 
+	 * seralized version of the schedule to a file. 
+	 */
+	public void GUISaveSchedule(){
+		FileHandler.saveSchedule(this.sch);
+	}
+
+/**
+ * This handlers all of the printing.
+ * It asks the user for the format,
+ *  formats the string accordingly, 
+ * gives them a print preview, and finally
+ * sends the document to the printer. 
+ */
+	public void GUIPrintSchedule(){
+		//Sets up the dialog box that asks the user what format they would like to print their schedule as. 
+		JPanel options = new JPanel();
+		options.setLayout(new BorderLayout());
+		//JCheckBox Construction. 
+		JCheckBox ReqLayout = new JCheckBox("Requirement Layout");
+		ReqLayout.setToolTipText("This is provides a checklist of all the requirements for your major, and GER. This will list out what has/hasn't been satisfied");
+		JCheckBox ScheduleLayout = new JCheckBox("Schedule Layout  	       ");//Gives space between Req JCheckBox. 
+		ScheduleLayout.setToolTipText("Diplays a the schedule created semester-by-semester. Includes scheduling errors, and a final checklist.");
+
+		JLabel instruct = new JLabel("Which format(s) would you like to use?");//Gives space between JCheckBoxes. 
+		options.add(instruct, BorderLayout.NORTH);
+		options.add(ReqLayout, BorderLayout.EAST);
+		options.add(ScheduleLayout, BorderLayout.WEST);
+
+
+		//Start creating the print material
+		String finalPrint = new String("<center> <h1> Academic Pathways Planner </h1> </center> "); 
+		//Adds Student's Name to Printed Schedule. 
+		if(sch.studentName != null){
+			finalPrint += sch.studentName;
+		}
+		//Creates Date at the top of the page. 
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate localDate = LocalDate.now();
+		finalPrint += "<br>" + dtf.format(localDate) + "<br>";
+
+		int userSelection = (int) JOptionPane.showOptionDialog(null, options, "Format", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		if(userSelection == 2 || userSelection == -1){//Cancel button, or "X"
+			return;
+		}
+
+
+		//If they didn't select anything, the default is schedule layout.
+		//Thus if ReqLayout is not selected ScheduleLayout must be. 
+		if(!ReqLayout.isSelected()){
+			ScheduleLayout.setSelected(true);
+		}
+
+		//Creates the schedule/reqs printout. 
+		if(ScheduleLayout.isSelected()){
+			finalPrint = finalPrint + sch.printScheduleString() + "<br>";
+
+		}
+		if(ReqLayout.isSelected()){
+			finalPrint = finalPrint + sch.printRequirementString() + "<br>";
+		}
+
+
+		//Creates the TextPane that will display the printPreview, and print. 
+		JTextPane schedulePrint = new JTextPane();
+		schedulePrint.setFont(FurmanOfficial.normalFont);
+		schedulePrint.setPreferredSize(new Dimension((int) new Paper().getWidth(), (int) new Paper().getHeight())); // Sets to standard piece of paper.
+		schedulePrint.setContentType("text/html");
+		schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>"); //Tacks disclaimer on end.
+		schedulePrint.setCaretPosition(0);
+		schedulePrint.setEditable(false);
+
+		//Places it in scroll Pane for User view. 
+		JScrollPane scrollPane = new JScrollPane(schedulePrint);
+		scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width,schedulePrint.getPreferredSize().height));
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		String[] choices= {"Print", "Cancel"};
+		//Allows user to cancel Print	
+		int userChoice = (int) JOptionPane.showOptionDialog(null, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+		if(userChoice == 0){
+			try {
+				schedulePrint.print();
+			} catch (PrinterException e) {
+				JOptionPane.showMessageDialog(null, "There was an error with printing.");
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	//File Handler deletes a Schedule. 
+	
+	
+	/**
+	 * This method is called by the the RequirementListPanel (Check all Errors button), the option is in the MainMenuBar, 
+	 * and once a schedule is deemed complete it is also displayed in a dialog box to the user via the BellTower. It provides a 
+	 * series of two dialog boxes, first it gives a list of all errors currently in the schedule. (Excluding the optimism error)
+	 * and then if the user has loaded a major that contains notes, a second dialog box will display those.  
+	 * 
+	 */
+	public void GUICheckAllErrors() {
+	String errorString = getErrorString();
+	String result = "<html><body>" + errorString;
+	if(errorString.equals("")){//The user has no errors. 
+		result = "Your Schedule had no errors! You're a pretty savvy scheduler";
+	}
+	result= result.replaceAll("\n", "<br>");
+	JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
+	
+	String majorNotes = "";
+	boolean hasNotes = false;
+	for(Major m : sch.getMajors()){
+		if(m.notes != null){
+			hasNotes = true;
+			majorNotes = majorNotes + this.htmlMajorNotes(m) + "<br><br>"; //Appends each note with a two line break btw
+		}
+	}
+	majorNotes = "<html>" + majorNotes + "</html>";
+	if(hasNotes){ //Only displays message if Major has notes. 
+		JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+
+}
+
+
+
+	public void importPriorCourses(boolean isStudent){
+		String importText;
+		if(isStudent){
+			importText=  "To import your prior courses and placements, "
+					+ "\n  1) Go to MyFurman. "
+					+ "\n  2) Navigate to your unofficial transcript. "
+					+ "\n  3) You should see your name and ID in the top left corner,"
+					+ "\n     and your cumulative GPA listed at the bottom."
+					+ "\n  4) Highlight all the data from your ID to your GPA and"
+					+ "\n     drag it into this text box. "
+					+ "\n  5) Click 'Validate' to make sure the process worked!";
+		}
+		else{
+			importText = "To import a student's prior courses and placements, "
+					+ "\n  1) Go to MyFurman. "
+					+ "\n  2) Navigate to the student's course credit summary. "
+					+ "\n  3) You should see the student's name and ID in the top left corner,"
+					+ "\n     and their cumulative GPA listed at the bottom."
+					+ "\n  4) Highlight all the data from their ID to their GPA and"
+					+ "\n     drag it into this text box."
+					+ "\n  5) Click 'Validate' to make sure the process worked!";
+		}
+	
+		JTextArea importArea = new JTextArea(importText);
+	
+	
+	
+		//Validate button
+		JButton validate = new JButton("Validate");
+		validate.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				String givenText = importArea.getText();
+				if(successText.equals(givenText)){
+					return;
+				}
+				try{
+					trySetStudentDataFromWebsite(givenText);
+					importArea.setText(successText);
+	
+				}catch(Exception except){
+					importArea.setText("Please try your import again");
+					showImportException(except);
+	
+				}
+			}
+		}); //end action listener
+	
+	
+		/* showInstructions button
+		JButton showInstructions = new JButton("Show Instructions");
+		showInstructions.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+	
+			}
+		});*/
+	
+	
+	
+		//Make the popup
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+		p.add(new JScrollPane(importArea), BorderLayout.NORTH);
+		p.add(validate, BorderLayout.EAST);
+		JOptionPane.showOptionDialog(null,p, "Import your schedule",
+				JOptionPane.CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
+	}
+
+
+
+	/**
+	 * Create the dialog box and get the user's choice of major.
+	 * @param s, The instructions that are added to the dialog box. 
+	 */
+	public void createMajorDiaologBox(String s, ArrayList<Major> displayThings){
+		Major[] dialogList = new Major[displayThings.size()];
+		//Puts in a form the JOptionPane will take. 
+		for(int i=0; i<displayThings.size(); i++){
+			dialogList[i]=displayThings.get(i);
+		}
+		Major m = (Major)JOptionPane.showInputDialog(frame, "Please " + s,  s, JOptionPane.PLAIN_MESSAGE, icon, dialogList, "cat" );
+		if((m != null) && (m instanceof Major)){
+			this.GUIAddMajor(m);
+		}
+	}
+
+
+	
+	/**
+	 * Called when user chooses a major from MajorPopUpChooser. 
+	 * @param m
+	 */
+		public void GUIAddMajor(Major m) {
+			//The degreeType is already set
+			if(m.degreeTypes.size()==1){
+					m.setChosenDegree(m.degreeTypes.get(0));
+				}
+		
+			// If there are multiple degree types the user gets to choose. 
+			else if(m.isNormalMajor()){//This filters out minor/tracks. 
+				if(!GUIChooseMajorDegreeType(m)){
+					//This stops the major from being added if the user does not specify an appropriate type
+					return;
+				}
+			}
+			else{
+				m.setChosenDegree(Major.None);
+			}
+			//If Major has notes these are displayed
+			if(m.notes != null){
+				String title = "Notes for " + m.name + ":";
+				String toUser = "<html>" + htmlMajorNotes(m) + "<html>";
+				JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
+	
+			}
+			this.sch.addMajor(m);
+			this.update();
+		}
+
+
+	/**
+	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
+	 * this lets the user choose a type.
+	 * @param m
+	 */
+	
+	public boolean GUIChooseMajorDegreeType(Major m){
+		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
+			ArrayList<String> toAdd= new ArrayList<String>();
+			String instructions = null;
+			String header = null;
+	
+	
+			for(int i = 0; i<m.degreeTypes.size(); i++){
+				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
+	
+			}
+	
+	
+	
+			if(m.degreeTypes.size()==0 && m.isNormalMajor()){
+				toAdd.add(CourseList.getDegreeTypeString(Major.BS));
+				toAdd.add(CourseList.getDegreeTypeString(Major.BA));
+				toAdd.add(CourseList.getDegreeTypeString(Major.BM));
+				instructions = "Your major was not given a degree type. Please look up your major and choose the appropriate option.";
+				header = "WARNING";
+			}
+	
+			String[] choices = new String[toAdd.size()];
+			for(int p = 0; p<toAdd.size(); p ++){
+				choices[p]=toAdd.get(p);
+	
+	
+			}
+			if(m.degreeTypes.size()>1){
+				instructions = "What type of degree would you like for " + m.name ;
+				header = "Degree Type";
+			}
+	
+			String GERNeeded = (String)JOptionPane.showInputDialog(null, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
+	
+			int MajorType = Major.BA;
+			if(GERNeeded == null){
+				return false;
+			}
+	
+			MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
+			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
+			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
+			m.setChosenDegree(MajorType);
+	
+		}
+		return true;
 	}
 
 
 	/**
-	 * Ask the user to pick out some of the enemies that will be allowed to
-	 * be satisfied by that course.
-	 * @param enemies
-	 * @param c
-	 * @return
+	 * When the user clicks the  + button to add a new semester to the schedule
 	 */
-	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
-
-		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>();
-		HashSet<Requirement> result = new HashSet<Requirement>();
-
-		JPanel problems = new JPanel();
-		problems.setLayout(new BorderLayout());
-
-		String advisorAdvice;
-		if(enemies.size()>2){
-			advisorAdvice = " \n If you are unsure of why or how these requirements conflict, talk to your advisor.";
-		}
-		else{
-			advisorAdvice = "";
-		}
-		JLabel instruct = new JLabel(
-				"<html><p style = 'width: 300px;'> The course "+ c.getPrefix() + " might satisfy the following requirements,"
-						+  " but it is not allowed to satisfy all of them at once."
-						+  advisorAdvice
-						+ "<br> <br> Which requirements do you want it to satisfy?</p> </html>");
-
-		problems.add(instruct, BorderLayout.NORTH);
-		JPanel stack = new JPanel();
-		stack.setLayout(new GridLayout(enemies.size(), 1, 1, 1));
-
-		for(int i = 0; i<enemies.size(); i++){
-			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(10) + " (" +  majors.get(i).name + ")" );
-			stack.add(combattingReqs);
-			userOptions.add(combattingReqs);
-		}
-
-
-		problems.add(stack);
-		JOptionPane.showMessageDialog(null,  problems, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
-
-		for(int i=0; i<userOptions.size(); i++){
-			if(userOptions.get(i).isSelected()){
-				result.add(enemies.get(i));
-			}
-
-		}
-
-		return result;
+	public void GUISemesterPanelAdded(){
+		sch.addNewSemester();
+		this.update();
 	}
-
-
 
 
 	/**
@@ -206,19 +543,16 @@ public class ScheduleGUI{
 	}
 
 
-
 	/**
 	 * When a schedule element panel is dropped into a semester panel
 	 * @param p
 	 * @param semesterPanel
 	 */
 	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel newSemesterPanel) {
-
-		Semester old = p.container.sem;
+		Semester old = p.container.sem; //Semester it was dragged from
 		if(p.getElement() instanceof ScheduleCourse){
-
 			Requirement r=	new Requirement(new Prefix[]{p.getElement().getPrefix()}, 1);
-			sch.replace(p.getElement(), r, old, newSemesterPanel.sem);
+			sch.replace(p.getElement(), r, old, newSemesterPanel.sem);//replaces what was taken from old, to the new semester
 		}
 		else{
 			sch.replace(p.getElement(), p.getElement(), old, newSemesterPanel.sem);
@@ -226,14 +560,6 @@ public class ScheduleGUI{
 		this.update();
 	}
 
-
-	/**
-	 * When the user clicks the  + button to add a new semester to the schedule
-	 */
-	public void GUISemesterPanelAdded(){
-		sch.addNewSemester();
-		this.update();
-	}
 
 	/**
 	 * When a schedule element is removed from a semester panel 
@@ -244,7 +570,7 @@ public class ScheduleGUI{
 	public void GUIRemoveElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
 		sch.removeElement(e.getElement(), semesterPanel.sem);
 		this.update();
-
+	
 	}
 
 
@@ -263,149 +589,105 @@ public class ScheduleGUI{
 	}
 
 
-	public void GUIAddMajor(Major m) {
-		boolean typeNeedsToBeChosen = true;
-		if( m.degreeTypes.isEmpty()){
-			typeNeedsToBeChosen = false;
-		}
-
-		if(m.degreeTypes.size()==1){
-			m.setChosenDegree(m.degreeTypes.get(0));
-			typeNeedsToBeChosen = false;
-		}
-		if(typeNeedsToBeChosen){
-			if(!GUIChooseMajorDegreeType(m)){
-				return;
-			}
-		}
-		if(m.notes != null){
-			String title = "Notes for " + m.name + ":";
-
-			String toUser = htmlMajorNotes(m);
-
-			JOptionPane.showMessageDialog(null, toUser , title, JOptionPane.INFORMATION_MESSAGE);
-
-		}
-		this.sch.addMajor(m);
-		this.update();
+	/**Whenever the scheduleGUI recieves a new schedule
+	 * this method updates the classes that use this new
+	 * schedule directly (Such as bellTower). And also lets the 
+	 * current schedule set it's scheduleGUI as this one. (For 
+	 * when another window is opened) 
+	 * 
+	 * @param current
+	 */
+	public void setSchedule(Schedule current) {
+		sch=current;
+		this.sch.setScheduleGUI(this);
+		this.b.setSchedule(current);
 	}
 
 
-	public String htmlMajorNotes(Major m){
-		//TODO create html major notes method
-		
-		//show the user the notes, and let them know that this is the last time they'll see 
-		// these notes.
-		String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
-		
+	/**
+	 * Takes the major notes and formats them with bullet points. 
+	 * @param m (Major)
+	 * @return Formatted String of Major Notes. 
+	 * 
+	 * 
 	
+
+	 */
+
+	public String htmlMajorNotes(Major m){
+		//There is an alternate way to view these notes again. 
+		String message = "Notes for " + m.name + ": (can be displayed by clicking " + MenuOptions.checkAllErrors + ")";
+
 		String bulletedList = "<ul width =" + FurmanOfficial.defaultPixelWidth + ">";
 		String [] toAddBullets = m.notes.split("\n");
 		for(String s: toAddBullets){
 			bulletedList += "<li>" + s + "</li>";
 		}
 		bulletedList += "</ul>";
-		
-		String toUser = "<html>" + message+ "<br><br>" + bulletedList + "</html>";
+
+		String toUser = message+ "<br><br>" + bulletedList;
 		return toUser;
 	}
-	
-	
-	
 	/**
-	 * If a major has an ambiguous degree type (BA, BS, BM, ...)
-	 * this lets the user choose a type.
-	 * @param m
+	 * Ask the user to pick out some of the enemies that will be allowed to
+	 * be satisfied by that course.
+	 * @param enemies
+	 * @param c
+	 * @return
 	 */
+	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
 
-	public boolean GUIChooseMajorDegreeType(Major m){
-		if(m.degreeTypes.size()>1 || m.degreeTypes.size()==0){
-			ArrayList<String> toAdd= new ArrayList<String>();
-			String instructions = null;
-			String header = null;
+		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>(); //Goes through after user selects, and get them from this. 
+		HashSet<Requirement> result = new HashSet<Requirement>();
 
+		JPanel backgroundPanel = new JPanel();
+		backgroundPanel.setLayout(new BorderLayout());
 
-			for(int i = 0; i<m.degreeTypes.size(); i++){
-				toAdd.add(CourseList.getDegreeTypeString(m.degreeTypes.get(i)));
-
-			}
-
-
-
-			if(m.degreeTypes.size()==0){
-				toAdd.add(CourseList.getDegreeTypeString(Major.BS));
-				toAdd.add(CourseList.getDegreeTypeString(Major.BA));
-				toAdd.add(CourseList.getDegreeTypeString(Major.BM));
-				instructions = "Your major was not given a degree type. Please look up your major and choose the appropriate option.";
-				header = "WARNING";
-			}
-
-			String[] choices = new String[toAdd.size()];
-			for(int p = 0; p<toAdd.size(); p ++){
-				choices[p]=toAdd.get(p);
-
-
-			}
-			if(m.degreeTypes.size()>1){
-				instructions = "What type of degree would you like for " + m.name ;
-				header = "Degree Type";
-			}
-
-			String GERNeeded = (String)JOptionPane.showInputDialog(null, instructions,  header, JOptionPane.PLAIN_MESSAGE, icon, choices, "cat" );
-
-			int MajorType = Major.BA;
-			if(GERNeeded == null){
-				return false;
-			}
-
-			MajorType=CourseList.getDegreeTypeNumber(GERNeeded);
-			//this.sch.removeMajor(sch.masterList.getGERMajor(0));
-			//this.sch.addAtMajor(sch.masterList.getGERMajor(MajorType), 0);
-			m.setChosenDegree(MajorType);
-
+		String advisorAdvice;//This is given when a group of three or more requirements conflict. Because as of now the program
+		//does not specify which specific requirements are enemies (A might be enemies of B, and C. However B and C might work well together.
+		// Thus a student could chose to take B and C at the same time. To know this however, the student would have to have intimate knowledge of the 
+		// major, or talk to an advisor. With only two choices it is clear that you must choose one or the other.)
+		if(enemies.size()>2){
+			advisorAdvice = " \n If you are unsure of how these requirements conflict, talk to your advisor.";
 		}
-		return true;
-	}
+		else{
+			advisorAdvice = "";
+		}
+		
+		JLabel instruct = new JLabel(
+				"<html><p style = 'width: 300px;'> The course "+ c.getPrefix() + " might satisfy the following requirements,"
+						+  " but it is not allowed to satisfy all of them at once."
+						+  advisorAdvice
+						+ "<br> <br> Which requirements do you want it to satisfy?</p> </html>");
 
-	/**
-	 * A method for letting the user choose among a list of majors.
-	 * The string determines whether it chooses between actual majors,
-	 * minors, or tracks.
-	 * @param s
-	 */
-	public void GUIPopUP(String s){
-		new MajorPopUpChooser(s, this, sch);
-	}
+		backgroundPanel.add(instruct, BorderLayout.NORTH);
 	
-
-	/**
-	 * Show the user a webpage
-	 * @param actionCommand
-	 */
-	public void GUIOutsideLink(String actionCommand) {
-		try{
-			if(actionCommand.equals(MenuOptions.exploreInternship)){
-
-				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/internship/FindingInternships/Pages/default.aspx").toURI());
-			}
-			if(actionCommand.equals(MenuOptions.exploreStudyAway)){
-				Desktop.getDesktop().browse(new URL("https://studyaway.furman.edu/index.cfm?FuseAction=Programs.SimpleSearch").toURI());
-			}
-			if(actionCommand.equals(MenuOptions.addResearch)){
-				Desktop.getDesktop().browse(new URL("http://www.furman.edu/sites/ur/Pages/default.aspx").toURI());
-			}
-			if(actionCommand.equals(MenuOptions.exploreMayX)){
-				Desktop.getDesktop().browse(new URL("http://www.furman.edu/academics/may-experience/Pages/default.aspx").toURI());
-			}
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
+		JPanel checkBoxLayeredPanel = new JPanel();
+		checkBoxLayeredPanel.setLayout(new GridLayout(enemies.size(), 1, 1, 1));//Each checkBox will stack on top of each other. 
+		
+		for(int i = 0; i<enemies.size(); i++){
+			JCheckBox combattingReqs = new JCheckBox(enemies.get(i).shortString(10) + " (" +  majors.get(i).name + ")" );
+			checkBoxLayeredPanel.add(combattingReqs);
+			userOptions.add(combattingReqs);
 		}
 
+
+		backgroundPanel.add(checkBoxLayeredPanel);
+		JOptionPane.showMessageDialog(null,  backgroundPanel, "Combatting Requirements", JOptionPane.INFORMATION_MESSAGE,  icon );
+
+		//Goes through and adds all the Requirements the user specified the course would count towards to an ArrayList, then returns that list. 
+		for(int i=0; i<userOptions.size(); i++){
+			if(userOptions.get(i).isSelected()){
+				result.add(enemies.get(i));
+			}
+
+		}
+
+		return result;
 	}
+
+
+
 
 	/**
 	 * If the user clicks an x button on a semester.
@@ -422,45 +704,6 @@ public class ScheduleGUI{
 		this.update();
 
 	}
-	/**
-	 * First asks the user to pick the appropriate summer session.
-	 * Then asks them what year they would like to add. 
-	 * It then displays list of classes that the user can choose
-	 * to add. 
-	 */
-	public void addSummerSession(){
-		//Choose Summer Session One or Two
-		int season = GUIChooseSummerSession();
-		if(season == SemesterDate.OTHER){
-			return;
-		}
-		Semester addedSemester = null;
-		//What year you'd like this summer class
-		Integer year = this.createYearDialogBox(getAvaliableYears(season), "Add Summer");
-		if(year == null){
-			return;
-		}
-		addedSemester = sch.addNewSemesterInsideSch(year, season);
-		addCourseTo(addedSemester);
-	}
-	/**
-	 * This asks the user what year they would 
-	 * like to add a MayX, and then provides them
-	 * with a list of courses avaibiable at that time. 
-	 * It then adds the user's choice to that semester.
-	 * 
-	 *  Does not allow the user to choose a year where a MayX already exists.
-	 */
-	public void addMayX(){
-		ScheduleCourse c = null;
-		Integer year = this.createYearDialogBox(getAvaliableYears(SemesterDate.MAYX), MenuOptions.addMayX);
-		if(year == null){
-			return;
-		}
-		Semester addedSemester = sch.addNewSemesterInsideSch(year, SemesterDate.MAYX);
-		addCourseTo(addedSemester);
-	}
-
 	/**
 	 * Asks the user for which Summer Session they would like to add
 	 * @return Number associated with the user specified semesterDate's season
@@ -842,35 +1085,6 @@ public class ScheduleGUI{
 
 
 
-	public void GUICheckAllErrors(boolean displayPopUp) {
-		String errorString = getErrorString();
-		String result = "<html><body>" + errorString;
-		if(errorString.equals("")){
-			result = "Your Schedule had no errors! You're a pretty savvy scheduler";
-		}
-		result= result.replaceAll("\n", "<br>");
-		JOptionPane.showMessageDialog(null,  result, "All Errors", JOptionPane.INFORMATION_MESSAGE,  icon );
-
-
-		String majorNotes = null;
-		boolean hasNotes = false;
-		for(Major m : sch.getMajors()){
-			if(m.notes != null){
-
-				hasNotes = true;
-				majorNotes = this.htmlMajorNotes(m);
-				
-			}
-		}
-
-		
-		if(hasNotes && displayPopUp){
-			JOptionPane.showMessageDialog(null, majorNotes, "Notes for all majors", JOptionPane.INFORMATION_MESSAGE);
-		}
-
-
-	}
-
 	public void showExamineRequirementHelp(){
 		JOptionPane.showMessageDialog(null, 
 				"To see details about a requirement,"
@@ -969,99 +1183,6 @@ public class ScheduleGUI{
 
 
 
-	public void GUIPrintSchedule(){
-		JPanel options = new JPanel();
-		ArrayList<JCheckBox> userOptions = new ArrayList<JCheckBox>();
-
-		options.setLayout(new BorderLayout());
-		JCheckBox ReqLayout = new JCheckBox("Requirement Layout");
-		ReqLayout.setToolTipText("This is provides a checklist of all the requirements for your major, and GER. This will list out what has/hasn't been satisfied");
-		userOptions.add(ReqLayout);
-		JCheckBox ScheduleLayout = new JCheckBox("Schedule Layout");
-		ScheduleLayout.setToolTipText("Diplays a the schedule created semester-by-semester. Includes scheduling errors ");
-		userOptions.add(ScheduleLayout);
-
-
-
-		JLabel instruct = new JLabel("Which format(s) would you like to use?           ");
-		options.add(instruct, BorderLayout.NORTH);
-		options.add(ReqLayout, BorderLayout.EAST);
-		options.add(ScheduleLayout, BorderLayout.WEST);
-		String finalPrint = new String();
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-		LocalDate localDate = LocalDate.now();
-		if(sch.studentName != null){
-			finalPrint = sch.studentName;
-		}
-
-		finalPrint = "<br>" + dtf.format(localDate) + "<br>";
-		
-		
-		int userSelection = (int) JOptionPane.showOptionDialog(null, options, "Format", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-		System.out.println(userSelection);
-		if(userSelection == 2 || userSelection == -1){//Cancel button, or "X"
-			return;
-		}
-		//JOptionPane.showMessageDialog(null, options);
-		boolean selectedScheduleLayout = userOptions.get(1).isSelected();
-		boolean selectedReqLayout = userOptions.get(0).isSelected();
-
-		//If they didn't select anything, the default is schedule layout.
-		if( (!selectedScheduleLayout) && (!selectedReqLayout)){
-			selectedScheduleLayout = true;
-		}
-
-		//Schedule
-		if(selectedScheduleLayout){
-			finalPrint = finalPrint + sch.printScheduleString() + "<br>";
-
-		}
-		//Reqs
-		if(selectedReqLayout){
-			finalPrint = finalPrint + sch.printRequirementString() + "<br>";
-		}
-
-
-		if(selectedScheduleLayout || selectedReqLayout){
-			JTextPane schedulePrint = new JTextPane();
-			schedulePrint.setFont(FurmanOfficial.normalFont);
-			//schedulePrint.setWrapStyleWord(true);
-			//Printable p = schedulePrint.getPrintable(null, null);
-			Paper p = new Paper();
-			schedulePrint.setPreferredSize(new Dimension((int) p.getWidth(), (int) p.getHeight()));
-			//	schedulePrint.setLineWrap(true);
-			schedulePrint.setContentType("text/html");
-			schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>");
-			schedulePrint.setCaretPosition(0);
-
-			schedulePrint.setEditable(false);
-			//schedulePrint.setFont(FurmanOfficial.monospaced);
-			JScrollPane scrollPane = new JScrollPane(schedulePrint);
-			scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width,500));
-			scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-			String[] choices= {"Print", "Cancel"};
-
-			int userChoice = (int) JOptionPane.showOptionDialog(null, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
-
-			if(userChoice == 0){
-				try {
-					schedulePrint.print();
-				} catch (PrinterException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-
-
-	public void GUISaveSchedule(){
-		FileHandler.saveSchedule(this.sch);
-	}
-
-
 	public void addWindowListener(WindowListener w){
 		frame.addWindowListener(w);
 	}
@@ -1100,75 +1221,7 @@ public class ScheduleGUI{
 
 
 	final String successText = "You're all set! The import went smoothly.";
-	public void importPriorCourses(boolean isStudent){
-		String importText;
-		if(isStudent){
-			importText=  "To import your prior courses and placements, "
-					+ "\n  1) Go to MyFurman. "
-					+ "\n  2) Navigate to your unofficial transcript. "
-					+ "\n  3) You should see your name and ID in the top left corner,"
-					+ "\n     and your cumulative GPA listed at the bottom."
-					+ "\n  4) Highlight all the data from your ID to your GPA and"
-					+ "\n     drag it into this text box. "
-					+ "\n  5) Click 'Validate' to make sure the process worked!";
-		}
-		else{
-			importText = "To import a student's prior courses and placements, "
-					+ "\n  1) Go to MyFurman. "
-					+ "\n  2) Navigate to the student's course credit summary. "
-					+ "\n  3) You should see the student's name and ID in the top left corner,"
-					+ "\n     and their cumulative GPA listed at the bottom."
-					+ "\n  4) Highlight all the data from their ID to their GPA and"
-					+ "\n     drag it into this text box."
-					+ "\n  5) Click 'Validate' to make sure the process worked!";
-		}
-
-		JTextArea importArea = new JTextArea(importText);
-
-
-
-		//Validate button
-		JButton validate = new JButton("Validate");
-		validate.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				String givenText = importArea.getText();
-				if(successText.equals(givenText)){
-					return;
-				}
-				try{
-					trySetStudentDataFromWebsite(givenText);
-					importArea.setText(successText);
-
-				}catch(Exception except){
-					importArea.setText("Please try your import again");
-					showImportException(except);
-
-				}
-			}
-		}); //end action listener
-
-
-		/* showInstructions button
-		JButton showInstructions = new JButton("Show Instructions");
-		showInstructions.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-
-			}
-		});*/
-
-
-
-		//Make the popup
-		JPanel p = new JPanel();
-		p.setLayout(new BorderLayout());
-		p.add(new JScrollPane(importArea), BorderLayout.NORTH);
-		p.add(validate, BorderLayout.EAST);
-		JOptionPane.showOptionDialog(null,p, "Import your schedule",
-				JOptionPane.CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
-	}
-
+	
 	public void showImportException(Exception e){
 		String errorText = "";
 		if(e.getMessage() == null){

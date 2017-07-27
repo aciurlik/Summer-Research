@@ -72,7 +72,7 @@ public class MajorPanel extends JPanel {
 		
 		//The string "(BA)" or "(BS)" next to the major name.
 		String degreeType = "";
-		if(m.chosenDegree != -1){
+		if(m.chosenDegree != Major.None){
 			degreeType = "(" + CourseList.getDegreeTypeString(m.chosenDegree) + ")";
 		}
 		JLabel topLeftLabel =new JLabel(m.name + " " 
