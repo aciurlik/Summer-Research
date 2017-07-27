@@ -360,7 +360,7 @@ public class SupriseMe extends JPanel implements ActionListener, Runnable, java.
 
 		if(e.getActionCommand().equals(MenuOptions.Want)){
 
-			d.GUIChallengeExcepted(s, c);
+			d.addCourseToSchedule(s, c);
 
 			frame.dispose();
 
