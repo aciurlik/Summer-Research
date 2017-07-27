@@ -286,6 +286,9 @@ public class PriorData implements Serializable{
 						throw new RuntimeException("Could not make the semester from string \""+ termString + "\"");
 					}
 				}
+				if(termString.length() > 3 && takenDate == null){
+					throw new RuntimeException("Could not make the semester from string \""+ termString + "\"");
+				}
 
 				//credits
 				int credits= CourseList.getCoursesCreditHours(p);

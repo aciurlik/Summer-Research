@@ -176,7 +176,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.exploreMayX) || e.getActionCommand().equals(MenuOptions.exploreStudyAway) || e.getActionCommand().equals(MenuOptions.exploreInternship)){
-			schGUI.GUIOutsideLink(e.getActionCommand());
+			schGUI.linkToWebpage(e.getActionCommand());
 		}
 		else if(e.getActionCommand().equals(MenuOptions.addMayX)){
 			schGUI.addMayX();
@@ -185,7 +185,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			schGUI.addSummerSession();
 		}
 		else if(e.getActionCommand().equals(MenuOptions.addMajor) || e.getActionCommand().equals(MenuOptions.addMinor) || (e.getActionCommand().equals(MenuOptions.addTrack))){
-			schGUI.GUIMajorPopUP(e.getActionCommand());
+			schGUI.addMajor(e.getActionCommand());
 		}
 		else if(e.getActionCommand().equals(MenuOptions.newBlankSchedule) || e.getActionCommand().equals(MenuOptions.newLoadedSchedule)){
 			schGUI.GUINewSchedule(e.getActionCommand());

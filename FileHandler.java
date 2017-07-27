@@ -192,7 +192,7 @@ public class FileHandler{
 		ArrayList<String> fullString = FileHandler.fileToStrings(file);
 		String[][] result = new String[fullString.size()][];
 		for(int i = 0; i < fullString.size() ; i ++){
-			ArrayList<String> splitLine = SaverLoader.parseAdvisorImportCSVLine(fullString.get(i));
+			ArrayList<String> splitLine = parseAdvisorImportCSVLine(fullString.get(i));
 			result[i] = splitLine.toArray(new String[splitLine.size()]);
 		}
 		return result;

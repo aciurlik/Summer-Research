@@ -188,6 +188,7 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<Semester> allSemesters = this.getAllSemestersSorted();
 		
 		for(int i = 0; i < allSemesters.size(); i ++){
+			
 			Semester s  = allSemesters.get(i);
 			if(s.semesterDate.compareTo(d) == 0){
 				return s.directAdd(e);
@@ -1598,8 +1599,8 @@ public class Schedule implements java.io.Serializable {
 		}
 		result.append("\n");
 		//If any Errors Prints them 
-		if(!schGUI.getErrorString().equals("")){
-			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorString());
+		if(!schGUI.getErrorStrings().equals("")){
+			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorStrings());
 		}
 		//Things left CLPS, Estimated Courses Left, CrditHours
 		result.append("\n <h3>The Final Countdown: </h3>");

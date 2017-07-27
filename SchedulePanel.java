@@ -43,18 +43,18 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	public String reqsText = "Requirements Left: ";
 	public ArrayList<SemesterPanel> allSemesterPanels;
 	int insetsWidth = 5;
-	ScheduleGUI d;
+	ScheduleGUI schGUI;
 	int Count=1;
 
 
 
 
 
-	public SchedulePanel(Schedule sch, ScheduleGUI d) {
+	public SchedulePanel(Schedule sch, ScheduleGUI schGUI) {
 
 		super();
 
-		this.d = d;
+		this.schGUI = schGUI;
 		this.sch=sch;
 
 
@@ -98,7 +98,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		d.GUISemesterPanelAdded();
+		schGUI.GUISemesterPanelAdded();
 
 	}
 
@@ -142,7 +142,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 			SemesterPanel semesterP = this.findPanelFor(s); //if you already have a panel for this semester,
 			// don't make a new one.
 			if(semesterP == null){
-				semesterP =new SemesterPanel(s, this.d);
+				semesterP =new SemesterPanel(s, this.schGUI);
 				allSemesterPanels.add(semesterP);
 			}
 			else{
@@ -169,7 +169,8 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		gbc.fill = GridBagConstraints.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
 		
-
+		System.out.println(allSemesterPanels.size());
+		
 		//This code opens the secret admin window
 		if(allSemesterPanels.size() == 15){
 			
@@ -177,7 +178,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 				@Override
 				public void mousePressed(MouseEvent e){
 					if(SwingUtilities.isRightMouseButton(e)){
-						d.askMasterPassword();
+						schGUI.askMasterPassword();
 					}
 				}
 			});
