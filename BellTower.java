@@ -5,62 +5,57 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+/**
+ * GUI CLASS
+ * 
+ * Blurb Written: 7/19/2017
+ * Last Updated:  7/27/2017
+ * 
+ * This is the graphic at the bottom, west side of the ScheduleGUI. It consists of 
+ * the Image of the BellTower loaded from the FileHandler.
+ * It fills with purple (a rectangle is placed on top of the image) as the user
+ * fulfills requirements. ( the amount filled represents the percentage done, subject to roundoff error)
+ * When all the requirements are considered satisfied (and the user has at least one major
+ * in his/her schedule) the bellTower will display a message describing all of the current user
+ * errors in the schedule, or in the case of no errors a celebratory fireworks picture.  
+ *  
+ */
 public class BellTower extends JPanel implements java.io.Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	Schedule sch;
-	JPanel layerPanel ;
+	JPanel layerPanel ; // the purple panel that fills up over the belltower image
 	ImageIcon bellTowerIcon ;
-	ImageIcon fireworkIcon;
+	ImageIcon fireworkIcon; //displayed on successful completion of the schedule
 	JLabel belltowerLabel;
-
-	JLabel pictureLabel;
+	JLabel fireworkLabel;
 
 	boolean wasComplete; //This is used to prevent the congrats/Error popUp from occurring multiple times
 	//after the user has originally complete the schedule. This will switch back to false if the user does
 	//an action that renders the schedule incomplete again. If they then were to recomplete the schedule 
 	//wasComplete would be false thus the popUp would occur. 
-
-	/**
-	 * GUI CLASS
-	 * 
-	 * Blurb Written: 7/19/2017
-	 * Last Updated:  7/19/2017
-	 * 
-	 * This is the graphic at the bottom, west side of the ScheduleGUI. It consists of Image of the BellTower loaded from the FileHandler
-	 * It fills with purple (the rectangle is placed on top of the image) the  as the user
-	 * fulfills his/her requirements. (Roughly represents the percentage done)
-	 * When all the requirements are considered satisfied (and the user has at least one major
-	 * in his/her schedule) the bellTower will display a message describing all of the current user
-	 * errors in the schedule, or in the case of no errors a celebratory fireworks picture.  
-	 * @param sch The schedule that is set in scheduleGUI. 
-	 */
+	
+	public static final int imageWidth = 100;
+	public static final int imageHeight = 300;
 
 	public BellTower(Schedule sch) {
 		super();
 		this.sch=sch;
+		
 		wasComplete = false;
-
-
 		layerPanel = new JPanel();
-		bellTowerIcon = FileHandler.makeBellTower();
 
-		fireworkIcon = FileHandler.makeFireWorks();
-		pictureLabel = new JLabel(fireworkIcon);
-
-		//Belltower icon and scaling
-		int givenHeight = 300;
-		int givenWidth =100;
-		Image image = bellTowerIcon.getImage();
-		Image newImage = image.getScaledInstance(givenWidth, givenHeight , java.awt.Image.SCALE_SMOOTH);
-		bellTowerIcon = new ImageIcon(newImage);
+		bellTowerIcon = FileHandler.getBellTower();
 		belltowerLabel = new JLabel(bellTowerIcon);
 		belltowerLabel.add(layerPanel);
 
+		fireworkIcon = FileHandler.getFireworks();
+		fireworkLabel = new JLabel(fireworkIcon);
+
 		this.add(belltowerLabel);
-		this.setPreferredSize(new Dimension(100, 300));
+		this.setPreferredSize(new Dimension(imageWidth, imageHeight));
 		this.setBackground(FurmanOfficial.bouzarthGrey);
 	}
 	
@@ -73,7 +68,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 	}
 
 	/**
-	 * This fills up the purple on the schedule in accordance to the amount 
+	 * This method fills up the purple on the schedule in accordance to the amount 
 	 * their schedule is complete, and displays a dialog message if the user
 	 * completes all of their requirements. 
 	 */
@@ -87,28 +82,33 @@ public class BellTower extends JPanel implements java.io.Serializable{
 		layerPanel.setBackground(FurmanOfficial.lightPurple);
 
 
-		//If you complete all the requirements in your schedule and have at least one major a popup will give you either
-		//a list of errors that are still present in your schedule, or a some fireworks of congrats if your schedule is perfect
-		boolean nowComplete = sch.isComplete(); //This method checks errors and Major>1
-		if(!nowComplete){
-			wasComplete = false;
-		}
-		else{
-			if(!wasComplete){
-				wasComplete=true;
-				if(sch.checkAllErrors().isEmpty()){
-					JOptionPane.showMessageDialog(null, pictureLabel, "Congratulations on having a complete, error free schedule!", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else{
-					JOptionPane.showMessageDialog(null, "You've finished your requirements, but there are still some errors left", "Finished Requirements", JOptionPane.INFORMATION_MESSAGE, sch.schGUI.icon);
+		//If you complete all the requirements in your schedule and have at least one major,
+		// a popup will give you either a list of errors that are still present in your schedule
+		// or a some fireworks of congrats if your schedule is perfect
+		boolean nowComplete = sch.isComplete(); //This method checks errors and that you have a major
 
-					sch.schGUI.GUICheckAllErrors();
-				}
+		if(nowComplete && (!wasComplete)){
+			if(sch.checkAllErrors().isEmpty()){
+				JOptionPane.showMessageDialog(null, 
+						fireworkLabel,
+						"Congratulations on having a complete, error free schedule!", 
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+			else{
+				JOptionPane.showMessageDialog(null, 
+						"You've finished your requirements, but there are still some errors left",
+						"Finished Requirements", 
+						JOptionPane.INFORMATION_MESSAGE,
+						ScheduleGUI.icon);
+
+				sch.schGUI.GUICheckAllErrors();
 			}
 		}
+		wasComplete = nowComplete;
+
 
 	}
-	
+
 	/**
 	 * Test cases:
 	 * The BellTower should rise in accordance with the percentage of requirements selected.
