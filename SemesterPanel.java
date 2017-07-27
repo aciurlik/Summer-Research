@@ -477,33 +477,17 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		try {
-			this.schGUI.GUITextBeingWritten(e, sem);
-		} catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-
+		this.schGUI.GUITextBeingWritten(e, sem);	
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		try {
-			this.schGUI.GUITextBeingWritten(e, sem);
-		} catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-
+		this.schGUI.GUITextBeingWritten(e, sem);
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		try {
-			this.schGUI.GUITextBeingWritten(e, sem);
-		} catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-
-
+		this.schGUI.GUITextBeingWritten(e, sem);
 	}
 
 	@Override

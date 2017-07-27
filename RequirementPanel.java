@@ -30,7 +30,7 @@ import javax.swing.TransferHandler;
 public class RequirementPanel extends JPanel implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	public Requirement req;
-	public ScheduleGUI d;
+	public ScheduleGUI schGUI;
 	
 	int percentComplete; //this has to be stored locally so that we can
 	// paint the right percentage of this panel grey.
@@ -44,10 +44,10 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 
 	
-	public RequirementPanel(Requirement req, ScheduleGUI d){
+	public RequirementPanel(Requirement req, ScheduleGUI schGUI){
 		super();
 		this.req = req;
-		this.d = d;
+		this.schGUI = schGUI;
 
 		//Setup the functionality for what to do when a drag starts
 		this.setTransferHandler(new RequirementPanelDragHandler());
@@ -172,7 +172,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public class RequirementPanelDragHandler extends ComponentDragHandler{
 		@Override
 		public void initiateDrag(JComponent toBeDragged) {
-			d.dragStarted(req);
+			schGUI.dragStarted(req);
 		}
 		
 		@Override
@@ -181,7 +181,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 
 			//	source.revalidate();
 			//	source.repaint();
-			d.dragEnded();
+			schGUI.dragEnded();
 
 		}
 	}
@@ -197,7 +197,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 
 	
 	public void examineRequirementPopup(){
-		d.GUIExamineRequirement(this.req);
+		schGUI.GUIExamineRequirement(this.req);
 	}
 	
 	public void showPopup(MouseEvent e){

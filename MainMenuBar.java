@@ -146,7 +146,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 			menuItem = new JMenuItem(MenuOptions.addTrack);
 			menuItem.addActionListener(this);
 		menu.add(menuItem);
-		this.add(menu);
+		this.add(menu)
 		
 		//Build the Settings menu
 		menu = new JMenu(MenuOptions.settings);
@@ -185,22 +185,29 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+
+		if(.equals(MenuOptions.exploreMayX) || .equals(MenuOptions.exploreStudyAway) ||.equals(MenuOptions.exploreInternship)){
+			schGUI.linkToWebpage();
+
 		String command = e.getActionCommand();
 		if(testing){
 			System.out.println("Clicked on " + command);
+
 		}
 		
 		if(command.equals(MenuOptions.exploreMayX) || command.equals(MenuOptions.exploreStudyAway) || command.equals(MenuOptions.exploreInternship)){
 			schGUI.GUIOutsideLink(command);
-		}
+		
 		else if(command.equals(MenuOptions.addMayX)){
 			schGUI.addMayX();
 		}
 		else if(command.equals(MenuOptions.addSummerClass)){
 			schGUI.addSummerSession();
 		}
-		else if(command.equals(MenuOptions.addMajor) || command.equals(MenuOptions.addMinor) || (command.equals(MenuOptions.addTrack))){
-			schGUI.GUIMajorPopUP(command);
+
+		else if(.equals(MenuOptions.addMajor) || .equals(MenuOptions.addMinor) || (.equals(MenuOptions.addTrack))){
+			schGUI.addMajor(e.getActionCommand());
+
 		}
 		else if(command.equals(MenuOptions.newBlankSchedule) || command.equals(MenuOptions.newLoadedSchedule)){
 			schGUI.GUINewSchedule(command);

@@ -189,6 +189,7 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<Semester> allSemesters = this.getAllSemestersSorted();
 		
 		for(int i = 0; i < allSemesters.size(); i ++){
+			
 			Semester s  = allSemesters.get(i);
 			if(s.semesterDate.compareTo(d) == 0){
 				return s.directAdd(e);
@@ -1875,6 +1876,163 @@ public class Schedule implements java.io.Serializable {
 		}
 	}
 
+
+
+	public  ArrayList<ScheduleError> checkAllErrors(){
+		ArrayList<ScheduleError> allErrors = new ArrayList<ScheduleError>();
+		//Don't check for errors in PriorSemester
+		for(Semester s: this.semesters){
+			ArrayList<ScheduleError> overlap = s.checkAllOverlap();
+			if(overlap!=null){
+				allErrors.addAll(s.checkAllOverlap());
+			}
+			ScheduleError overload = s.checkOverload(null);
+			if(overload != null){
+				allErrors.add(overload);	
+			}
+		}
+		allErrors.addAll(this.checkAllPrerequsites());
+		allErrors.addAll(this.checkAllDuplicates());
+		return allErrors;
+	}
+
+
+
+	public ArrayList<ScheduleCourse> getCoursesInSemester(Semester s) {
+		ArrayList<Course> toFinal = CourseList.getCoursesIn(s);
+		ArrayList<ScheduleCourse> scheduleCoursesInSemester = new ArrayList<ScheduleCourse>();
+		for(Course c: toFinal){
+			ScheduleCourse sc = new ScheduleCourse(c, this);
+			scheduleCoursesInSemester.add(sc);
+		}
+		return scheduleCoursesInSemester;
+	}
+
+
+
+
+	public String printScheduleString(){
+		StringBuilder result = new StringBuilder();
+		//Add Majors
+
+		if(!this.majorsList.isEmpty()){
+			result.append("<table style = 'width: 100%'> <tr>");
+			result.append( "<th> Major:</th> " +
+					" <th>Notes:</th> " +
+					"</tr>");
+			for(Major m: this.majorsList){
+				result.append("<tr Align='left'> <td>" + m.name + "</td>  ");
+				if(m.notes != null){
+					result.append("<td>" + m.notes + "</td>");
+				}
+				result.append("</tr>");
+
+			}
+			result.append("</table>");
+		}
+
+		result.append("<center> <h2> Schedule </h2> </center> ");
+		//Adds all the scheduleElements from each major
+		for(Semester s: this.getAllSemestersSorted()){
+			result.append("\n");
+			if(s.isPriorSemester){
+				result.append("<b>Prior Courses: </b>" + "\n");
+			}
+			else{
+				result.append("<b>" + s.semesterDate.toString() + ": </b> \n");
+			}
+			if(s.studyAway){
+				result.append("<b> STUDY AWAY SEMESTER </b>\n");
+			}
+			for(ScheduleElement se : s.elements){
+				String prefix = "  ";
+				if(se instanceof Requirement){
+					prefix = "  Scheduled one course of: ";
+					result.append(prefix + se.shortString(1000) + "\n");
+				}
+				else{
+					result.append(se.getDisplayString() + "\n");
+				}
+			}
+			if(s.elements.isEmpty()){
+				result.append("Nothing scheduled for this semester \n");
+			}
+			if(s.hasNotes()){
+				result.append("<b> Notes: </b>" +  s.notes + "\n");
+			}
+
+		}
+		result.append("\n");
+		//If any Errors Prints them 
+		if(!schGUI.getErrorStrings().equals("")){
+			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorStrings());
+		}
+		//Things left CLPS, Estimated Courses Left, CrditHours
+		result.append("\n <h3>The Final Countdown: </h3>");
+		result.append("<b> Estimated Courses Left: </b> " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
+		result.append("<b> Credit Hours Left:</b> " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
+
+
+
+
+		String toResult = result.toString().replaceAll("&", "&amp;");
+		return toResult.replaceAll("\n", "<br>");
+
+
+
+	}
+
+
+
+	public String printRequirementString(){
+		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
+		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
+		ArrayList<SemesterDate> coorespondingDates = new ArrayList<SemesterDate>();
+		for(Semester s: this.getAllSemestersSorted()){
+			for(ScheduleElement se: s.elements){
+				allOrderedElements.add(se);
+				if(s.isPriorSemester){
+					coorespondingDates.add(defaultPrior);
+
+				}
+				else {
+					coorespondingDates.add(s.semesterDate);
+				}
+			}
+		}
+		StringBuilder result = new StringBuilder();
+		result.append("<h2><center> Degree Checklist \n </center></h2>");
+		result.append("<b> General Education Requirements </b>");
+
+		Hashtable<ScheduleElement, HashSet<Requirement>> elementsSatisfy = new Hashtable<ScheduleElement, HashSet<Requirement>>();
+		for(ScheduleElement e : this.getAllElementsSorted()){
+			elementsSatisfy.put(e, new HashSet<Requirement>(e.filterEnemyRequirements(this.getAllRequirements())));
+		}
+		for(Major m: this.getMajors()){
+			result.append("\n");
+			result.append("<b>" + m.name + "</b>");
+			ArrayList<Requirement> sortedReq = new ArrayList<Requirement>(m.reqList);
+			Collections.sort(sortedReq);
+			for(Requirement r: sortedReq){
+				String rDisplay = r.shortString(10000) + " -";
+				if(rDisplay.length()<=30){
+					String spaces = new String (new char[30-rDisplay.length()]).replace("\0", " ");
+					rDisplay = rDisplay + spaces;
+
+				}
+				result.append("\n <b>" +  rDisplay + "</b>" );
+
+				boolean isComplete = r.getStoredIsComplete();
+				if(!isComplete){
+					int  coursesNeeded =  r.minMoreNeeded(getAllElementsSorted(), false);
+					if(coursesNeeded == 1){
+						result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Course Needed </b></font>	\n");
+					}
+					if(coursesNeeded >1){
+						result.append("<b><font color = '#F75D59'>" + coursesNeeded + " Courses Needed </b></font> \n");
+					}
+				}
+				int counter = 0;
 
 
 

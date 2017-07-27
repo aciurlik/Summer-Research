@@ -131,13 +131,17 @@ public class AdditionsPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 		//For add Major, Minor, Track
-		if(command.equals(MenuOptions.addMajor) || command.equals(MenuOptions.addMinor)|| command.equals(MenuOptions.addTrack)){
-			schGUI.GUIMajorPopUP(command);
+
+		if(.equals(MenuOptions.addMajor) || .equals(MenuOptions.addMinor)|| .equals(MenuOptions.addTrack)){
+			schGUI.addMajor();
+
 		}
 		//Explore Buttons, goes to outside links
 		if((command.equals(MenuOptions.exploreInternship)) || (command.equals(MenuOptions.addResearch))||(command.equals(MenuOptions.exploreStudyAway))){
 
-			schGUI.GUIOutsideLink(command);
+
+			schGUI.linkToWebpage();
+
 		}
 		if(command.equals(MenuOptions.addSummerClass)){
 			schGUI.addSummerSession();
