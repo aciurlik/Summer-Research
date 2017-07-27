@@ -1,16 +1,29 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 
+/**
+ * Blurb written: 7/26/2017
+ * Last updated: 7/26/2017
+ * 
+ * This class represents a course that has been scheduled in some semester. It 
+ * if differentiated from course (a FILE class) in order to hold
+ * a reference to a schedule so that it can perform other actions, like
+ * asking the user to resolve conflicting requirements. Multiple 
+ * ScheduleCourses may share the same course.
+ * 
+ * It is in the DATA group of classes.
+ *
+ */
 public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	Course c;
-	//public boolean taken;
-	HashSet<Requirement> userSpecifiedReqs; //when enemy list is not empty, this list specifies which reqs the user chose to satisfy
-	private HashSet<Requirement> oldEnemyList;//this is a list of enemy requirements that this schedule course satisfied last time the schedule told this course to update.
-	// used to tell if we need to ask the user for userSpecifiedReqs again.
+	HashSet<Requirement> userSpecifiedReqs; // If there are some requirements where this 
+	// course can only satisfy one of them, and the user chose which ones to satisfy,
+	// this field stores the user's choices.
+	private HashSet<Requirement> oldEnemyList;//this is a list of enemy requirements 
+	//that this schedule course satisfied last time the schedule told this course to update.
+	// it is used to tell if we need to ask the user for userSpecifiedReqs again.
 	Schedule s;
 
 	public ScheduleCourse(Course c, Schedule s){
@@ -20,10 +33,28 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 		this.oldEnemyList = new HashSet<Requirement>();
 	}
 
+	
+	/////////////////////////
+	/////////////////////////
+	////Getters and Setters
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___Getters_________;
+	
 	@Override
 	public Prefix getPrefix() {
 		return c.coursePrefix;
 	}
+	
+	public SemesterDate getSemester() {
+		return c.getSemesterDate();
+	}
+	
+	public int getCreditHours() {
+		return c.getCreditHours();
+	}
+
 
 	@Override
 	/**
@@ -43,12 +74,15 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 	}
 
 	/**
+	 * 
 	 * uses priority order
 	 * Number/subject
 	 * Time
 	 * Title
 	 * Professor
 	 * 
+	 * to decide what information to include. Only includes the next piece of information
+	 * if it can fit without going over preferredLength characters.
 	 */
 	@Override
 	public String shortString(int preferredLength){
@@ -103,27 +137,6 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 		
 		return result.toString();
 	}
-
-	public String supriseString(){
-		String result = "";
-		result = result + c.getPrefix().getSubject() + "-,";
-		result = result + c.getPrefix().getNumber() + "-,";
-		result = result + c.sectionNumber + ",";
-		if(c.name!=null){
-			result = result + c.name+ ",";
-		}
-		if(c.meetingDaysCode()!=null){
-			result = result + c.meetingDaysCode() + ",";
-		}
-		if(c.meetingTime != null){
-			result= result +( c.meetingTime[0].clockTime() + ",");
-		}
-		if(c.professor!=null){
-			result = result + c.professor + " ";
-		}
-		return result;
-
-	}
 	
 	/**
 	 * Return an unsorted list of the requirements satisfied by this course.
@@ -131,64 +144,83 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 	@Override
 	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> loaded){
 		//get the reqs fulfilled while having the user resolve conflicts.
-		return getRequirementsFulfilled(loaded, true);
+		return filterEnemyRequirements(loaded, true);
 	}
 
+	
 	/**
 	 * Return an unsorted list of the requirements satisfied by this course.
 	 * If haveUserResolveConflicts is false, all requirement-enemies will be included in the list.
 	 * @return
 	 */
-	public ArrayList<Requirement> getRequirementsFulfilled(ArrayList<Requirement> loaded, boolean haveUserResolveConflicts) {
+	public ArrayList<Requirement> filterEnemyRequirements(ArrayList<Requirement> loaded, boolean haveUserResolveConflicts) {
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Requirement r : loaded){
 			if(r.isSatisfiedBy(this.getPrefix())){
 				result.add(r);
 			}
 		}
-		
-		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
-		
-		
-		
-	    //  There are different sets of enemies being called for REL-226
-	    if (((ScheduleCourse) this).c.name.contains("Roman")){
-		
+		if(!haveUserResolveConflicts){
+			return result;
 		}
-	    
-		result.removeAll(enemies);
-		
-		
-		if(! /*sets equal*/ ((enemies.containsAll(this.oldEnemyList)) && this.oldEnemyList.containsAll(enemies)) ){
-			
-			if(enemies.isEmpty()){
-				this.userSpecifiedReqs = new HashSet<Requirement>();
+		else{
+			HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(result));
+			//  TODO There are different sets of enemies being called for REL-226 (Is this still happening after 7/26?)
+
+			result.removeAll(enemies);
+			if(! /*oldEnemyList == enemies*/ ((enemies.containsAll(this.oldEnemyList)) 
+					&& this.oldEnemyList.containsAll(enemies)) ){
+				//the enemies changed. Ask the user which requirements should now 
+				// be satisfied by this course, and store the result. 
+				if(enemies.isEmpty()){
+					this.userSpecifiedReqs = new HashSet<Requirement>();
+				}
+				else{
+					this.userSpecifiedReqs = this.s.resolveConflictingRequirements(enemies, this.c); 
+				}
 				this.oldEnemyList = enemies;
 			}
-			else{
-				
-				//the enemies changed.  
-				//ask the user which requirements should now be satisfied by this course. 
-				
-				HashSet<Requirement> kept = enemies;
-				if(haveUserResolveConflicts){
-					kept = this.s.resolveConflictingRequirements(enemies, this.c); 
-				}
-				this.userSpecifiedReqs = kept; 
-				if(haveUserResolveConflicts){
-					this.oldEnemyList = enemies; 
-				}
-			}
-			
+			result.addAll(this.userSpecifiedReqs);
+			return result;
 		}
+	}
+	
+	
+	
+
+	/**
+	 * Get each of the pieces that surprise me slowly shows to the user
+	 * @return
+	 */
+	public String[] supriseMePieces(){
+		ArrayList<String> result = new ArrayList<String>();
+		result.add(c.getPrefix().getSubject() + "-");
+		result.add(c.getPrefix().getNumber() + "-");
+		result.add(c.sectionNumber);
+		if(c.name!=null){
+			result.add( c.name);
+		}
+		if(c.meetingDaysCode()!=null){
+			result.add(c.meetingDaysCode());
+		}
+		if(c.meetingTime != null){
+			result.add(c.meetingTime[0].clockTime());
+		}
+		if(c.professor!=null){
+			result.add(c.professor);
+		}
+		return result.toArray(new String[result.size()]);
+	}
+	
+	/////////////////////////
+	/////////////////////////
+	////Time methods
+	/////////////////////////
+	/////////////////////////
+	@SuppressWarnings("unused")
+	private boolean ___TimeMethods_________;
 
 
-		
-		result.addAll(this.userSpecifiedReqs);
-		return result;
-
-
-	} 
 	public Interval<Time> examTime() {
 		return c.examTime();
 	}
@@ -236,25 +268,6 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 	}
 
 
-
-	/**
-	 * If the user declares that this course will satisfy this requirement, 
-	 * then this will save it forever (even if the requirement is no longer on
-	 * the requirements list visible to the user).
-	 * @param req
-	 */
-	public void userSpecifiedSatisfies(Requirement req){
-		userSpecifiedReqs.add(req);
-	}
-
-	public int getCreditHours() {
-		return c.getCreditHours();
-	}
-
-	public SemesterDate getSemester() {
-		return c.getSemester();
-	}
-
 	@Override
 	public boolean equals(Object other){
 		if(other instanceof ScheduleCourse){
@@ -267,6 +280,16 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 		return false;	
 	}
 
+	public static ArrayList<ScheduleCourse> toScheduleCourses(Iterable<Course> input, Schedule sch){
+		ArrayList<ScheduleCourse> result = new ArrayList<ScheduleCourse>();
+		for(Course c : input){
+			result.add(new ScheduleCourse(c, sch));
+		}
+		return result;
+	}
+	
+	//TODO Test case - what if we call filterEnemyRequiremements and there are 2 requirements that are enemies, but that don't
+	// actually use this course? Will a popup happen for the user?
 
 
 }

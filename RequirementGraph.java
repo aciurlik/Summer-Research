@@ -3,18 +3,33 @@ import java.util.Hashtable;
 
 
 /**
- * This class stores any case of requirements that are 
- * unable to work nicely with each other.
+ * Blurb written: Before 7/1/2017
+ * Last Updated: 7/26/2017
+ * 
+ * This class stores which requirements are able to 
+ * work nicely with each other.
  * 
  * For example, no course may satisfy both the 
  * MTH elective requirement and the Applied math elective requirement 
- * at the same time. This class stores that relation - the 
- * "doesn't play nice with" relation.
+ * at the same time. These two requirements do not work nicely with each
+ * other - here we will call such requirements 'enemies'. This class stores
+ * the 'are enemies' relation.
  * 
- * We think about this as a graph where requirements r1 and r2 are
- * adjacent to iff r1 doesn't play nice with r2.
+ * To test if two requirements are enemies, use the method doesPlayNice(R1, R2).
  * 
- * @author dannyrivers
+ * 
+ * We think about this class as a graph where requirements r1 and r2 are
+ * adjacent to iff r1 is enemies with r2.
+ * 
+ * There is a special case - some requirements are loners, which means they are
+ * enemies by default. If a requirement is a loner, then the interpretation of 
+ * the graph changes for that requirement. Now, any requirements it IS adjacent
+ * to are NOT enemies - any requirements it's NOT adjacent to ARE enemies.
+ * 
+ * 
+ * 
+ * This class is in the FILE group of classes, and interfaces with the DATA group.
+ * 
  *
  */
 public class RequirementGraph implements java.io.Serializable {
@@ -26,7 +41,10 @@ public class RequirementGraph implements java.io.Serializable {
 	/**
 	 * Declares that r1 can't play nice with r2.
 	 * 
-	 * Add both edges.
+	 * If either r1 or r2 is a loner, instead declares that they can play nice.
+	 * 
+	 * Forces an undirected graph by putting in both edges
+	 * r1-r2 and r2-r1.
 	 * @param r1
 	 * @param r2
 	 */
@@ -50,7 +68,7 @@ public class RequirementGraph implements java.io.Serializable {
 	
 	/**
 	 * Set it so that this requirement is enemies with all other requirements,
-	 * except 
+	 * except those that it is adjacent to in the graph.
 	 * @param r
 	 */
 	public static void makeLoner(Requirement r){
@@ -80,9 +98,8 @@ public class RequirementGraph implements java.io.Serializable {
 	}
 	
 	/**
-	 * Looks for enemy requirements in this set.
-	 * If found, it returns the first pair of enemies found.
-	 * Otherwise returns an empty list.
+	 * Return a hash set of all the requirements in reqs that have an 
+	 * enemy also in reqs.
 	 * @param reqs
 	 * @return
 	 */

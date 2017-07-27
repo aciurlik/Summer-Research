@@ -29,9 +29,18 @@ import javax.swing.TransferHandler;
  *   when a drop occurs, and ComponentDragHandler must specify what happens to
  *   the moving component and the donating container.
  *   
- * To use ComponentDragHandler, you should create a subclass of ComponentDragHandler,
- * 	   and have the component you want to drag call the method
+ *   
+ *   
+ *   
+ *   
+ * To use ComponentDragHandler, you should 
+ * 	   create a subclass of ComponentDragHandler,
+ * 	   have the component you want to drag call the method
  * 	       myComp.setTransferHandler(mySubclass);
+ * 	   then register a mouseListener that converts clicks into drags.
+ * 		   myComp.addMouseListener(ComponentDragHandler.getDragListener())
+ * 
+ * 		   
  * 
  *     Your subclass should override the methods:
  *         public void initiateDrag(JComponent toBeDragged)

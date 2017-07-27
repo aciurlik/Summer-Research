@@ -70,11 +70,11 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 
 
 		menuItem = new JMenuItem();
-		if(semPanel.sem.hasNotes){
+		if(semPanel.sem.hasNotes()){
 			menuItem.setText(MenuOptions.removeNotes);
 			menuItem.setActionCommand(MenuOptions.removeNotes);
 		}
-		if(!semPanel.sem.hasNotes){
+		if(!semPanel.sem.hasNotes()){
 			menuItem.setText(MenuOptions.addNotes);
 			menuItem.setActionCommand(MenuOptions.addNotes);
 		}

@@ -282,7 +282,7 @@ public class Driver {
 		for(Semester s: one.getAllSemestersSorted()){
 			for(ScheduleElement se: s.elements){
 				allOrderedElementsOne.add(se);
-				if(s.isAP){
+				if(s.isPriorSemester){
 					coorespondingDatesOne.add(defaultPrior);
 
 				}
@@ -309,7 +309,7 @@ public class Driver {
 		for(Semester s: two.getAllSemestersSorted()){
 			for(ScheduleElement se: s.elements){
 				allOrderedElementsTwo.add(se);
-				if(s.isAP){
+				if(s.isPriorSemester){
 					coorespondingDatesTwo.add(defaultPrior);
 
 				}
