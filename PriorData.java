@@ -256,6 +256,9 @@ public class PriorData implements Serializable{
 				  //Check if this is a language prefix that would affect GER types.
 				String numString = p.getNumber();
 				boolean examineTitleForLanguagePrefix = false;
+				
+				
+				this.setLanguagePrefix(new Prefix("SPN", 120));
 				if(numString.contains("PL")){
 					if(numString.compareTo("PL.110") > 0){
 						String number = numString.substring(numString.indexOf(".") + 1);
@@ -263,7 +266,7 @@ public class PriorData implements Serializable{
 							setLanguagePrefix(new Prefix(p.getSubject(), number)); 
 						}
 						catch(Exception e){
-							examineTitleForLanguagePrefix = true;
+							//examineTitleForLanguagePrefix = true;
 						}
 					}
 				}
