@@ -33,7 +33,7 @@ import javax.swing.text.BadLocationException;
 public class ScheduleGUI{ 
 	Schedule sch; //The single schedule scheduleGUI contains, updates GUI according to its data
 	SchedulePanel schP; //The top half of the GUI, that contains all the semesters
-	RequirementListPanel reqs; //The bottom half of the GUI, that contains the majors, list of reqs
+	MajorListPanel reqs; //The bottom half of the GUI, that contains the majors, list of reqs
 	static ImageIcon icon; //used to display Furman logo on dialog boxes
 	JFrame frame;//holds the entire GUI
 	ListOfMajors l;// These are all the majors that are read from the data.
@@ -42,7 +42,7 @@ public class ScheduleGUI{
 	
 /**
  * 
- *Blurb written: 7/28/2017
+ * Blurb written: 7/28/2017
  * Last updated: 7/28/2017
  * 
  * 
@@ -100,7 +100,7 @@ public class ScheduleGUI{
 		schP = new SchedulePanel(sch, this);
 		layeredPanel.add(schP, BorderLayout.NORTH);
 		//Creates/adds the RequirementList Panel which holds the major/Ger requirements 
-		reqs = new RequirementListPanel(sch, this);
+		reqs = new MajorListPanel(sch, this);
 		layeredPanel.add(reqs, BorderLayout.CENTER);
 
 		//Sets all of this inside a scroll panel so the user can see the whole program regardless of screen size. 
