@@ -43,6 +43,9 @@ public class Semester implements Comparable<Semester>, java.io.Serializable{
 		this.semesterDate = sD;
 		this.schedule = s;
 		if(this.semesterDate.sNumber == SemesterDate.FALL || this.semesterDate.sNumber == SemesterDate.SPRING){
+			if(this.semesterDate.equals(this.schedule.firstSemester) || this.semesterDate.equals(this.schedule.firstSemester.nextSemester())){
+				
+			}
 			overloadLimit = 20;
 		}
 		if(this.semesterDate.sNumber == SemesterDate.SUMMERONE|| this.semesterDate.sNumber == SemesterDate.SUMMERTWO){

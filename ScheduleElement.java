@@ -8,7 +8,7 @@ import java.util.HashSet;
  * An interface that describes the operations of any anything that can be put
  * into a semester as a planned course.
  * 
- * This currently includes Requirement, ScheduleCourse, and Prefix 
+ * This currently includes Requirement, ScheduleCourse, and Prefix
  *
  */
 
