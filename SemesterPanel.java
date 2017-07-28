@@ -195,7 +195,7 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.deleteSemester)){
-			schGUI.GUIRemoveSemester(this);
+			schGUI.removeSemester(this);
 		}
 		else{
 			hide();
@@ -392,16 +392,16 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 		}
 		if(s instanceof RequirementPanel){
 			RequirementPanel r = (RequirementPanel) s;
-			schGUI.GUIRequirementPanelDropped(r, this);
+			schGUI.requirementPanelDropped(r, this);
 		}
 		else{
 			ScheduleElementPanel p = (ScheduleElementPanel) s;
-			schGUI.GUIScheduleElementPanelDropped(p, this);
+			schGUI.scheduleElementPanelDropped(p, this);
 		}
 	}
 
 	public void removeElement(ScheduleElementPanel e){
-		schGUI.GUIRemoveElement(e, this);
+		schGUI.removeElement(e, this);
 		//this.updatePanel(true);
 	}
 
@@ -477,17 +477,17 @@ public class SemesterPanel extends JPanel implements ActionListener, DocumentLis
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		this.schGUI.GUITextBeingWritten(e, sem);	
+		this.schGUI.saveTextToSemesterNotes(e, sem);	
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		this.schGUI.GUITextBeingWritten(e, sem);
+		this.schGUI.saveTextToSemesterNotes(e, sem);
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		this.schGUI.GUITextBeingWritten(e, sem);
+		this.schGUI.saveTextToSemesterNotes(e, sem);
 	}
 
 	@Override

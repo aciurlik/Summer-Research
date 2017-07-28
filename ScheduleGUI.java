@@ -31,15 +31,35 @@ import javax.swing.text.BadLocationException;
 
 
 public class ScheduleGUI{ 
-	Schedule sch;
-	SchedulePanel schP;
-	RequirementListPanel reqs;
-	static ImageIcon icon;
-	JFrame frame;
-	ListOfMajors l;
-	BellTower b;
+	Schedule sch; //The single schedule scheduleGUI contains, updates GUI according to its data
+	SchedulePanel schP; //The top half of the GUI, that contains all the semesters
+	RequirementListPanel reqs; //The bottom half of the GUI, that contains the majors, list of reqs
+	static ImageIcon icon; //used to display Furman logo on dialog boxes
+	JFrame frame;//holds the entire GUI
+	ListOfMajors l;// These are all the majors that are read from the data.
+	BellTower b;//The object that holds the bellTower image and fills in according to how much the 
+	//user has completed. 
 	
-
+/**
+ * 
+ *Blurb written: 7/28/2017
+ * Last updated: 7/28/2017
+ * 
+ * 
+ * This is the central GUI portion of the program. It only relates to one schedule.
+ * So if a user action is/something needs to be displayed that is specific to one schedule,
+ * this class is probably called.  It relays all of the user actions to the data side of the 
+ * program, and when the data needs an update from the user about a single
+ * schedule, this class in charge of getting that information and giving it back to the data side.
+ *  The class is formatted to mirror the layout of the schGUI. 
+ *  Thus all of the user actions that occur from one class are grouped together. If there 
+ * is a method that only assists one other method, or a group of methods from one class it is placed
+ * with that class, under the methods called directly by the user. At the bottom of the 
+ * class are method that are called by the drag/drop handler, following that are various  
+ * utility methods that help out with multiple methods from many other classes. 
+ * 
+ * @param sch
+ */
 
 
 
@@ -166,7 +186,7 @@ public class ScheduleGUI{
 	}
 	
 
-	////////////////////Used only by above addSummerSession  ^
+	////////////////////Used only by above addSummerSession   ^
 	///////////////////////////////////////////////////////// |
 	////////////////////////////////////////////////////////////
 	/**
@@ -190,12 +210,6 @@ public class ScheduleGUI{
 
 }
 
-	
-	
-
-
-
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -324,12 +338,12 @@ public class ScheduleGUI{
 	 * Create a new schedule to work from. It either pulls from the last imported schedule
 	 * or creates a blank one using the prior schedule's CourseList, and the start date saved in settings
 	 */
-	public void GUINewSchedule(String typeOfSchedule) {
+	public void createNewSchedule(String typeOfSchedule) {
 		Schedule current;
 		//Gives the user the option to save his/her schedule before opening new schedule. 
 		int n = Driver.saveScheduleReminder();
 		if(n == 0){
-			GUISaveSchedule();
+			saveSchedule();
 		}
 		
 		//This creates a schedule that matches the current schedules Course List and starting Semester Date
@@ -376,7 +390,7 @@ public class ScheduleGUI{
 	 * who deals with it because it involves writing the 
 	 * seralized version of the schedule to a file. 
 	 */
-	public void GUISaveSchedule(){
+	public void saveSchedule(){
 		FileHandler.saveSchedule(this.sch);
 	}
 
@@ -387,7 +401,7 @@ public class ScheduleGUI{
 	 * gives them a print preview, and finally
 	 * sends the document to the printer. 
 	 */
-	public void GUIPrintSchedule(){
+	public void printSchedule(){
 		//Sets up the dialog box that asks the user what format they would like to print their schedule as. 
 		JPanel options = new JPanel();
 		options.setLayout(new BorderLayout());
@@ -473,7 +487,7 @@ public class ScheduleGUI{
 	 * and then if the user has loaded a major that contains notes, a second dialog box will display those.  
 	 * 
 	 */
-	public void GUICheckAllErrors() {
+	public void checkAllErrors() {
 	String errorString = getErrorStrings();
 	String result = "<html><body>" + errorString;
 	if(errorString.equals("")){//The user has no errors. 
@@ -718,7 +732,7 @@ public class ScheduleGUI{
 	/**
 	 * When the user clicks the  + button to add a new semester to the schedule
 	 */
-	public void GUISemesterPanelAdded(){
+	public void addSemesterPanel(){
 		sch.addNewSemester();
 		this.update();
 	}
@@ -776,7 +790,7 @@ public class ScheduleGUI{
 	 * removed from the GUI, and the schedule. 
 	 * @param semesterPanel
 	 */
-	public void GUIRemoveSemester(SemesterPanel semesterPanel) {
+	public void removeSemester(SemesterPanel semesterPanel) {
 		sch.removeSemester(semesterPanel.sem);
 		this.update();
 	
@@ -789,8 +803,7 @@ public class ScheduleGUI{
 	 * @param s -> the semester to which the notes are being written. 
 	 * @throws BadLocationException
 	 */
-	public void GUITextBeingWritten(DocumentEvent e, Semester s){
-		System.out.println(e);
+	public void saveTextToSemesterNotes(DocumentEvent e, Semester s){
 		try {
 			int length = e.getDocument().getLength();
 			//Gets the notes as they are written and sets them to the semester's notes field. 
@@ -798,7 +811,6 @@ public class ScheduleGUI{
 			noteWritten = e.getDocument().getText(0, length);
 			s.setNotes(noteWritten);
 		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -847,7 +859,7 @@ public class ScheduleGUI{
 			finalCourseList[i] = toFinal.get(i);
 		}
 
-		ScheduleCourse c = GUIChooseCourse(finalCourseList);
+		ScheduleCourse c = chooseCourse(finalCourseList);
 		return c;
 	}
 	
@@ -857,7 +869,7 @@ public class ScheduleGUI{
 	 * This creates a supriseMe object for the user.
 	 * @param s Semester one wants a surprise. 
 	 */
-	public void GUISupriseWindow(Semester s) {
+	public void createSurpriseWindow(Semester s) {
 		if(s.semesterDate.sNumber == (SemesterDate.MAYX)){
 			//Tells Surprise Me to skip asking for the GER Req, chooses from all the classes. 
 			new SurpriseMe(s, this, "Skip");
@@ -887,7 +899,7 @@ public class ScheduleGUI{
 	 * instruction to the user on how to treat this semester. 
 	 * @param sem
 	 */
-	public void GUImakeSemesterStudyAway(Semester sem) {
+	public void makeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(true);
 		this.update();
 		JOptionPane.showMessageDialog(null, "This semester is marked as Study Away, please drag in any requirements you will fulfill while abroad.", "Study abroad",JOptionPane.INFORMATION_MESSAGE,  icon  );
@@ -900,7 +912,7 @@ public class ScheduleGUI{
 	 * tells the semester to update its appearance accordingly. 
 	 * @param sem
 	 */
-	public void GUIremoveSemesterStudyAway(Semester sem) {
+	public void removeSemesterStudyAway(Semester sem) {
 		sem.setStudyAway(false);
 		this.update();
 	}
@@ -912,7 +924,7 @@ public class ScheduleGUI{
 	 * provide the notes window to the user. 
 	 * @param sem
 	 */
-	public void GUIaddNotes(Semester sem) {
+	public void addNotesToSemester(Semester sem) {
 		sem.setNotes("");
 		this.update();
 
@@ -924,7 +936,7 @@ public class ScheduleGUI{
 	 * notes = null. 
 	 * @param sem
 	 */
-	public void GUIremoveNotes(Semester sem) {
+	public void removeNotesFromSemester(Semester sem) {
 		sem.setNotes(null);
 		this.update();
 
@@ -947,7 +959,7 @@ public class ScheduleGUI{
 	 * @param r
 	 * @param semesterP
 	 */
-	public void GUIRequirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
+	public void requirementPanelDropped(RequirementPanel r, SemesterPanel semesterP) {
 		sch.addScheduleElement(r.req, semesterP.sem);
 		this.update();
 	}
@@ -958,7 +970,7 @@ public class ScheduleGUI{
 	 * @param p
 	 * @param semesterPanel
 	 */
-	public void GUIScheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel newSemesterPanel) {
+	public void scheduleElementPanelDropped(ScheduleElementPanel p, SemesterPanel newSemesterPanel) {
 		Semester old = p.container.sem; //Semester it was dragged from
 		if(p.getElement() instanceof ScheduleCourse){
 			Requirement r=	new Requirement(new Prefix[]{p.getElement().getPrefix()}, 1);
@@ -977,7 +989,7 @@ public class ScheduleGUI{
 	 * @param e
 	 * @param semesterPanel
 	 */
-	public void GUIRemoveElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
+	public void removeElement(ScheduleElementPanel e, SemesterPanel semesterPanel) {
 		sch.removeElement(e.getElement(), semesterPanel.sem);
 		this.update();
 	
@@ -999,7 +1011,7 @@ public class ScheduleGUI{
 	 * @param toChange
 	 * @param newValue
 	 */
-	public void GUIElementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
+	public void elementChanged(SemesterPanel container, ScheduleElementPanel toChange, ScheduleElement newValue){
 		Semester s = container.sem;
 		ScheduleElement old = toChange.getElement();
 		sch.replace(old, newValue, s, s);
@@ -1035,7 +1047,7 @@ public class ScheduleGUI{
 	 * Removes major from schedule, and then updates GUI accordingly. 
 	 * @param p
 	 */
-	public void GUIRemoveMajor(MajorPanel p) {
+	public void removeMajor(MajorPanel p) {
 		sch.removeMajor(p.major);
 		this.update();
 	
@@ -1054,7 +1066,7 @@ public class ScheduleGUI{
    	   Include the full definition as written in our code.
 	 * @param r, The Requirement the user selects. 
 	 */
-	public void GUIExamineRequirement(Requirement r){
+	public void examineRequirement(Requirement r){
 		int defaultHeight = 300;
 		String showText = r.examineRequirementString();
 		JTextArea toShow = new JTextArea(showText);
@@ -1096,7 +1108,8 @@ public class ScheduleGUI{
 	
 	
 	
-
+	@SuppressWarnings("unused")
+	private boolean ______Utility_Methods_Called_Within_Class__________;
 ////////////////Utility Methods called from multiple sections of the GUI. 
 
 	/**
@@ -1130,7 +1143,7 @@ public class ScheduleGUI{
 	 * @param finalListOfCourses
 	 * @return
 	 */
-	public ScheduleCourse GUIChooseCourse(ScheduleCourse[] finalListOfCourses) {
+	public ScheduleCourse chooseCourse(ScheduleCourse[] finalListOfCourses) {
 		if(finalListOfCourses.length <= 0){
 			JOptionPane.showMessageDialog(null, 
 					"There were no courses to choose from. \n"
@@ -1273,7 +1286,8 @@ public class ScheduleGUI{
 	}
 	
 	
-	
+	@SuppressWarnings("unused")
+	private boolean ______DemandUserImputfromData__________;	
 ///////////// Get User Input --Thrown from data portion of the program. 	
 	
 	/**
@@ -1283,7 +1297,7 @@ public class ScheduleGUI{
 	 * @param c
 	 * @return
 	 */
-	public HashSet<Requirement> GUIResolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
+	public HashSet<Requirement> resolveConflictingRequirements(ArrayList<Requirement> enemies, ArrayList<Major> majors, Course c){
 
 		ArrayList<JCheckBox> userOptions =new ArrayList<JCheckBox>(); //Goes through after user selects, and get them from this. 
 		HashSet<Requirement> result = new HashSet<Requirement>();
@@ -1398,9 +1412,9 @@ public class ScheduleGUI{
 
 	
 
-
-
-//////////////////////Utility Methods called from outside the class. (Can also be used within class) 
+	@SuppressWarnings("unused")
+	private boolean ______Utility_Methods_Called_Outside_Class__________;
+    //////////////////Utility Methods called from outside the class. (Can also be used within class) 
 	/**
 	 * This finds all of the errors and creates a string that combines
 	 * all of them, separating with a new line. 
@@ -1491,7 +1505,7 @@ public class ScheduleGUI{
 			finalCourseList[i] = toFinal.get(i);
 		}
 		//choose the course
-		ScheduleCourse c = GUIChooseCourse(finalCourseList);
+		ScheduleCourse c = chooseCourse(finalCourseList);
 		return c;
 	}
 	

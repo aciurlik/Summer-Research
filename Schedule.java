@@ -1868,7 +1868,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		if(this.schGUI != null){
 			//Ask the user to pick for us.
-			return schGUI.GUIResolveConflictingRequirements(reqs, majors, c);
+			return schGUI.resolveConflictingRequirements(reqs, majors, c);
 		}
 		else{
 			//If we try to resolve conflicts on our own, this is where we would do it.

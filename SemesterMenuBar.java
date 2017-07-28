@@ -95,23 +95,23 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 			semPanel.schGUI.addCourseTo(semPanel.sem);
 		}
 		if(e.getActionCommand().equals(MenuOptions.supriseMe)){
-			semPanel.schGUI.GUISupriseWindow(semPanel.sem);
+			semPanel.schGUI.createSurpriseWindow(semPanel.sem);
 		}
 		if(e.getActionCommand().equals(MenuOptions.addStudyAway)){
-			semPanel.schGUI.GUImakeSemesterStudyAway(semPanel.sem);
+			semPanel.schGUI.makeSemesterStudyAway(semPanel.sem);
 
 		}
 		if(e.getActionCommand().equals(MenuOptions.removeStudyAway)){
-			semPanel.schGUI.GUIremoveSemesterStudyAway(semPanel.sem);
+			semPanel.schGUI.removeSemesterStudyAway(semPanel.sem);
 
 		}
 		if(e.getActionCommand().equals(MenuOptions.addNotes)){
-			semPanel.schGUI.GUIaddNotes(semPanel.sem);
+			semPanel.schGUI.addNotesToSemester(semPanel.sem);
 			semPanel.updatePanel(semPanel.sem);
 			
 			}
 		if(e.getActionCommand().equals(MenuOptions.removeNotes)){
-			semPanel.schGUI.GUIremoveNotes(semPanel.sem);
+			semPanel.schGUI.removeNotesFromSemester(semPanel.sem);
 		}
 	}
 }

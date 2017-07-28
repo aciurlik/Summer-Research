@@ -98,7 +98,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		schGUI.GUISemesterPanelAdded();
+		schGUI.addSemesterPanel();
 
 	}
 
@@ -169,7 +169,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		gbc.fill = GridBagConstraints.NONE;
 		scrollPanel.add(addExtraSemesterButtonPanel, gbc);
 		
-		System.out.println(allSemesterPanels.size());
 		
 		//This code opens the secret admin window
 		if(allSemesterPanels.size() == 15){

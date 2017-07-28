@@ -145,7 +145,7 @@ public class RequirementListPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals(MenuOptions.checkAllErrors)){
 
-			schGUI.GUICheckAllErrors();
+			schGUI.checkAllErrors();
 
 		}
 	}

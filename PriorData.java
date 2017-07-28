@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class PriorData implements Serializable{
 	SemesterDate earliestDate;
 	SemesterDate latestDate;
 	Prefix languagePrefix;
-	String[][] data;
+	String[][] data; //csv version of imported text
 	String studentName;
 
 
@@ -150,6 +151,9 @@ public class PriorData implements Serializable{
 	 * @return
 	 */
 	public void readFromCSV(String[][] s){
+		earliestDate =  new SemesterDate(100000,1);
+		latestDate = new SemesterDate(0, 1);
+		courseList = new ArrayList<Course>();
 
 		String[] headers = s[0];
 		int termIndex = -1;
@@ -258,7 +262,7 @@ public class PriorData implements Serializable{
 				boolean examineTitleForLanguagePrefix = false;
 				
 				
-				this.setLanguagePrefix(new Prefix("SPN", 120));
+				//this.setLanguagePrefix(new Prefix("SPN", 120));
 				if(numString.contains("PL")){
 					if(numString.compareTo("PL.110") > 0){
 						String number = numString.substring(numString.indexOf(".") + 1);
@@ -266,7 +270,7 @@ public class PriorData implements Serializable{
 							setLanguagePrefix(new Prefix(p.getSubject(), number)); 
 						}
 						catch(Exception e){
-							//examineTitleForLanguagePrefix = true;
+							examineTitleForLanguagePrefix = true;
 						}
 					}
 				}
@@ -327,7 +331,7 @@ public class PriorData implements Serializable{
 			}
 			catch(Exception e){
 				System.out.println("Started catch" + Arrays.toString(row));
-				System.out.println(Arrays.toString(row));
+				e.printStackTrace();
 				if(FurmanOfficial.masterIsAround){
 					throw e;
 				}
@@ -337,6 +341,10 @@ public class PriorData implements Serializable{
 						+    courseString 
 						+ "<br>due to something unexpected in the data, "
 						+ "so it won't show up in your schedule.</p></html>");
+			}
+			if(languagePrefix == null){
+				setLanguagePrefix(new Prefix("SPN", "110")); 
+				// If no language prefix in the data, this prevents a null pointer exception
 			}
 		}
 		data = s;
@@ -445,8 +453,25 @@ public class PriorData implements Serializable{
 	public void testReading(){
 		
 	}
+	
+	
 
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException{
+		out.writeObject(this.data);
+	}
+	
 
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
+			data = (String[][])in.readObject();
+			readFromCSV(data);
+			
+	}
+		
+
+	private void readObjectNoData(){
+		
+	}
+		   
 
 
 

@@ -116,7 +116,7 @@ public class Driver {
 		//Asks user to save schedule
 		int n = saveScheduleReminder();
 		if(n==0){
-			schGUI.GUISaveSchedule();
+			schGUI.saveSchedule();
 		}
 		//If there are no other schedules loaded, it will proceeded to 
 		//shut down the whole program. 

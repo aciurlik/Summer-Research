@@ -101,7 +101,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 						JOptionPane.INFORMATION_MESSAGE,
 						ScheduleGUI.icon);
 
-				sch.schGUI.GUICheckAllErrors();
+				sch.schGUI.checkAllErrors();
 			}
 		}
 		wasComplete = nowComplete;
