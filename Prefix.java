@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+
 
 /**
  * Blurb written: 7/26/2017
@@ -11,7 +14,7 @@
  * 
  *
  */
-public class Prefix implements Comparable<Prefix>, java.io.Serializable{
+public class Prefix implements ScheduleElement, Comparable<Prefix>, java.io.Serializable{
 	private static final long serialVersionUID = 1L;
 	private String subject;
 	private String courseNumber; //We made this field into
@@ -37,6 +40,11 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 		return courseNumber;
 	}
 
+	/**
+	 * User friendly and easy to parse:
+	 * "subject-number"
+	 * @return
+	 */
 	public String toString(){
 		return this.subject + "-" + this.courseNumber;
 	}
@@ -69,5 +77,50 @@ public class Prefix implements Comparable<Prefix>, java.io.Serializable{
 			return subjDiff;
 		}
 		return this.courseNumber.compareTo(other.courseNumber);
+	}
+
+	////////////////////////
+	////////////////////////
+	/////// Methods from ScheduleElement
+	////////////////////////
+	////////////////////////
+	
+	@Override
+	public Prefix getPrefix() {
+		return this;
+	}
+
+	@Override
+	public int getCreditHours() {
+		return CourseList.getCoursesCreditHours(this);
+	}
+
+	@Override
+	public boolean isDuplicate(ScheduleElement other) {
+		return other.getPrefix().equals(this);
+	}
+
+	@Override
+	public String getDisplayString() {
+		return this.toString();
+	}
+
+	@Override
+	public String shortString(int preferredLength) {
+		return this.toString();
+	}
+
+	@Override
+	public ArrayList<Requirement> filterEnemyRequirements(
+			ArrayList<Requirement> loaded) {
+		//remove all enemies
+		HashSet<Requirement> enemies = RequirementGraph.enemiesIn(new HashSet<Requirement>(loaded));
+		ArrayList<Requirement> result = new ArrayList<Requirement>();
+		for(Requirement r : loaded){
+			if(!enemies.contains(r)){
+				result.add(r);
+			}
+		}
+		return result;
 	}
 }

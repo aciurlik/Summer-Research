@@ -1,10 +1,16 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -755,6 +761,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 	 * @return
 	 */
 	public boolean isSubset(Requirement other){
+		if(other == null){
+			return false;
+		}
 
 		//To build a requirement's set of terminals, 
 		//first check if the requirement itself is a terminal, then
@@ -1013,6 +1022,9 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 		if(this.name != null){
 			return this.name;
 		}
+		if(this.isTerminal()){
+			return this.getTerminal().shortString(preferredLength);
+		}
 		// If display string is small enough, return it.
 		String result = this.getDisplayString();
 		if(result.length() <= preferredLength){
@@ -1106,7 +1118,12 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 	 */
 	public String coderString(){
 		String tab = "  ";
-		return indent(this.saveString(), tab);
+		
+		String result = indent(this.saveString(), tab);
+		if(result.charAt(result.length() - 1) == '\n'){
+			result = result.substring(0, result.length() - 1);
+		}
+		return result;
 	}
 
 
@@ -1572,95 +1589,282 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 			System.out.println("Short string 10:\t" + r.shortString(10));
 		}
 	}
+	
+	
+	
+	
+	
 
-	public static void generalTest(){
-		CourseList.loadAllCourses();
+	/**
+	 * This method creates the list of test requirements.
+	 * Each entry in the return is of the form [String, Requirement].
+	 * 
+	 * If you find a weird requirement, please add it to the list at the bottom.
+	 * The order of the list matters when using generalTest().
+	 * @return
+	 */
+	public static ArrayList<Object[]> getTestRequirements(){
+		ArrayList<Object[]> result  = new ArrayList<Object[]>();
 		String[] tests = new String[]{
+				// different ways of reading MTH-110
 				"MTH-110",
+				"MTH 110",
+				"MTH110",
+
 				"(MTH 110)",
-				//"(MTH-110)",
-				"((MTH110))",
-				"(((MTH-110)))",
-				//"MTH-110",
-				//"MTH 110",
+				"(MTH-110)",
+				"(MTH110)",
+				"1 of (MTH 110)",
+				"1 of (MTH-110)",
+				"1 of (MTH110)",
+
+				//Different ways of reading complex things
 				"2 of (MTH 110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, MTH 130)",
-				"2 of (ACC-110, MTH 120, MTH 130)",
 				"2 of (MTH-110, MTH 120, or MTH 130)",
+
+				//Different requirements, similar completion status
+				"(MTH-110)",
+				"((MTH110))",
+				"(((MTH-110)))",
+				"2 of (MTH 110, MTH 120, MTH 130)",
+				"2 of (MTH 110, (MTH 120), (MTH 130))",
+
+
+				"2 of (ACC-110, MTH 120, MTH 130)",
+
+
+				//Nesting different common words - either, both, all, ...
+				"1 of (MTH 110, MTH 120)",
+				"2 of (MTH 110, MTH 120)",
+				"3 of (MTH 110, MTH 120, MTH 130)",
+
 				"1 of (2 of (MTH-110, MTH-120), MTH-130)",
+				"1 of (1 of (MTH-110, MTH-120), MTH-130)",
+				"2 of (1 of (MTH-110, MTH-120), MTH-130)",
+				"2 of (2 of (MTH-110, MTH-120), MTH-130)",
+				"1 of (MTH-130 , 2 of (MTH-110, MTH-120))",
+				"1 of (MTH-130 , 1 of (MTH-110, MTH-120))",
+				"2 of (MTH-130 , 1 of (MTH-110, MTH-120))",
+				"2 of (MTH-130 , 2 of (MTH-110, MTH-120))",
+
+				"1 of (MTH-110, 2 of (MTH-120, MTH130))",
 				"2 of (MTH 110, (MTH 120, MTH 130))",
 				"1 of (MTH 110, (1 of (MTH 120, MTH 130)))",
 				"2 of (MTH 110, (2 of (MTH 120, MTH 130)))",
-				"3 of (MTH 110, MTH 120, MTH 130)",
+
 				"1 of ( 2 of (MTH - 110, MTH120 ) , MTH 140, MTH 150, or MTH 160)",
+
+				//subset test
 				"2 of (BIO 110, BIO 112, BIO 120)",
 				"3 of (BIO 110, BIO 112, BIO 120, BIO 130)",
-				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
 
+				//Terminals
+				"MTH-150",
+				"MTH-001",
+				"MTH-500",
+				"MTH > 150",
+				"MTH < 150",
+				"MTH >= 150",
+				"MTH <= 150",
+				"MTH > 150 < 200",
+				"MTH < 200 > 150",
+				"MTH <= 200 >= 150",
+
+				"MTH >= 150 <= 200",
+				"2 of MTH>100",
+
+				//credit hours requirements
 				"2 ch of (MTH-110, MTH-120, MTH-130)",
 				"2 chof (MTH-110, MTH-120, MTH-130)",
 				"8 chof (2 of (MTH-110, ACC-110), MTH 120, MTH 330)",
 				"8 chof (2 of (MTH-110, ACC-110), 1 of (MTH 120, MTH 800), MTH 330)",
-				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
-				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"8 ch of (5 of MTH > 100)",
+				"8 ch of (2 of MTH>100)",
+
+				//Terminal vs requirement
 				"(1 of MTH>100)",
 				"1 of MTH>100",
+				"1 of (MTH > 100)",
+				"1 of MTH > 300",
+				"1 of (MTH > 300)",
+				"1 of MTH>300",
 				"4 of MTH>100",
-				"1 of MTH > 300"
+				"(4 of MTH>100)",
+
+				//Known examples of interesting requirements
+				"1 of (MTH 150, 2 of (MTH 145, MTH 120))",
+				"1 of (MTH 110, 2 of (MTH 120, MTH 130))",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)",
+				"1 of (CHN>200<302, FRN>200<302, GRK>200<302, JPN>200<302, LTN>200<302, or SPN>200<302)"
 		};
-
-		ArrayList<ScheduleElement> takens = new ArrayList<ScheduleElement>();
-
-		//takens.add(new PrefixHours(new Prefix("MTH", "110"), 4));
-		//takens.add(TerminalRequirement.readFrom("MTH-110"));
-		takens.add(Requirement.readFrom("(MTH-110)"));
-		//takens.add(new PrefixHours(new Prefix("MTH", "120"), 4));
-		//takens.add(TerminalRequirement.readFrom("MTH-120"));
-		takens.add(Requirement.readFrom("(MTH-120)"));
-
-		System.out.print("Taken prefixes: ");
-		for(ScheduleElement p : takens){
-			System.out.print(p + " ");
-		}
-		System.out.println();
-		System.out.println();
-
-		Requirement previous = new Requirement();
-
 		for(String toRead : tests){
-			boolean needsToBeShown = false;
-			Requirement r = Requirement.readFrom(toRead);
-			boolean equalToLast = r.equals(previous);
+			Object[] pair = {toRead, Requirement.readFrom(toRead)};
+			result.add(pair);
+		}
+		String[][] namedTests = {
+				{"ART < 150 > 300", "Western art"},
+				{"ART > 150 < 300", "Western art"},
+				{"4 of ART > 150 < 300", "Western art"},
+				{"(4 of ART > 150 < 300)", "Western art"},
+				{"ART > 100", "Western art"},
+				{"ART < 100", "Western art"},
+				{"ART- 100", "Western art"},
+				{"(ART > 100)", "Western art"},
+				{"(ART < 100)", "Western art"},
+				{"(ART - 100)", "Western art"},
+				{"(ART-100)", "short"},
+				{"(ART-100)", "A very long name that aught to be shorter in practice"},
+				{"ART-100", "short"},
+				{"ART-100", "A very long name that aught to be shorter in practice"}
+		};
+		for(String[] s : namedTests){
+			Requirement r = Requirement.readFrom(s[0]);
+			r.setName(s[1]);
+			Object[] pair = {s[0], r};
+			result.add(pair);
+		}
+		return result;
+	}
+	
+	
+	public static LinkedHashMap<String, Object> getTestData(Requirement r, Requirement comparison){
+		LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>();
+		
+
+		//comparison
+		result.put("equalsPrevious", r.equals(comparison));
+		result.put("isSubsetPrevious", r.isSubset(comparison));
+		result.put("compareToPrevious", r.compareTo(comparison));
+		
+		//Strings
+		result.put("Save string", r.saveString());
+		result.put("Display string", r.getDisplayString());
+		//result.put("examineString", r.examineRequirementString());
+		result.put("coderString", r.coderString());
+		result.put("shortString(100000)", r.shortString(100000));
+		result.put("shortString(100)", r.shortString(100));
+		result.put("shortString(50)", r.shortString(100));
+		result.put("shortString(10)", r.shortString(10));
+		result.put("shortString(1)", r.shortString(1));
+		result.put("Name", r.getName());
+		
+		
+		
+		//Internal values
+		result.put("numToChoose", r.numToChoose);
+		result.put("getCredits()", r.getCreditHours());
+		result.put("originalCoursesNeeded", r.getOriginalCoursesNeeded());
+		result.put("originalNumNeeded", r.getOriginalNumberNeeded());
+		result.put("terminal", r.isTerminal());
+		result.put("satByMTH110", r.isSatisfiedBy(new Prefix("MTH", "110")));
+		result.put("satByMTH120", r.isSatisfiedBy(new Prefix("MTH", "120")));
+		
+		
+		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
+		taken.add(new Prefix("MTH", "110"));
+		result.put("MTH110moreNeeded", r.minMoreNeeded(taken, true));
+		result.put("MTH110complete?", r.getStoredIsComplete());
+		result.put("MTH110percent", r.getStoredPercentComplete());
+		result.put("MTH110coursesLeft", r.getStoredCoursesLeft());
+		result.put("MTH110originalNumber", r.getOriginalNumberNeeded());
+		
+		
+		taken.add(new Prefix("MTH", "120"));
+		result.put("110120moreNeeded", r.minMoreNeeded(taken, true));
+		result.put("110120complete?", r.getStoredIsComplete());
+		result.put("110120percent", r.getStoredPercentComplete());
+		result.put("110120coursesLeft", r.getStoredCoursesLeft());
+		result.put("110120originalNumber", r.getOriginalNumberNeeded());
+	
+		return result;
+	}
+	
+	private static ArrayList< HashMap<String, Object>> testResults;
+	public static void loadTestResults(){
+		try{
+		testResults = (ArrayList<HashMap<String, Object>>)FileHandler.loadRequirementTestResults();
+		}catch(Exception e){
+			testResults = new ArrayList<HashMap<String, Object>>();
+		}
+	}
+	public static void saveTestResults(){
+		try {
+			FileHandler.saveRequirementTestResults(testResults);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void generalTest(){
+		loadTestResults();
+		Scanner scan = null;
+		
+		CourseList.loadAllCourses();
+		ArrayList<Object[]> reqList = getTestRequirements();
+		Requirement previous = null;
+		for(int i = 0; i < reqList.size(); i ++){
+			System.out.println("\n\n\n\nTest " + i);
+			System.out.println("read from " + reqList.get(i)[0]);
+			
+			
+			Requirement r = (Requirement)reqList.get(i)[1];
+			LinkedHashMap<String, Object> testData = getTestData(r, previous);
+			boolean showRequirement = false;
+			if(i < testResults.size()){
+				if( ! testData.equals(testResults.get(i))){
+					showRequirement = true;
+				}
+			}
+			else{
+				showRequirement = true;
+			}
+			
+			if(showRequirement){
+				for(String key : testData.keySet()){
+					String display = key;
+					while(display.length() < 30){
+						display += " ";
+					}
+					System.out.println(display + ": " + testData.get(key));
+				}
+				
+				System.out.println("The requirement above doesn't match its test case."
+						+ "\n Type OK to set this as the correct test results, or anything else to "
+						+ "skip this requirement.");
+				System.out.println(" Test " + i  + " ^");
+				
+				scan = new Scanner(System.in);
+				String input = scan.nextLine();
+				if(input.toUpperCase().equals("OK")){
+					if(i == testResults.size()){
+						testResults.add(testData);
+					}
+					else{
+						testResults.set(i, testData);
+					}
+					saveTestResults();
+				}
+				else{
+					if(i == testResults.size()){
+						testResults.add(null);
+					}
+					else{
+						testResults.set(i, null);
+					}
+					saveTestResults();
+				}
+			}
+			else{
+				System.out.println("matches test case");
+			}
 			previous = r;
-			boolean complete = r.isComplete(takens, true);
-			double percentComplete = r.percentComplete(takens, true);
-			int minLeft = r.minMoreNeeded(takens, true);
-
-			double tol = Double.MIN_VALUE * 10000;
-			if(r.getStoredIsComplete() != complete){
-				needsToBeShown = true;
-			}
-			if(r.getStoredPercentComplete() != percentComplete){
-				needsToBeShown = true;
-			}
-
-			needsToBeShown = true;
-
-
-			if(needsToBeShown){
-				//System.out.println("ReadingFrom \"" +toRead + "\"");
-				System.out.println("    got \"" + r.saveString() + "\"");
-				System.out.println("Equal to last?" + equalToLast);
-				//System.out.println("Uses CH? " + r.usesCreditHours);
-				System.out.println("Complete?" + complete );
-				//System.out.println("Percent Complete:" + percentComplete + "/" + r.storedPercentComplete());
-				//System.out.println("minLeft:" + minLeft + "/" + r.storedCoursesLeft);
-				System.out.println(r.numToChoose);
-				System.out.println();
-			}
-
 		}
 		System.out.println("Finished testing");
+		if(scan != null){
+			scan.close();
+		}
+		
 	}
 
 

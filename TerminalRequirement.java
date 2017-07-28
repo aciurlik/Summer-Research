@@ -389,6 +389,9 @@ public class TerminalRequirement extends Requirement implements  java.io.Seriali
 	public boolean equals(Requirement r){
 		//If r isn't a terminal, we can quickly recurse with a
 		// terminal or else say no.
+		if(r == null){
+			return false;
+		}
 		if(!(r instanceof TerminalRequirement)){
 			if(r.isTerminal()){
 				return this.equals(r.getTerminal());

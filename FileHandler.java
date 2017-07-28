@@ -675,6 +675,17 @@ public class FileHandler{
 	}
 	
 	
+	public static String testResultsFolder = "ProgrammerTests" + File.separator;
+	public static String requirementTestsFile = "RequirementResults.txt";
+	public static Object loadRequirementTestResults() throws ClassNotFoundException, IOException{
+		makeFolder(testResultsFolder);
+		return readObjectFromFile(testResultsFolder + requirementTestsFile);
+	}
+	public static void saveRequirementTestResults(Serializable results) throws IOException{
+		saveObjectToFile(testResultsFolder + requirementTestsFile, results);
+	}
+	
+	
 
 
 	private static void saveToFile(String fileName, String data){
