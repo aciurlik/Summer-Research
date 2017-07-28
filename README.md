@@ -1,3 +1,5 @@
+
+
 # Summer-Research
 
 Quick start for a coder:
@@ -5,11 +7,12 @@ Quick start for a coder:
     eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
     turn code into a .jar, you can use that.
 
-I. Introduction
-  a. Purpose 
+
+## Introduction
+  #### Purpose 
      This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
      and more time planning life pathways.
-  b. Goals
+  #### Goals
     Usable by faculty and students 
       including the old professors who are scared of computers
       Easy and quick - make a schedule from scratch in 5 min or less
@@ -33,7 +36,8 @@ I. Introduction
     Easily find classes satisfying a requirement
     Should be able to specify a placeholder in a schedule using different levels of generality, 
         as in "any GER", "any TA," "HST 141," or "HST 141-02"
-II. Background
+## Background
+
     The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
     Data objects handle the actual schedule - the main class in this group is the Schedule class. This group includes classes
         like Requirement, ScheduleElement, and Schedule. Only Schedule should be allowed to request user events from
@@ -48,7 +52,7 @@ II. Background
         WARNING - WARNING -  NO MEMBER OF THIS GROUP may directly modify any member of the DATA group - WARNING - WARNING
         all modifications to the schedule should be passed to the SchdeuleGUI, which
         may then inform schedule that a user has requested a change.
-III. Data Group Object Descriptions
+### Data Group Object Descriptions
   a. Schedule
     A list of available semesters, each of which contains ScheduleElements
     Also holds the list of majors that the user has chosen, and handles GER requirements.
@@ -76,7 +80,7 @@ III. Data Group Object Descriptions
       
  
   
-IV. GUI group object descriptions
+### GUI group object descriptions
   a. ScheduleGUI 
       Communicates with the Data group via a Schedule object.
       Represents one open window.
@@ -91,7 +95,7 @@ IV. GUI group object descriptions
   e. MainMenuBar
       The MenuBar at the top of the program.
     
-V. File group object descriptions
+### File group object descriptions
   a. FileHandler
       Handles all files and collecting data, including images, course catalogs, saved schedules, and major files.
       All data is currently stored in the two folder "Resources" and "UserData."
@@ -101,5 +105,5 @@ V. File group object descriptions
   c. ListOfMajors
       The list of all available majors.
   
-VI. Optimization
+### Optimization
 
