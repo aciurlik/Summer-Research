@@ -197,7 +197,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 
 	
 	public void examineRequirementPopup(){
-		schGUI.GUIExamineRequirement(this.req);
+		schGUI.examineRequirement(this.req);
 	}
 	
 	public void showPopup(MouseEvent e){

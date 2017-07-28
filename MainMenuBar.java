@@ -205,23 +205,23 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 
 		}
 		else if(command.equals(MenuOptions.newBlankSchedule) || command.equals(MenuOptions.newLoadedSchedule)){
-			schGUI.GUINewSchedule(command);
+			schGUI.createNewSchedule(command);
 		}
 		else if(command.equals(MenuOptions.openSchedule)){
 			Driver.openSchedule();
 		}
 		else if(command.equals(MenuOptions.saveSchedule)){
-			schGUI.GUISaveSchedule();
+			schGUI.saveSchedule();
 		}
 		else if(command.equals(MenuOptions.printSchedule)){
 
-			schGUI.GUIPrintSchedule();
+			schGUI.printSchedule();
 		}
 		else if(command.equals(MenuOptions.viewStartUp)){
 			Driver.startUpMessage();
 		}
 		else if(command.equals(MenuOptions.checkAllErrors)){
-			schGUI.GUICheckAllErrors();
+			schGUI.checkAllErrors();
 		}
 		else if(command.equals(MenuOptions.studentDnD) ){
 			schGUI.importPriorCourses(true);

@@ -125,7 +125,7 @@ public class MajorPanel extends JPanel {
 
 	
 	public void removeSelf(){
-		schGUI.GUIRemoveMajor(this);
+		schGUI.removeMajor(this);
 
 	}
 }

@@ -79,7 +79,7 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	 */
 	public void dropdownSelected(){
 		ScheduleElement e = (ScheduleElement) this.requirementDropDown.getSelectedItem();
-		container.schGUI.GUIElementChanged(container, this, e);
+		container.schGUI.elementChanged(container, this, e);
 	}
 
 
@@ -173,9 +173,9 @@ public class ScheduleElementPanel extends JPanel implements java.io.Serializable
 	 * called when the user clicks 'choose a course'
 	 */
 	public void chooseACourse(){
-		ScheduleCourse c = container.schGUI.GUIChooseCourse(coursesToChooseFrom);
+		ScheduleCourse c = container.schGUI.chooseCourse(coursesToChooseFrom);
 		if(c != null){
-			container.schGUI.GUIElementChanged(container,this, c);
+			container.schGUI.elementChanged(container,this, c);
 		}
 	}
 	public void removeSelf(){
