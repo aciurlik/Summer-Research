@@ -28,6 +28,13 @@ import javax.swing.JOptionPane;
 
 
 /**
+ * 
+ * Blurb Written:7/27/2017
+ * Last updated: 8/1/2017
+ * 
+ * 
+ * 
+ * 
  * This class handles all file operations, including locating files and 
  * reading from files. This way if we change how our data is stored at any point,
  * as long as the underlying data is not changed, 
@@ -55,16 +62,14 @@ public class FileHandler{
 	public static final String resourcesFolder = "Resources" + File.separator;
 	public static final String userDataFolder = "UserData" + File.separator;
 	public static String startSemester = "Set First Semester";
-
 	public static final String bellTowerImageFile = resourcesFolder + "bellTower.jpg";
 	public static final String fireworksImageFile = resourcesFolder + "fireworks.jpg";
 	public static final String prereqMeaningsFile = resourcesFolder + "PrereqMeanings.txt";
 	public static final String courseListFolder = resourcesFolder + "CourseCatologs";
 	public static final String studentDataFile = userDataFolder + "SavedStudentData.txt";
 	public static final String savedScheduleFolder = userDataFolder + "SavedSchedule" + File.separator;
-	public static final String startUpFolder = resourcesFolder + "StartUpSlides" + File.separator;
+	public static final String startUpFolder = resourcesFolder + "StartUpSlides";
 	public static final String settingsDoc = userDataFolder +  "Settings";
-
 	public static final String testScheduleSource = resourcesFolder +  "tutorial.ser";
 	public static final String testScheduleDestination = savedScheduleFolder + "tutorial.ser";
 
@@ -75,7 +80,6 @@ public class FileHandler{
 
 	/**
 	 * This static block tries to load the existing settings
-	 * 
 	 * from the settingsDoc file.
 	 * 
 	 * If the file is not found, it makes a new settings
@@ -114,17 +118,31 @@ public class FileHandler{
 		saveProperties();
 		
 	}
+	/**
+	 * This asks the user if they are sure they want to 
+	 * restore Default Settings, as of now that
+	 * just means the startUp Menu will load at the opening
+	 * of the program. 
+	 */
 	public static void requestRestoreDefaultSettings(){
 		int n = JOptionPane.showConfirmDialog(null, "Are you sure you would like to restore default settings?", "Restore Default Settings", JOptionPane.OK_CANCEL_OPTION);
 		if(n==0){
 			FileHandler.restoreDefaultSettings();
 		}
 	}
+	
+	/**
+	 * This resets all of the properties, in settings. 
+	 */
 	private static void restoreDefaultSettings() {
 		properties.setProperty(MenuOptions.startUp, "true");
+		//There is no "default to Semesters
 		saveProperties();
 	}
 
+	/**
+	 * This updates and stores the changes made to the settings file. 
+	 */
 	private static void saveProperties(){
 		try(FileOutputStream output = new FileOutputStream(settingsDoc);) {
 			properties.store(output, "Edited Settings");
@@ -134,6 +152,10 @@ public class FileHandler{
 		}
 	}
 
+	/**
+	 * This returns the PriorData given from student's unofficial Transcript.
+	 * @return
+	 */
 	public static PriorData getSavedStudentData(){
 		File f = new File(studentDataFile);
 		if(!f.exists()){
@@ -143,12 +165,20 @@ public class FileHandler{
 			return (PriorData)FileHandler.readObjectFromFile(studentDataFile);
 		}
 		catch(Exception e){
-			JOptionPane.showMessageDialog(null, "There was an issue loading your saved student data");
+			JOptionPane.showMessageDialog(null, 
+				    "<html><p>The data you were trying to read from never loaded correctly. <br>" 
+				+ "<br> If this is your first time reading in the data, please try again. <br>"
+				+ "If you were trying to open a previously loaded schedule, <br>"
+				+ "please delete the 'SavedStudentData.txt file in your UserData folder, <br> and reload that schedule from scratch.</p></html>");
 			e.printStackTrace();
 			return null;
 		}
 	}
 
+	/**
+	 * This saves student's data as a file. 
+	 * @param d
+	 */
 	public static void writeStudentData(PriorData d){
 		try{
 			FileHandler.saveObjectToFile(studentDataFile, d);
@@ -199,6 +229,12 @@ public class FileHandler{
 
 	}
 
+	/**
+	 * Returns the extension of a file. Example 
+	 * ".ser" 
+	 * @param f
+	 * @return
+	 */
 	public static String getExtension(File f){
 		if(!f.isFile()){
 			return null;
@@ -213,14 +249,22 @@ public class FileHandler{
 
 
 
-
+	/**
+	 * Returns a property of a specific setting.
+	 * @param setting
+	 * @return String associated with this setting.
+	 */
 	public static String propertyGet(String setting){
 		String value = properties.getProperty(setting);
 		return value;
 	}
 
 
-
+/**
+ * This is shown to the user every time they need to pick a schedule out of a list. 
+ * @param s, tells what action prompted this method
+ * @return File name of schedule chosen. 
+ */
 	public static String chooseSchedule(String s){
 		String header = "";
 		String instruct = "";
@@ -258,7 +302,10 @@ public class FileHandler{
 	}
 
 
-
+/**
+ * 
+ * @return Schedule that the user has chosen to open. 
+ */
 	public static Schedule openSchedule(){
 		String chosenSched = chooseSchedule("open");
 		if(chosenSched !=null){
@@ -268,16 +315,21 @@ public class FileHandler{
 				ois.close();
 				return result;
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(null, "There was an error in opening your schedule");
 				e.printStackTrace();
 			}
 		}
 		return null;
 	}
 
-
+/**
+ * Allows user to save schedule, if a user picks a non-unique name 
+ * their old schedule will be overwritten, thus the user is warned and 
+ * allowed to rename the schedule they are trying to save. 
+ * @param sch
+ */
 	public static void saveSchedule(Schedule sch){
-		boolean uniqueName = false;
+		boolean uniqueName = false;//asks until user gives permission to overwrite, or chooses unique name. 
 		String fileName = null;
 		String schedName = (String)JOptionPane.showInputDialog(null, "Name your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
 		fileName=schedName;
@@ -289,6 +341,9 @@ public class FileHandler{
 					if(overwrite==1){
 						String newName = (String)JOptionPane.showInputDialog(null, "Please choose a different name for your schedule", "Save Schedule", JOptionPane.PLAIN_MESSAGE, null, null, null);
 						fileName=newName;
+					}
+					if(overwrite == 0){
+						uniqueName=true;
 					}
 				}
 				else{
@@ -302,13 +357,16 @@ public class FileHandler{
 			}catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "This schedule was not able to be saved. ");
 				e.printStackTrace();
-				System.out.println(e.getLocalizedMessage());
 			}
 		}
 	}
 
 
-
+	/**
+	 * This gets all of the schedule's names that are saved in a file. 
+	 * @param FolderName
+	 * @return ArrayList of these names. 
+	 */
 	public static ArrayList<String> getScheduleNames(String FolderName){
 		ArrayList<String> scheduleNames = new ArrayList<String>();
 		File folder = new File(FolderName);
@@ -324,7 +382,7 @@ public class FileHandler{
 							return false;
 						}
 						String extension = fullName.substring(i+1);
-						return pathname.isFile() && extension.equals("ser");
+						return pathname.isFile() && extension.equals("ser"); //denotes a seralized schedule. 
 					}
 				}
 				)){
@@ -343,7 +401,12 @@ public class FileHandler{
 	public static final String majorsFile = resourcesFolder + "Majors";
 
 
-
+/**
+ * This checks to see if the ListOfMajors have been read
+ * if not it will read and return the folder containing
+ * the list of all of Furman's majors. 
+ * @return
+ */
 	public static ListOfMajors getMajorsList(){
 		if(listOfMajors == null){
 			listOfMajors = readMajorsFrom(new File(majorsFile));
@@ -351,6 +414,11 @@ public class FileHandler{
 		return listOfMajors;
 	}
 
+	/**
+	 * Creates the ListOfMajors
+	 * @param folder
+	 * @return ListOFMajors Object. Which is an arrayList of Majors
+	 */
 	public static ListOfMajors readMajorsFrom(File folder){
 		ListOfMajors result = new ListOfMajors();
 		for (File f: folder.listFiles(
@@ -379,7 +447,7 @@ public class FileHandler{
 			}
 			catch(Exception e){
 				e.printStackTrace();
-				System.out.println("I'm skipping  " + f.getName());
+				System.out.println("I'm skipping  " + f.getName()); //In case of error it will alert which file does not fit correct format. 
 			}
 
 		}
@@ -404,7 +472,6 @@ public class FileHandler{
 			}
 			br.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
@@ -430,7 +497,6 @@ public class FileHandler{
 			}
 			br.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println("There was an issue reading from " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
@@ -463,10 +529,6 @@ public class FileHandler{
 
 	}
 
-
-	public static ImageIcon getDialogBoxImage(){
-		return new ImageIcon(FileHandler.resourcesFolder + "FurmanOfficialAcademicLogo.jpg");
-	}
 
 
 	/**
@@ -519,7 +581,9 @@ public class FileHandler{
 
 	}
 
-
+/**
+ * This allows a user to delete a schedule from the UserData. 
+ */
 	public static void deleteSchedule() {
 		String chosen = chooseSchedule("delete");
 		if(chosen != null){
@@ -536,27 +600,33 @@ public class FileHandler{
 	}
 
 
-
+/**
+ * This creates a panel that allows the
+ * user to change their settings. This is made 
+ * new each time, so that the information is always
+ * up to date. 
+ */
 	public static void showSetting() {
-		SettingsPanel sp = new SettingsPanel();
+		new SettingsPanel();
 
 	}
 
 
 
 
-
-	public void saveMe(Major m, File f){
-
-		try(BufferedWriter bf = new BufferedWriter(new FileWriter(f));) {
-			bf.write(m.saveString());
-			bf.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-
-	}
+/**
+ * This was used when re-saving majors, not used now
+ * could become necessary if the saveString of majors
+ * is altered. 
+ */
+//	public void saveMe(Major m, File f){
+//		try(BufferedWriter bf = new BufferedWriter(new FileWriter(f));) {
+//			bf.write(m.saveString());
+//			bf.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	/////////////////////////////////
 	/////////////////////////////////
@@ -571,13 +641,30 @@ public class FileHandler{
 	private static ImageIcon fireworks;
 	
 
-	public static ArrayList<ImageIcon> getInstructions() {
+	
+	/**
+	 * This is image that is to be shown in all dialog boxes. 
+	 * @return
+	 */
+	public static ImageIcon getDialogBoxImage(){
+		return new ImageIcon(FileHandler.resourcesFolder + "FurmanOfficialAcademicLogo.jpg");
+	}
+
+	/**
+	 * This gets the slides for the startUpMenu
+	 * @return
+	 */
+	public static ArrayList<ImageIcon> getStartUpSlides() {
 		if(instructions == null){
 			return loadInstructions();
 		}
 		return instructions;
 	}
 	
+	/**
+	 * 
+	 * @return Image used by the BellTower class
+	 */
 	public static ImageIcon getBellTower(){
 		if(bellTower == null){
 			return loadBellTower();
@@ -585,6 +672,11 @@ public class FileHandler{
 		return bellTower;
 	}
 	
+	/**
+	 * 
+	 * @return The picture used to congratulate the 
+	 * user for a good schedule. 
+	 */
 	public static ImageIcon getFireworks(){
 		if(fireworks == null){
 			return loadFireworks();
@@ -592,13 +684,19 @@ public class FileHandler{
 		return fireworks;
 	}
 	
+	/**
+	 * This loads all the images together. Not used currently
+	 */
 	public void loadImages(){
 		loadBellTower();
 		loadFireworks();
 		loadInstructions();
 	}
 	
-	
+	/**
+	 * Scales and returns bellTower
+	 * @return
+	 */
 	private static ImageIcon loadBellTower() {
 		ImageIcon original = new ImageIcon(bellTowerImageFile);
 		Image image = original.getImage();
@@ -610,14 +708,23 @@ public class FileHandler{
 		return bellTower;
 	}
 
+	/**
+	 * Loads fireWork image.
+	 * @return
+	 */
 	private static ImageIcon loadFireworks() {
 		fireworks =  new ImageIcon(fireworksImageFile);
 		return fireworks;
 	}
 		
-		
+	/**
+	 * Loads and scales startUp Images, the 
+	 * scaled images will be saved once finalized to save time. 
+	 * It gets and returns all of the images in this StartUpSlides. folder. 
+	 * @return
+	 */
 	private static ArrayList<ImageIcon> loadInstructions(){
-		File folder = new File(resourcesFolder + "StartUpSlides");
+		File folder = new File(startUpFolder);
 		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
 		for (File f: folder.listFiles(
 				new FileFilter(){
@@ -662,7 +769,12 @@ public class FileHandler{
 	private boolean ___UtilityMethods_________;
 	
 	
-	
+	/**
+	 * This makes a folder out of given name if it does
+	 * not already exist. If the savedScheduleFolder is made,
+	 * it also transfers the tutorial schedule to the savedScheduleFolder.  
+	 * @param folderName
+	 */
 	public static void makeFolder(String folderName){
 		File folder = new File(folderName);
 		if(!folder.exists()){
@@ -674,7 +786,9 @@ public class FileHandler{
 		}
 	}
 	
-	
+	/**
+	 * This is all used for Requirement Testing purposes
+	 */
 	public static String testResultsFolder = "ProgrammerTests" + File.separator;
 	public static String requirementTestsFile = "RequirementResults.txt";
 	public static Object loadRequirementTestResults() throws ClassNotFoundException, IOException{
@@ -686,7 +800,13 @@ public class FileHandler{
 	}
 	
 	
-
+	
+	/**
+	 * USUSED METHOD
+	 * @param fileName saves the data to a file. (Could be used for giving print version to the user in file form in
+	 * the future)
+	 * @param data
+	 */
 
 	private static void saveToFile(String fileName, String data){
 		try(FileWriter fw = new FileWriter(fileName); BufferedWriter b = new BufferedWriter(fw);){
@@ -698,6 +818,13 @@ public class FileHandler{
 
 	}
 
+	
+	/**
+	 * This saves an object to a file. This is used for schedules. 
+	 * @param fileName
+	 * @param data
+	 * @throws IOException
+	 */
 	private static void saveObjectToFile(String fileName, Serializable data) throws IOException{
 		try( FileOutputStream saveFile = new FileOutputStream(fileName); 
 				ObjectOutputStream save = new ObjectOutputStream(saveFile); ) {
@@ -709,6 +836,13 @@ public class FileHandler{
 		}
 	}
 
+	/**
+	 * This is used when a schedule is opened. 
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private static Object readObjectFromFile(String fileName) throws IOException, ClassNotFoundException{
 		try(FileInputStream fis = new FileInputStream(fileName);
 				ObjectInputStream ois = new ObjectInputStream(fis);) {
@@ -720,7 +854,7 @@ public class FileHandler{
 
 	/**
 	 * This transfers one file from one destination to another. In this version it
-	 * clones and transfers the test.ser to the userData so that the program always has a schedule
+	 * clones and transfers the tutoiral.ser to the userData so that the program always has a schedule
 	 * to open when it originally open. The user will have the option to delete the tutorial. 
 	 * @param source
 	 * @param dest

@@ -1,31 +1,24 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
-public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io.Serializable{
+public class SemesterMenuBar extends JMenuBar implements ActionListener{
 
 
 	/**
 	 * 
+	 * Blurb written 7/31/2017
+	 * Last updated 7/31/2017
+	 * When a user picks Options this is what is shown. It adjust based on the state of the 
+	 * Semester concerning notes, and studyAway. 
 	 */
-	private static final long serialVersionUID = 1L;
 	SemesterPanel semPanel;
 
 
 	public SemesterMenuBar(SemesterPanel semesterPanel) {
-		
 		super();
-		this.removeAll();
-		
 		this.semPanel=semesterPanel;
 
 		JMenu menu;
@@ -33,41 +26,28 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 
 
 		//Create the menu bar.
-
-
 		menu = new JMenu(MenuOptions.Options);
-		menuItem = new JMenuItem(MenuOptions.addInstruct);
-		JPopupMenu addACoursePopup = new JPopupMenu();
+		menuItem = new JMenuItem(MenuOptions.addInstruct);//Add a course
 		menuItem.addActionListener(this);
-		addACoursePopup.add(menuItem);
 		menu.add(menuItem);
 
 
 		menuItem = new JMenuItem(MenuOptions.supriseMe);
-		JPopupMenu addSuprise = new JPopupMenu();
 		menuItem.addActionListener(this);
-		addSuprise.add(menuItem);
 		menu.add(menuItem);
 
 		
 		JMenuItem studyAway = new JMenuItem();
 		if(semPanel.sem.studyAway){
-	
 			studyAway.setText(MenuOptions.removeStudyAway);
 			studyAway.setActionCommand(MenuOptions.removeStudyAway);
 		}
 		else{
-	
 			studyAway.setText(MenuOptions.addStudyAway);
 			studyAway.setActionCommand(MenuOptions.addStudyAway);
 		}
-		
-		JPopupMenu addStudyAway = new JPopupMenu();
 		studyAway.addActionListener(this);
-		addStudyAway.add(studyAway);
 		menu.add(studyAway);
-
-
 
 		menuItem = new JMenuItem();
 		if(semPanel.sem.hasNotes()){
@@ -78,10 +58,7 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 			menuItem.setText(MenuOptions.addNotes);
 			menuItem.setActionCommand(MenuOptions.addNotes);
 		}
-		
-		JPopupMenu notes = new JPopupMenu();
 		menuItem.addActionListener(this);
-		notes.add(menuItem);
 		menu.add(menuItem);
 
 		
@@ -91,26 +68,27 @@ public class SemesterMenuBar extends JMenuBar implements ActionListener, java.io
 
 
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals(MenuOptions.addInstruct)){
+		String command = e.getActionCommand();
+		if(command.equals(MenuOptions.addInstruct)){
 			semPanel.schGUI.addCourseTo(semPanel.sem);
 		}
-		if(e.getActionCommand().equals(MenuOptions.supriseMe)){
+		if(command.equals(MenuOptions.supriseMe)){
 			semPanel.schGUI.createSurpriseWindow(semPanel.sem);
 		}
-		if(e.getActionCommand().equals(MenuOptions.addStudyAway)){
+		if(command.equals(MenuOptions.addStudyAway)){
 			semPanel.schGUI.makeSemesterStudyAway(semPanel.sem);
 
 		}
-		if(e.getActionCommand().equals(MenuOptions.removeStudyAway)){
+		if(command.equals(MenuOptions.removeStudyAway)){
 			semPanel.schGUI.removeSemesterStudyAway(semPanel.sem);
 
 		}
-		if(e.getActionCommand().equals(MenuOptions.addNotes)){
+		if(command.equals(MenuOptions.addNotes)){
 			semPanel.schGUI.addNotesToSemester(semPanel.sem);
 			semPanel.updatePanel(semPanel.sem);
 			
 			}
-		if(e.getActionCommand().equals(MenuOptions.removeNotes)){
+		if(command.equals(MenuOptions.removeNotes)){
 			semPanel.schGUI.removeNotesFromSemester(semPanel.sem);
 		}
 	}
