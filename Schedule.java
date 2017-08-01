@@ -7,13 +7,15 @@ import java.util.StringJoiner;
 
 /**
  * Blurb Written:7/27/2017
- * Last updated: 7/27/2017
+ * Last updated: 8/1/2017
  * 
  * The schedule class is the main object in the DATA side.
+ * It is the half of the program that is serialized and saved. 
+ * Each instantiation of this class is responsible for a single schedule.
  * It handles communication with the GUI side of classes.
  * 
- * The main GUI class (scheduleGUI) can make edits to the schedule by using the
- * methods in the MethodsUsedByGUI section. Schedule can communicate to the GUI 
+ * The main GUI class (scheduleGUI) can make edits to the schedule.
+ * Schedule can communicate to the GUI 
  * via the userOverride method. NOTHING IN THE DATA SIDE SHOULD DIRECTLY
  * CAUSE CHANGES TO THE SCREEN.
  * 
@@ -35,7 +37,8 @@ public class Schedule implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private ArrayList<Major> majorsList;//the list of majors currently 
-	//loaded by the schedule, excluding the GER.
+	//loaded by the schedule, excluding the GER. These are the majors that a student
+	//has chosen to take, not a list of all possible majors. 
 	private ArrayList<Semester> semesters;//The list of semesters. 
 	// MayX and summer sessions must be explicitly added.
 	
@@ -44,14 +47,14 @@ public class Schedule implements java.io.Serializable {
 	private Major GER; //the GER major is not stored in MajorsList.
 
 
-	//transient is for Serializable purposes.
+	//transient is for Serializable purposes, Java does not like serializing swing things
 	public transient ScheduleGUI schGUI;
 	
 	private Prefix languagePrefix; //Furman students get a language placement, which
 	// determines their FL requirement in the GER major. This field stores 
 	// a student's language placement.
 	
-	private int totalCoursesNeeded;
+	private int totalCoursesNeeded; //Used to calculate how done a req is. 
 	
 	
 	SemesterDate firstSemester; //the first semester at furman
@@ -61,13 +64,18 @@ public class Schedule implements java.io.Serializable {
 	private Semester priorSemester;//the semester before you arrived at furman.
 	// holds AP courses and placements
 
-	public String studentName;
+	public String studentName;// placed on print, and at the top of the program, only given if 
+	//a schedule has been imported. 
+	
+	public static final boolean prereqsCanBeSatisfiedInSameSemester = false; //This is
+	//so if Furman allows for a preReq to be taken at the same time as the upper level class
+	//all one has to is switch this boolean. 
 
-	public static final boolean prereqsCanBeSatisfiedInSameSemester = false;
-
-
+	/**
+	 * This can be used for testing purposes, but is currently not in use. 
+	 * @return Schedule. 
+	 */
 	public static Schedule testSchedule(){
-		//	CourseList l = CourseList.testList();
 		Driver.tryPickStartDate();
 		Schedule result = new Schedule();
 		result.readBlankPrior();
@@ -79,9 +87,7 @@ public class Schedule implements java.io.Serializable {
 	 * Make a new schedule of semesters where firstSemester is the first shown semester 
 	 * and currentSemester is the first semester that might be scheduled
 	 * (assume that earlier semesters have passed and already have their courses fixed.)
-	 * @param masterList
-	 * @param firstYear
-	 * @param currentSemester
+	 * 
 	 */
 	public Schedule(){
 		//Majors and requirements
@@ -94,12 +100,15 @@ public class Schedule implements java.io.Serializable {
 	}
 
 	
+	/**
+	 * This is called when a student has loaded their schedule into the 
+	 * program.
+	 * @param priorCourses Refers to the student's schedule. 
+	 */
 	
 	public Schedule(PriorData priorCourses){
-		
 		this.majorsList= new ArrayList<Major>();
 		this.prereqs = new HashSet<Prereq>();
-
 		readPrior(priorCourses);
 		recalcGERMajor();
 		updatePrereqs();
@@ -245,6 +254,11 @@ public class Schedule implements java.io.Serializable {
 	@SuppressWarnings("unused")
 	private boolean _________addRemoveSemesters_________;
 	
+	/**
+	 * This adds a Semester with the next SemesterDate. This adds it to the end
+	 * of the schedule. 
+	 * @return
+	 */
 	public Semester addNewSemester(){
 		SemesterDate last = semesters.get(semesters.size() - 1).getDate();
 		Semester next = new Semester(last.nextSemester(), this);
@@ -252,14 +266,25 @@ public class Schedule implements java.io.Serializable {
 		return next;
 	}
 
+	/**
+	 * This makes a semester and adds it within the schedule. 
+	 * @param year
+	 * @param season
+	 * @return
+	 */
 	public Semester addNewSemesterInsideSch(int year, int season) {
 		SemesterDate inside = new SemesterDate(year, season);
 		Semester toAdd = new Semester(inside, this);
 		this.semesters.add(toAdd);
-		Collections.sort(semesters);
+		Collections.sort(semesters); //Puts in the correct spot. 
 		return toAdd;
 	}
 
+	/**
+	 * Removes the given semester. Currently only used for
+	 * normal semesters at the end, and MayX, Summer semesters. 
+	 * @param sem
+	 */
 	public void removeSemester(Semester sem) {
 		this.semesters.remove(sem);
 		Collections.sort(semesters);
@@ -279,7 +304,9 @@ public class Schedule implements java.io.Serializable {
 
 
 	/**
-	 * In semester S, remove ScheduleElement e.
+	 * In semester S, remove ScheduleElement e. Returns if the remove was
+	 * successful, will return false if there was an error, or if the remove/
+	 * updates were not successful. 
 	 * @param e
 	 * @param s
 	 */
@@ -296,12 +323,18 @@ public class Schedule implements java.io.Serializable {
 		return false;
 	}
 
+	/**
+	 * In Semester sem, add scheduleElement element, if remove 
+	 * was successful return true, false otherwise. 
+	 * @param element
+	 * @param sem
+	 * @return
+	 */
 	public boolean addScheduleElement(ScheduleElement element, Semester sem) {
 		if(this.checkErrorsWhenAdding(element, sem)){
 			System.out.println("add didn't work");
 			return false;
 		}
-
 		if(sem.add(element)){
 			//updateRequirementsSatisfied(element);
 			updatePrereqs();
@@ -324,7 +357,7 @@ public class Schedule implements java.io.Serializable {
 	 * @param newElement
 	 * @param oldSemester
 	 * @param newSemester
-	 * @return
+	 * @return true if successful, false otherwise. 
 	 */
 	public boolean replace(ScheduleElement oldElement, ScheduleElement newElement, Semester oldSemester, Semester newSemester){
 		if(this.checkErrorsWhenReplacing(oldSemester, newSemester, oldElement, newElement)){
@@ -357,7 +390,11 @@ public class Schedule implements java.io.Serializable {
 	@SuppressWarnings("unused")
 	private boolean _________addRemoveMajors_________;
 
-
+	/**
+	 * Adds Major to a student's majorsList,
+	 * and updates teh GER "major"
+	 * @param newMajor
+	 */
 	public void addMajor(Major newMajor){
 		majorsList.add(newMajor);
 		if(!newMajor.name.equals("GER")){
@@ -367,17 +404,28 @@ public class Schedule implements java.io.Serializable {
 		updateTotalCoursesNeeded();
 	}
 
-
+	/**
+	 * Removes a Major from a student's list of majors.
+	 * Recalcs GER accordingly. 
+	 * @param major
+	 */
 	public void removeMajor(Major major) {
 		majorsList.remove(major);
-		if(!major.name.equals("GER")){
+		if(!major.name.equals("GER")){//User should not be able to remove GER major.
+			//This is a precaution. 
 			recalcGERMajor();
 		}
-		updatePrereqs();//courses might be removed?
+		updatePrereqs();//courses might be removed in the future. This functionality is not in place. 
 		updateReqs();
 		updateTotalCoursesNeeded();
 	}
 
+	/**
+	 * Currently the GER's are ordered by difficulty, this returns
+	 * the most strenuous GER the student has based on the majors they
+	 * have in their majorList. 
+	 * @return
+	 */
 	public int determineGER(){
 		int highestDegree = -1;
 		for(Major m: this.majorsList){
@@ -412,6 +460,11 @@ public class Schedule implements java.io.Serializable {
 		return result;
 	}
 
+	/**
+	 * True if student has complete all requirements, and they
+	 * have chosen at atleast one major. This is used by BellTower. 
+	 * @return
+	 */
 	public boolean isComplete(){
 		if(getPercentDone() > 1.0 - 0.000000000001){
 			if(majorsList.size() >= 1){
@@ -490,37 +543,36 @@ public class Schedule implements java.io.Serializable {
 		return allSemesters;
 	}
 	
-
-	public SemesterDate getStartDate(){
-		return this.getStartSemester().semesterDate;
-	}
-	public ArrayList<Semester> getSemesters(){
-		return this.semesters;
-	}
+	/**
+	 * POSSIBLE EXTRANEOUS METHODS
+	 * Returns the semesterDate of the student's first semster at Furman. 
+	 * @return
+	 */
+//	public SemesterDate getStartDate(){ 
+//		return this.getStartSemester().semesterDate;
+//	}
+//	public ArrayList<Semester> getSemesters(){
+//		return this.semesters;
+//	}
 
 	
 	/**
+	 * POSSIBLE EXTRANEOUS METHODS
 	 * This does not include prior Semester, because that is not apart of this.semesters
 	 * @return The first real (not prior Semester)
 	 */
-	public Semester getStartSemester(){
-		//TODO is the sort necessary?
-		Collections.sort(this.semesters);
-		return this.semesters.get(0);
-	}
-
+//	public Semester getStartSemester(){
+	//	Collections.sort(this.semesters); //Kept in as precaution. 
+	//	return this.semesters.get(0);
+	//}
 	
+//	public Semester getPriorSemester() {
+	//	return priorSemester;
+//	}
 
-	public Semester getPriorSemester() {
-		return priorSemester;
-	}
-
-
-
-
-	public SemesterDate getCurrentSemester() {
-		return currentSemester;
-	}
+//	public SemesterDate getCurrentSemester() {
+//		return currentSemester;
+//	}
 
 
 	public void setCurrentSemester(SemesterDate currentSemester) {
@@ -539,7 +591,7 @@ public class Schedule implements java.io.Serializable {
 	/**
 	 * Find the list of all ScheduleElements in any semester of this Schedule.
 	 * Will be sorted based on the time the element was scheduled.
-	 * @return
+	 * @return ArrayList of scheduleElements. 
 	 */
 	public ArrayList<ScheduleElement> getAllElementsSorted(){
 		ArrayList<ScheduleElement> result = new ArrayList<ScheduleElement>();
@@ -575,6 +627,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		return result;
 	}
+	
 	public ArrayList<Requirement> getAllRequirementsMinusPrereqs(){
 		ArrayList<Requirement> result = new ArrayList<Requirement>();
 		for(Major m : this.majorsList){
@@ -601,13 +654,15 @@ public class Schedule implements java.io.Serializable {
 	 */
 	public ArrayList<Major> getMajors(){
 		ArrayList<Major> result = new ArrayList<Major>();
-		if(GER != null){
+		if(GER != null){ //This should never be null, a student should always have GER. 
 			result.add(GER);
 		}
-		if(prereqs.size() > 0){
+		if(prereqs.size() > 0){ //Creates a preReq major, that holds all the classes a
+			//student needs to schedule. 
 			Major prereqsM = new Major("Prereqs");
-			prereqsM.chosenDegree = -1;
-			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>();
+			prereqsM.chosenDegree = Major.None;
+			HashSet<Requirement> uniquePrereqs = new HashSet<Requirement>(); //no duplicates because
+			//if two courses has a preReq of a course, you'd only want that course to show up once. 
 			for(Prereq p : prereqs){
 				if(!p.getRequirement().getStoredIsComplete()){
 					uniquePrereqs.add(p.getRequirement());
@@ -625,14 +680,17 @@ public class Schedule implements java.io.Serializable {
 		return result;
 	}
 
+	/**
+	 * Gets GER 'Major'
+	 * @return
+	 */
 	public Major getGER() {
 		return GER;
 	}
-
-
-	public void setGER(Major gER) {
-		GER = gER;
-	}
+	
+//	public void setGER(Major gER) {
+//		GER = gER;
+//	}
 	
 	///////////////////////////////
 	///////////////////////////////
@@ -651,9 +709,9 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
-	public Prefix getLanguagePrefix() {
-		return languagePrefix;
-	}
+	//public Prefix getLanguagePrefix() {
+	//	return languagePrefix;
+	//}
 
 	public void setLanguagePrefix(Prefix languagePrefix) {
 		//The language classes prereq diagram looks like this:
@@ -719,11 +777,14 @@ public class Schedule implements java.io.Serializable {
 	
 
 
-
+/**
+ * This returns the string that is of the Schedule format variety. 
+ * @return
+ */
 	public String getPrintScheduleString(){
 		StringBuilder result = new StringBuilder();
+		
 		//Add Majors
-
 		if(!this.majorsList.isEmpty()){
 			result.append("<table style = 'width: 100%'> <tr>");
 			result.append( "<th> Major:</th> " +
@@ -780,19 +841,15 @@ public class Schedule implements java.io.Serializable {
 		result.append("\n <h3>The Final Countdown: </h3>");
 		result.append("<b> Estimated Courses Left: </b> " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
 		result.append("<b> Credit Hours Left:</b> " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
-
-
-
-
 		String toResult = result.toString().replaceAll("&", "&amp;");
 		return toResult.replaceAll("\n", "<br>");
-
-
-
 	}
 
 
-
+/**
+ *  
+ * @return String that is set up in the Requirement Layout. 
+ */
 	public String getPrintRequirementString(){
 		SemesterDate defaultPrior = new SemesterDate(1995, SemesterDate.OTHER);
 		ArrayList<ScheduleElement> allOrderedElements = new ArrayList<ScheduleElement>();
@@ -873,7 +930,6 @@ public class Schedule implements java.io.Serializable {
 					if(se instanceof Requirement){
 						part.append("Scheduled  " + se.shortString(10000).trim());
 
-
 					}
 					else{
 						part.append(se.getDisplayString().trim());
@@ -895,6 +951,7 @@ public class Schedule implements java.io.Serializable {
 		String toResult = result.toString().replaceAll("&", "&amp;");
 		return toResult.replaceAll("\n", "<br>");
 	}
+	
 	/**
 	 * Given a list of ScheduleElements (denoted by satisfiedSEPointers) 
 	 * that complete Requirement r, trim that list down until it
@@ -918,39 +975,12 @@ public class Schedule implements java.io.Serializable {
 				toCompleteR.add(i, toRemove);
 			}
 			else{
-
 				satisfiedSEPointers.remove(i);
 				i--;
 			}
-
 		}
 		return satisfiedSEPointers;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	///////////////////////////////
@@ -964,7 +994,7 @@ public class Schedule implements java.io.Serializable {
 	
 	public boolean userOverride(ScheduleError s){
 		if(this.schGUI != null){
-			return(schGUI.userOverrideError(s));
+			return(schGUI.userOverrideError(s)); //SchGUI asks user to override. 
 		}
 		else{
 			return true;
@@ -995,13 +1025,18 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
+/**
+ * Return true if error is found. 
+ * @param oldS
+ * @param newS
+ * @param oldElement
+ * @param newElement
+ * @return
+ */
 	public boolean checkErrorsWhenReplacing(Semester oldS, Semester newS, ScheduleElement oldElement, ScheduleElement newElement){
 		if(this.checkPrerequsitesReplacing(oldS, newS, oldElement, newElement)){
 			return true;
 		}
-
-
 		if(newElement == oldElement){
 			if (checkDuplicates(newElement, true, false)){
 				return true;
@@ -1012,8 +1047,6 @@ public class Schedule implements java.io.Serializable {
 				return true;
 			}
 		}
-
-
 		if(newS.checkOverlap(newElement)){
 			return true;
 		}
@@ -1046,6 +1079,12 @@ public class Schedule implements java.io.Serializable {
 		return false;
 	}
 
+	/**
+	 * Return true if error is found. 
+	 * @param e
+	 * @param s
+	 * @return
+	 */
 	public boolean checkErrorsWhenRemoving(ScheduleElement e, Semester s){
 		return(this.checkPrerequsitesRemoving(e, s.getDate()));
 	}
@@ -1077,7 +1116,7 @@ public class Schedule implements java.io.Serializable {
 			for(ScheduleElement e : s.getElements()){
 				inSemester.add(e);
 			}
-			if(this.prereqsCanBeSatisfiedInSameSemester){
+			if(Schedule.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(inSemester);
 			}
 			for (ScheduleElement e : inSemester){
@@ -1094,7 +1133,7 @@ public class Schedule implements java.io.Serializable {
 					}
 				}
 			}
-			if(!this.prereqsCanBeSatisfiedInSameSemester){
+			if(!Schedule.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(inSemester);
 			}
 		}
@@ -1118,7 +1157,7 @@ public class Schedule implements java.io.Serializable {
 		}
 		else{
 			ArrayList<ScheduleElement> taken = elementsTakenBefore(sD);
-			if(this.prereqsCanBeSatisfiedInSameSemester){
+			if(Schedule.prereqsCanBeSatisfiedInSameSemester){
 				taken.addAll(elementsTakenIn(sD));
 			}
 			Prereq needed = CourseList.getPrereq(p);
@@ -1173,7 +1212,7 @@ public class Schedule implements java.io.Serializable {
 		ArrayList<ScheduleElement> taken = new ArrayList<ScheduleElement>();
 		for(Semester other : this.getAllSemestersSorted()){
 			//if this semester is after s
-			if( (prereqsCanBeSatisfiedInSameSemester && other.getDate().compareTo(SD) == 0 )
+			if( (prereqsCanBeSatisfiedInSameSemester && other.getDate().compareTo(SD) == 0 ) //If they are in the same semester, and allowed to be so
 					||  other.getDate().compareTo(SD) > 0 ){
 				//add all the elements in this semester into taken, leaving out e.
 				for(ScheduleElement laterElement : other.elements){
@@ -1273,7 +1312,7 @@ public class Schedule implements java.io.Serializable {
 			ArrayList<ScheduleElement> beforeTo = this.elementsTakenBefore(toSem.semesterDate);
 			ArrayList<ScheduleElement> afterFrom = this.elementsTakenAfter(fromSem.semesterDate);
 			ArrayList<ScheduleElement> inFrom = this.elementsTakenIn(fromSem);
-			if(this.prereqsCanBeSatisfiedInSameSemester){
+			if(Schedule.prereqsCanBeSatisfiedInSameSemester){
 				afterFrom.addAll(inFrom);
 			}
 			afterFrom.retainAll(beforeTo);
@@ -1351,20 +1390,6 @@ public class Schedule implements java.io.Serializable {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	///////////////////////////////
 	///////////////////////////////
 	//	Duplicate error checking
@@ -1376,7 +1401,7 @@ public class Schedule implements java.io.Serializable {
 
 	/**
 	 * Check all semesters for duplicates.
-	 * If one is found, throw an exception.
+	 * If one is found, return true.
 	 */
 	public boolean  checkDuplicates(){
 		ArrayList<ScheduleError> result = checkAllDuplicates();
@@ -1412,7 +1437,6 @@ public class Schedule implements java.io.Serializable {
 			if(e1 == e){
 				exactDuplicateCount++;
 				if(exactDuplicateCount > 1){
-					ScheduleElement[] result = {e, e1};
 					if(e1.isDuplicate(e) || e.isDuplicate(e1)){
 						ScheduleElement[] results = {e, e1};
 						ScheduleError duplicate = new ScheduleError(ScheduleError.duplicateError);
@@ -1564,7 +1588,7 @@ public class Schedule implements java.io.Serializable {
 
 	private void recalcGERMajor(){
 		int type = this.determineGER();
-		if(type == -1){
+		if(type == -1){ //None given assume BA
 			type = Major.BA;
 		}
 		this.GER =CourseList.getGERMajor(languagePrefix, type);
@@ -1877,6 +1901,11 @@ public class Schedule implements java.io.Serializable {
 	}
 
 
+	/**
+	 * Returns all scheduledCourses in a semester. Might be able to turn into Stream. 
+	 * @param s
+	 * @return
+	 */
 	public ArrayList<ScheduleCourse> getCoursesInSemester(Semester s) {
 		ArrayList<Course> toFinal = CourseList.getCoursesIn(s);
 		ArrayList<ScheduleCourse> scheduleCoursesInSemester = new ArrayList<ScheduleCourse>();
@@ -1886,89 +1915,6 @@ public class Schedule implements java.io.Serializable {
 		}
 		return scheduleCoursesInSemester;
 	}
-
-
-
-
-	public String printScheduleString(){
-		StringBuilder result = new StringBuilder();
-		//Add Majors
-
-		if(!this.majorsList.isEmpty()){
-			result.append("<table style = 'width: 100%'> <tr>");
-			result.append( "<th> Major:</th> " +
-					" <th>Notes:</th> " +
-					"</tr>");
-			for(Major m: this.majorsList){
-				result.append("<tr Align='left'> <td>" + m.name + "</td>  ");
-				if(m.notes != null){
-					result.append("<td>" + m.notes + "</td>");
-				}
-				result.append("</tr>");
-
-			}
-			result.append("</table>");
-		}
-
-		result.append("<center> <h2> Schedule </h2> </center> ");
-		//Adds all the scheduleElements from each major
-		for(Semester s: this.getAllSemestersSorted()){
-			result.append("\n");
-			if(s.isPriorSemester){
-				result.append("<b>Prior Courses: </b>" + "\n");
-			}
-			else{
-				result.append("<b>" + s.semesterDate.toString() + ": </b> \n");
-			}
-			if(s.studyAway){
-				result.append("<b> STUDY AWAY SEMESTER </b>\n");
-			}
-			for(ScheduleElement se : s.elements){
-				String prefix = "  ";
-				if(se instanceof Requirement){
-					prefix = "  Scheduled one course of: ";
-					result.append(prefix + se.shortString(1000) + "\n");
-				}
-				else{
-					result.append(se.getDisplayString() + "\n");
-				}
-			}
-			if(s.elements.isEmpty()){
-				result.append("Nothing scheduled for this semester \n");
-			}
-			if(s.hasNotes()){
-				result.append("<b> Notes: </b>" +  s.notes + "\n");
-			}
-
-		}
-		result.append("\n");
-		//If any Errors Prints them 
-		if(!schGUI.getErrorStrings().equals("")){
-			result.append("<b> Scheduling Errors: </b> <br>" + schGUI.getErrorStrings());
-		}
-		//Things left CLPS, Estimated Courses Left, CrditHours
-		result.append("\n <h3>The Final Countdown: </h3>");
-		result.append("<b> Estimated Courses Left: </b> " + Math.max(0, this.estimatedCoursesLeft()) + "\n");
-		result.append("<b> Credit Hours Left:</b> " +  Math.max(0, (128 - this.getCreditHoursComplete())) + "\n");
-
-
-
-
-		String toResult = result.toString().replaceAll("&", "&amp;");
-		return toResult.replaceAll("\n", "<br>");
-
-
-
-	}
-
-
-
-
-
-
-
-
-
 
 
 	/**

@@ -27,7 +27,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 	
 	static boolean testing = false;
 
-	public MainMenuBar(ScheduleGUI schGUI) {
+	public MainMenuBar(ScheduleGUI schGUI, PriorData p) {
 		super();
 		this.schGUI=schGUI;
 		JMenu menu, submenu, subTwomenu; //The length
@@ -72,11 +72,11 @@ public class MainMenuBar extends JMenuBar implements ActionListener {
 				blankSchedule.addActionListener(this);
 			newSchedule.add(blankSchedule);
 
-				PriorData s = FileHandler.getSavedStudentData();
+				
 
 			importPriorSchedule = new JMenuItem(MenuOptions.newLoadedSchedule);
 				importPriorSchedule.addActionListener(this);
-			if(s != null){
+			if(p != null){
 			newSchedule.add(importPriorSchedule);
 			}
 		menu.add(newSchedule);

@@ -30,7 +30,7 @@ import javax.swing.text.BadLocationException;
 
 
 
-public class ScheduleGUI{ 
+public class ScheduleGUI   { 
 	Schedule sch; //The single schedule scheduleGUI contains, updates GUI according to its data
 	SchedulePanel schP; //The top half of the GUI, that contains all the semesters
 	MajorListPanel reqs; //The bottom half of the GUI, that contains the majors, list of reqs
@@ -63,7 +63,8 @@ public class ScheduleGUI{
 
 
 
-	public ScheduleGUI(Schedule sch) {
+	public ScheduleGUI(Schedule sch){
+		super();
 		this.sch = sch;
 		sch.setScheduleGUI(this);
 	
@@ -73,9 +74,10 @@ public class ScheduleGUI{
 		frame = new JFrame();
 		
 		//Adds the menu bar
-		MainMenuBar menu = new MainMenuBar(this);
+		MainMenuBar menu = new MainMenuBar(this, Driver.data);
 		menu.setFont(FurmanOfficial.normalFont); 
 		frame.setJMenuBar(menu);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		
 		JPanel layeredPanel = new JPanel();
@@ -97,7 +99,7 @@ public class ScheduleGUI{
 		layeredPanel.add(left, BorderLayout.WEST);
 
 		//Creates, adds schedulePanel the panel, that holds all the semesters
-		schP = new SchedulePanel(sch, this);
+		schP = new SchedulePanel(this);
 		layeredPanel.add(schP, BorderLayout.NORTH);
 		//Creates/adds the RequirementList Panel which holds the major/Ger requirements 
 		reqs = new MajorListPanel(sch, this);
@@ -342,10 +344,12 @@ public class ScheduleGUI{
 		Schedule current;
 		//Gives the user the option to save his/her schedule before opening new schedule. 
 		int n = Driver.saveScheduleReminder();
-		if(n == 0){
-			saveSchedule();
+		if(n==2){
+			return;//Stops loading the new schedule. 
 		}
-		
+		if(n==0){
+			this.saveSchedule();
+		}
 		//This creates a schedule that matches the current schedules Course List and starting Semester Date
 		if(typeOfSchedule.equals(MenuOptions.newBlankSchedule)){
 			if(FileHandler.propertyGet(FileHandler.startSemester) == null && Driver.tryPickStartDate() == null){
@@ -356,7 +360,14 @@ public class ScheduleGUI{
 			}
 		}
 		else{
-			current = new Schedule(FileHandler.getSavedStudentData());//Opens a user imported schedule. 
+			if(Driver.data != null){
+				
+			current = new Schedule(Driver.data);//Opens a user imported schedule. 
+			}
+			else{
+				Driver.data = FileHandler.getSavedStudentData(); //PriorData is only held in Driver. 
+				current = new Schedule(Driver.data);//Opens a user imported schedule. 
+			}
 		}
 		setSchedule(current);
 		this.update();
@@ -1519,6 +1530,12 @@ public class ScheduleGUI{
   
 	public void addWindowListener(WindowListener w){
 		frame.addWindowListener(w);
+	}
+
+
+	public void removeMyself() {
+		frame.dispose();
+		
 	}
 }
 

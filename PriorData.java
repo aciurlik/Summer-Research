@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
  */
 public class PriorData implements Serializable{
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1 + 1L;
 	ArrayList<Course> courseList;
 	SemesterDate earliestDate;
 	SemesterDate latestDate;
@@ -408,7 +408,7 @@ public class PriorData implements Serializable{
 	
 	public void checkIsCorrupted(){
 		if(isCorrupted()){
-			throw new RuntimeException("The data you were trying to read from never loaded correctly");
+			throw new RuntimeException("The data you were trying to read from never loaded correctly.");
 		}
 	}
 	

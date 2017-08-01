@@ -36,7 +36,7 @@ public class Driver {
 	//without them interacting with each other.
 	static StartUpMenu startUP = null;//This stores the startup object, because inital loading is time 
 	//consuming. 
-
+	static PriorData data;
 	
 	
 	
@@ -60,12 +60,19 @@ public class Driver {
 			}
 			@Override
 			public void windowClosed(WindowEvent arg0) {
-				removeScheduleGUI(schGUI);
-
 			}
 
 			@Override
 			public void windowClosing(WindowEvent arg0) {
+				//Asks user to save schedule
+				int n = saveScheduleReminder();
+				if(n==2){
+					return;
+				}
+				if(n==0){
+					schGUI.saveSchedule();
+				}
+				schGUI.removeMyself();
 				removeScheduleGUI(schGUI);
 			}
 			@Override
@@ -95,12 +102,12 @@ public class Driver {
 	 * @return int cooresponding to user choice. 
 	 */
 	public static int saveScheduleReminder(){
-		String[] Options = {"Yes", "No"};
+		String[] Options = {"Yes", "No", "Cancel"};
 
 		int n = JOptionPane.showOptionDialog(null,
 				"Would you like to save your schedule",
 				"Save Schedule",
-				JOptionPane.YES_NO_OPTION,
+				JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE,
 				null,
 				Options,Options[1]);
@@ -113,11 +120,6 @@ public class Driver {
 	 */
 	public static void removeScheduleGUI(ScheduleGUI schGUI){
 		listOfScheduleGUIs.remove(schGUI);
-		//Asks user to save schedule
-		int n = saveScheduleReminder();
-		if(n==0){
-			schGUI.saveSchedule();
-		}
 		//If there are no other schedules loaded, it will proceeded to 
 		//shut down the whole program. 
 		if(listOfScheduleGUIs.isEmpty()){
@@ -427,7 +429,7 @@ public class Driver {
 					//This gets any import they had already done, and 
 					//loads that schedule, or ask the user for a startDate
 					//and then opens a blank schedule. 
-					PriorData data = FileHandler.getSavedStudentData();
+					data = FileHandler.getSavedStudentData();
 					if(data != null){
 						Driver.addScheduleGUI(new Schedule(data));
 					}

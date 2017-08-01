@@ -2,10 +2,24 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-
+/**
+ * Blurb written 8/1/2017
+ * Last updated 8/1/2017
+ * 
+ * This gives a list of all possible permutations of predetermined subset.
+ * Great for looking at Requirements and subRequirements. 
+ * 
+ *
+ * @param <T>
+ */
 public class SizedPowerSetsIter<T> implements Iterator, java.io.Serializable {
 	ArrayList<T> data;
 	ArrayList<Integer> currentSubset;
+	/**
+	 * This gives all possible subsets of a given size
+	 * @param input //The list of elements
+	 * @param size //size of the subset. 
+	 */
 	public SizedPowerSetsIter(Iterable<T> input, int size){
 		data = new ArrayList<T>();
 		currentSubset = new ArrayList<Integer>(size);
@@ -26,6 +40,9 @@ public class SizedPowerSetsIter<T> implements Iterator, java.io.Serializable {
 	public boolean hasNext() {
 		return incrementIndex() != -1;
 	}
+	/**
+	 * This increments through the set. 
+	 */
 	@Override
 	public HashSet<T> next() {
 		// Shift currentSubset, then return the new result.

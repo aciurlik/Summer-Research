@@ -1,46 +1,38 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 
+/**
+ * 
+ * Blurb Written: 7/31/2017
+ * Last Updated: 7/31/2017
+ * 
+ * This is the container that holds all of the semesterPanels it updates
+ * based on the changed made to the schedule
+ * @param schGUI
+ */
 
-public class SchedulePanel extends JPanel implements ActionListener, java.io.Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * 
-	 */
-	private Schedule sch;
+public class SchedulePanel extends JPanel implements ActionListener{
+
 	JPanel scrollPanel = new JPanel();
 	JPanel addExtraSemesterButtonPanel = new JPanel();
 	JButton addSemesterButton = new JButton("+");
-	JPanel infoPanel; //reqs left, credit hours, and CLPs
-	public int infoPanelFontSize = 20;
-	public JLabel creditHoursLabel;
-	public String cHText = "     Credit Hours Left: ";
-	public JLabel reqsLeftLabel;
-	public String reqsText = "Requirements Left: ";
 	public ArrayList<SemesterPanel> allSemesterPanels;
 	int insetsWidth = 5;
 	ScheduleGUI schGUI;
@@ -49,26 +41,14 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 
 
 
-
-	public SchedulePanel(Schedule sch, ScheduleGUI schGUI) {
+	public SchedulePanel(ScheduleGUI schGUI) {
 
 		super();
-
 		this.schGUI = schGUI;
-		this.sch=sch;
-
-
-
 		this.setBackground(Color.white);
-		//This will be deleted once we set it relative to the whole. 
-		//this.setPreferredSize(new Dimension(700, 400));
 		this.setLayout(new BorderLayout());
-
 		allSemesterPanels= new ArrayList<SemesterPanel>();
-
 		scrollPanel.setBackground(Color.white);
-
-
 		addExtraSemesterButtonPanel.setPreferredSize(new Dimension(100, 100)); //Arbitrary size smaller than scroll Panel set to same color
 		addExtraSemesterButtonPanel.setBackground(FurmanOfficial.lightPurple(50));
 		JButton addSemester = new JButton("+");
@@ -84,7 +64,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		JScrollPane scrollPane = new JScrollPane(scrollPanel);
 		JScrollBar scrollBar = new JScrollBar();
 		int scrollWidth = scrollBar.getPreferredSize().width;
-		//scrollPane.setPreferredSize(new Dimension(700, 310));
 		scrollPane.setSize(new Dimension(700,SemesterPanel.height+4*insetsWidth+scrollWidth));
 		this.setPreferredSize(new Dimension(700,SemesterPanel.height+4*insetsWidth+scrollWidth));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -97,9 +76,7 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		schGUI.addSemesterPanel();
-
 	}
 
 	public void dragStarted(ScheduleElement e){
@@ -114,10 +91,8 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 	}
 
 
-
 	int counter = 0;
 	public void update(Schedule sch) {
-
 		scrollPanel.removeAll();
 		scrollPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -125,7 +100,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.insets = new Insets(insetsWidth,insetsWidth,insetsWidth,insetsWidth);
-
 		ArrayList<Semester> schSemesters = sch.getAllSemestersSorted();
 		for(int i = 0; i < schSemesters.size() ; i ++){
 			Semester s =  schSemesters.get(i);
@@ -137,8 +111,9 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 				s.setOverloadLimit(1000);
 
 			}
-			
-			
+			if(s.semesterDate.equals(sch.firstSemester) || s.semesterDate.equals(sch.firstSemester.nextSemester())){
+				s.setOverloadLimit(16);
+			}
 			SemesterPanel semesterP = this.findPanelFor(s); //if you already have a panel for this semester,
 			// don't make a new one.
 			if(semesterP == null){
@@ -159,8 +134,6 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 			if( i <= 1){
 				semesterP.setDeletable(false);
 			}
-			
-
 			scrollPanel.add(semesterP, gbc);
 			gbc.gridx ++;
 		}
@@ -185,6 +158,12 @@ public class SchedulePanel extends JPanel implements ActionListener, java.io.Ser
 
 	}
 
+	/**
+	 * Finds and returns the Panel for that semester, if not
+	 * then it alerts this class to make a new one. 
+	 * @param s
+	 * @return
+	 */
 
 	public SemesterPanel findPanelFor(Semester s){
 		for(int i=0; i<allSemesterPanels.size(); i++ ){
