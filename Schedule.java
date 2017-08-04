@@ -57,6 +57,11 @@ public class Schedule implements java.io.Serializable {
 	private int totalCoursesNeeded; //Used to calculate how done a req is. 
 	
 	
+	boolean studentDecidesDegreeType = false; //There was some discussion if a student was taking
+	//both a major with BA and BS then could they choose or would one of these be automatically given 
+	//to them. This assumes that the student has the power to choose. 
+	
+	
 	SemesterDate firstSemester; //the first semester at furman
 	public SemesterDate currentSemester; //The earliest semester that can still be scheduled.
 	// used to tell which semesters are already taken
@@ -387,19 +392,30 @@ public class Schedule implements java.io.Serializable {
 	//	Adding and removing Majors
 	///////////////////////////////
 	///////////////////////////////
+	
 	@SuppressWarnings("unused")
 	private boolean _________addRemoveMajors_________;
 
+	
+	public void warnUserAboutDegreeChange(int orginalGERType){
+		if(orginalGERType != GER.chosenDegree){
+			schGUI.alertUserToThisChange();
+		}
+	}
+	
+	
 	/**
 	 * Adds Major to a student's majorsList,
 	 * and updates teh GER "major"
 	 * @param newMajor
 	 */
 	public void addMajor(Major newMajor){
+		int orginalGERType = GER.chosenDegree;
 		majorsList.add(newMajor);
 		if(!newMajor.name.equals("GER")){
 			recalcGERMajor();
 		}
+		warnUserAboutDegreeChange(orginalGERType);
 		updateReqs();
 		updateTotalCoursesNeeded();
 	}
@@ -410,11 +426,13 @@ public class Schedule implements java.io.Serializable {
 	 * @param major
 	 */
 	public void removeMajor(Major major) {
+		int orginalGERType = GER.chosenDegree;
 		majorsList.remove(major);
 		if(!major.name.equals("GER")){//User should not be able to remove GER major.
 			//This is a precaution. 
 			recalcGERMajor();
 		}
+		warnUserAboutDegreeChange(orginalGERType);
 		updatePrereqs();//courses might be removed in the future. This functionality is not in place. 
 		updateReqs();
 		updateTotalCoursesNeeded();
@@ -427,18 +445,36 @@ public class Schedule implements java.io.Serializable {
 	 * @return
 	 */
 	public int determineGER(){
-		int highestDegree = -1;
-		for(Major m: this.majorsList){
-			if(!m.name.equals("GER")){
-				if(m.getChosenDegree() > highestDegree){
-					highestDegree=m.getChosenDegree();
-				}
-
+		
+		if(studentDecidesDegreeType){
+			HashSet<Integer> possibleMajorTypes = new HashSet<Integer>();
+			for(Major m: this.majorsList){
+				possibleMajorTypes.add(m.getChosenDegree());	
+			}
+			if(possibleMajorTypes.isEmpty()){
+				return -1;
+			}
+			if(possibleMajorTypes.size() == 1){
+				return (int) possibleMajorTypes.toArray()[0];	
+			}
+			else{
+				return schGUI.askUserGERType(possibleMajorTypes.toArray());
 			}
 		}
-		return highestDegree;
+		else{
+			int highestDegree = -1;
+			for(Major m: this.majorsList){
+				if(!m.name.equals("GER")){
+					if(m.getChosenDegree() > highestDegree){
+						highestDegree=m.getChosenDegree();
+					}
+
+				}
+			}
+			return highestDegree;
+		}
 	}
-	
+
 	///////////////////////////////
 	///////////////////////////////
 	//	Completion Status
@@ -1586,7 +1622,7 @@ public class Schedule implements java.io.Serializable {
 	@SuppressWarnings("unused")
 	private boolean ___Updates_________;
 
-	private void recalcGERMajor(){
+	private void recalcGERMajor(){	
 		int type = this.determineGER();
 		if(type == -1){ //None given assume BA
 			type = Major.BA;

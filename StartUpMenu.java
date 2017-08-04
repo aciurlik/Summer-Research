@@ -45,7 +45,8 @@ public class StartUpMenu implements ActionListener {
 			instructions = FileHandler.getStartUpSlides();
 		}
 		
-		label = new JLabel(instructions.get(0));
+		label = new JLabel();
+		label.setIcon(instructions.get(0));
 		frame = new JFrame("Getting Started");
 		layer.add(label, BorderLayout.NORTH);
 		
@@ -76,6 +77,7 @@ public class StartUpMenu implements ActionListener {
 		layer.add(buttonPanel, BorderLayout.SOUTH);
 		frame.add(layer);
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(false);
 
 	}
