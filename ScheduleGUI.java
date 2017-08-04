@@ -1400,6 +1400,47 @@ public class ScheduleGUI   {
 	}
 	
 	
+	/**
+	 * This is used to ask a user which degree they would like to earn, if they
+	 * are adding majors with two different degree types. This pop up occurs whenever 
+	 * another major is added, or a major is removed but the dispute still exist. The 
+	 * user's choice is not stored so every time it is recalculated it will be asked again. 
+	 * @param array
+	 * @return
+	 */
+	
+	public int askUserGERType(Object[] array) {
+		String[] optionToUser = new String[array.length];
+		for(int i= 0; i<array.length; i++){
+			int toAdd = Integer.parseInt((String) array[i].toString());
+			optionToUser[i] = CourseList.getDegreeTypeString(toAdd);
+		}
+		String s = (String)JOptionPane.showInputDialog(
+                null,
+                "Which Degree are you planning on earning? \n (This will affect your General Education Requirements) \n",
+                "Choose your Degree Type",
+                JOptionPane.PLAIN_MESSAGE,
+                icon,
+                optionToUser, 
+                "BS");
+		
+		
+
+		return CourseList.getDegreeTypeNumber(s);
+	
+		
+	}
+	
+	public void alertUserToThisChange() {
+		JOptionPane.showMessageDialog(null, 
+				"Since you changed the type of degree you are planning to receive, "
+				+ "\n your GER requirements have also changed. "
+				+ "\n Thus some of those requirements may no longer be fulfilled. "
+				+ "\n Be sure to review your GERs to detect any changes in completion.");
+		
+	}
+
+	
 	
 	//////////Only used by userOverrideError above. 
 	private String headerFor(ScheduleError e){
@@ -1537,6 +1578,11 @@ public class ScheduleGUI   {
 		frame.dispose();
 		
 	}
+
+
+	
+
+	
 }
 
 

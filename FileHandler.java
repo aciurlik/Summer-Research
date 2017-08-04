@@ -741,10 +741,12 @@ public class FileHandler{
 				)){
 			try{
 				ImageIcon image = new ImageIcon(f.toString());
-				Image img = image.getImage();
-				double scalar = 2;
-				Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
-				image = new ImageIcon(newimg);
+				
+				//This was used to scale when we had slides. This may not be necessary if we use GIFs. 
+			//	Image img = image.getImage();
+			//	double scalar = 2;
+			//	Image newimg = img.getScaledInstance((int)scalar* 380, (int)scalar* 280, java.awt.Image.SCALE_SMOOTH);
+			//	image = new ImageIcon(newimg);
 				result.add(image);
 
 			}

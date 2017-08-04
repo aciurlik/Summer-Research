@@ -42,7 +42,7 @@ public class Major implements java.io.Serializable{
 	ArrayList<Integer> degreeTypes = new ArrayList<Integer>();
 	//The possible degree types (BS, BA, BM) that the user can pick for this major.
 	
-	public int chosenDegree;
+	public int chosenDegree = None;
 	//The degree type (BS, BA, BM) that the user has chosen for this major when it is in
 	//the schedule.
 	
@@ -113,6 +113,7 @@ public class Major implements java.io.Serializable{
 	@SuppressWarnings("unused")
 	private boolean ___GettersAndSetters_________;
 	
+
 	
 	/**
 	 * Add this degree type to the list of possible degrees for this major.
@@ -137,6 +138,10 @@ public class Major implements java.io.Serializable{
 	}
 
 
+	
+	
+	
+	
 
 	public int getChosenDegree() {
 		return chosenDegree;
