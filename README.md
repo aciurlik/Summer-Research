@@ -1,9 +1,8 @@
 
-
 # Summer-Research
 
 Quick start for a coder:
-    Check out the code, there should be reasonably good comments. If you want to turn the java code into a .jar file, we used
+    Check out the code, there should be reasonably good comments. There is also a diagram that labels classes that creates the separate       parts of GUI, and an excel document catagorizing each class of our program. If you want to turn the java code into a .jar file, we used
     eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
     turn code into a .jar, you can use that.
 
@@ -11,7 +10,7 @@ Quick start for a coder:
 ## Introduction
   #### Purpose 
      This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
-     and more time planning life pathways.
+     and more time planning life pathways, and students will be able to experiment more with their potential paths at Furman. 
   #### Goals
     Usable by faculty and students 
       including the old professors who are scared of computers
@@ -37,8 +36,7 @@ Quick start for a coder:
     Should be able to specify a placeholder in a schedule using different levels of generality, 
         as in "any GER", "any TA," "HST 141," or "HST 141-02"
 ## Background
-
-    The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
+   The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
     Data objects handle the actual schedule - the main class in this group is the Schedule class. This group includes classes
         like Requirement, ScheduleElement, and Schedule. Only Schedule should be allowed to request user events from
         the GUI group, other classes should simply inform Schedule that user intervention may be required.
@@ -52,6 +50,7 @@ Quick start for a coder:
         WARNING - WARNING -  NO MEMBER OF THIS GROUP may directly modify any member of the DATA group - WARNING - WARNING
         all modifications to the schedule should be passed to the SchdeuleGUI, which
         may then inform schedule that a user has requested a change.
+ 
 ### Data Group Object Descriptions
   a. Schedule
     A list of available semesters, each of which contains ScheduleElements
@@ -104,6 +103,4 @@ Quick start for a coder:
       (getCoursesSatisfying(Predicate<Course>) is the most general)
   c. ListOfMajors
       The list of all available majors.
-  
-### Optimization
 
