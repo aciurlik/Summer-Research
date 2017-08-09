@@ -64,6 +64,9 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 		if(! ( other instanceof ScheduleCourse )){
 			return false;
 		}
+		if((this.getCreditHours()==0) || (other.getCreditHours()==0)){ //So zero credit classes can be taken multiple times without error. 
+			return false;
+		}
 		return this.getPrefix().compareTo(other.getPrefix()) == 0;
 	}
 
@@ -107,6 +110,13 @@ public class ScheduleCourse implements ScheduleElement, java.io.Serializable{
 			size += timeString.length() + 1;
 			if(size < preferredLength){
 				data.add(0, timeString);
+			}
+		}
+		
+		if(c.meetingDaysCode()!= null && c.meetingDaysCode().length() != 0){
+			size += c.meetingDaysCode().length() + 1;
+			if(size< preferredLength){
+				data.add(0, c.meetingDaysCode());
 			}
 		}
 

@@ -20,7 +20,6 @@ import javax.swing.JToggleButton;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -277,12 +276,18 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		Time startTime = c.c.getStartTime();
 		Prefix prefix = c.getPrefix();
 		String professor = c.c.professor;
-				
-		
+
+
 		if(startTime != null) 
 			results.add(startTime.clockTime());
 		else
 			results.add(null);
+		if(c.c.meetingDays != null){
+			results.add(c.c.meetingDaysCode());
+		}
+		else{
+			results.add(null);
+		}
 		results.add(prefix);
 		results.add(c.c.getName());
 		results.add(professor);
@@ -308,7 +313,7 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 	public String[] columnNames(int numberColumns){
 		String[] result = new String[numberColumns];
 		String[] known = new String[]{
-				"Start Time","Course","Title","Professor","Credit Hours","Num new Reqs"};
+				"Start Time","Meeting Days","Course","Title","Professor","Credit Hours","Num new Reqs"};
 		for(int i = 0; i < known.length ; i ++){
 			result[i] = known[i];
 		}

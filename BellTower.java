@@ -91,7 +91,7 @@ public class BellTower extends JPanel implements java.io.Serializable{
 			if(sch.checkAllErrors().isEmpty()){
 				JOptionPane.showMessageDialog(null, 
 						fireworkLabel,
-						"Congratulations on having a complete, error free schedule!", 
+						"Congratulations on having your life in order. You have a complete, error free schedule!", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			else{

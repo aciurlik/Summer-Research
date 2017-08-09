@@ -57,7 +57,7 @@ public class Schedule implements java.io.Serializable {
 	private int totalCoursesNeeded; //Used to calculate how done a req is. 
 	
 	
-	boolean studentDecidesDegreeType = false; //There was some discussion if a student was taking
+	boolean studentDecidesDegreeType = true; //There was some discussion if a student was taking
 	//both a major with BA and BS then could they choose or would one of these be automatically given 
 	//to them. This assumes that the student has the power to choose. 
 	

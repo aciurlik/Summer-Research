@@ -64,7 +64,7 @@ public class MenuOptions {
 			public static final  String printSchedule = "Print Schedule";
 			public static String deleteSchedule = "Delete Schedule";
 			public static String checkAllErrors = "Check all Errors";
-			public static String loadPriorCourses = "Import Prior Courses";
+			public static String loadPriorCourses = "Import Prior Courses/Placements";
 						public static String student = "Student";
 							public static String dragAndDrop = "Drag and Drop via MyFurman";
 								public static String studentDnD = "studentDnD";

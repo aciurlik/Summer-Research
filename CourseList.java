@@ -619,7 +619,6 @@ public class CourseList implements java.io.Serializable  {
 	 */
 	public static Major getGERMajor(Prefix forignLang,int majorType){
 		Major m = new Major("GER");
-		ArrayList<Requirement> allReqs = new ArrayList<Requirement>();
 		outerloop:
 			for(String key : GERRequirements.keySet()){
 				//Special cases first, then default behavior.
@@ -691,10 +690,6 @@ public class CourseList implements java.io.Serializable  {
 					}
 					break;
 				case "NWL":
-					//Music majors don't need this requirement TODO check if it's NW or NWL that they don't need.
-					if(majorType == Major.BM){
-						continue outerloop;
-					}
 					if(majorType == Major.BS){
 						for(Prefix p : GERRequirements.get("NWL")){
 							if(p.getNumber().compareTo("110") >= 0){
@@ -725,16 +720,17 @@ public class CourseList implements java.io.Serializable  {
 		m.addRequirement(FYWRequirement());
 
 		//collect nw, nwl, or nw/nwl into the list naturalWorldReqs.
-
+		Requirement nw = null;
 		Requirement nwl = m.getRequirement("NWL");
-		Requirement nw = m.getRequirement("NW");
+		if(majorType != Major.BM){
+			 nw = m.getRequirement("NW");
+		}
 		m.removeRequirement(nwl);
 		m.removeRequirement(nw);
 		ArrayList<Requirement> naturalWorldReqs = new ArrayList<Requirement>();
 		if(nwAndNwlAreOne){
 			if(majorType == Major.BM){
-
-				naturalWorldReqs.add(nw);
+				naturalWorldReqs.add(nwl);
 
 			}
 			else{
@@ -749,8 +745,13 @@ public class CourseList implements java.io.Serializable  {
 			}
 		}
 		else{
-			naturalWorldReqs.add(nw);
-			naturalWorldReqs.add(nwl);
+			if(majorType == Major.BM){
+				naturalWorldReqs.add(nwl);
+			}
+			else{
+				naturalWorldReqs.add(nw);
+				naturalWorldReqs.add(nwl);
+			}
 		}
 
 		// Make WC and NE enemies 
@@ -1006,13 +1007,13 @@ public class CourseList implements java.io.Serializable  {
 						if( newDuplicateCourse != duplicateCourse){
 							if(duplicateCourse != null){
 
-
-
 								listOfCourses.add(duplicateCourse);	
 							}
 							duplicateCourse=newDuplicateCourse;
 						}
+						//If a course does not have a time for summer it is added to both summer session one and two. 
 						duplicateCourse.semesterDate = new SemesterDate(duplicateCourse.semesterDate.year, SemesterDate.SUMMERTWO);
+						
 
 					}
 				}
@@ -1070,7 +1071,7 @@ public class CourseList implements java.io.Serializable  {
 
 
 	public static void main(String[] args){
-		viewKnownPrereqs();
+	//	viewKnownPrereqs();
 
 	}
 

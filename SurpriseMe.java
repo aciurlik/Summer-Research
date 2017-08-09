@@ -67,7 +67,7 @@ public class SurpriseMe extends JPanel implements ActionListener, Runnable {
 		frame = new JFrame();
 		if(CourseList.getCoursesIn(s).size()==0){ //If semester that is chosen has no classes, alert User, can't do anymore. 
 			ImageIcon icon = FileHandler.getDialogBoxImage();
-			JOptionPane.showMessageDialog(frame, "Classes are not avaliable in the "+ SemesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
+			JOptionPane.showMessageDialog(null, "Classes are not avaliable in the "+ SemesterDate.getSeason(s.semesterDate.sNumber)+ " "+ s.semesterDate.year + " semester", "No classes",JOptionPane.INFORMATION_MESSAGE,  icon  );
 			return;
 		}
 		if(gerChoice == null){

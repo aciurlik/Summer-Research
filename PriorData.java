@@ -233,7 +233,7 @@ public class PriorData implements Serializable{
 				//remove spaces from these fields
 				creditsString = creditsString.replaceAll("\\s+", "");
 				gradeString = gradeString.replaceAll("\\s+", "");
-
+				
 				//Turn the strings into objects
 
 				//Prefix, title, and section number
@@ -260,9 +260,7 @@ public class PriorData implements Serializable{
 				  //Check if this is a language prefix that would affect GER types.
 				String numString = p.getNumber();
 				boolean examineTitleForLanguagePrefix = false;
-				
-				
-				//this.setLanguagePrefix(new Prefix("SPN", 120));
+			
 				if(numString.contains("PL")){
 					if(numString.compareTo("PL.110") > 0){
 						String number = numString.substring(numString.indexOf(".") + 1);
@@ -426,7 +424,9 @@ public class PriorData implements Serializable{
 	 * @return
 	 */
 	public boolean isPassing(String grade){
-		if(grade == null || grade.equals("")){
+
+		/**
+		 * 		if(grade == null || grade.equals("") || grade.equals(" ")){
 			return true;
 		}
 		//Should catch grades like A+, B-, so on,
@@ -443,12 +443,21 @@ public class PriorData implements Serializable{
 			return true;
 		}
 
-		return false;
+		 * 
+		 * 
+		 */
+
+		if(grade.equals("F") || grade.equals("NP")){
+
+			return false;
+		}
+		else{
+			return true;
+		}
+
+
+
 	}
-	
-	
-	
-	
 	
 	public void testReading(){
 		
@@ -458,19 +467,21 @@ public class PriorData implements Serializable{
 
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{
 		out.writeObject(this.data);
+		
 	}
 	
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
 			data = (String[][])in.readObject();
 			readFromCSV(data);
+		
 			
 	}
 		
 
-	private void readObjectNoData(){
+//	private void readObjectNoData(){
 		
-	}
+	//}
 		   
 
 

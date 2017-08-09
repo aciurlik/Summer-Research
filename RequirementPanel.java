@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -31,7 +32,7 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	public Requirement req;
 	public ScheduleGUI schGUI;
-	
+	static HashMap<String, String> toToolTip;
 	int percentComplete; //this has to be stored locally so that we can
 	// paint the right percentage of this panel grey.
 	
@@ -43,6 +44,19 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 	public static int shortStringLength = 25;
 	public static final Color GreyedOut = FurmanOfficial.grey(200);
 
+	/**
+	 * This sets up the special tool tips for the GERs. 
+	 */
+	static{
+		toToolTip = new HashMap<String, String>(); 
+		String GERshortStrings[] = {   "FYW",                           "WR",                        "NW/NWL",                                  "NW",        "NWL",                      "HB",             "HA",                  "TA",               "VP",                         "MR",                                "FL",               "UQ",                 "MB",            "NE",                                 "WC"};
+		String GERfullName [] = {     "First Year Writing Seminar", "Writing-Research Intensive", "Natural World/Natural World (with Lab)", "Natural World", "Natural World (with lab)", "Human Behavior", "Historical Analysis", "Textual Analysis", "Visual and Performing Arts", "Mathematical and Formal Reasoning", "Foreign Language", "Ultimate Questions", "Mind and Body", "Humans and the Natural Environment", "World Cultures"};
+		
+		for(int i = 0; i<GERshortStrings.length; i++){
+			toToolTip.put(GERshortStrings[i], GERfullName[i]);
+		}
+		
+	}
 	
 	public RequirementPanel(Requirement req, ScheduleGUI schGUI){
 		super();
@@ -119,7 +133,10 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		// as the first 20 characters of the shortString,
 		// and capitalize the first letter.
 		String labelText = req.shortString(shortStringLength);
-		labelText = labelText.substring(0,1).toUpperCase() + labelText.substring(1);
+		
+		if(!labelText.trim().equals("")){//This keeps it from breaking if someone adds an accidental space.
+			labelText = labelText.substring(0,1).toUpperCase() + labelText.substring(1);
+		}
 		if(labelText.length() > shortStringLength){
 			labelText = labelText.substring(0,shortStringLength-3) + "...";
 		}
@@ -130,10 +147,22 @@ public class RequirementPanel extends JPanel implements java.io.Serializable {
 		
 		//set the tooltip (showed when the mouse hovers on a requirement panel)
 		// to be the display string (if it fits) or the short string(if it doesn't).
+		
+		
+		
+		
+		
+		
 		String toolTipText = req.getDisplayString(); 
+		if(toToolTip.containsKey(req.name)){
+			toolTipText = toToolTip.get(req.name);
+		}
+		
+	
 		if(toolTipText.length() > 60){
 			toolTipText = req.shortString(60);
 		}
+		
 		textLabel.setToolTipText(toolTipText);
 		textLabel.addMouseListener(ComponentDragHandler.passingAdapter());
 
