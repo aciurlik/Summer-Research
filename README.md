@@ -8,10 +8,10 @@ Quick start for a coder:
 
 
 ## Introduction
-  #### Purpose 
+  ### Purpose 
      This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
      and more time planning life pathways, and students will be able to experiment more with their potential paths at Furman. 
-  #### Goals
+  ### Goals
     Usable by faculty and students 
       including the old professors who are scared of computers
       Easy and quick - make a schedule from scratch in 5 min or less
