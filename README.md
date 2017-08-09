@@ -2,17 +2,17 @@
 # Summer-Research
 
 Quick start for a coder:
-    Check out the code, there should be reasonably good comments. There is also a diagram that labels classes that creates the separate       parts of GUI, and an excel document catagorizing each class of our program. If you want to turn the java code into a .jar file, we used
+    Check out the code, there should be reasonably good comments. There is also a diagram that labels classes that creates the separate       parts of GUI, and an excel document catagorizing each class of our program. If you want to turn the java code into a .jar file, we       used
     eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
     turn code into a .jar, you can use that.
 
 
 ## Introduction
-  ### Purpose 
-     This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
-     and more time planning life pathways, and students will be able to experiment more with their potential paths at Furman. 
-  ### Goals
-    Usable by faculty and students 
+ ### Purpose 
+   This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
+   and more time planning life pathways, and students will be able to experiment more with their potential paths at Furman.
+ ### Goals
+   Usable by faculty and students 
       including the old professors who are scared of computers
       Easy and quick - make a schedule from scratch in 5 min or less
       Not clunky
