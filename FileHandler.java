@@ -194,6 +194,7 @@ public class FileHandler{
 	 * @return
 	 */
 	public static String[][] importCSVStudentData(){
+		JOptionPane.showMessageDialog(null, "This is where we would give instructions on getting that csv.");
 		JFileChooser fc = new JFileChooser(
 				Paths.get(".").toAbsolutePath().normalize().toString()){
 			private static final long serialVersionUID = 1L;

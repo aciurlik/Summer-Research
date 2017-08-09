@@ -2,12 +2,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -488,7 +484,6 @@ public class Requirement implements ScheduleElement, Comparable<Requirement>,  j
 	 */
 	public ArrayList<Requirement> atLeastRequirementPairs(){
 		if(this.numToChoose == 2 && this.choices.size() == 2){
-
 			ArrayList<Requirement> choices = new ArrayList<Requirement>();
 			for(Requirement r : this.choices){
 				choices.add(r);

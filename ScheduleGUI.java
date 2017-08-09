@@ -240,7 +240,7 @@ public class ScheduleGUI   {
 		}
 		
 		//Asks the user 
-		Major m = (Major)JOptionPane.showInputDialog(frame, "Please " + s,  s, JOptionPane.PLAIN_MESSAGE, icon, dialogList, "cat" );
+		Major m = (Major)JOptionPane.showInputDialog(null, "Please " + s,  s, JOptionPane.PLAIN_MESSAGE, icon, dialogList, "cat" );
 		
 		if(m == null){
 			return;
@@ -263,7 +263,7 @@ public class ScheduleGUI   {
 		}
 		//If Major has notes these are displayed
 		if(m.notes != null){
-			String title = "Additional requirements and notes for " + m.name + ":";
+			String title = "Additional requirements and notes for " + m.name;
 			String toUser = "<html>" + "Please remember these ";
 			String string = htmlMajorNotes(m);
 			string = string.substring(0, 1).toLowerCase() + string.substring(1);
@@ -571,7 +571,7 @@ public class ScheduleGUI   {
 					importArea.setText(successText);
 	
 				}catch(Exception except){
-					importArea.setText("Please try your import again");
+					importArea.setText("Please try import again");
 					showImportException(except);
 	
 				}
@@ -595,7 +595,7 @@ public class ScheduleGUI   {
 		p.setLayout(new BorderLayout());
 		p.add(new JScrollPane(importArea), BorderLayout.NORTH);
 		p.add(validate, BorderLayout.EAST);
-		JOptionPane.showOptionDialog(null,p, "Import your schedule",
+		JOptionPane.showOptionDialog(null,p, "Import your Prior Courses/Placements",
 				JOptionPane.CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,null, null, null);
 	}
 
@@ -688,7 +688,7 @@ public class ScheduleGUI   {
 		}
 		JScrollPane scroll = new JScrollPane(new JTextArea(errorText));
 		scroll.setPreferredSize(new Dimension(300,300));
-		JOptionPane.showMessageDialog(null,scroll , "Import error ", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null, scroll , "Import error ", JOptionPane.ERROR_MESSAGE);
 	}
 	
 
@@ -1195,7 +1195,7 @@ public class ScheduleGUI   {
 			if(e.labOverlap){
 				issueStrings.add("labs");
 			}
-			result += "\nOverlaps in :" + issueStrings.toString();
+			result += "\nOverlaps in: " + issueStrings.toString();
 
 		}
 		else if(e.error.equals(ScheduleError.overloadError)){
@@ -1433,10 +1433,12 @@ public class ScheduleGUI   {
 	
 	public void alertUserToThisChange() {
 		JOptionPane.showMessageDialog(null, 
-				"Since you changed the type of degree you are planning to receive, "
-				+ "\n your GER requirements have also changed. "
-				+ "\n Thus some of those requirements may no longer be fulfilled. "
-				+ "\n Be sure to review your GERs to detect any changes in completion.");
+				"<html><p width =" + FurmanOfficial.defaultPixelWidth/1.5 + "> "
+				+ "Since you changed the type of degree you are planning to receive, "
+				+ " your GER requirements have also changed. "
+				+ " Thus some of those requirements may no longer be fulfilled. "
+				+ " Be sure to review your GERs to detect any changes in completion."
+				+ "</p></html>");
 		
 	}
 

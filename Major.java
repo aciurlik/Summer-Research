@@ -451,7 +451,7 @@ public class Major implements java.io.Serializable{
 		saveString = saveString.trim();
 		String[] lines = saveString.split("[\\n]+");
 		//Name
-		Major result = new Major(lines[0]);
+		Major result = new Major(lines[0].trim());
 		
 		//startIndex is used until we have finished the header section and reach
 		// the section that specifies requirements.
@@ -516,7 +516,9 @@ public class Major implements java.io.Serializable{
 		Requirement newRequirement = Requirement.readFrom(reqString);
 		if(firstSpace != -1 && firstSpace < colonIndex){
 			String name = s.substring(firstSpace, colonIndex).trim();
-			newRequirement.setName(name);
+			if(!name.trim().equals("")){ //This keeps mistakes in spacing from messing up the naming. 
+				newRequirement.setName(name);
+			}
 		}
 		return newRequirement;
 	}
