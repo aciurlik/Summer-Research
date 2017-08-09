@@ -14,7 +14,7 @@ import java.util.HashSet;
  * 
  *
  */
-public class Prefix implements ScheduleElement, Comparable<Prefix>, java.io.Serializable{
+public class   Prefix implements ScheduleElement, Comparable<Prefix>, java.io.Serializable{
 	private static final long serialVersionUID = 1L;
 	private String subject;
 	private String courseNumber; //We made this field into
