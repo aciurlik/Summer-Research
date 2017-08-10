@@ -212,15 +212,16 @@ public class Schedule implements java.io.Serializable {
 				//we've passed where the semester should have been, so we need to make a 
 				// new semester.
 				
-				//TODO replace this with addNewSemesterInsideSch method
+				//Replaced this with addNewSemesterInsideSch method
 				// (if the method name changes, it's the second method in the 
 				// gui methods for adding semesters).
-				int indexInSemesters = i-1;
+				//int indexInSemesters = i-1;
 				if(i == -1){
 					return false;
 				}
-				Semester newSemester = new Semester(d, this);
-				semesters.add(indexInSemesters, newSemester);
+				Semester newSemester = this.addNewSemesterInsideSch(d.year, d.sNumber);
+				//Semester newSemester = new Semester(d, this);
+				//semesters.add(indexInSemesters, newSemester);
 				return newSemester.directAdd(e);
 			}
 		}
