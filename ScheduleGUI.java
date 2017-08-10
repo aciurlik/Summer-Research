@@ -463,7 +463,7 @@ public class ScheduleGUI   {
 
 		//Creates the TextPane that will display the printPreview, and print. 
 		JTextPane schedulePrint = new JTextPane();
-		schedulePrint.setFont(FurmanOfficial.normalFont);
+		schedulePrint.setFont(FurmanOfficial.getFont(9));
 		schedulePrint.setPreferredSize(new Dimension((int) new Paper().getWidth(), (int) new Paper().getHeight())); // Sets to standard piece of paper.
 		schedulePrint.setContentType("text/html");
 		schedulePrint.setText("<html><p>" + finalPrint + "</p>"+ Driver.getDisclaimer() +"</html>"); //Tacks disclaimer on end.
