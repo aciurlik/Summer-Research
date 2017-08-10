@@ -182,7 +182,12 @@ public class CourseChooser extends JPanel implements FocusListener, ActionListen
 		
 		//This section of code ensures that the table's values are not editable
 		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames(maxNumColumns)) {
-		    @Override
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
 		    public boolean isCellEditable(int row, int column) {
 		       return false;
 		    }
