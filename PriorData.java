@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +27,11 @@ import javax.swing.JOptionPane;
  */
 public class PriorData implements Serializable{
 
+	
+	
+	
 	private static final long serialVersionUID = 1 + 1L;
+	static HashSet<String> failingGrades = new HashSet<String>();
 	ArrayList<Course> courseList;
 	SemesterDate earliestDate;
 	SemesterDate latestDate;
@@ -35,6 +40,16 @@ public class PriorData implements Serializable{
 	String studentName;
 
 
+	
+	static{
+		// These are the grades, or things listed under the grades that should not be 
+		//added to a student's schedule.  To get this information we went to:
+		//http://catalog.furman.edu/content.php?catoid=3&navoid=60&hl=grading&returnto=search#Grading
+		String[] failingGradeStrings = {"F", "NP", "AU","U", "W", "I", "NR", "TS", "Q", "CIP" };
+		for(String s: failingGradeStrings){
+			failingGrades.add(s);
+		}
+	}
 
 	public PriorData(){
 		earliestDate =  new SemesterDate(100000,1);
@@ -447,7 +462,7 @@ public class PriorData implements Serializable{
 		 * 
 		 */
 
-		if(grade.equals("F") || grade.equals("NP")){
+		if(failingGrades.contains(grade)){
 
 			return false;
 		}
