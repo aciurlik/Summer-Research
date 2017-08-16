@@ -194,7 +194,14 @@ public class FileHandler{
 	 * @return
 	 */
 	public static String[][] importCSVStudentData(){
-		JOptionPane.showMessageDialog(null, "This is where we would give instructions on getting that csv.");
+		JOptionPane.showMessageDialog(null, "To import a student's prior courses and placements, "
+					+ "\n  1) Go to MyFurman. "
+					+ "\n  2) Navigate to the student's course credit summary. "
+					+ "\n  3) Click 'Download course credit summary to Excel via Email'"
+					+ "\n  4) Go to your email, download, and save that file."
+					+ "\n  5) The next window will allow you to navigate through the files on "
+					+ "\n your computer and choose the one you just saved."
+					+ "\n  6)Click Open after you've selected the desired file.");
 		JFileChooser fc = new JFileChooser(
 				Paths.get(".").toAbsolutePath().normalize().toString()){
 			private static final long serialVersionUID = 1L;
