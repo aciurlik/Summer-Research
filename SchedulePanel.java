@@ -104,10 +104,13 @@ public class SchedulePanel extends JPanel implements ActionListener{
 		for(int i = 0; i < schSemesters.size() ; i ++){
 			Semester s =  schSemesters.get(i);
 			if(s.isTaken()){
-				//Makes it so you don't get errors from taken semesters
-				//TODO find a better place to put this logic, or else
-				// explain why the best place to put it is in the 
-				// schedule panel update method.
+				// TODO Makes it so you don't get errors from taken semesters
+				//Since the semesters and created in tandem with the list, you
+				//cannot set these limits when the semester is created.
+				//They must be created when looking at the whole group
+				//of them because their assignment depends on their position in the group.
+				//Thus they exist in the update of schedulePanel because this is the class
+				//responsible for putting these in order.
 				s.setOverloadLimit(1000);
 
 			}
