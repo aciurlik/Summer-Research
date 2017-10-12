@@ -700,7 +700,8 @@ public class CourseList implements java.io.Serializable  {
 					}
 					break;
 				case "HB":
-					//every major type needs 2 hb.					newNumToChoose = 2;
+					//every major type needs 2 hb.					
+					newNumToChoose = 2;
 					break;
 				case "WC":
 				case "NE":
