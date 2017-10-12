@@ -138,13 +138,13 @@ public class StartUpMenu implements ActionListener {
 				//settings given by the user. 
 				doNotShowAgain.setSelected(true);
 			}
-			buttonPanel.add(doNotShowAgain, BorderLayout.WEST);
+			buttonPanel.add(doNotShowAgain, BorderLayout.CENTER);
 		}
 
 		buttonPanel.revalidate();
 		buttonPanel.repaint();
 
-		layer.add(buttonPanel, BorderLayout.CENTER);
+		layer.add(buttonPanel, BorderLayout.EAST);
 
 		layer.revalidate();
 		layer.repaint();
