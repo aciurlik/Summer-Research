@@ -2,6 +2,8 @@
 
 # Summer-Research
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/41914b7b0374468790180485436115f5)](https://www.codacy.com/app/aciurlik/Summer-Research?utm_source=github.com&utm_medium=referral&utm_content=aciurlik/Summer-Research&utm_campaign=badger)
+
 Quick start for a coder:
     Check out the code, there should be reasonably good comments. If you want to turn the java code into a .jar file, we used
     eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
