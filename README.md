@@ -4,17 +4,19 @@
 
 Quick start for a coder:
     Check out the code, there should be reasonably good comments. If you want to turn the java code into a .jar file, we used
-    eclipse Luna and did File --> Export --> Java --> RunnableJAR file, with Driver as the main class. If you have another way to 
-    turn code into a .jar, you can use that.
+    eclipse Luna and did ``File --> Export --> Java --> RunnableJAR`` file, with Driver as the main class. If you have another way to 
+    turn code into a ``.jar``, you can use that.
 
 
 ## Introduction
-  #### Purpose 
-     This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
-     and more time planning life pathways.
-  #### Goals
-    Usable by faculty and students 
-      including the old professors who are scared of computers
+
+#### Purpose 
+This program is intended to be a useful tool for advising, so that Furman advisors can spend less time scheduling courses
+and more time planning life pathways.
+
+#### Goals
+Usable by faculty and students 
+including the old professors who are scared of computers
       Easy and quick - make a schedule from scratch in 5 min or less
       Not clunky
     Easy to mofidy a schedule
@@ -38,9 +40,9 @@ Quick start for a coder:
         as in "any GER", "any TA," "HST 141," or "HST 141-02"
 ## Background
 
-    The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
+The objects in this program are divided into three major groups - the Data group, the File group, and the GUI group.
     Data objects handle the actual schedule - the main class in this group is the Schedule class. This group includes classes
-        like Requirement, ScheduleElement, and Schedule. Only Schedule should be allowed to request user events from
+        like Requirement, ``ScheduleElement``, and ``Schedule``. Only Schedule should be allowed to request user events from
         the GUI group, other classes should simply inform Schedule that user intervention may be required.
     File groups handle collection of raw data from furman. Currently they use files to do so. File classes should be 
          the ONLY classes that use files in any way - all other classes can only use strings provided by file classes.
@@ -53,21 +55,22 @@ Quick start for a coder:
         all modifications to the schedule should be passed to the SchdeuleGUI, which
         may then inform schedule that a user has requested a change.
 ### Data Group Object Descriptions
-  a. Schedule
-    A list of available semesters, each of which contains ScheduleElements
+
+* Schedule
+    * A list of available semesters, each of which contains ScheduleElements
     Also holds the list of majors that the user has chosen, and handles GER requirements.
     This class is the go-between for the Data side and the GUI side
 
-  b. ScheduleElement
-    Anything that can be added to a semester's plans.
+* ScheduleElement
+    * Anything that can be added to a semester's plans.
     Includes Course, Prefix, and Requirement.
     
-  c. Major
-    A fixed collection of requirements.
+* Major
+    * A fixed collection of requirements.
     Tracks, GERs, Minors, and the collection of unsatisfied Prereqs are all represented with Major objects.
       
-  d. Requirement
-    Represents a collection of needed courses by the course's prefixes (i.e., "MTH-120")
+* Requirement
+    * Represents a collection of needed courses by the course's prefixes (i.e., "MTH-120")
     Every requirement has a number to choose, and a list of choices. The choices may themselves be requirements.
     There is a subclass TerminalRequirement that represents a requirement with only 1 choice.
     Requirements have their own specification language that includes strings like "MTH-150", "3 of (MTH-110, MTH-120, MTH-130),"
@@ -81,29 +84,36 @@ Quick start for a coder:
  
   
 ### GUI group object descriptions
-  a. ScheduleGUI 
-      Communicates with the Data group via a Schedule object.
+
+* ScheduleGUI 
+    * Communicates with the Data group via a Schedule object.
       Represents one open window.
       Handles updating all subcomponents based on the Schedule's data, by using the update() method.
-  b. SchedulePanel
-      Represents the top part of the GUI, where semesters are displayed.
-  c. MajorListPanel
-      Represents the bottom right part of the GUI, where majors are listed out.
-  d. AdditionsPanel / BellTower
-      The two panels to the left of the MajorListPanel, one which is a picture of the belltower and fills as you 
+      
+* SchedulePanel
+    * Represents the top part of the GUI, where semesters are displayed.
+      
+* MajorListPanel
+    * Represents the bottom right part of the GUI, where majors are listed out.
+      
+* AdditionsPanel / BellTower
+    * The two panels to the left of the MajorListPanel, one which is a picture of the belltower and fills as you 
       complete your requirements, the other which includes lots of high-impact buttons for freshman
-  e. MainMenuBar
-      The MenuBar at the top of the program.
+      
+* MainMenuBar
+    * The MenuBar at the top of the program.
     
 ### File group object descriptions
-  a. FileHandler
-      Handles all files and collecting data, including images, course catalogs, saved schedules, and major files.
+* FileHandler
+    * Handles all files and collecting data, including images, course catalogs, saved schedules, and major files.
       All data is currently stored in the two folder "Resources" and "UserData."
-  b. CourseList
-      The list of available courses. May be replaced with a database system later. Includes methods to filter the course list
+      
+* CourseList
+    * The list of available courses. May be replaced with a database system later. Includes methods to filter the course list
       (getCoursesSatisfying(Predicate<Course>) is the most general)
-  c. ListOfMajors
-      The list of all available majors.
+    
+* ListOfMajors
+    * The list of all available majors.
   
 ### Optimization
 
