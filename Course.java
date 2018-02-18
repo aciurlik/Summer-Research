@@ -465,8 +465,9 @@ public class Course implements java.io.Serializable{
 	public static Course readFromFurmanData(ArrayList<String> furmanData){
 		String semesterString = furmanData.get(0); // EX "Fall 2017 - Day"
 		String section = furmanData.get(1); // EX "ACC-111-01"
-		String title = furmanData.get(3);  // EX "Financial Accounting Prncpls"
+		String title = furmanData.get(3);  // EX "Financial Accounting Prncpls";
 		int creditHours = Integer.parseInt(furmanData.get(4));
+	
 		String instructionalMethod = furmanData.get(5); 
 		// Known examples 
 		// EXAM, LEC, LAB, IDI, STU, SKL, SEM, ADD, ACT, blank 

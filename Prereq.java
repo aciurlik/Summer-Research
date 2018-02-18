@@ -48,7 +48,6 @@ public class Prereq implements java.io.Serializable{
 			}
 		}
 		taken.removeAll(toRemove);
-		
 		//Update on the new array list.
 		this.r.updateAllStoredValues(taken);
 	}

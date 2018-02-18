@@ -439,7 +439,7 @@ public class ScheduleGUI   {
 		LocalDate localDate = LocalDate.now();
 		finalPrint += "<br>" + dtf.format(localDate) + "<br>";
 
-		int userSelection = (int) JOptionPane.showOptionDialog(null, options, "Format", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int userSelection = (int) JOptionPane.showOptionDialog(null, options, "Format", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
 		if(userSelection == 2 || userSelection == -1){//Cancel button, or "X"
 			return;
 		}
@@ -472,11 +472,11 @@ public class ScheduleGUI   {
 
 		//Places it in scroll Pane for User view. 
 		JScrollPane scrollPane = new JScrollPane(schedulePrint);
-		scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width,schedulePrint.getPreferredSize().height));
+		scrollPane.setPreferredSize(new Dimension(schedulePrint.getPreferredSize().width -150,schedulePrint.getPreferredSize().height-150));
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		String[] choices= {"Print", "Cancel"};
 		//Allows user to cancel Print	
-		int userChoice = (int) JOptionPane.showOptionDialog(null, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+		int userChoice = (int) JOptionPane.showOptionDialog(null, scrollPane, "Print Preview", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
 		if(userChoice == 0){
 			try {
 				schedulePrint.print();

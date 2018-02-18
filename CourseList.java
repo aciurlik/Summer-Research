@@ -1072,8 +1072,8 @@ public class CourseList implements java.io.Serializable  {
 
 
 	public static void main(String[] args){
-	//	viewKnownPrereqs();
-
+	// viewKnownPrereqs();
+		
 	}
 
 }
