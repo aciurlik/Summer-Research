@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -734,19 +735,20 @@ public class FileHandler{
 	private static ArrayList<ImageIcon> loadInstructions(){
 		File folder = new File(startUpFolder);
 		ArrayList<ImageIcon> result = new ArrayList<ImageIcon>();
-		for (File f: folder.listFiles(
-				new FileFilter(){
-					@Override
-					public boolean accept(File pathname) {
-						String fullName = pathname.getAbsolutePath();
-						int i = fullName.lastIndexOf('.');
-						if(i <= 0){
-							return false;
-						}
-						return pathname.isFile();
-					}
+		
+		File[] files = folder.listFiles(new FileFilter(){
+			@Override
+			public boolean accept(File pathname) {
+				String fullName = pathname.getAbsolutePath();
+				int i = fullName.lastIndexOf('.');
+				if(i <= 0){
+					return false;
 				}
-				)){
+				return pathname.isFile();
+			}});
+		Arrays.sort(files);
+		
+		for (File f: files){
 			try{
 				ImageIcon image = new ImageIcon(f.toString());
 			//	if(f.toString().equals("1.png")){
